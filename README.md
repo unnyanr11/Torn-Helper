@@ -30,7 +30,12 @@ npm run dev
 supabase functions deploy link-torn-key
 supabase functions deploy refresh-targets
 supabase functions deploy refresh-live-data
+supabase functions deploy evaluate-alerts
 ```
+
+## Schedule the alert job
+
+In the Supabase dashboard, create a cron job (pg_cron) calling the `evaluate-alerts` function every 5 minutes, or use Supabase's scheduled functions feature.
 
 ## Regenerate API capability registry
 
@@ -53,6 +58,7 @@ node scripts/generate-capabilities.mjs
 - [x] Step 11: racing (manual race log with best-time highlight)
 - [x] Step 12: community (posts with categories and moderation flag)
 - [x] Step 13: live data feeds (travel, market, stocks, company via cached refresh)
-- [ ] Later phases: alert evaluation job, estimate integrations
+- [x] Step 14: alert-evaluation job (notifications table, evaluate-alerts function, Notifications UI)
+- [ ] Later phases: estimate integrations
 
 All data in Demo Mode is seeded sample data and is never presented as live.

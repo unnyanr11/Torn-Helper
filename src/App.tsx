@@ -4,6 +4,7 @@ import Overview from './pages/Overview';
 import Planner from './pages/Planner';
 import Targets from './pages/Targets';
 import Alerts from './pages/Alerts';
+import Notifications from './pages/Notifications';
 import WarRoom from './pages/WarRoom';
 import Payouts from './pages/Payouts';
 import Losses from './pages/Losses';
@@ -49,6 +50,7 @@ export default function App() {
         {page === 'Planner' && <Planner />}
         {page === 'Targets' && <Targets />}
         {page === 'Alerts' && <Alerts />}
+        {page === 'Notifications' && <Notifications />}
         {page === 'War Room' && <WarRoom />}
         {page === 'Payouts' && <Payouts />}
         {page === 'Losses' && <Losses />}
@@ -61,7 +63,7 @@ export default function App() {
         {page === 'Community' && <Community />}
         {page === 'Live Feeds' && <LiveFeeds />}
         {page === 'API Usage' && <ApiUsage />}
-        {!['Overview','Planner','Targets','Alerts','War Room','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','API Usage'].includes(page) && <Placeholder name={page} />}
+        {!['Overview','Planner','Targets','Alerts','Notifications','War Room','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','API Usage'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );
