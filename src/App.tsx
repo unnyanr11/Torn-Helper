@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { BUILT, NAV, Page } from './nav';
 import Overview from './pages/Overview';
+import Planner from './pages/Planner';
+import Targets from './pages/Targets';
 import ApiUsage from './pages/ApiUsage';
 import Placeholder from './pages/Placeholder';
 
@@ -32,8 +34,10 @@ export default function App() {
           </button>
         </header>
         {page === 'Overview' && <Overview />}
+        {page === 'Planner' && <Planner />}
+        {page === 'Targets' && <Targets />}
         {page === 'API Usage' && <ApiUsage />}
-        {page !== 'Overview' && page !== 'API Usage' && <Placeholder name={page} />}
+        {!['Overview','Planner','Targets','API Usage'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );
