@@ -7,6 +7,7 @@ import ComparePlayers from './pages/ComparePlayers';
 import Leaderboards from './pages/Leaderboards';
 import RoiCalculator from './pages/RoiCalculator';
 import PiMortgages from './pages/PiMortgages';
+import Bounties from './pages/Bounties';
 import Alerts from './pages/Alerts';
 import Notifications from './pages/Notifications';
 import WarRoom from './pages/WarRoom';
@@ -66,6 +67,7 @@ export default function App() {
         {page === 'Leaderboards' && <Leaderboards />}
         {page === 'ROI Calculator' && <RoiCalculator />}
         {page === 'PI Mortgages' && <PiMortgages />}
+        {page === 'Bounties' && <Bounties />}
         {page === 'Alerts' && <Alerts />}
         {page === 'Notifications' && <Notifications />}
         {page === 'War Room' && <WarRoom />}
@@ -89,7 +91,7 @@ export default function App() {
         {page === 'Graffiti' && <Graffiti />}
         {page === 'Reports' && <Reports />}
         {page === 'API Usage' && <ApiUsage />}
-        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Estimates','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage'].includes(page) && <Placeholder name={page} />}
+        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Estimates','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );
