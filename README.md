@@ -45,6 +45,7 @@ node scripts/generate-capabilities.mjs
 - [x] Step 4: key linking Edge Function with encryption + disclosure table
 - [x] Step 5: planner and levelling list UI screens
 - [x] Step 6: target intelligence (live status refresh, observations, estimates, alert center)
-- [ ] Later phases: war room, payouts, losses, travel, markets, etc.
+- [x] Step 7: war room (wars, 15-min target claims) and payouts (deterministic allocation, draft runs)
+- [ ] Later phases: losses marketplace, travel, markets, company, properties, racing, community, etc.
 
 All data in Demo Mode is seeded sample data and is never presented as live.

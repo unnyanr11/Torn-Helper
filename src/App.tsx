@@ -4,6 +4,8 @@ import Overview from './pages/Overview';
 import Planner from './pages/Planner';
 import Targets from './pages/Targets';
 import Alerts from './pages/Alerts';
+import WarRoom from './pages/WarRoom';
+import Payouts from './pages/Payouts';
 import ApiUsage from './pages/ApiUsage';
 import Placeholder from './pages/Placeholder';
 
@@ -38,8 +40,10 @@ export default function App() {
         {page === 'Planner' && <Planner />}
         {page === 'Targets' && <Targets />}
         {page === 'Alerts' && <Alerts />}
+        {page === 'War Room' && <WarRoom />}
+        {page === 'Payouts' && <Payouts />}
         {page === 'API Usage' && <ApiUsage />}
-        {!['Overview','Planner','Targets','Alerts','API Usage'].includes(page) && <Placeholder name={page} />}
+        {!['Overview','Planner','Targets','Alerts','War Room','Payouts','API Usage'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );
