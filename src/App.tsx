@@ -28,6 +28,7 @@ import WarRoom from './pages/WarRoom';
 import WarAnalyzer from './pages/WarAnalyzer';
 import PayoutCalculator from './pages/PayoutCalculator';
 import LossMarketplace from './pages/LossMarketplace';
+import TornStats from './pages/TornStats';
 import Travel from './pages/Travel';
 import Markets from './pages/Markets';
 import Stocks from './pages/Stocks';
@@ -107,6 +108,7 @@ export default function App() {
         {page === 'War Analyzer' && <WarAnalyzer />}
         {page === 'Payouts' && <PayoutCalculator />}
         {page === 'Losses' && <LossMarketplace />}
+        {page === 'TornStats' && <TornStats />}
         {page === 'Travel' && <Travel />}
         {page === 'Markets' && <Markets />}
         {page === 'Stocks' && <Stocks />}
@@ -126,7 +128,7 @@ export default function App() {
         {page === 'Public API' && <PublicApi />}
         {page === 'Admin Cost Dashboard' && <AdminCostDashboard />}
         {page === 'Competitor Matrix' && <CompetitorMatrix />}
-        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Flight Tracker','Dibs','Target Pools','Tornipedia','Assistant','Discord','Notification Prefs','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage','Public API','Admin Cost Dashboard','Competitor Matrix'].includes(page) && <Placeholder name={page} />}
+        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Flight Tracker','Dibs','Target Pools','Tornipedia','Assistant','Discord','Notification Prefs','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','TornStats','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage','Public API','Admin Cost Dashboard','Competitor Matrix'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );
