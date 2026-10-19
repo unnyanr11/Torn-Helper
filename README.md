@@ -75,6 +75,7 @@ node scripts/generate-capabilities.mjs
 - [x] Step 21: graffiti wall (alliance-scoped posts, reactions, pin/hide moderation, RLS; Graffiti UI)
 - [x] Step 22: exports & reports (client-side CSV export across 15 data sources, row-count summary, RLS-aware; Reports UI)
 - [x] Step 23: AI war analyzer (analysis jsonb on wars, analyze-war Edge Function with coverage/online-rate/target-ranking heuristics, War Analyzer UI)
-- [ ] Pending: image uploads for graffiti, Compare Players, Leaderboards, ROI Calculator, PI Mortgages, Bounties, 217-stat catalog, custom stat columns, TornStats/FFScouter deep integration, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
+- [x] Step 24: Compare Players (client-side 2-5 player ID comparison across targets, latest estimates, observation-based online rate; Compare Players UI)
+- [ ] Pending: image uploads for graffiti, Leaderboards, ROI Calculator, PI Mortgages, Bounties, 217-stat catalog, custom stat columns, TornStats/FFScouter deep integration, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
 
 All data in Demo Mode is seeded sample data and is never presented as live.
