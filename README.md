@@ -29,6 +29,7 @@ npm run dev
 ```bash
 supabase functions deploy link-torn-key
 supabase functions deploy refresh-targets
+supabase functions deploy refresh-live-data
 ```
 
 ## Regenerate API capability registry
@@ -51,6 +52,7 @@ node scripts/generate-capabilities.mjs
 - [x] Step 10: company and properties (manual snapshots and property tracker)
 - [x] Step 11: racing (manual race log with best-time highlight)
 - [x] Step 12: community (posts with categories and moderation flag)
-- [ ] Later phases: live data feeds, alert evaluation job, estimate integrations
+- [x] Step 13: live data feeds (travel, market, stocks, company via cached refresh)
+- [ ] Later phases: alert evaluation job, estimate integrations
 
 All data in Demo Mode is seeded sample data and is never presented as live.
