@@ -19,6 +19,8 @@ import FlightTracker from './pages/FlightTracker';
 import Dibs from './pages/Dibs';
 import TargetPools from './pages/TargetPools';
 import Glossary from './pages/Glossary';
+import Discord from './pages/Discord';
+import NotificationPrefs from './pages/NotificationPrefs';
 import Alerts from './pages/Alerts';
 import Notifications from './pages/Notifications';
 import WarRoom from './pages/WarRoom';
@@ -89,6 +91,8 @@ export default function App() {
         {page === 'Dibs' && <Dibs />}
         {page === 'Target Pools' && <TargetPools />}
         {page === 'Tornipedia' && <Glossary />}
+        {page === 'Discord' && <Discord />}
+        {page === 'Notification Prefs' && <NotificationPrefs />}
         {page === 'Alerts' && <Alerts />}
         {page === 'Notifications' && <Notifications />}
         {page === 'War Room' && <WarRoom />}
@@ -111,7 +115,7 @@ export default function App() {
         {page === 'Graffiti' && <Graffiti />}
         {page === 'Reports' && <Reports />}
         {page === 'API Usage' && <ApiUsage />}
-        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Flight Tracker','Dibs','Target Pools','Tornipedia','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage'].includes(page) && <Placeholder name={page} />}
+        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Flight Tracker','Dibs','Target Pools','Tornipedia','Discord','Notification Prefs','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
-interface Post { id: string; alliance_id: string; author_user_id: string; body: string; pinned: boolean; hidden: boolean; created_at: string; }
-interface Reaction { id: string; post_id: string; emoji: string; }
+interface Post { id: string; alliance_id: string; author_user_id: string; body: string; pinned: boolean; hidden: boolean; image_url: string; created_at: string }
+interface Reaction { id: string; post_id: string; emoji: string }
 
 const EMOJIS = ['👍', '👎', '❤️', '😂', '😮'];
 
@@ -11,6 +11,7 @@ export default function Graffiti() {
   const [reactions, setReactions] = useState<Reaction[]>([]);
   const [allianceId, setAllianceId] = useState('');
   const [body, setBody] = useState('');
+  const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => { load(); }, []);
@@ -24,18 +25,22 @@ export default function Graffiti() {
     else setReactions(r ?? []);
   }
 
-  async function setAlliance(id: string) {
-    setAllianceId(id);
-    await load();
-  }
-
   async function post() {
-    if (!allianceId || !body.trim()) { setError('Select an alliance and enter a message'); return; }
+    if (!allianceId || (!body.trim() && !file)) { setError('Select an alliance and enter a message or attach an image'); return; }
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    const { error } = await supabase.from('graffiti_posts').insert({ alliance_id: allianceId, author_user_id: user.id, body: body.trim().slice(0, 500) });
+    let imageUrl: string | null = null;
+    if (file) {
+      const ext = file.name.split('.').pop();
+      const path = `${user.id}/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from('graffiti-images').upload(path, file);
+      if (upErr) { setError(upErr.message); return; }
+      const { data } = supabase.storage.from('graffiti-images').getPublicUrl(path);
+      imageUrl = data.publicUrl;
+    }
+    const { error } = await supabase.from('graffiti_posts').insert({ alliance_id: allianceId, author_user_id: user.id, body: body.trim().slice(0, 500) || null, image_url: imageUrl });
     if (error) setError(error.message);
-    else { setBody(''); load(); }
+    else { setBody(''); setFile(null); load(); }
   }
 
   async function react(postId: string, emoji: string) {
@@ -68,15 +73,16 @@ export default function Graffiti() {
   return (
     <section>
       <h2>Graffiti Wall</h2>
-      <p className="muted">Short text posts (max 500 chars) scoped to your alliance. Officers can pin or hide; authors can delete their own posts.</p>
+      <p className="muted">Short text posts (max 500 chars) and optional image uploads, scoped to your alliance. Officers can pin or hide; authors can delete their own posts.</p>
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Alliance ID</h3>
-        <input className="nu-input" placeholder="Alliance ID" value={allianceId} onChange={(e) => setAlliance(e.target.value)} />
+        <input className="nu-input" placeholder="Alliance ID" value={allianceId} onChange={(e) => setAllianceId(e.target.value)} />
       </article>
       <article className="card nu-inset">
         <h3>New post</h3>
         <textarea className="nu-input" placeholder="Message (max 500 chars)" value={body} onChange={(e) => setBody(e.target.value)} rows={3} maxLength={500} />
+        <input className="nu-input" type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
         <button className="nu-btn" onClick={post}>Post</button>
       </article>
       <div className="grid">
@@ -86,7 +92,8 @@ export default function Graffiti() {
           return (
             <article key={p.id} className={`card ${p.pinned ? 'nu-raised' : 'nu-inset'}`}>
               {p.pinned && <span className="badge">📌 pinned</span>}
-              <p>{p.body}</p>
+              {p.body && <p>{p.body}</p>}
+              {p.image_url && <img src={p.image_url} alt="graffiti" style={{ maxWidth: '100%', borderRadius: 8, marginTop: 8 }} />}
               <p className="muted">{new Date(p.created_at).toLocaleString()}</p>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 {EMOJIS.map((e) => (

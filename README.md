@@ -23,6 +23,7 @@ npm run dev
    openssl rand -base64 32
    supabase secrets set TORN_KEY_ENCRYPTION_KEY=<your-base64-key>
    ```
+5. Create a public Storage bucket named `graffiti-images` for graffiti image uploads.
 
 ## Deploy Edge Functions
 
@@ -46,12 +47,10 @@ node scripts/generate-capabilities.mjs
 
 ## Status (delivery checklist)
 
-- [x] Steps 1-36: app shell through build detection (see git history for full list)
-- [x] Step 37: flight tracker (flight_logs table, owner RLS, log/status/delete; Flight Tracker UI)
-- [x] Step 38: hospital-timer dibs (dibs table, owner RLS, claim window with expiry; Dibs UI)
-- [x] Step 39: target pools (target_pools table with bigint[] target lists, owner RLS; Target Pools UI)
-- [x] Step 40: Tornipedia glossary (static searchable glossary of Torn terms; Glossary UI)
-- [x] Step 41: fine-grained activity tracking (5-minute auto-refresh polling option on Activity page)
-- [ ] Pending: image uploads for graffiti, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
+- [x] Steps 1-41: app shell through fine-grained activity tracking (see git history for full list)
+- [x] Step 42: graffiti image uploads (image_url column, Supabase Storage upload/display in Graffiti UI)
+- [x] Step 43: Discord webhook integration (discord_webhooks table, owner RLS, add/send/delete webhooks; Discord UI)
+- [x] Step 44: notification preferences (notification_preferences table, email/push opt-in toggles; Notification Prefs UI)
+- [ ] Pending: companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
 
 All data in Demo Mode is seeded sample data and is never presented as live.
