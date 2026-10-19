@@ -84,24 +84,28 @@ Per-feature audit table (spec section 7C #16) covering 16 features across TornSt
 
 ## Halloween Tools
 
-Seasonal event tracker (spec Phase 22): log candy/chocolate/plushie/flower hauls with source, view totals by type and grand total, approximate NPC spawn timers, and manage recent haul history. Backed by `halloween_candy_log` table with owner-only RLS.
+Seasonal event tracker (spec Phase 22): log candy/chocolate/plushie/flower hauls with source, view totals by type and grand total, approximate NPC spawn timers, and manage recent haul history.
 
 ## Faction Operations
 
-Roster management, chain state tracking, armory inventory, and territory control toggling. Backed by four tables all with owner-only RLS.
+Roster management, chain state tracking, armory inventory, and territory control toggling.
 
 ## Faction Finance
 
-Money requests (submit → pending → approve&pay / reject) with automatic ledger withdrawal on approval, plus a manual ledger with running balance.
+Money requests with approval workflow and a running ledger.
 
 ## Faction Upgrade Simulation
 
-Plan respect spending across faction upgrade branches: enter current level, target level, and respect cost per level (manual input, labelled as such); app calculates per-branch and total respect needed.
+Plan respect spending across faction upgrade branches with per-branch and total respect totals.
+
+## Alliance Sharing
+
+Scoped resource sharing with alliance/sister factions by role (member/officer/leader) across target lists, spy reports, war reports, ledger, and custom resources. Instant revoke and reactivate.
 
 ## Status (delivery checklist)
 
-- [x] Steps 1-59: app shell through faction finance (see git history for full list)
-- [x] Step 60: Faction upgrade simulation (0042 migration with faction_upgrade_simulations + RLS; FactionUpgrades page with branch sims and respect totals)
-- [ ] Pending: deeper alliance sharing, AI provider wiring, retention trends, armory history/loans
+- [x] Steps 1-60: app shell through faction upgrade simulation (see git history for full list)
+- [x] Step 61: Deeper alliance sharing & revocation (0043 migration with alliance_sharing_grants + RLS; AllianceSharing page with grant/revoke/reactivate by role)
+- [ ] Pending: AI provider wiring, retention trends, armory history/loans
 
 All data in Demo Mode is seeded sample data and is never presented as live.
