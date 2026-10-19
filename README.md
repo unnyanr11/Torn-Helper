@@ -88,12 +88,16 @@ Seasonal event tracker (spec Phase 22): log candy/chocolate/plushie/flower hauls
 
 ## Faction Operations
 
-Roster management (add/update/remove members with Torn ID, name, role, level), chain state tracking (current/best/timeout), armory inventory (item/quantity/total value with aggregate), and territory control toggling. Backed by four tables (faction_members, faction_chain_state, faction_armory, faction_territory) all with owner-only RLS.
+Roster management, chain state tracking, armory inventory, and territory control toggling. Backed by four tables all with owner-only RLS.
+
+## Faction Finance
+
+Money requests (submit → pending → approve&pay / reject) with automatic ledger withdrawal on approval, plus a manual ledger (deposit/withdrawal/loan/repayment/expense/income) with running balance. Backed by `faction_money_requests` and `faction_ledger_entries` tables with owner-only RLS.
 
 ## Status (delivery checklist)
 
-- [x] Steps 1-57: app shell through Halloween tools (see git history for full list)
-- [x] Step 58: Faction operations depth (0040 migration with 4 tables + RLS; FactionOps page with roster/chain/armory/territory)
-- [x] All pending items from the original delivery checklist are now complete.
+- [x] Steps 1-58: app shell through faction operations depth (see git history for full list)
+- [x] Step 59: Faction money requests & ledger (0041 migration with faction_money_requests + faction_ledger_entries + RLS; FactionFinance page with request workflow, approval, ledger)
+- [ ] Pending: faction upgrade simulation, deeper alliance sharing, AI provider wiring, retention trends
 
 All data in Demo Mode is seeded sample data and is never presented as live.
