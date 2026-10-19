@@ -1,4 +1,4 @@
-const CACHE = "tcc-shell-v3";
+const CACHE = "tcc-shell-v4-spatial";
 self.addEventListener("install", (e) => {
   e.waitUntil(
     caches
@@ -13,7 +13,9 @@ self.addEventListener("activate", (e) => {
       .keys()
       .then((keys) =>
         Promise.all(
-          keys.filter((k) => k.startsWith("tcc-") && k !== CACHE).map((k) => caches.delete(k)),
+          keys
+            .filter((k) => k.startsWith("tcc-") && k !== CACHE)
+            .map((k) => caches.delete(k)),
         ),
       ),
   );

@@ -1,3 +1,4 @@
+import SpatialShell from "./components/SpatialShell";
 import TornDataShortcut from "./components/TornDataShortcut";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { NAV, Page } from "./nav";
@@ -161,148 +162,107 @@ export default function App() {
     window.addEventListener("hashchange", route);
     return () => window.removeEventListener("hashchange", route);
   }, []);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
-  const [open, setOpen] = useState(false);
-
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    if ("serviceWorker" in navigator) {
+    if ("serviceWorker" in navigator)
       navigator.serviceWorker.register("/sw.js").catch(() => {});
-    }
-  }, [theme]);
-
+  }, []);
   return (
-    <div className="layout">
-      <button
-        className="nu-btn menu-btn"
-        aria-label="Toggle navigation"
-        onClick={() => setOpen(!open)}
-      >
-        ☰
-      </button>
-      <nav
-        className={`sidebar nu-raised ${open ? "open" : ""}`}
-        aria-label="Main"
-      >
-        <h1 className="brand">Torn Command Center</h1>
-        {NAV.filter((n) => canAccessPage(n, signedIn, role)).map((n) => (
-          <button
-            key={n}
-            className={`nu-btn nav-item ${n === page ? "active" : ""}`}
-            aria-current={n === page ? "page" : undefined}
-            onClick={() => {
-              setSharedToken("");
-              setPage(n);
-              location.hash = encodeURIComponent(n);
-              setOpen(false);
-            }}
-          >
-            {n}
-          </button>
-        ))}
-      </nav>
-      <main className="content">
-        <header className="topbar nu-raised">
-          <span className="badge">
-            {sharedToken
-              ? "SHARED SNAPSHOT · published report, not live game data"
-              : signedIn
-                ? "SIGNED IN · manual records and API observations are labelled by source"
-                : "SIGN IN · connect your account to view your data"}
-          </span>
-          <button
-            className="nu-btn"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            {theme === "dark" ? "Light" : "Dark"} mode
-          </button>
-        </header>
-        <Suspense fallback={<p role="status">Loading workspace…</p>}>
-          {sharedToken ? (
-            <SharedReport token={sharedToken} />
-          ) : !authReady ? (
-            <p role="status">Checking session…</p>
-          ) : authError ? (
-            <p role="alert">{authError}</p>
-          ) : !signedIn ? (
-            <Settings />
-          ) : !canAccessPage(page, signedIn, role) ? (
-            <p role="alert">Your account does not have access to this page.</p>
-          ) : (
-            <div key={accountId ?? "signed-out"}>
-              <TornDataShortcut page={page} />
-              {page === "Overview" && <Overview />}
-              {page === "Settings" && <Settings />}
-              {page === "Player Intel" && <PlayerIntel />}
-              {page === "Planner" && <Planner />}
-              {page === "Targets" && <Targets />}
-              {page === "Compare Players" && <ComparePlayers />}
-              {page === "Leaderboards" && <Leaderboards />}
-              {page === "ROI Calculator" && <RoiCalculator />}
-              {page === "PI Mortgages" && <PiMortgages />}
-              {page === "Bounties" && <Bounties />}
-              {page === "Stats Catalog" && <StatsCatalog />}
-              {page === "Custom Stats" && <CustomStats />}
-              {page === "Stat Intelligence" && <StatIntelligence />}
-              {page === "Stat Growth" && <StatGrowth />}
-              {page === "Spy Reports" && <SpyReports />}
-              {page === "War Hits" && <WarHits />}
-              {page === "Crime Tracker" && <CrimeTracker />}
-              {page === "Flight Tracker" && <FlightTracker />}
-              {page === "Dibs" && <Dibs />}
-              {page === "Target Pools" && <TargetPools />}
-              {page === "Tornipedia" && <Glossary />}
-              {page === "Assistant" && <Assistant />}
-              {page === "Discord" && <Discord />}
-              {page === "Notification Prefs" && <NotificationPrefs />}
-              {page === "Alerts" && <Alerts />}
-              {page === "Notifications" && <Notifications />}
-              {page === "War Room" && <WarRoom />}
-              {page === "War Analyzer" && <WarAnalyzer />}
-              {page === "AI War Analyzer" && <AiWarAnalyzer />}
-              {page === "Payouts" && <PayoutCalculator />}
-              {page === "Losses" && <LossMarketplace />}
-              {page === "TornStats" && <TornStats />}
-              {page === "Travel" && <Travel />}
-              {page === "Travel Optimizer" && <TravelOptimizer />}
-              {page === "OC Planner" && <OcPlanner />}
-              {page === "Chain Queue" && <ChainQueue />}
-              {page === "Daily Digest" && <DailyDigest />}
-              {page === "Revive Tracker" && <ReviveTracker />}
-              {page === "Revive Marketplace" && <ReviveMarketplace />}
-              {page === "Settlement Queue" && <SettlementQueue />}
-              {page === "Operator Dashboard" && <OperatorDashboard />}
-              {page === "AI Settings" && <AiSettings />}
-              {page === "Markets" && <Markets />}
-              {page === "Stocks" && <Stocks />}
-              {page === "Company" && <Company />}
-              {page === "Properties" && <Properties />}
-              {page === "Racing" && <Racing />}
-              {page === "Community" && <Community />}
-              {page === "Live Feeds" && <LiveFeeds />}
-              {page === "Alliances" && <Alliances />}
-              {page === "Watched Factions" && <WatchedFactions />}
-              {page === "Recruitment" && <Recruitment />}
-              {page === "Gym" && <Gym />}
-              {page === "Activity" && <Activity />}
-              {page === "Graffiti" && <Graffiti />}
-              {page === "Reports" && <Reports />}
-              {page === "API Usage" && <ApiUsage />}
-              {page === "Public API" && <PublicApi />}
-              {page === "Admin Cost Dashboard" && <AdminCostDashboard />}
-              {page === "Competitor Matrix" && <CompetitorMatrix />}
-              {page === "Halloween" && <Halloween />}
-              {page === "Faction" && <FactionOps />}
-              {page === "Faction Finance" && <FactionFinance />}
-              {page === "Faction Upgrades" && <FactionUpgrades />}
-              {page === "Alliance Sharing" && <AllianceSharing />}
-              {page === "Retention Trends" && <RetentionTrends />}
-              {page === "Armory History" && <ArmoryHistory />}
-              {page === "Loan Reminders" && <LoanReminders />}
-            </div>
-          )}
-        </Suspense>
-      </main>
-    </div>
+    <SpatialShell
+      page={page}
+      signedIn={signedIn}
+      role={role}
+      shared={!!sharedToken}
+      onNavigate={(next) => {
+        setSharedToken("");
+        setPage(next);
+        location.hash = encodeURIComponent(next);
+      }}
+    >
+      <Suspense fallback={<p role="status">Loading workspace…</p>}>
+        {sharedToken ? (
+          <SharedReport token={sharedToken} />
+        ) : !authReady ? (
+          <p role="status">Checking session…</p>
+        ) : authError ? (
+          <p role="alert">{authError}</p>
+        ) : !signedIn ? (
+          <Settings />
+        ) : !canAccessPage(page, signedIn, role) ? (
+          <p role="alert">Your account does not have access to this page.</p>
+        ) : (
+          <div key={accountId ?? "signed-out"}>
+            <TornDataShortcut page={page} />
+            {page === "Overview" && <Overview />}
+            {page === "Settings" && <Settings />}
+            {page === "Player Intel" && <PlayerIntel />}
+            {page === "Planner" && <Planner />}
+            {page === "Targets" && <Targets />}
+            {page === "Compare Players" && <ComparePlayers />}
+            {page === "Leaderboards" && <Leaderboards />}
+            {page === "ROI Calculator" && <RoiCalculator />}
+            {page === "PI Mortgages" && <PiMortgages />}
+            {page === "Bounties" && <Bounties />}
+            {page === "Stats Catalog" && <StatsCatalog />}
+            {page === "Custom Stats" && <CustomStats />}
+            {page === "Stat Intelligence" && <StatIntelligence />}
+            {page === "Stat Growth" && <StatGrowth />}
+            {page === "Spy Reports" && <SpyReports />}
+            {page === "War Hits" && <WarHits />}
+            {page === "Crime Tracker" && <CrimeTracker />}
+            {page === "Flight Tracker" && <FlightTracker />}
+            {page === "Dibs" && <Dibs />}
+            {page === "Target Pools" && <TargetPools />}
+            {page === "Tornipedia" && <Glossary />}
+            {page === "Assistant" && <Assistant />}
+            {page === "Discord" && <Discord />}
+            {page === "Notification Prefs" && <NotificationPrefs />}
+            {page === "Alerts" && <Alerts />}
+            {page === "Notifications" && <Notifications />}
+            {page === "War Room" && <WarRoom />}
+            {page === "War Analyzer" && <WarAnalyzer />}
+            {page === "AI War Analyzer" && <AiWarAnalyzer />}
+            {page === "Payouts" && <PayoutCalculator />}
+            {page === "Losses" && <LossMarketplace />}
+            {page === "TornStats" && <TornStats />}
+            {page === "Travel" && <Travel />}
+            {page === "Travel Optimizer" && <TravelOptimizer />}
+            {page === "OC Planner" && <OcPlanner />}
+            {page === "Chain Queue" && <ChainQueue />}
+            {page === "Daily Digest" && <DailyDigest />}
+            {page === "Revive Tracker" && <ReviveTracker />}
+            {page === "Revive Marketplace" && <ReviveMarketplace />}
+            {page === "Settlement Queue" && <SettlementQueue />}
+            {page === "Operator Dashboard" && <OperatorDashboard />}
+            {page === "AI Settings" && <AiSettings />}
+            {page === "Markets" && <Markets />}
+            {page === "Stocks" && <Stocks />}
+            {page === "Company" && <Company />}
+            {page === "Properties" && <Properties />}
+            {page === "Racing" && <Racing />}
+            {page === "Community" && <Community />}
+            {page === "Live Feeds" && <LiveFeeds />}
+            {page === "Alliances" && <Alliances />}
+            {page === "Watched Factions" && <WatchedFactions />}
+            {page === "Recruitment" && <Recruitment />}
+            {page === "Gym" && <Gym />}
+            {page === "Activity" && <Activity />}
+            {page === "Graffiti" && <Graffiti />}
+            {page === "Reports" && <Reports />}
+            {page === "API Usage" && <ApiUsage />}
+            {page === "Public API" && <PublicApi />}
+            {page === "Admin Cost Dashboard" && <AdminCostDashboard />}
+            {page === "Competitor Matrix" && <CompetitorMatrix />}
+            {page === "Halloween" && <Halloween />}
+            {page === "Faction" && <FactionOps />}
+            {page === "Faction Finance" && <FactionFinance />}
+            {page === "Faction Upgrades" && <FactionUpgrades />}
+            {page === "Alliance Sharing" && <AllianceSharing />}
+            {page === "Retention Trends" && <RetentionTrends />}
+            {page === "Armory History" && <ArmoryHistory />}
+            {page === "Loan Reminders" && <LoanReminders />}
+          </div>
+        )}
+      </Suspense>
+    </SpatialShell>
   );
 }

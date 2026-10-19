@@ -6,7 +6,13 @@ export default function KeyDisclosure({
   session?: boolean;
 }) {
   return (
-    <div style={{ overflowX: "auto" }}>
+    <div
+      className="key-disclosure"
+      role="region"
+      aria-label="Key privacy and access disclosure"
+      tabIndex={0}
+      style={{ overflowX: "auto" }}
+    >
       <table>
         <thead>
           <tr>
