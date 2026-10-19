@@ -11,6 +11,10 @@ import Bounties from './pages/Bounties';
 import StatsCatalog from './pages/StatsCatalog';
 import CustomStats from './pages/CustomStats';
 import StatIntelligence from './pages/StatIntelligence';
+import StatGrowth from './pages/StatGrowth';
+import SpyReports from './pages/SpyReports';
+import WarHits from './pages/WarHits';
+import CrimeTracker from './pages/CrimeTracker';
 import Alerts from './pages/Alerts';
 import Notifications from './pages/Notifications';
 import WarRoom from './pages/WarRoom';
@@ -73,6 +77,10 @@ export default function App() {
         {page === 'Stats Catalog' && <StatsCatalog />}
         {page === 'Custom Stats' && <CustomStats />}
         {page === 'Stat Intelligence' && <StatIntelligence />}
+        {page === 'Stat Growth' && <StatGrowth />}
+        {page === 'Spy Reports' && <SpyReports />}
+        {page === 'War Hits' && <WarHits />}
+        {page === 'Crime Tracker' && <CrimeTracker />}
         {page === 'Alerts' && <Alerts />}
         {page === 'Notifications' && <Notifications />}
         {page === 'War Room' && <WarRoom />}
@@ -95,7 +103,7 @@ export default function App() {
         {page === 'Graffiti' && <Graffiti />}
         {page === 'Reports' && <Reports />}
         {page === 'API Usage' && <ApiUsage />}
-        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage'].includes(page) && <Placeholder name={page} />}
+        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );
