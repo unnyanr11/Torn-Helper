@@ -3,6 +3,7 @@ import { BUILT, NAV, Page } from './nav';
 import Overview from './pages/Overview';
 import Planner from './pages/Planner';
 import Targets from './pages/Targets';
+import Alerts from './pages/Alerts';
 import ApiUsage from './pages/ApiUsage';
 import Placeholder from './pages/Placeholder';
 
@@ -36,8 +37,9 @@ export default function App() {
         {page === 'Overview' && <Overview />}
         {page === 'Planner' && <Planner />}
         {page === 'Targets' && <Targets />}
+        {page === 'Alerts' && <Alerts />}
         {page === 'API Usage' && <ApiUsage />}
-        {!['Overview','Planner','Targets','API Usage'].includes(page) && <Placeholder name={page} />}
+        {!['Overview','Planner','Targets','Alerts','API Usage'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );

@@ -24,10 +24,11 @@ npm run dev
    supabase secrets set TORN_KEY_ENCRYPTION_KEY=<your-base64-key>
    ```
 
-## Deploy the key-linking Edge Function
+## Deploy Edge Functions
 
 ```bash
 supabase functions deploy link-torn-key
+supabase functions deploy refresh-targets
 ```
 
 ## Regenerate API capability registry
@@ -42,7 +43,8 @@ node scripts/generate-capabilities.mjs
 - [x] Step 2: capability registry from Torn OpenAPI
 - [x] Step 3: Supabase schema, Auth triggers, RLS
 - [x] Step 4: key linking Edge Function with encryption + disclosure table
-- [x] Step 5: planner and levelling list UI screens (goals, target lists, entries) with migration 0005
-- [ ] Later phases: targets intelligence, war room, payouts, losses, travel, markets, etc.
+- [x] Step 5: planner and levelling list UI screens
+- [x] Step 6: target intelligence (live status refresh, observations, estimates, alert center)
+- [ ] Later phases: war room, payouts, losses, travel, markets, etc.
 
 All data in Demo Mode is seeded sample data and is never presented as live.

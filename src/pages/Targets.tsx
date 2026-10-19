@@ -8,6 +8,7 @@ interface Entry {
   player_name: string | null;
   level: number | null;
   status: string | null;
+  last_checked_at: string | null;
   notes: string | null;
   excluded: boolean;
 }
@@ -21,6 +22,8 @@ export default function Targets() {
   const [playerName, setPlayerName] = useState('');
   const [level, setLevel] = useState('');
   const [error, setError] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshResult, setRefreshResult] = useState('');
 
   useEffect(() => { loadLists(); }, []);
   useEffect(() => { if (activeList) loadEntries(activeList.id); }, [activeList]);
@@ -65,10 +68,30 @@ export default function Targets() {
     else if (activeList) loadEntries(activeList.id);
   }
 
+  async function refreshStatus() {
+    if (!activeList) return;
+    setRefreshing(true);
+    setRefreshResult('');
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (!token) { setError('Not signed in'); setRefreshing(false); return; }
+    const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/refresh-targets`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ listId: activeList.id }),
+    });
+    const data = await res.json();
+    setRefreshing(false);
+    if (!res.ok) { setError(data.error ?? 'Refresh failed'); return; }
+    setRefreshResult(`Refreshed ${data.refreshed} target(s)`);
+    loadEntries(activeList.id);
+  }
+
   return (
     <section>
       <h2>Targets</h2>
       {error && <p className="badge warn">{error}</p>}
+      {refreshResult && <p className="badge ok">{refreshResult}</p>}
       <article className="card nu-inset">
         <h3>Levelling lists</h3>
         <input className="nu-input" placeholder="New list name" value={listName} onChange={(e) => setListName(e.target.value)} />
@@ -86,14 +109,19 @@ export default function Targets() {
           <input className="nu-input" placeholder="Player name (optional)" value={playerName} onChange={(e) => setPlayerName(e.target.value)} />
           <input className="nu-input" placeholder="Level (optional)" value={level} onChange={(e) => setLevel(e.target.value)} />
           <button className="nu-btn" onClick={addEntry}>Add target</button>
+          <button className="nu-btn" onClick={refreshStatus} disabled={refreshing}>
+            {refreshing ? 'Refreshing…' : 'Refresh status'}
+          </button>
           <table>
-            <thead><tr><th>ID</th><th>Name</th><th>Level</th><th>Attack</th><th></th></tr></thead>
+            <thead><tr><th>ID</th><th>Name</th><th>Level</th><th>Status</th><th>Checked</th><th>Attack</th><th></th></tr></thead>
             <tbody>
               {entries.map((e) => (
                 <tr key={e.id}>
                   <td>{e.torn_player_id}</td>
                   <td>{e.player_name ?? '—'}</td>
                   <td>{e.level ?? '—'}</td>
+                  <td>{e.status ?? '—'}</td>
+                  <td>{e.last_checked_at ? new Date(e.last_checked_at).toLocaleString() : '—'}</td>
                   <td><a href={`https://www.torn.com/loader.php?sid=attack&user2ID=${e.torn_player_id}`} target="_blank" rel="noreferrer">Attack</a></td>
                   <td><button className="nu-btn" onClick={() => removeEntry(e.id)}>Remove</button></td>
                 </tr>
