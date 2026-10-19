@@ -97,7 +97,7 @@ Roster, chain, armory, territory.
 
 ## Faction Finance
 
-Money requests + running ledger.
+Money requests + running ledger + automated loan reminders.
 
 ## Faction Upgrade Simulation
 
@@ -117,12 +117,16 @@ Armory event log + member loans.
 
 ## AI War Analyzer
 
-Optional AI-powered war evidence summarization (OpenAI gpt-4o-mini) behind explicit user consent, with a rules-based non-AI fallback always available. AI provides recommendations only — never allocations or payment authorization (spec section 7C #17).
+Consent-gated OpenAI summary + rules-based fallback.
+
+## Travel Profit Optimizer
+
+Compare buy/sell scenarios across destinations, ranked by profit per hour of flight time. Manual price entry (labelled as such), with best-route highlight.
 
 ## Status (delivery checklist)
 
-- [x] Steps 1-63: app shell through armory history & loans (see git history for full list)
-- [x] Step 64: AI war analyzer wiring (0046 migration with ai_consents + ai_analysis_requests + RLS; analyze-war-ai Edge Function; AiWarAnalyzer page with consent toggle, AI summary, rules-based fallback)
-- [x] All items from the original delivery checklist and follow-up gap list are now complete.
+- [x] Steps 1-66: app shell through loan reminders (see git history for full list)
+- [x] Step 67: Travel profit optimizer (0049 migration with travel_profit_scenarios + RLS; TravelOptimizer page with scenario CRUD, profit/hr ranking, best-route highlight)
+- [ ] Pending: OC planner, chain target queue, daily digest, revive tracker
 
 All data in Demo Mode is seeded sample data and is never presented as live.

@@ -31,6 +31,7 @@ import PayoutCalculator from './pages/PayoutCalculator';
 import LossMarketplace from './pages/LossMarketplace';
 import TornStats from './pages/TornStats';
 import Travel from './pages/Travel';
+import TravelOptimizer from './pages/TravelOptimizer';
 import Markets from './pages/Markets';
 import Stocks from './pages/Stocks';
 import Company from './pages/Company';
@@ -56,6 +57,7 @@ import FactionUpgrades from './pages/FactionUpgrades';
 import AllianceSharing from './pages/AllianceSharing';
 import RetentionTrends from './pages/RetentionTrends';
 import ArmoryHistory from './pages/ArmoryHistory';
+import LoanReminders from './pages/LoanReminders';
 import Placeholder from './pages/Placeholder';
 
 export default function App() {
@@ -119,6 +121,7 @@ export default function App() {
         {page === 'Losses' && <LossMarketplace />}
         {page === 'TornStats' && <TornStats />}
         {page === 'Travel' && <Travel />}
+        {page === 'Travel Optimizer' && <TravelOptimizer />}
         {page === 'Markets' && <Markets />}
         {page === 'Stocks' && <Stocks />}
         {page === 'Company' && <Company />}
@@ -144,7 +147,8 @@ export default function App() {
         {page === 'Alliance Sharing' && <AllianceSharing />}
         {page === 'Retention Trends' && <RetentionTrends />}
         {page === 'Armory History' && <ArmoryHistory />}
-        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Flight Tracker','Dibs','Target Pools','Tornipedia','Assistant','Discord','Notification Prefs','Alerts','Notifications','War Room','War Analyzer','AI War Analyzer','Payouts','Losses','TornStats','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage','Public API','Admin Cost Dashboard','Competitor Matrix','Halloween','Faction','Faction Finance','Faction Upgrades','Alliance Sharing','Retention Trends','Armory History'].includes(page) && <Placeholder name={page} />}
+        {page === 'Loan Reminders' && <LoanReminders />}
+        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Flight Tracker','Dibs','Target Pools','Tornipedia','Assistant','Discord','Notification Prefs','Alerts','Notifications','War Room','War Analyzer','AI War Analyzer','Payouts','Losses','TornStats','Travel','Travel Optimizer','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage','Public API','Admin Cost Dashboard','Competitor Matrix','Halloween','Faction','Faction Finance','Faction Upgrades','Alliance Sharing','Retention Trends','Armory History','Loan Reminders'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );
