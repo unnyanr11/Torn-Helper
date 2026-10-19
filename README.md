@@ -23,6 +23,11 @@ npm run dev
    openssl rand -base64 32
    supabase secrets set TORN_KEY_ENCRYPTION_KEY=<your-base64-key>
    ```
+5. Set third-party estimate API keys (optional, only if you use those sources):
+   ```bash
+   supabase secrets set FFSCOUTER_API_KEY=<your-key>
+   supabase secrets set TORNSTATS_API_KEY=<your-key>
+   ```
 
 ## Deploy Edge Functions
 
@@ -31,6 +36,7 @@ supabase functions deploy link-torn-key
 supabase functions deploy refresh-targets
 supabase functions deploy refresh-live-data
 supabase functions deploy evaluate-alerts
+supabase functions deploy fetch-estimates
 ```
 
 ## Schedule the alert job
@@ -59,6 +65,6 @@ node scripts/generate-capabilities.mjs
 - [x] Step 12: community (posts with categories and moderation flag)
 - [x] Step 13: live data feeds (travel, market, stocks, company via cached refresh)
 - [x] Step 14: alert-evaluation job (notifications table, evaluate-alerts function, Notifications UI)
-- [ ] Later phases: estimate integrations
+- [x] Step 15: estimate integrations (FFScouter/TornStats opt-in, fetch-estimates function, Estimates UI)
 
 All data in Demo Mode is seeded sample data and is never presented as live.
