@@ -11,24 +11,38 @@ export default function SavedPresets({
   kind,
   config,
   onLoad,
+  loadLabel = "Load",
 }: {
   kind: PresetKind;
   config: unknown;
-  onLoad: (config: any) => void;
+  onLoad: (config: any) => void | Promise<void>;
+  loadLabel?: string;
 }) {
   const [rows, setRows] = useState<Preset[]>([]),
     [selected, setSelected] = useState(""),
     [name, setName] = useState(""),
     [message, setMessage] = useState(""),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),
+    [loading, setLoading] = useState(true);
   async function load() {
-    const r = await supabase
-      .from("workspace_presets")
-      .select("id,name,config")
-      .eq("kind", kind)
-      .order("name");
-    if (r.error) setMessage(r.error.message);
-    else setRows(r.data ?? []);
+    setLoading(true);
+    try {
+      const result = await supabase
+        .from("workspace_presets")
+        .select("id,name,config")
+        .eq("kind", kind)
+        .order("name");
+      if (result.error) throw result.error;
+      setRows(result.data ?? []);
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : ((error as any)?.message ?? "Unable to load presets."),
+      );
+    } finally {
+      setLoading(false);
+    }
   }
   useEffect(() => {
     setSelected("");
@@ -89,6 +103,7 @@ export default function SavedPresets({
         Preset
         <select
           className="nu-input"
+          disabled={busy || loading}
           value={selected}
           onChange={(e) => {
             setSelected(e.target.value);
@@ -107,23 +122,35 @@ export default function SavedPresets({
       <button
         className="nu-btn"
         disabled={!selected || busy}
-        onClick={() => {
+        onClick={async () => {
           const p = rows.find((r) => r.id === selected);
           if (p) {
             try {
-              onLoad(p.config);
+              setBusy(true);
+              setMessage("Loading…");
+              await onLoad(p.config);
               setMessage("Loaded.");
             } catch (e) {
               setMessage(e instanceof Error ? e.message : "Invalid preset");
+            } finally {
+              setBusy(false);
             }
           }
         }}
       >
-        Load
+        {loadLabel}
       </button>
       <button className="nu-btn" disabled={!selected || busy} onClick={remove}>
         Delete preset
       </button>
+      {loading && <p role="status">Loading saved presets…</p>}
+      {!loading && !rows.length && (
+        <p>
+          No saved presets for this page yet. Configure the view, enter a name,
+          and save it. Presets store settings; fetched observations are shown by
+          the page.
+        </p>
+      )}
       <label>
         Save current settings as
         <input
