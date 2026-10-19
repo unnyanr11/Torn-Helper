@@ -90,6 +90,12 @@ beforeAll(async () => {
       "utf8",
     ),
   );
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261019153325_torn_key_authentication.sql",
+      "utf8",
+    ),
+  );
   const candidate = await db.query(
     "select table_name as table,column_name as column,data_type as type from information_schema.columns where table_schema='public'",
   );
@@ -819,5 +825,92 @@ describe("unavailable integrations cannot collect client-side secrets", () => {
         [buyer],
       ),
     ).rejects.toThrow(/permission denied/);
+  });
+});
+
+describe("server-only Torn authentication mapping and abuse limits", () => {
+  it("does not let anonymous or signed-in browsers mint accounts or bypass login limits", async () => {
+    await expect(
+      asUser(
+        buyer,
+        "select complete_torn_login(123,$1,'Forged','Limited Access',false,null)",
+        [buyer],
+      ),
+    ).rejects.toThrow(/permission denied/);
+    await expect(
+      asUser(buyer, "select consume_torn_login_budget($1,$2)", [
+        "a".repeat(64),
+        "b".repeat(64),
+      ]),
+    ).rejects.toThrow(/permission denied/);
+  });
+  it("reuses the unique verified identity and atomically updates optional credential retention", async () => {
+    const r = await asService(
+      "select complete_torn_login(101,$1,'Verified buyer','Limited Access',true,'test-iv:authenticated-ciphertext') as id",
+      [seller],
+    );
+    expect(r.rows[0].id).toBe(buyer);
+    const credential = await asService(
+      "select encrypted_key from encrypted_credentials where user_id=$1 and provider='torn'",
+      [buyer],
+    );
+    expect(credential.rows).toHaveLength(1);
+    await asService(
+      "select complete_torn_login(101,$1,'Verified buyer','Limited Access',false,null)",
+      [seller],
+    );
+    expect(
+      (
+        await asService(
+          "select * from encrypted_credentials where user_id=$1 and provider='torn'",
+          [buyer],
+        )
+      ).rows,
+    ).toHaveLength(0);
+  });
+  it("uses the first committed mapping when two first-login proposals arrive", async () => {
+    const first = "00000000-0000-4000-8000-000000000004",
+      second = "00000000-0000-4000-8000-000000000005";
+    for (const id of [first, second]) {
+      await db.query("insert into auth.users(id) values($1)", [id]);
+      await db.query("insert into profiles(id) values($1)", [id]);
+    }
+    for (const id of [first, second])
+      expect(
+        (
+          await asService(
+            "select complete_torn_login(90001,$1,'New player','Minimal Access',false,null) as id",
+            [id],
+          )
+        ).rows[0].id,
+      ).toBe(first);
+    expect(
+      Number(
+        (
+          await asService(
+            "select count(*) as n from linked_torn_accounts where torn_id=90001",
+          )
+        ).rows[0].n,
+      ),
+    ).toBe(1);
+  });
+  it("enforces a per-key sign-in budget without retaining raw keys", async () => {
+    for (let i = 0; i < 5; i++)
+      expect(
+        (
+          await asService(
+            "select consume_torn_login_budget($1,$2) as allowed",
+            ["a".repeat(64), "b".repeat(64)],
+          )
+        ).rows[0].allowed,
+      ).toBe(true);
+    expect(
+      (
+        await asService("select consume_torn_login_budget($1,$2) as allowed", [
+          "a".repeat(64),
+          "b".repeat(64),
+        ])
+      ).rows[0].allowed,
+    ).toBe(false);
   });
 });

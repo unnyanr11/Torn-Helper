@@ -112,3 +112,8 @@ The concrete proposed deployment consists of the reviewed migration, coordinated
 The runtime seed-data module, unauthenticated sample dashboard and sample financial inputs have been removed. Authentication and administrator checks apply to deep links as well as navigation. No full-database wipe was performed: production audit counts showed no fixture accounts or financial rows requiring deletion. Reference catalogs, glossary definitions and isolated automated test fixtures are not account seed data.
 
 Unconfigured Discord, TornStats token collection and email/push opt-ins are blocked in both the relevant browser UI and database grants. Finishing those adapters requires secure backend implementations and actual configuration; suppressing demo values does not complete the wider feature specification. Real hosted acceptance, user-key/provider operations and other previously listed requirements remain outstanding.
+
+
+## Authentication scope update
+
+The user's Torn-key login requirement supersedes the former email/password account UI and password-recovery workflow. The current primary flow is server-verified Torn API key sign-in, automatic unique account creation/reuse, and a Supabase app session. Password forms are removed. Supabase remains the internal session/RLS provider; the project publishable key is hosting configuration, not an end-user login credential. Live authentication with a legitimate Torn key is still an acceptance limit; there are now 87 local tests.

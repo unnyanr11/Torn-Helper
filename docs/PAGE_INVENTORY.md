@@ -60,7 +60,7 @@ Static inventory of every page module. Table references describe implemented que
 | ReviveMarketplace | revive_claims, revive_contracts | None |
 | ReviveTracker | revive_logs | None |
 | RoiCalculator | workspace_presets | None |
-| Settings | linked_torn_accounts, profiles | account-data, link-torn-key, remove-ai-key |
+| Settings | linked_torn_accounts, profiles | sign-in-torn, account-data, link-torn-key, remove-ai-key |
 | SettlementQueue | loss_disputes, loss_settlement_entries | None |
 | SharedReport | Calculation / static UI | shared-report |
 | SpyReports | spy_reports | None |

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { validateClientConfig } from "../lib/config";
 import { canAccessPage } from "../lib/access";
-vi.mock("../lib/supabase", () => ({ supabase: {}, isRecoveryLink: false }));
+vi.mock("../lib/supabase", () => ({ supabase: {} }));
 const publishable = "sb_publishable_configuration_validation_only";
 const jwt = (role: string) =>
   "eyJhbGciOiJIUzI1NiJ9." + btoa(JSON.stringify({ role })) + ".test-signature";
@@ -75,6 +75,7 @@ describe("production screens start without generated account or financial data",
       import("../pages/PayoutCalculator"),
       import("../pages/PiMortgages"),
       import("../pages/RoiCalculator"),
+      import("../pages/Settings"),
     ]);
     const client = new QueryClient({
       defaultOptions: { queries: { enabled: false, retry: false } },
@@ -83,6 +84,8 @@ describe("production screens start without generated account or financial data",
       const html = renderToStaticMarkup(
         createElement(QueryClientProvider, { client }, createElement(Page)),
       );
+      expect(html).not.toContain('type="email"');
+      expect(html).not.toContain("App password");
       expect(html).not.toMatch(
         /Member [ABC]|value="(?:1000000|1100000|5|12)"|DEMO_WIDGETS|DEMO PREVIEW/,
       );

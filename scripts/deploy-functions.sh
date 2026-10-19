@@ -12,4 +12,5 @@ for function_dir in supabase/functions/*; do
   npx supabase functions deploy "$function_name" --project-ref "$PROJECT_REF" --no-verify-jwt
 done
 # Each private function authenticates getUser(token) or the scoped Vault job token in its body.
+# sign-in-torn is a public login endpoint protected by Torn key proof and server-side rate limits.
 # public-api exposes static public documentation only. No unauthenticated verification probes run here.

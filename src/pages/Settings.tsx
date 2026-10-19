@@ -1,23 +1,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { downloadBlob } from "../lib/export";
-export default function Settings({
-  passwordRecovery = false,
-  onPasswordUpdated = () => {},
-}: {
-  passwordRecovery?: boolean;
-  onPasswordUpdated?: () => void;
-}) {
-  const [email, setEmail] = useState(""),
-    [password, setPassword] = useState(""),
-    [confirmation, setConfirmation] = useState(""),
-    [key, setKey] = useState(""),
+export default function Settings() {
+  const [key, setKey] = useState(""),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
     [signedIn, setSignedIn] = useState(false),
     [identity, setIdentity] = useState<any>(null),
     [paused, setPaused] = useState(false),
-    [persist, setPersist] = useState(true);
+    [persist, setPersist] = useState(false);
   useEffect(() => {
     void load().catch((e) =>
       setMessage(
@@ -60,39 +51,29 @@ export default function Settings({
       setBusy(false);
     }
   }
-  async function auth(signup: boolean) {
-    const result = signup
-      ? await supabase.auth.signUp({ email, password })
-      : await supabase.auth.signInWithPassword({ email, password });
-    if (result.error) throw result.error;
-    setPassword("");
-    setMessage(
-      signup
-        ? "Account created. Check your email if confirmation is required."
-        : "Signed in",
-    );
-  }
-  async function resetPassword() {
-    if (!email.trim()) throw new Error("Enter your email address first.");
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: window.location.origin + window.location.pathname,
+  async function signIn() {
+    const submitted = key;
+    setKey("");
+    const { data, error } = await supabase.functions.invoke("sign-in-torn", {
+      body: { apiKey: submitted, persist },
     });
-    if (error) throw error;
-    setMessage(
-      "If an account exists for that email, a password reset link will be sent.",
-    );
-  }
-  async function updatePassword() {
-    if (password.length < 8 || password !== confirmation)
-      throw new Error(
-        "Use at least 8 characters and make both passwords match.",
-      );
-    const { error } = await supabase.auth.updateUser({ password });
-    if (error) throw error;
-    setPassword("");
-    setConfirmation("");
-    setMessage("Password updated.");
-    onPasswordUpdated();
+    if (error || data?.error) {
+      let message = data?.error ?? error?.message ?? "Unable to sign in.";
+      if (error && "context" in error && error.context instanceof Response) {
+        try {
+          message = (await error.context.json()).error ?? message;
+        } catch {}
+      }
+      throw new Error(message);
+    }
+    if (typeof data?.token_hash !== "string" || data.type !== "magiclink")
+      throw new Error("No valid sign-in session was returned.");
+    const verified = await supabase.auth.verifyOtp({
+      token_hash: data.token_hash,
+      type: "magiclink",
+    });
+    if (verified.error) throw verified.error;
+    setMessage(`Signed in as ${data.torn_name} [${data.torn_id}]`);
   }
   async function link() {
     const { data, error } = await supabase.functions.invoke("link-torn-key", {
@@ -142,47 +123,6 @@ export default function Settings({
     if (error || data?.error) throw new Error(data?.error ?? error?.message);
     await supabase.auth.signOut();
   }
-  if (passwordRecovery)
-    return (
-      <section>
-        <h2>Reset your app password</h2>
-        {message && <p role="status">{message}</p>}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void run(updatePassword);
-          }}
-        >
-          <label>
-            New password
-            <input
-              className="nu-input"
-              type="password"
-              autoComplete="new-password"
-              minLength={8}
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </label>
-          <label>
-            Confirm password
-            <input
-              className="nu-input"
-              type="password"
-              autoComplete="new-password"
-              minLength={8}
-              required
-              value={confirmation}
-              onChange={(e) => setConfirmation(e.target.value)}
-            />
-          </label>
-          <button className="nu-btn" disabled={busy} type="submit">
-            Save new password
-          </button>
-        </form>
-      </section>
-    );
   return (
     <section>
       <h2>Account & privacy settings</h2>
@@ -196,53 +136,58 @@ export default function Settings({
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              void run(() => auth(false));
+              void run(signIn);
             }}
           >
-            <h3>Sign in to your app account</h3>
+            <h3>Continue with your Torn API key</h3>
             <p>
-              This password is for Torn Command Center. Never enter your Torn
-              password.
+              Your Torn identity is your account. The first verified sign-in
+              creates your app account automatically; later sign-ins return to
+              it. No email address or app password is required.
             </p>
+            <KeyDisclosure persist={persist} />
             <label>
-              Email
-              <input
-                className="nu-input"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </label>
-            <label>
-              App password
+              Torn API key
               <input
                 className="nu-input"
                 type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="off"
+                spellCheck={false}
+                minLength={16}
+                maxLength={16}
+                required
+                value={key}
+                onChange={(e) => setKey(e.target.value.trim())}
               />
             </label>
-            <button className="nu-btn" disabled={busy} type="submit">
-              Sign in
-            </button>
+            <label>
+              <input
+                type="checkbox"
+                checked={persist}
+                onChange={(e) => setPersist(e.target.checked)}
+              />
+              Retain my encrypted key for live refreshes and background
+              verification
+            </label>
+            <p>
+              Without retention, the key is used for sign-in only and any
+              previously retained Torn key is removed. Ongoing API features need
+              a retained key. Keep this key private: it is your sign-in
+              credential.
+            </p>
             <button
               className="nu-btn"
-              disabled={busy || password.length < 8}
-              type="button"
-              onClick={() => run(() => auth(true))}
+              disabled={busy || !/^[A-Za-z0-9]{16}$/.test(key)}
+              type="submit"
             >
-              Create account
+              {busy ? "Verifying Torn identity…" : "Continue with Torn"}
             </button>
-            <button
-              className="nu-btn"
-              type="button"
-              disabled={busy || !email.trim()}
-              onClick={() => run(resetPassword)}
-            >
-              Forgot password
-            </button>
+            <p>
+              Create a dedicated key in Torn Settings → API Keys. Minimal or
+              Limited access is accepted; Full access is not required. Custom
+              keys must allow identity verification. Public-only keys cannot
+              sign in.
+            </p>
           </form>
         </article>
       ) : (
@@ -254,41 +199,7 @@ export default function Settings({
                 ? `${identity.torn_name} [${identity.torn_id}] · ${identity.key_access_level}`
                 : "No active Torn key linked"}
             </p>
-            <table>
-              <thead>
-                <tr>
-                  <th>Data storage</th>
-                  <th>Data sharing</th>
-                  <th>Purpose</th>
-                  <th>Key storage & sharing</th>
-                  <th>Access level</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    Persistent until deletion; history starts when collected.
-                    Backups expire under the host retention policy.
-                  </td>
-                  <td>
-                    You and authorized service operators; marketplace
-                    participants see contract evidence.
-                  </td>
-                  <td>
-                    Read-only companion data, planning, and loss verification.
-                  </td>
-                  <td>
-                    {persist
-                      ? "Encrypted server-side until removal. Never forwarded to third parties."
-                      : "Used once for identity verification; not retained."}
-                  </td>
-                  <td>
-                    Public: identity; Minimal: bars; Limited: battle stats and
-                    attacks. Custom selections may reduce features.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <KeyDisclosure persist={persist} />
             <label>
               Torn API key
               <input
@@ -371,5 +282,51 @@ export default function Settings({
         </>
       )}
     </section>
+  );
+}
+
+function KeyDisclosure({ persist }: { persist: boolean }) {
+  return (
+    <div style={{ overflowX: "auto" }}>
+      <table>
+        <thead>
+          <tr>
+            <th>Data storage</th>
+            <th>Data sharing</th>
+            <th>Purpose</th>
+            <th>Key storage & sharing</th>
+            <th>Access level</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              Verified Torn ID/name and your app records persist until account
+              deletion. History starts when collected. Backups follow the host
+              retention policy.
+            </td>
+            <td>
+              You and authorized service operators; marketplace participants see
+              contract evidence. No key is sent to third-party tools.
+            </td>
+            <td>
+              Verify your identity and open your private workspace. Optional
+              refreshes and verification require key retention.
+            </td>
+            <td>
+              {persist
+                ? "Encrypted on the server until removed; never returned to the browser."
+                : "Used for this request only, then discarded. No raw key is stored in your browser."}
+            </td>
+            <td>
+              Minimal or Limited access for sign-in. Limited selections are
+              required for battle stats/attacks. Custom keys must expose
+              identity/key information. Missing selections reduce available
+              features.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   );
 }

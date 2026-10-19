@@ -69,7 +69,7 @@ const LoanReminders = lazy(() => import("./pages/LoanReminders"));
 const Settings = lazy(() => import("./pages/Settings"));
 const PlayerIntel = lazy(() => import("./pages/PlayerIntel"));
 import { canAccessPage } from "./lib/access";
-import { supabase, isRecoveryLink } from "./lib/supabase";
+import { supabase } from "./lib/supabase";
 
 const SharedReport = lazy(() => import("./pages/SharedReport"));
 import { useQueryClient } from "@tanstack/react-query";
@@ -80,7 +80,6 @@ export default function App() {
   const [accountId, setAccountId] = useState<string | null>(null);
   const [signedIn, setSignedIn] = useState(false);
   const [authReady, setAuthReady] = useState(false);
-  const [recovering, setRecovering] = useState(isRecoveryLink);
   const [authError, setAuthError] = useState("");
   const [role, setRole] = useState("user");
   useEffect(() => {
@@ -135,8 +134,6 @@ export default function App() {
         setRole("user");
         queryClient.clear();
       }
-      if (event === "PASSWORD_RECOVERY") setRecovering(true);
-      if (event === "SIGNED_OUT") setRecovering(false);
       setTimeout(() => void refresh(), 0);
     });
     return () => {
@@ -226,11 +223,8 @@ export default function App() {
             <p role="status">Checking session…</p>
           ) : authError ? (
             <p role="alert">{authError}</p>
-          ) : !signedIn || recovering ? (
-            <Settings
-              passwordRecovery={recovering}
-              onPasswordUpdated={() => setRecovering(false)}
-            />
+          ) : !signedIn ? (
+            <Settings />
           ) : !canAccessPage(page, signedIn, role) ? (
             <p role="alert">Your account does not have access to this page.</p>
           ) : (

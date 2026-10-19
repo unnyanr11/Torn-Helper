@@ -6,7 +6,7 @@ The coordinated runtime repair migration has been applied to the linked Supabase
 
 ## Local verification
 
-Create `.env.local` from `.env.example` and set the actual Supabase project URL and publishable key before building. Production builds reject missing configuration, placeholder values, secret/service-role keys and insecure project URLs. Runtime account screens have no demo data or sample financial records.
+Create `.env.local` with `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`, using the actual project URL and publishable key before building. Production builds reject missing configuration, placeholder values, secret/service-role keys and insecure project URLs. Runtime account screens have no demo data or sample financial records.
 
 ```sh
 npm ci
@@ -25,7 +25,7 @@ deno check --no-config --node-modules-dir=manual supabase/functions/*/index.ts
 
 Use Node 24.x (validated here with Node 24.19); the major version is pinned for reproducible Vercel builds.
 
-Copy `.env.example` to `.env.local`, enter the project's publishable key, and run `npm run dev`. The legacy `VITE_SUPABASE_ANON_KEY` variable is also accepted. Never put a service-role key or provider secret in a `VITE_` variable. Supabase Auth sessions are distinct from Torn API keys.
+Create `.env.local`, set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` to your project's values, and run `npm run dev`. The legacy `VITE_SUPABASE_ANON_KEY` variable is also accepted. Never put a service-role key or provider secret in a `VITE_` variable. Supabase Auth sessions are distinct from Torn API keys.
 
 ## Deployment order
 
@@ -53,9 +53,9 @@ See [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) for the supplied specification 
 
 ## Vercel production deployment
 
-`vercel.json` configures Vite, `npm ci`, `npm run build`, the `dist` output, response security headers and revalidation of the application shell/service worker. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the Vercel deployment environment before deploying. Never put server secrets in `VITE_` variables. Set the deployed origin as the Supabase Auth Site URL and allow the same origin as a redirect URL for confirmation and password recovery.
+`vercel.json` configures Vite, `npm ci`, `npm run build`, the `dist` output, response security headers and revalidation of the application shell/service worker. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the Vercel deployment environment before deploying. Never put server secrets in `VITE_` variables. Keep the Supabase Auth Site URL set to the deployed origin. Torn-key sign-in exchanges a one-time app-session token directly; users do not follow email links.
 
-New sessions open the real sign-in flow. Deep links cannot bypass authentication or administrative role gates. A separate app-account password reset flow is available. Published shared reports remain explicitly token-accessible. Page/module loading failures show a recoverable error screen.
+New sessions open the real sign-in flow. Deep links cannot bypass authentication or administrative role gates. The sign-in form accepts a Torn API key and automatically creates/reuses the verified Torn account. No user email or app password is required. Published shared reports remain explicitly token-accessible. Page/module loading failures show a recoverable error screen.
 
 Discord, email/push delivery and live TornStats access are explicitly unavailable until their secure server integrations are implemented and configured. No webhook or TornStats credential entry is exposed. Authorized manual spy reports remain available. These disabled capabilities are not represented as functioning production integrations.
 
@@ -63,3 +63,14 @@ The removal of seeded data does **not** certify all workflows in REQUIREMENTS.md
 
 
 If Vercel fails with `VITE_SUPABASE_PUBLISHABLE_KEY is missing or still a placeholder`, open the project's Settings → Environment Variables and set the real public project key for the **Production** environment. A local `.env.local` file is not uploaded to Vercel. Set the same variables separately for Preview if using preview deployments. Save, then redeploy the latest main commit. Do not bypass validation or substitute a service-role/secret key.
+
+
+## Torn API key sign-in
+
+Users choose **Continue with Torn** and enter a dedicated 16-character Torn API key. `sign-in-torn` validates `/user/basic` and `/key/info` server-side before creating or reusing the unique linked Torn identity. Minimal/Limited access and suitable Custom keys are accepted; Public Only keys cannot authenticate. Existing linked app accounts retain their user IDs and data.
+
+The backend uses Supabase Auth internally with a random, non-deliverable alias and a one-time session exchange token. No email is requested or sent, no app password is created, and no raw Torn key is returned. An explicit retention choice controls encrypted storage; declining retention removes any previously retained Torn credential. Without retention, ongoing API refresh/verification is unavailable until a key is retained in Settings.
+
+The public login endpoint is rate-limited per server-HMAC request/key fingerprint and globally, bounds request bodies and derives identities only from verified Torn responses. Account linking is transactional and concurrent first-sign-in proposals converge on the same identity. A signed-in account cannot replace its key with one for a different Torn player; sign out to switch accounts.
+
+The Vercel `VITE_SUPABASE_PUBLISHABLE_KEY` remains project hosting configuration. It is distinct from the individual Torn API key entered by each user. The backend's `TORN_KEY_ENCRYPTION_KEY` is needed only for encrypted retention. Keep Supabase's email provider enabled for the internal one-time token exchange; public email signups can be disabled separately because account provisioning is server-side.

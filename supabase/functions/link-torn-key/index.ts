@@ -29,6 +29,20 @@ Deno.serve(async (req) => {
     const access = allowed.includes(keyInfo.access?.type)
       ? keyInfo.access.type
       : "Custom";
+    const current = await admin
+      .from("linked_torn_accounts")
+      .select("torn_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (current.error) throw current.error;
+    if (current.data && Number(current.data.torn_id) !== Number(basic.id))
+      return json(
+        {
+          error:
+            "This key belongs to a different Torn identity. Sign out and use Continue with Torn to switch accounts.",
+        },
+        409,
+      );
     const { data: existing, error: lookupError } = await admin
       .from("linked_torn_accounts")
       .select("user_id")
