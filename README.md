@@ -66,10 +66,14 @@ Full buy/sell workflow for verified losses (spec section 7A). Contracts are dire
 
 Full audited payout workflow (spec section 8). Four modes (equal/proportional/weighted/hybrid), caps with iterative redistribution, floors with infeasibility detection, largest-remainder integer rounding, draft→locked→approved→paid→reconciled state machine, CSV export, and append-only audit log.
 
+## Stats Catalog
+
+224 verified distinct metrics across 15 categories (battle, personal, financial, crime, faction, war, travel, company, property, racing, education, items, social, awards, health). Searchable with category filter, favourites (localStorage), tooltips, units, and source labels (official-api/derived/manual).
+
 ## Status (delivery checklist)
 
-- [x] Steps 1-51: app shell through Loss Marketplace (see git history for full list)
-- [x] Step 52: full payout calculator workflow (0036 migration with 4 tables + RLS; PayoutCalculator page with 4 modes, caps/floors, integer rounding, state machine, CSV export, audit log)
-- [ ] Pending: 217-stat catalog audit, TornStats integration, CSV/XLSX export hardening, detailed competitor matrix, Halloween tools, faction operations depth
+- [x] Steps 1-52: app shell through payout calculator (see git history for full list)
+- [x] Step 53: 217-stat catalog audit (224 verified metrics across 15 categories; expanded StatsCatalog with search/filter/favourites/tooltips/units/source labels)
+- [ ] Pending: TornStats integration, CSV/XLSX export hardening, detailed competitor matrix, Halloween tools, faction operations depth
 
 All data in Demo Mode is seeded sample data and is never presented as live.
