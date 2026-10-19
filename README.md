@@ -46,12 +46,12 @@ node scripts/generate-capabilities.mjs
 
 ## Status (delivery checklist)
 
-- [x] Steps 1-31: app shell, capability registry, schema/RLS, key linking, planner, targets, war room, payouts, losses, travel/markets, company/properties, racing, community, live feeds, alerts, alliances, watched factions, recruitment, gym, activity, graffiti, exports, war analyzer, compare players, leaderboards, ROI, PI mortgages, bounties, stat catalog, custom stats, native stat intelligence
-- [x] Step 32: stat growth charts (native SVG time-series for gym gains and custom numeric columns; Stat Growth UI)
-- [x] Step 33: spy report import & per-target stat storage (spy_reports table, bulk CSV-style import, owner RLS; Spy Reports UI)
-- [x] Step 34: war hit counter (war_hits table, per-attacker leaderboard, owner RLS; War Hits UI)
-- [x] Step 35: crime pass-rate tracker (crime_logs table, per-crime pass-rate aggregation, owner RLS; Crime Tracker UI)
-- [x] Step 36: build detection (Stat Intelligence classifies stat distribution from spy reports when available)
-- [ ] Pending: flight tracker, fine-grained activity tracker, hospital-timer dibs, target pools, Tornipedia glossary, image uploads for graffiti, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
+- [x] Steps 1-36: app shell through build detection (see git history for full list)
+- [x] Step 37: flight tracker (flight_logs table, owner RLS, log/status/delete; Flight Tracker UI)
+- [x] Step 38: hospital-timer dibs (dibs table, owner RLS, claim window with expiry; Dibs UI)
+- [x] Step 39: target pools (target_pools table with bigint[] target lists, owner RLS; Target Pools UI)
+- [x] Step 40: Tornipedia glossary (static searchable glossary of Torn terms; Glossary UI)
+- [x] Step 41: fine-grained activity tracking (5-minute auto-refresh polling option on Activity page)
+- [ ] Pending: image uploads for graffiti, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
 
 All data in Demo Mode is seeded sample data and is never presented as live.
