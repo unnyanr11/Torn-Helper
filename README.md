@@ -58,12 +58,14 @@ The app is installable as a PWA (manifest.json + service worker in public/). Add
 
 Read-only, keyless JSON API at `/functions/v1/public-api` with endpoints `/glossary`, `/capabilities`, and `/`. CORS-enabled.
 
+## Loss Marketplace
+
+Full buy/sell workflow for verified losses (spec section 7A). Contracts are direct-payment (no operator custody). Sellers claim slots (15-min expiry), submit attack evidence (deduplicated by attack ID), and earnings flow through earned → approved → paid → reconciled. Disputes supported.
+
 ## Status (delivery checklist)
 
-- [x] Steps 1-46: app shell through assistant (see git history for full list)
-- [x] Step 47: public API (public-api Edge Function with /glossary, /capabilities, / endpoints; Public API docs page)
-- [x] Step 48: PWA (manifest.json, sw.js service worker, registration in App)
-- [x] Step 49: admin cost dashboard (AdminCostDashboard page aggregating api_usage by endpoint with cost totals)
-- [x] Step 50: competitor coverage matrix (static comparison vs TornTools/YATA/TornStats; CompetitorMatrix page)
+- [x] Steps 1-50: app shell through competitor matrix (see git history for full list)
+- [x] Step 51: Loss Marketplace full workflow (0035 migration with 6 tables + RLS; LossMarketplace UI with Buy/Sell/My Contracts/Active Claim/Earnings/Payment Queue/Disputes tabs)
+- [ ] Pending: full payout calculator workflow (versioned policies, caps/floors, integer rounding), 217-stat catalog audit, TornStats integration, CSV/XLSX export hardening, detailed competitor matrix, Halloween tools, faction operations depth
 
-All planned features are now delivered. All data in Demo Mode is seeded sample data and is never presented as live.
+All data in Demo Mode is seeded sample data and is never presented as live.
