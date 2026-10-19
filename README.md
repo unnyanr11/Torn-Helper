@@ -82,10 +82,14 @@ Immutable report snapshots with CSV and genuine XLSX export (formula-injection s
 
 Per-feature audit table (spec section 7C #16) covering 16 features across TornStats, TornTools, YATA, and TornWise with source URL, date checked, freemium status, acceptance test, and blocker visibility. Searchable/filterable in-app.
 
+## Halloween Tools
+
+Seasonal event tracker (spec Phase 22): log candy/chocolate/plushie/flower hauls with source, view totals by type and grand total, approximate NPC spawn timers (Pumpkin Head, Ghost, Skeleton Crew), and manage recent haul history. Backed by `halloween_candy_log` table with owner-only RLS.
+
 ## Status (delivery checklist)
 
-- [x] Steps 1-55: app shell through CSV/XLSX export hardening (see git history for full list)
-- [x] Step 56: Detailed competitor coverage matrix (src/data/competitors.ts with 16 audited rows; CompetitorMatrix page with filterable table)
-- [ ] Pending: Halloween tools, faction operations depth
+- [x] Steps 1-56: app shell through competitor coverage matrix (see git history for full list)
+- [x] Step 57: Halloween tools (0039 migration with halloween_candy_log + RLS; Halloween page with haul logging, totals, NPC timers, history)
+- [ ] Pending: faction operations depth
 
 All data in Demo Mode is seeded sample data and is never presented as live.

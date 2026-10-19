@@ -48,6 +48,7 @@ import ApiUsage from './pages/ApiUsage';
 import PublicApi from './pages/PublicApi';
 import AdminCostDashboard from './pages/AdminCostDashboard';
 import CompetitorMatrix from './pages/CompetitorMatrix';
+import Halloween from './pages/Halloween';
 import Placeholder from './pages/Placeholder';
 
 export default function App() {
@@ -128,7 +129,8 @@ export default function App() {
         {page === 'Public API' && <PublicApi />}
         {page === 'Admin Cost Dashboard' && <AdminCostDashboard />}
         {page === 'Competitor Matrix' && <CompetitorMatrix />}
-        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Flight Tracker','Dibs','Target Pools','Tornipedia','Assistant','Discord','Notification Prefs','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','TornStats','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage','Public API','Admin Cost Dashboard','Competitor Matrix'].includes(page) && <Placeholder name={page} />}
+        {page === 'Halloween' && <Halloween />}
+        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Flight Tracker','Dibs','Target Pools','Tornipedia','Assistant','Discord','Notification Prefs','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','TornStats','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage','Public API','Admin Cost Dashboard','Competitor Matrix','Halloween'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );
