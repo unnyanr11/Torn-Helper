@@ -1,0 +1,2022 @@
+{
+  "specVersion": "6.13.8",
+  "sourceUrl": "https://www.torn.com/swagger/openapi.json",
+  "metrics": [
+    {
+      "id": "personalstats.attacking.attacks.won",
+      "name": "Attacking / Attacks / Won",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.attacks.won"
+    },
+    {
+      "id": "personalstats.attacking.attacks.lost",
+      "name": "Attacking / Attacks / Lost",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.attacks.lost"
+    },
+    {
+      "id": "personalstats.attacking.attacks.stalemate",
+      "name": "Attacking / Attacks / Stalemate",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.attacks.stalemate"
+    },
+    {
+      "id": "personalstats.attacking.attacks.assist",
+      "name": "Attacking / Attacks / Assist",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.attacks.assist"
+    },
+    {
+      "id": "personalstats.attacking.attacks.stealth",
+      "name": "Attacking / Attacks / Stealth",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.attacks.stealth"
+    },
+    {
+      "id": "personalstats.attacking.defends.won",
+      "name": "Attacking / Defends / Won",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.defends.won"
+    },
+    {
+      "id": "personalstats.attacking.defends.lost",
+      "name": "Attacking / Defends / Lost",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.defends.lost"
+    },
+    {
+      "id": "personalstats.attacking.defends.stalemate",
+      "name": "Attacking / Defends / Stalemate",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.defends.stalemate"
+    },
+    {
+      "id": "personalstats.attacking.defends.total",
+      "name": "Attacking / Defends / Total",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.defends.total"
+    },
+    {
+      "id": "personalstats.attacking.elo",
+      "name": "Attacking / Elo",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.elo"
+    },
+    {
+      "id": "personalstats.attacking.unarmored_wins",
+      "name": "Attacking / Unarmored Wins",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.unarmored_wins"
+    },
+    {
+      "id": "personalstats.attacking.highest_level_beaten",
+      "name": "Attacking / Highest Level Beaten",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.highest_level_beaten"
+    },
+    {
+      "id": "personalstats.attacking.escapes.player",
+      "name": "Attacking / Escapes / Player",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.escapes.player"
+    },
+    {
+      "id": "personalstats.attacking.escapes.foes",
+      "name": "Attacking / Escapes / Foes",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.escapes.foes"
+    },
+    {
+      "id": "personalstats.attacking.killstreak.best",
+      "name": "Attacking / Killstreak / Best",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.killstreak.best"
+    },
+    {
+      "id": "personalstats.attacking.killstreak.current",
+      "name": "Attacking / Killstreak / Current",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.killstreak.current"
+    },
+    {
+      "id": "personalstats.attacking.hits.success",
+      "name": "Attacking / Hits / Success",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.hits.success"
+    },
+    {
+      "id": "personalstats.attacking.hits.miss",
+      "name": "Attacking / Hits / Miss",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.hits.miss"
+    },
+    {
+      "id": "personalstats.attacking.hits.critical",
+      "name": "Attacking / Hits / Critical",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.hits.critical"
+    },
+    {
+      "id": "personalstats.attacking.hits.one_hit_kills",
+      "name": "Attacking / Hits / One Hit Kills",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.hits.one_hit_kills"
+    },
+    {
+      "id": "personalstats.attacking.damage.total",
+      "name": "Attacking / Damage / Total",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.damage.total"
+    },
+    {
+      "id": "personalstats.attacking.damage.best",
+      "name": "Attacking / Damage / Best",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.damage.best"
+    },
+    {
+      "id": "personalstats.attacking.networth.money_mugged",
+      "name": "Attacking / Networth / Money Mugged",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.networth.money_mugged"
+    },
+    {
+      "id": "personalstats.attacking.networth.largest_mug",
+      "name": "Attacking / Networth / Largest Mug",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.networth.largest_mug"
+    },
+    {
+      "id": "personalstats.attacking.networth.items_looted",
+      "name": "Attacking / Networth / Items Looted",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.networth.items_looted"
+    },
+    {
+      "id": "personalstats.attacking.ammunition.total",
+      "name": "Attacking / Ammunition / Total",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.ammunition.total"
+    },
+    {
+      "id": "personalstats.attacking.ammunition.special",
+      "name": "Attacking / Ammunition / Special",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.ammunition.special"
+    },
+    {
+      "id": "personalstats.attacking.ammunition.hollow_point",
+      "name": "Attacking / Ammunition / Hollow Point",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.ammunition.hollow_point"
+    },
+    {
+      "id": "personalstats.attacking.ammunition.tracer",
+      "name": "Attacking / Ammunition / Tracer",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.ammunition.tracer"
+    },
+    {
+      "id": "personalstats.attacking.ammunition.piercing",
+      "name": "Attacking / Ammunition / Piercing",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.ammunition.piercing"
+    },
+    {
+      "id": "personalstats.attacking.ammunition.incendiary",
+      "name": "Attacking / Ammunition / Incendiary",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.ammunition.incendiary"
+    },
+    {
+      "id": "personalstats.attacking.faction.respect",
+      "name": "Attacking / Faction / Respect",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.faction.respect"
+    },
+    {
+      "id": "personalstats.attacking.faction.retaliations",
+      "name": "Attacking / Faction / Retaliations",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.faction.retaliations"
+    },
+    {
+      "id": "personalstats.attacking.faction.ranked_war_hits",
+      "name": "Attacking / Faction / Ranked War Hits",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.faction.ranked_war_hits"
+    },
+    {
+      "id": "personalstats.attacking.faction.raid_hits",
+      "name": "Attacking / Faction / Raid Hits",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.faction.raid_hits"
+    },
+    {
+      "id": "personalstats.attacking.faction.territory.wall_joins",
+      "name": "Attacking / Faction / Territory / Wall Joins",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.faction.territory.wall_joins"
+    },
+    {
+      "id": "personalstats.attacking.faction.territory.wall_clears",
+      "name": "Attacking / Faction / Territory / Wall Clears",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.faction.territory.wall_clears"
+    },
+    {
+      "id": "personalstats.attacking.faction.territory.wall_time",
+      "name": "Attacking / Faction / Territory / Wall Time",
+      "category": "Attacking",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.attacking.faction.territory.wall_time"
+    },
+    {
+      "id": "personalstats.battle_stats.strength",
+      "name": "Battle Stats / Strength",
+      "category": "Battle Stats",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.battle_stats.strength"
+    },
+    {
+      "id": "personalstats.battle_stats.defense",
+      "name": "Battle Stats / Defense",
+      "category": "Battle Stats",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.battle_stats.defense"
+    },
+    {
+      "id": "personalstats.battle_stats.speed",
+      "name": "Battle Stats / Speed",
+      "category": "Battle Stats",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.battle_stats.speed"
+    },
+    {
+      "id": "personalstats.battle_stats.dexterity",
+      "name": "Battle Stats / Dexterity",
+      "category": "Battle Stats",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.battle_stats.dexterity"
+    },
+    {
+      "id": "personalstats.battle_stats.total",
+      "name": "Battle Stats / Total",
+      "category": "Battle Stats",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.battle_stats.total"
+    },
+    {
+      "id": "personalstats.jobs.job_points_used",
+      "name": "Jobs / Job Points Used",
+      "category": "Jobs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.jobs.job_points_used"
+    },
+    {
+      "id": "personalstats.jobs.trains_received",
+      "name": "Jobs / Trains Received",
+      "category": "Jobs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.jobs.trains_received"
+    },
+    {
+      "id": "personalstats.jobs.stats.manual",
+      "name": "Jobs / Stats / Manual",
+      "category": "Jobs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.jobs.stats.manual"
+    },
+    {
+      "id": "personalstats.jobs.stats.intelligence",
+      "name": "Jobs / Stats / Intelligence",
+      "category": "Jobs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.jobs.stats.intelligence"
+    },
+    {
+      "id": "personalstats.jobs.stats.endurance",
+      "name": "Jobs / Stats / Endurance",
+      "category": "Jobs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.jobs.stats.endurance"
+    },
+    {
+      "id": "personalstats.jobs.stats.total",
+      "name": "Jobs / Stats / Total",
+      "category": "Jobs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.jobs.stats.total"
+    },
+    {
+      "id": "personalstats.trading.items.bought.market",
+      "name": "Trading / Items / Bought / Market",
+      "category": "Trading",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.trading.items.bought.market"
+    },
+    {
+      "id": "personalstats.trading.items.bought.shops",
+      "name": "Trading / Items / Bought / Shops",
+      "category": "Trading",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.trading.items.bought.shops"
+    },
+    {
+      "id": "personalstats.trading.items.auctions.won",
+      "name": "Trading / Items / Auctions / Won",
+      "category": "Trading",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.trading.items.auctions.won"
+    },
+    {
+      "id": "personalstats.trading.items.auctions.sold",
+      "name": "Trading / Items / Auctions / Sold",
+      "category": "Trading",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.trading.items.auctions.sold"
+    },
+    {
+      "id": "personalstats.trading.items.sent",
+      "name": "Trading / Items / Sent",
+      "category": "Trading",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.trading.items.sent"
+    },
+    {
+      "id": "personalstats.trading.trades",
+      "name": "Trading / Trades",
+      "category": "Trading",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.trading.trades"
+    },
+    {
+      "id": "personalstats.trading.points.bought",
+      "name": "Trading / Points / Bought",
+      "category": "Trading",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.trading.points.bought"
+    },
+    {
+      "id": "personalstats.trading.points.sold",
+      "name": "Trading / Points / Sold",
+      "category": "Trading",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.trading.points.sold"
+    },
+    {
+      "id": "personalstats.trading.bazaar.customers",
+      "name": "Trading / Bazaar / Customers",
+      "category": "Trading",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.trading.bazaar.customers"
+    },
+    {
+      "id": "personalstats.trading.bazaar.sales",
+      "name": "Trading / Bazaar / Sales",
+      "category": "Trading",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.trading.bazaar.sales"
+    },
+    {
+      "id": "personalstats.trading.bazaar.profit",
+      "name": "Trading / Bazaar / Profit",
+      "category": "Trading",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.trading.bazaar.profit"
+    },
+    {
+      "id": "personalstats.trading.item_market.customers",
+      "name": "Trading / Item Market / Customers",
+      "category": "Trading",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.trading.item_market.customers"
+    },
+    {
+      "id": "personalstats.trading.item_market.sales",
+      "name": "Trading / Item Market / Sales",
+      "category": "Trading",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.trading.item_market.sales"
+    },
+    {
+      "id": "personalstats.trading.item_market.revenue",
+      "name": "Trading / Item Market / Revenue",
+      "category": "Trading",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.trading.item_market.revenue"
+    },
+    {
+      "id": "personalstats.trading.item_market.fees",
+      "name": "Trading / Item Market / Fees",
+      "category": "Trading",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.trading.item_market.fees"
+    },
+    {
+      "id": "personalstats.jail.times_jailed",
+      "name": "Jail / Times Jailed",
+      "category": "Jail",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.jail.times_jailed"
+    },
+    {
+      "id": "personalstats.jail.busts.success",
+      "name": "Jail / Busts / Success",
+      "category": "Jail",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.jail.busts.success"
+    },
+    {
+      "id": "personalstats.jail.busts.fails",
+      "name": "Jail / Busts / Fails",
+      "category": "Jail",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.jail.busts.fails"
+    },
+    {
+      "id": "personalstats.jail.bails.amount",
+      "name": "Jail / Bails / Amount",
+      "category": "Jail",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.jail.bails.amount"
+    },
+    {
+      "id": "personalstats.jail.bails.fees",
+      "name": "Jail / Bails / Fees",
+      "category": "Jail",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.jail.bails.fees"
+    },
+    {
+      "id": "personalstats.hospital.times_hospitalized",
+      "name": "Hospital / Times Hospitalized",
+      "category": "Hospital",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.hospital.times_hospitalized"
+    },
+    {
+      "id": "personalstats.hospital.medical_items_used",
+      "name": "Hospital / Medical Items Used",
+      "category": "Hospital",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.hospital.medical_items_used"
+    },
+    {
+      "id": "personalstats.hospital.blood_withdrawn",
+      "name": "Hospital / Blood Withdrawn",
+      "category": "Hospital",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.hospital.blood_withdrawn"
+    },
+    {
+      "id": "personalstats.hospital.reviving.skill",
+      "name": "Hospital / Reviving / Skill",
+      "category": "Hospital",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.hospital.reviving.skill"
+    },
+    {
+      "id": "personalstats.hospital.reviving.revives",
+      "name": "Hospital / Reviving / Revives",
+      "category": "Hospital",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.hospital.reviving.revives"
+    },
+    {
+      "id": "personalstats.hospital.reviving.revives_received",
+      "name": "Hospital / Reviving / Revives Received",
+      "category": "Hospital",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.hospital.reviving.revives_received"
+    },
+    {
+      "id": "personalstats.finishing_hits.heavy_artillery",
+      "name": "Finishing Hits / Heavy Artillery",
+      "category": "Finishing Hits",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.finishing_hits.heavy_artillery"
+    },
+    {
+      "id": "personalstats.finishing_hits.machine_guns",
+      "name": "Finishing Hits / Machine Guns",
+      "category": "Finishing Hits",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.finishing_hits.machine_guns"
+    },
+    {
+      "id": "personalstats.finishing_hits.rifles",
+      "name": "Finishing Hits / Rifles",
+      "category": "Finishing Hits",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.finishing_hits.rifles"
+    },
+    {
+      "id": "personalstats.finishing_hits.sub_machine_guns",
+      "name": "Finishing Hits / Sub Machine Guns",
+      "category": "Finishing Hits",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.finishing_hits.sub_machine_guns"
+    },
+    {
+      "id": "personalstats.finishing_hits.shotguns",
+      "name": "Finishing Hits / Shotguns",
+      "category": "Finishing Hits",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.finishing_hits.shotguns"
+    },
+    {
+      "id": "personalstats.finishing_hits.pistols",
+      "name": "Finishing Hits / Pistols",
+      "category": "Finishing Hits",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.finishing_hits.pistols"
+    },
+    {
+      "id": "personalstats.finishing_hits.temporary",
+      "name": "Finishing Hits / Temporary",
+      "category": "Finishing Hits",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.finishing_hits.temporary"
+    },
+    {
+      "id": "personalstats.finishing_hits.piercing",
+      "name": "Finishing Hits / Piercing",
+      "category": "Finishing Hits",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.finishing_hits.piercing"
+    },
+    {
+      "id": "personalstats.finishing_hits.slashing",
+      "name": "Finishing Hits / Slashing",
+      "category": "Finishing Hits",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.finishing_hits.slashing"
+    },
+    {
+      "id": "personalstats.finishing_hits.clubbing",
+      "name": "Finishing Hits / Clubbing",
+      "category": "Finishing Hits",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.finishing_hits.clubbing"
+    },
+    {
+      "id": "personalstats.finishing_hits.mechanical",
+      "name": "Finishing Hits / Mechanical",
+      "category": "Finishing Hits",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.finishing_hits.mechanical"
+    },
+    {
+      "id": "personalstats.finishing_hits.hand_to_hand",
+      "name": "Finishing Hits / Hand To Hand",
+      "category": "Finishing Hits",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.finishing_hits.hand_to_hand"
+    },
+    {
+      "id": "personalstats.communication.mails_sent.total",
+      "name": "Communication / Mails Sent / Total",
+      "category": "Communication",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.communication.mails_sent.total"
+    },
+    {
+      "id": "personalstats.communication.mails_sent.friends",
+      "name": "Communication / Mails Sent / Friends",
+      "category": "Communication",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.communication.mails_sent.friends"
+    },
+    {
+      "id": "personalstats.communication.mails_sent.faction",
+      "name": "Communication / Mails Sent / Faction",
+      "category": "Communication",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.communication.mails_sent.faction"
+    },
+    {
+      "id": "personalstats.communication.mails_sent.colleagues",
+      "name": "Communication / Mails Sent / Colleagues",
+      "category": "Communication",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.communication.mails_sent.colleagues"
+    },
+    {
+      "id": "personalstats.communication.mails_sent.spouse",
+      "name": "Communication / Mails Sent / Spouse",
+      "category": "Communication",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.communication.mails_sent.spouse"
+    },
+    {
+      "id": "personalstats.communication.classified_ads",
+      "name": "Communication / Classified Ads",
+      "category": "Communication",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.communication.classified_ads"
+    },
+    {
+      "id": "personalstats.communication.personals",
+      "name": "Communication / Personals",
+      "category": "Communication",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.communication.personals"
+    },
+    {
+      "id": "personalstats.crimes.total",
+      "name": "Crimes / Total",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.total"
+    },
+    {
+      "id": "personalstats.crimes.sell_illegal_goods",
+      "name": "Crimes / Sell Illegal Goods",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.sell_illegal_goods"
+    },
+    {
+      "id": "personalstats.crimes.theft",
+      "name": "Crimes / Theft",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.theft"
+    },
+    {
+      "id": "personalstats.crimes.auto_theft",
+      "name": "Crimes / Auto Theft",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.auto_theft"
+    },
+    {
+      "id": "personalstats.crimes.drug_deals",
+      "name": "Crimes / Drug Deals",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.drug_deals"
+    },
+    {
+      "id": "personalstats.crimes.computer",
+      "name": "Crimes / Computer",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.computer"
+    },
+    {
+      "id": "personalstats.crimes.fraud",
+      "name": "Crimes / Fraud",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.fraud"
+    },
+    {
+      "id": "personalstats.crimes.murder",
+      "name": "Crimes / Murder",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.murder"
+    },
+    {
+      "id": "personalstats.crimes.other",
+      "name": "Crimes / Other",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.other"
+    },
+    {
+      "id": "personalstats.crimes.organized_crimes",
+      "name": "Crimes / Organized Crimes",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.organized_crimes"
+    },
+    {
+      "id": "personalstats.crimes.offenses.vandalism",
+      "name": "Crimes / Offenses / Vandalism",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.offenses.vandalism"
+    },
+    {
+      "id": "personalstats.crimes.offenses.fraud",
+      "name": "Crimes / Offenses / Fraud",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.offenses.fraud"
+    },
+    {
+      "id": "personalstats.crimes.offenses.theft",
+      "name": "Crimes / Offenses / Theft",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.offenses.theft"
+    },
+    {
+      "id": "personalstats.crimes.offenses.counterfeiting",
+      "name": "Crimes / Offenses / Counterfeiting",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.offenses.counterfeiting"
+    },
+    {
+      "id": "personalstats.crimes.offenses.illicit_services",
+      "name": "Crimes / Offenses / Illicit Services",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.offenses.illicit_services"
+    },
+    {
+      "id": "personalstats.crimes.offenses.cybercrime",
+      "name": "Crimes / Offenses / Cybercrime",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.offenses.cybercrime"
+    },
+    {
+      "id": "personalstats.crimes.offenses.extortion",
+      "name": "Crimes / Offenses / Extortion",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.offenses.extortion"
+    },
+    {
+      "id": "personalstats.crimes.offenses.illegal_production",
+      "name": "Crimes / Offenses / Illegal Production",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.offenses.illegal_production"
+    },
+    {
+      "id": "personalstats.crimes.offenses.organized_crimes",
+      "name": "Crimes / Offenses / Organized Crimes",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.offenses.organized_crimes"
+    },
+    {
+      "id": "personalstats.crimes.offenses.total",
+      "name": "Crimes / Offenses / Total",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.offenses.total"
+    },
+    {
+      "id": "personalstats.crimes.skills.search_for_cash",
+      "name": "Crimes / Skills / Search For Cash",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.skills.search_for_cash"
+    },
+    {
+      "id": "personalstats.crimes.skills.bootlegging",
+      "name": "Crimes / Skills / Bootlegging",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.skills.bootlegging"
+    },
+    {
+      "id": "personalstats.crimes.skills.graffiti",
+      "name": "Crimes / Skills / Graffiti",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.skills.graffiti"
+    },
+    {
+      "id": "personalstats.crimes.skills.shoplifting",
+      "name": "Crimes / Skills / Shoplifting",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.skills.shoplifting"
+    },
+    {
+      "id": "personalstats.crimes.skills.pickpocketing",
+      "name": "Crimes / Skills / Pickpocketing",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.skills.pickpocketing"
+    },
+    {
+      "id": "personalstats.crimes.skills.card_skimming",
+      "name": "Crimes / Skills / Card Skimming",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.skills.card_skimming"
+    },
+    {
+      "id": "personalstats.crimes.skills.burglary",
+      "name": "Crimes / Skills / Burglary",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.skills.burglary"
+    },
+    {
+      "id": "personalstats.crimes.skills.hustling",
+      "name": "Crimes / Skills / Hustling",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.skills.hustling"
+    },
+    {
+      "id": "personalstats.crimes.skills.disposal",
+      "name": "Crimes / Skills / Disposal",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.skills.disposal"
+    },
+    {
+      "id": "personalstats.crimes.skills.cracking",
+      "name": "Crimes / Skills / Cracking",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.skills.cracking"
+    },
+    {
+      "id": "personalstats.crimes.skills.forgery",
+      "name": "Crimes / Skills / Forgery",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.skills.forgery"
+    },
+    {
+      "id": "personalstats.crimes.skills.scamming",
+      "name": "Crimes / Skills / Scamming",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.skills.scamming"
+    },
+    {
+      "id": "personalstats.crimes.skills.arson",
+      "name": "Crimes / Skills / Arson",
+      "category": "Crimes",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.crimes.skills.arson"
+    },
+    {
+      "id": "personalstats.bounties.placed.amount",
+      "name": "Bounties / Placed / Amount",
+      "category": "Bounties",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.bounties.placed.amount"
+    },
+    {
+      "id": "personalstats.bounties.placed.value",
+      "name": "Bounties / Placed / Value",
+      "category": "Bounties",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.bounties.placed.value"
+    },
+    {
+      "id": "personalstats.bounties.collected.amount",
+      "name": "Bounties / Collected / Amount",
+      "category": "Bounties",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.bounties.collected.amount"
+    },
+    {
+      "id": "personalstats.bounties.collected.value",
+      "name": "Bounties / Collected / Value",
+      "category": "Bounties",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.bounties.collected.value"
+    },
+    {
+      "id": "personalstats.bounties.received.amount",
+      "name": "Bounties / Received / Amount",
+      "category": "Bounties",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.bounties.received.amount"
+    },
+    {
+      "id": "personalstats.bounties.received.value",
+      "name": "Bounties / Received / Value",
+      "category": "Bounties",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.bounties.received.value"
+    },
+    {
+      "id": "personalstats.investments.bank.total",
+      "name": "Investments / Bank / Total",
+      "category": "Investments",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.investments.bank.total"
+    },
+    {
+      "id": "personalstats.investments.bank.profit",
+      "name": "Investments / Bank / Profit",
+      "category": "Investments",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.investments.bank.profit"
+    },
+    {
+      "id": "personalstats.investments.bank.current",
+      "name": "Investments / Bank / Current",
+      "category": "Investments",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.investments.bank.current"
+    },
+    {
+      "id": "personalstats.investments.bank.time_remaining",
+      "name": "Investments / Bank / Time Remaining",
+      "category": "Investments",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.investments.bank.time_remaining"
+    },
+    {
+      "id": "personalstats.investments.stocks.profits",
+      "name": "Investments / Stocks / Profits",
+      "category": "Investments",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.investments.stocks.profits"
+    },
+    {
+      "id": "personalstats.investments.stocks.losses",
+      "name": "Investments / Stocks / Losses",
+      "category": "Investments",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.investments.stocks.losses"
+    },
+    {
+      "id": "personalstats.investments.stocks.fees",
+      "name": "Investments / Stocks / Fees",
+      "category": "Investments",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.investments.stocks.fees"
+    },
+    {
+      "id": "personalstats.investments.stocks.net_profits",
+      "name": "Investments / Stocks / Net Profits",
+      "category": "Investments",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.investments.stocks.net_profits"
+    },
+    {
+      "id": "personalstats.investments.stocks.payouts",
+      "name": "Investments / Stocks / Payouts",
+      "category": "Investments",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.investments.stocks.payouts"
+    },
+    {
+      "id": "personalstats.items.found.city",
+      "name": "Items / Found / City",
+      "category": "Items",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.items.found.city"
+    },
+    {
+      "id": "personalstats.items.found.dump",
+      "name": "Items / Found / Dump",
+      "category": "Items",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.items.found.dump"
+    },
+    {
+      "id": "personalstats.items.found.easter_eggs",
+      "name": "Items / Found / Easter Eggs",
+      "category": "Items",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.items.found.easter_eggs"
+    },
+    {
+      "id": "personalstats.items.trashed",
+      "name": "Items / Trashed",
+      "category": "Items",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.items.trashed"
+    },
+    {
+      "id": "personalstats.items.used.books",
+      "name": "Items / Used / Books",
+      "category": "Items",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.items.used.books"
+    },
+    {
+      "id": "personalstats.items.used.boosters",
+      "name": "Items / Used / Boosters",
+      "category": "Items",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.items.used.boosters"
+    },
+    {
+      "id": "personalstats.items.used.consumables",
+      "name": "Items / Used / Consumables",
+      "category": "Items",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.items.used.consumables"
+    },
+    {
+      "id": "personalstats.items.used.candy",
+      "name": "Items / Used / Candy",
+      "category": "Items",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.items.used.candy"
+    },
+    {
+      "id": "personalstats.items.used.alcohol",
+      "name": "Items / Used / Alcohol",
+      "category": "Items",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.items.used.alcohol"
+    },
+    {
+      "id": "personalstats.items.used.energy_drinks",
+      "name": "Items / Used / Energy Drinks",
+      "category": "Items",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.items.used.energy_drinks"
+    },
+    {
+      "id": "personalstats.items.used.stat_enhancers",
+      "name": "Items / Used / Stat Enhancers",
+      "category": "Items",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.items.used.stat_enhancers"
+    },
+    {
+      "id": "personalstats.items.used.easter_eggs",
+      "name": "Items / Used / Easter Eggs",
+      "category": "Items",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.items.used.easter_eggs"
+    },
+    {
+      "id": "personalstats.items.viruses_coded",
+      "name": "Items / Viruses Coded",
+      "category": "Items",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.items.viruses_coded"
+    },
+    {
+      "id": "personalstats.travel.total",
+      "name": "Travel / Total",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.total"
+    },
+    {
+      "id": "personalstats.travel.time_spent",
+      "name": "Travel / Time Spent",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.time_spent"
+    },
+    {
+      "id": "personalstats.travel.items_bought",
+      "name": "Travel / Items Bought",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.items_bought"
+    },
+    {
+      "id": "personalstats.travel.hunting.skill",
+      "name": "Travel / Hunting / Skill",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.hunting.skill"
+    },
+    {
+      "id": "personalstats.travel.attacks_won",
+      "name": "Travel / Attacks Won",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.attacks_won"
+    },
+    {
+      "id": "personalstats.travel.defends_lost",
+      "name": "Travel / Defends Lost",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.defends_lost"
+    },
+    {
+      "id": "personalstats.travel.argentina",
+      "name": "Travel / Argentina",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.argentina"
+    },
+    {
+      "id": "personalstats.travel.canada",
+      "name": "Travel / Canada",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.canada"
+    },
+    {
+      "id": "personalstats.travel.cayman_islands",
+      "name": "Travel / Cayman Islands",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.cayman_islands"
+    },
+    {
+      "id": "personalstats.travel.china",
+      "name": "Travel / China",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.china"
+    },
+    {
+      "id": "personalstats.travel.hawaii",
+      "name": "Travel / Hawaii",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.hawaii"
+    },
+    {
+      "id": "personalstats.travel.japan",
+      "name": "Travel / Japan",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.japan"
+    },
+    {
+      "id": "personalstats.travel.mexico",
+      "name": "Travel / Mexico",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.mexico"
+    },
+    {
+      "id": "personalstats.travel.united_arab_emirates",
+      "name": "Travel / United Arab Emirates",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.united_arab_emirates"
+    },
+    {
+      "id": "personalstats.travel.united_kingdom",
+      "name": "Travel / United Kingdom",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.united_kingdom"
+    },
+    {
+      "id": "personalstats.travel.south_africa",
+      "name": "Travel / South Africa",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.south_africa"
+    },
+    {
+      "id": "personalstats.travel.switzerland",
+      "name": "Travel / Switzerland",
+      "category": "Travel",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.travel.switzerland"
+    },
+    {
+      "id": "personalstats.drugs.cannabis",
+      "name": "Drugs / Cannabis",
+      "category": "Drugs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.drugs.cannabis"
+    },
+    {
+      "id": "personalstats.drugs.ecstasy",
+      "name": "Drugs / Ecstasy",
+      "category": "Drugs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.drugs.ecstasy"
+    },
+    {
+      "id": "personalstats.drugs.ketamine",
+      "name": "Drugs / Ketamine",
+      "category": "Drugs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.drugs.ketamine"
+    },
+    {
+      "id": "personalstats.drugs.lsd",
+      "name": "Drugs / Lsd",
+      "category": "Drugs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.drugs.lsd"
+    },
+    {
+      "id": "personalstats.drugs.opium",
+      "name": "Drugs / Opium",
+      "category": "Drugs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.drugs.opium"
+    },
+    {
+      "id": "personalstats.drugs.pcp",
+      "name": "Drugs / Pcp",
+      "category": "Drugs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.drugs.pcp"
+    },
+    {
+      "id": "personalstats.drugs.shrooms",
+      "name": "Drugs / Shrooms",
+      "category": "Drugs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.drugs.shrooms"
+    },
+    {
+      "id": "personalstats.drugs.speed",
+      "name": "Drugs / Speed",
+      "category": "Drugs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.drugs.speed"
+    },
+    {
+      "id": "personalstats.drugs.vicodin",
+      "name": "Drugs / Vicodin",
+      "category": "Drugs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.drugs.vicodin"
+    },
+    {
+      "id": "personalstats.drugs.xanax",
+      "name": "Drugs / Xanax",
+      "category": "Drugs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.drugs.xanax"
+    },
+    {
+      "id": "personalstats.drugs.total",
+      "name": "Drugs / Total",
+      "category": "Drugs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.drugs.total"
+    },
+    {
+      "id": "personalstats.drugs.overdoses",
+      "name": "Drugs / Overdoses",
+      "category": "Drugs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.drugs.overdoses"
+    },
+    {
+      "id": "personalstats.drugs.rehabilitations.amount",
+      "name": "Drugs / Rehabilitations / Amount",
+      "category": "Drugs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.drugs.rehabilitations.amount"
+    },
+    {
+      "id": "personalstats.drugs.rehabilitations.fees",
+      "name": "Drugs / Rehabilitations / Fees",
+      "category": "Drugs",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.drugs.rehabilitations.fees"
+    },
+    {
+      "id": "personalstats.missions.missions",
+      "name": "Missions / Missions",
+      "category": "Missions",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.missions.missions"
+    },
+    {
+      "id": "personalstats.missions.contracts.total",
+      "name": "Missions / Contracts / Total",
+      "category": "Missions",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.missions.contracts.total"
+    },
+    {
+      "id": "personalstats.missions.contracts.duke",
+      "name": "Missions / Contracts / Duke",
+      "category": "Missions",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.missions.contracts.duke"
+    },
+    {
+      "id": "personalstats.missions.credits",
+      "name": "Missions / Credits",
+      "category": "Missions",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.missions.credits"
+    },
+    {
+      "id": "personalstats.racing.skill",
+      "name": "Racing / Skill",
+      "category": "Racing",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.racing.skill"
+    },
+    {
+      "id": "personalstats.racing.points",
+      "name": "Racing / Points",
+      "category": "Racing",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.racing.points"
+    },
+    {
+      "id": "personalstats.racing.races.entered",
+      "name": "Racing / Races / Entered",
+      "category": "Racing",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.racing.races.entered"
+    },
+    {
+      "id": "personalstats.racing.races.won",
+      "name": "Racing / Races / Won",
+      "category": "Racing",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.racing.races.won"
+    },
+    {
+      "id": "personalstats.networth.total",
+      "name": "Networth / Total",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.total"
+    },
+    {
+      "id": "personalstats.networth.wallet",
+      "name": "Networth / Wallet",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.wallet"
+    },
+    {
+      "id": "personalstats.networth.vaults",
+      "name": "Networth / Vaults",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.vaults"
+    },
+    {
+      "id": "personalstats.networth.bank",
+      "name": "Networth / Bank",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.bank"
+    },
+    {
+      "id": "personalstats.networth.overseas_bank",
+      "name": "Networth / Overseas Bank",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.overseas_bank"
+    },
+    {
+      "id": "personalstats.networth.points",
+      "name": "Networth / Points",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.points"
+    },
+    {
+      "id": "personalstats.networth.inventory",
+      "name": "Networth / Inventory",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.inventory"
+    },
+    {
+      "id": "personalstats.networth.display_case",
+      "name": "Networth / Display Case",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.display_case"
+    },
+    {
+      "id": "personalstats.networth.bazaar",
+      "name": "Networth / Bazaar",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.bazaar"
+    },
+    {
+      "id": "personalstats.networth.item_market",
+      "name": "Networth / Item Market",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.item_market"
+    },
+    {
+      "id": "personalstats.networth.property",
+      "name": "Networth / Property",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.property"
+    },
+    {
+      "id": "personalstats.networth.stock_market",
+      "name": "Networth / Stock Market",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.stock_market"
+    },
+    {
+      "id": "personalstats.networth.auction_house",
+      "name": "Networth / Auction House",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.auction_house"
+    },
+    {
+      "id": "personalstats.networth.bookie",
+      "name": "Networth / Bookie",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.bookie"
+    },
+    {
+      "id": "personalstats.networth.company",
+      "name": "Networth / Company",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.company"
+    },
+    {
+      "id": "personalstats.networth.enlisted_cars",
+      "name": "Networth / Enlisted Cars",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.enlisted_cars"
+    },
+    {
+      "id": "personalstats.networth.piggy_bank",
+      "name": "Networth / Piggy Bank",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.piggy_bank"
+    },
+    {
+      "id": "personalstats.networth.pending",
+      "name": "Networth / Pending",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.pending"
+    },
+    {
+      "id": "personalstats.networth.loans",
+      "name": "Networth / Loans",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.loans"
+    },
+    {
+      "id": "personalstats.networth.unpaid_fees",
+      "name": "Networth / Unpaid Fees",
+      "category": "Networth",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.networth.unpaid_fees"
+    },
+    {
+      "id": "personalstats.other.activity.time",
+      "name": "Other / Activity / Time",
+      "category": "Other",
+      "unit": "as documented",
+      "description": "Time played in seconds",
+      "source": "official-api",
+      "sourceField": "personalstats.other.activity.time"
+    },
+    {
+      "id": "personalstats.other.activity.streak.best",
+      "name": "Other / Activity / Streak / Best",
+      "category": "Other",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.other.activity.streak.best"
+    },
+    {
+      "id": "personalstats.other.activity.streak.current",
+      "name": "Other / Activity / Streak / Current",
+      "category": "Other",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.other.activity.streak.current"
+    },
+    {
+      "id": "personalstats.other.awards",
+      "name": "Other / Awards",
+      "category": "Other",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.other.awards"
+    },
+    {
+      "id": "personalstats.other.merits_bought",
+      "name": "Other / Merits Bought",
+      "category": "Other",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.other.merits_bought"
+    },
+    {
+      "id": "personalstats.other.refills.energy",
+      "name": "Other / Refills / Energy",
+      "category": "Other",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.other.refills.energy"
+    },
+    {
+      "id": "personalstats.other.refills.nerve",
+      "name": "Other / Refills / Nerve",
+      "category": "Other",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.other.refills.nerve"
+    },
+    {
+      "id": "personalstats.other.refills.token",
+      "name": "Other / Refills / Token",
+      "category": "Other",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.other.refills.token"
+    },
+    {
+      "id": "personalstats.other.donator_days",
+      "name": "Other / Donator Days",
+      "category": "Other",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.other.donator_days"
+    },
+    {
+      "id": "personalstats.other.ranked_war_wins",
+      "name": "Other / Ranked War Wins",
+      "category": "Other",
+      "unit": "as documented",
+      "description": "Official numeric field; interpretation depends on the endpoint category.",
+      "source": "official-api",
+      "sourceField": "personalstats.other.ranked_war_wins"
+    }
+  ]
+}

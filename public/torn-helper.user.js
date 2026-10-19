@@ -1,64 +1,87 @@
 // ==UserScript==
-// @name         Torn Command Center Companion
-// @namespace    torn-command-center
-// @version      1.0.0
-// @description  Floating quick-links panel and target lookup for Torn City, companion to Torn Command Center.
-// @author       Torn Command Center
-// @match        https://www.torn.com/*
-// @grant        GM_setValue
-// @grant        GM_getValue
-// @run-at       document-idle
+// @name Torn Command Center Companion
+// @namespace torn-command-center
+// @version 1.1.0
+// @description Manual quick links to your Command Center. No Torn key storage or gameplay automation.
+// @match https://www.torn.com/*
+// @grant GM_setValue
+// @grant GM_getValue
+// @run-at document-idle
 // ==/UserScript==
-
 (function () {
-  'use strict';
-
-  const APP_URL = GM_getValue('tcc_app_url', 'http://localhost:5173');
-  const API_KEY = GM_getValue('tcc_api_key', '');
-
-  const panel = document.createElement('div');
-  panel.id = 'tcc-companion';
-  panel.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:99999;background:#1a1a2e;color:#eee;border:1px solid #444;border-radius:12px;padding:12px;font-family:sans-serif;font-size:13px;max-width:260px;box-shadow:0 4px 16px rgba(0,0,0,.5);';
-  panel.innerHTML = `
-    <div style="font-weight:bold;margin-bottom:8px;">Torn Command Center</div>
-    <div style="display:flex;flex-direction:column;gap:4px;">
-      <a href="${APP_URL}/" target="_blank" style="color:#7dd3fc;">Open Command Center</a>
-      <a href="${APP_URL}/#/Targets" target="_blank" style="color:#7dd3fc;">Targets</a>
-      <a href="${APP_URL}/#/War%20Room" target="_blank" style="color:#7dd3fc;">War Room</a>
-      <a href="${APP_URL}/#/Dibs" target="_blank" style="color:#7dd3fc;">Dibs</a>
-    </div>
-    <div style="margin-top:10px;">
-      <input id="tcc-target-id" placeholder="Target ID" style="width:100%;padding:4px;border-radius:6px;border:1px solid #555;background:#222;color:#eee;" />
-      <button id="tcc-lookup" style="margin-top:4px;width:100%;padding:4px;border-radius:6px;border:none;background:#3b82f6;color:#fff;cursor:pointer;">Look up</button>
-      <div id="tcc-result" style="margin-top:6px;font-size:12px;"></div>
-    </div>
-    <div style="margin-top:8px;font-size:11px;color:#888;">
-      <a href="#" id="tcc-settings" style="color:#888;">Settings</a>
-    </div>
-  `;
-  document.body.appendChild(panel);
-
-  document.getElementById('tcc-lookup').addEventListener('click', async () => {
-    const id = document.getElementById('tcc-target-id').value.trim();
-    const result = document.getElementById('tcc-result');
-    if (!id || !API_KEY) { result.textContent = API_KEY ? 'Enter a target ID' : 'Set your API key in Settings'; return; }
-    result.textContent = 'Loading…';
+  "use strict";
+  GM_setValue("tcc_api_key", ""); // Remove the obsolete locally stored credential.
+  const panel = document.createElement("aside");
+  panel.setAttribute("aria-label", "Torn Command Center companion");
+  panel.style.cssText =
+    "position:fixed;bottom:20px;right:20px;z-index:99999;background:#17212b;color:#fff;padding:16px;border-radius:12px;max-width:260px;font:14px sans-serif";
+  let app;
+  try {
+    app = new URL(GM_getValue("tcc_app_url", "http://localhost:5173"));
+    if (
+      app.protocol !== "https:" &&
+      !(app.hostname === "localhost" && app.protocol === "http:")
+    )
+      throw new Error();
+  } catch {
+    return;
+  }
+  const title = document.createElement("strong");
+  title.textContent = "Torn Command Center";
+  panel.append(title);
+  function link(label, route) {
+    const a = document.createElement("a");
+    a.textContent = label;
+    a.href = app.origin + app.pathname.replace(/\/$/, "") + "/#/" + route;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.style.cssText = "display:block;color:#9bdeff;margin:8px 0";
+    panel.append(a);
+  }
+  link("Open Command Center", "Overview");
+  link("Targets", "Targets");
+  link("War Room", "War%20Room");
+  const input = document.createElement("input");
+  input.placeholder = "Player Torn ID";
+  input.setAttribute("aria-label", "Player Torn ID");
+  input.inputMode = "numeric";
+  panel.append(input);
+  const lookup = document.createElement("button");
+  lookup.textContent = "View player in app";
+  lookup.onclick = () => {
+    if (!/^[1-9]\d*$/.test(input.value)) return;
+    window.open(
+      app.origin +
+        app.pathname.replace(/\/$/, "") +
+        "/#/Player%20Intel?player=" +
+        input.value,
+      "_blank",
+      "noopener,noreferrer",
+    );
+  };
+  panel.append(lookup);
+  const settings = document.createElement("button");
+  settings.textContent = "Set app URL";
+  settings.onclick = () => {
+    const value = prompt("Your Command Center HTTPS URL:", app.href);
+    if (!value) return;
     try {
-      const res = await fetch(`https://api.torn.com/v2/user/${id}?selections=basic,profile&key=${API_KEY}`);
-      const data = await res.json();
-      if (data.error) { result.textContent = `Error: ${data.error.error}`; return; }
-      const u = data;
-      result.innerHTML = `<b>${u.name}</b> [${u.player_id}]<br>Level ${u.level} • ${u.status.state}<br><a href="${APP_URL}/#/Compare%20Players" target="_blank" style="color:#7dd3fc;">Compare in app</a>`;
-    } catch (e) {
-      result.textContent = 'Lookup failed';
+      const next = new URL(value);
+      if (
+        next.protocol !== "https:" &&
+        !(next.hostname === "localhost" && next.protocol === "http:")
+      )
+        throw new Error();
+      GM_setValue("tcc_app_url", next.origin + next.pathname);
+      location.reload();
+    } catch {
+      alert("Enter a valid HTTPS app URL.");
     }
-  });
-
-  document.getElementById('tcc-settings').addEventListener('click', (e) => {
-    e.preventDefault();
-    const url = prompt('Command Center URL:', APP_URL);
-    if (url) { GM_setValue('tcc_app_url', url); location.reload(); }
-    const key = prompt('Torn API key (stored locally in your browser):', API_KEY);
-    if (key !== null) { GM_setValue('tcc_api_key', key); location.reload(); }
-  });
+  };
+  panel.append(settings);
+  const close = document.createElement("button");
+  close.textContent = "Hide panel";
+  close.onclick = () => panel.remove();
+  panel.append(close);
+  document.body.append(panel);
 })();

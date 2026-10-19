@@ -1,20 +1,30 @@
-export type ApiVersion = 'v1' | 'v2';
-export type DataSource = 'official API' | 'derived calculation' | 'manual input' | 'future work';
-export type AccessLevel = 'Public Only' | 'Minimal Access' | 'Limited Access' | 'Full Access' | 'Custom';
+export type ApiVersion = "v1" | "v2";
+export type DataSource =
+  | "official API"
+  | "derived calculation"
+  | "manual input"
+  | "future work";
+export type AccessLevel =
+  | "Public Only"
+  | "Minimal Access"
+  | "Limited Access"
+  | "Full Access"
+  | "Custom"
+  | "Unknown";
 
 export interface Capability {
   id: string;
   version: ApiVersion;
-  method: 'GET';
+  method: "GET";
   path: string;
   group: string;
   summary: string;
   queryParams: string[];
   requiredAccess: AccessLevel;
-  privacy: 'public' | 'own' | 'faction' | 'company';
-  pagination: 'none' | 'limit-offset' | 'from-to' | 'cursor';
+  privacy: "public" | "own" | "faction" | "company" | "unknown";
+  pagination: "none" | "limit-offset" | "from-to" | "cursor";
   cacheSeconds: number;
-  refresh: 'manual' | 'active-session' | 'background';
+  refresh: "manual" | "active-session" | "background";
   features: string[];
   source: DataSource;
   verified: boolean;

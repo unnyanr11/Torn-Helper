@@ -1,126 +1,96 @@
-import { createClient } from 'jsr:@supabase/supabase-js@2';
-
-const cors = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
-
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
-}
-
-async function decryptKey(payload: string, secretB64: string): Promise<string> {
-  const [ivLenStr, b64] = payload.split(':');
-  const ivLen = parseInt(ivLenStr);
-  const raw = Uint8Array.from(atob(secretB64), (c) => c.charCodeAt(0));
-  const key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
-  const data = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-  const iv = data.slice(0, ivLen);
-  const ct = data.slice(ivLen);
-  const buf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct);
-  return new TextDecoder().decode(buf);
-}
-
-Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
-  if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
-
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader) return json({ error: 'Missing authorization header' }, 401);
-
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-    { global: { headers: { Authorization: authHeader } } }
-  );
-
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError || !userData.user) return json({ error: 'Unauthorized' }, 401);
-  const userId = userData.user.id;
-
-  let listId: string;
+import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
+import { decrypt } from "../_shared/crypto.ts";
+import { tornGet } from "../_shared/torn.ts";
+Deno.serve(async (req) => {
+  const early = preflight(req);
+  if (early) return early;
   try {
-    const body = await req.json();
-    listId = body.listId;
-  } catch {
-    return json({ error: 'Invalid JSON body' }, 400);
-  }
-  if (!listId) return json({ error: 'listId is required' }, 400);
-
-  const { data: linked, error: linkedError } = await supabase
-    .from('linked_torn_accounts')
-    .select('id, torn_id')
-    .eq('user_id', userId)
-    .is('revoked_at', null)
-    .maybeSingle();
-  if (linkedError || !linked) return json({ error: 'No active linked Torn account. Link a key first.' }, 400);
-
-  const { data: cred, error: credError } = await supabase
-    .from('encrypted_credentials')
-    .select('ciphertext')
-    .eq('linked_account_id', linked.id)
-    .is('revoked_at', null)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (credError || !cred) return json({ error: 'No stored credential found' }, 400);
-
-  const secret = Deno.env.get('TORN_KEY_ENCRYPTION_KEY');
-  if (!secret) return json({ error: 'Server encryption secret not configured' }, 500);
-
-  let apiKey: string;
-  try {
-    apiKey = await decryptKey(cred.ciphertext as unknown as string, secret);
-  } catch {
-    return json({ error: 'Failed to decrypt stored credential' }, 500);
-  }
-
-  const { data: entries, error: entriesError } = await supabase
-    .from('target_list_entries')
-    .select('id, torn_player_id')
-    .eq('list_id', listId)
-    .eq('excluded', false);
-  if (entriesError) return json({ error: 'Failed to load targets', detail: entriesError.message }, 500);
-  if (!entries?.length) return json({ refreshed: 0, results: [] });
-
-  const results: Array<{ torn_player_id: string; status?: string; level?: number; error?: string }> = [];
-
-  for (const entry of entries) {
-    try {
-      const res = await fetch(`https://api.torn.com/user/${entry.torn_player_id}?selections=basic&key=${encodeURIComponent(apiKey)}`);
-      if (!res.ok) {
-        results.push({ torn_player_id: entry.torn_player_id, error: `HTTP ${res.status}` });
+    const admin = adminClient();
+    const user = await authenticate(req, admin);
+    if (!user) return json({ error: "Unauthorized" }, 401);
+    const { listId } = await req.json();
+    const { data: list } = await admin
+      .from("target_lists")
+      .select("id")
+      .eq("id", listId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (!list) return json({ error: "List not found" }, 404);
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("tracking_paused")
+      .eq("id", user.id)
+      .single();
+    if (profile?.tracking_paused)
+      return json({ error: "Tracking paused in Settings" }, 409);
+    const { data: cred } = await admin
+      .from("encrypted_credentials")
+      .select("encrypted_key")
+      .eq("user_id", user.id)
+      .eq("provider", "torn")
+      .single();
+    if (!cred) return json({ error: "Link a Torn key in Settings" }, 400);
+    const apiKey = await decrypt(
+      cred.encrypted_key,
+      Deno.env.get("TORN_KEY_ENCRYPTION_KEY")!,
+    );
+    const { data: entries, error } = await admin
+      .from("target_list_entries")
+      .select("*")
+      .eq("list_id", listId)
+      .eq("excluded", false)
+      .order("last_checked_at", { ascending: true, nullsFirst: true })
+      .limit(20);
+    if (error) throw error;
+    let refreshed = 0;
+    for (const entry of entries ?? []) {
+      if (
+        entry.last_checked_at &&
+        Date.now() - Date.parse(entry.last_checked_at) < 60000
+      )
         continue;
-      }
-      const data = await res.json();
-      if (data.error) {
-        results.push({ torn_player_id: entry.torn_player_id, error: data.error.error });
-        continue;
-      }
-      const status = data.status?.state ?? null;
-      const level = data.level ?? null;
-      const lastAction = data.last_action?.relative ?? null;
-
-      await supabase.from('target_list_entries').update({
-        status,
-        level,
-        last_checked_at: new Date().toISOString(),
-      }).eq('id', entry.id);
-
-      await supabase.from('player_observations').insert({
-        user_id: userId,
-        torn_player_id: entry.torn_player_id,
-        status,
-        level,
-        last_action: lastAction,
-      });
-
-      results.push({ torn_player_id: entry.torn_player_id, status: status ?? undefined, level: level ?? undefined });
-    } catch (e) {
-      results.push({ torn_player_id: entry.torn_player_id, error: String(e) });
+      const payload = await tornGet(
+        `/user/${entry.torn_player_id}/profile`,
+        apiKey,
+      );
+      const player = payload.profile;
+      if (!player) continue;
+      const status = player.status?.state ?? null,
+        level = player.level ?? null;
+      const update = await admin
+        .from("target_list_entries")
+        .update({
+          status,
+          level,
+          player_name: player.name,
+          last_checked_at: new Date().toISOString(),
+        })
+        .eq("id", entry.id);
+      if (update.error) throw update.error;
+      const observation = await admin
+        .from("player_observations")
+        .insert({
+          user_id: user.id,
+          torn_player_id: entry.torn_player_id,
+          status,
+          level,
+          last_action: player.last_action?.status ?? null,
+        });
+      if (observation.error) throw observation.error;
+      refreshed++;
     }
+    return json({
+      refreshed,
+      message:
+        "Refreshes up to 20 oldest targets; observations younger than one minute are reused",
+    });
+  } catch {
+    return json(
+      {
+        error:
+          "Unable to refresh targets. Check key permissions or retry later.",
+      },
+      503,
+    );
   }
-
-  return json({ refreshed: results.length, results });
 });

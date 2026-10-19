@@ -44,3 +44,9 @@ a { color: var(--accent); }
   .content { padding-top: 48px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+.card { margin-bottom: 16px; min-width: 0; }
+.content { min-width: 0; overflow-wrap: anywhere; }
+.nu-input::placeholder { color: var(--muted); opacity: 1; }
+button:disabled { cursor: not-allowed; opacity: .55; }
+pre { max-width: 100%; overflow: auto; }
+@media (max-width: 800px) { section { overflow-x: auto; } table { min-width: 540px; } }

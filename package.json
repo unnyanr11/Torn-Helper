@@ -12,26 +12,38 @@
     "test:edge": "vitest run src/__tests__/edge-functions.test.ts",
     "test:payout": "vitest run src/__tests__/payout-workflow.test.ts",
     "deploy:functions": "bash scripts/deploy-functions.sh",
-    "db:push": "supabase db push",
-    "db:reset": "supabase db reset",
-    "types": "supabase gen types typescript --project-id caxhhhtrlqfuatraamto > src/types/supabase.ts"
+    "types": "mkdir -p src/types && supabase gen types typescript --project-id caxhhhtrlqfuatraamto > src/types/supabase.ts",
+    "test:db": "vitest run src/__tests__/database.test.ts",
+    "audit:schema": "node scripts/audit-schema.mjs --candidate --check",
+    "check:edge": "deno check supabase/functions/*/index.ts"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.118.0",
+    "@tanstack/react-query": "^5.51.0",
+    "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
+    "exceljs": "4.4.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "@supabase/supabase-js": "^2.45.0",
-    "recharts": "^2.12.0",
-    "@tanstack/react-query": "^5.51.0",
-    "date-fns": "^3.6.0",
-    "clsx": "^2.1.1"
+    "recharts": "^2.12.0"
   },
   "devDependencies": {
-    "typescript": "^5.5.0",
-    "vite": "^5.4.0",
-    "@vitejs/plugin-react": "^4.3.0",
-    "vitest": "^2.0.0",
+    "@electric-sql/pglite": "0.3.14",
+    "@types/node": "22.19.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
-    "supabase": "^1.192.0"
+    "@vitejs/plugin-react": "6.1.2",
+    "supabase": "2.121.0",
+    "typescript": "^5.5.0",
+    "vite": "8.3.4",
+    "vitest": "5.0.5"
+  },
+  "overrides": {
+    "exceljs": {
+      "uuid": "11.1.1"
+    }
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
   }
 }

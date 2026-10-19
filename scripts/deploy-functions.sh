@@ -1,37 +1,15 @@
 #!/usr/bin/env bash
-# Torn Command Center - Deploy Edge Functions via Supabase CLI
-# Usage: ./scripts/deploy-functions.sh
-
 set -euo pipefail
-
-# Check CLI installed
-if ! command -v supabase &> /dev/null; then
-  echo "Error: Supabase CLI not found. Install with: npm install -g supabase"
+PROJECT_REF="${SUPABASE_PROJECT_REF:-caxhhhtrlqfuatraamto}"
+# The SQL repair must be applied and approved before deploying these coordinated changes.
+if [[ "${TCC_SCHEMA_REPAIR_APPLIED:-}" != "yes" ]]; then
+  echo 'Apply and verify the reviewed runtime repair migration first; then set TCC_SCHEMA_REPAIR_APPLIED=yes.' >&2
   exit 1
 fi
-
-# Check logged in
-if ! supabase projects list &> /dev/null; then
-  echo "Error: Not logged in. Run: supabase login"
-  exit 1
-fi
-
-# Link project (idempotent)
-PROJECT_REF="caxhhhtrlqfuatraamto"
-echo "Linking project $PROJECT_REF..."
-supabase link --project-ref "$PROJECT_REF"
-
-# Deploy functions
-echo "Deploying verify-loss-payment..."
-supabase functions deploy verify-loss-payment
-
-echo "Deploying verify-loss-funding..."
-supabase functions deploy verify-loss-funding
-
-echo "All functions deployed successfully."
-
-echo "Verifying deployment..."
-curl -s -X POST "https://${PROJECT_REF}.supabase.co/functions/v1/verify-loss-funding" \
-  -H "Content-Type: application/json" \
-  -d '{}' | head -c 500
-echo ""
+for function_dir in supabase/functions/*; do
+  [[ -d "$function_dir" && "$(basename "$function_dir")" != "_shared" ]] || continue
+  function_name="$(basename "$function_dir")"
+  npx supabase functions deploy "$function_name" --project-ref "$PROJECT_REF" --no-verify-jwt
+done
+# Each private function authenticates getUser(token) or the scoped Vault job token in its body.
+# public-api exposes static public documentation only. No unauthenticated verification probes run here.

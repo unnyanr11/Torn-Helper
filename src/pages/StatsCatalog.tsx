@@ -24,8 +24,9 @@ export default function StatsCatalog() {
   return (
     <section>
       <h2>Stats Catalog</h2>
-      <p className="muted">Searchable catalog of {VERIFIED_METRIC_COUNT} verified distinct metrics across {STAT_CATEGORIES.length} categories. Favourites persist locally. Each metric shows unit, source, and description.</p>
-      <p className="badge">{VERIFIED_METRIC_COUNT} / 217+ target metrics verified</p>
+      <p className="muted">Searchable catalog of {VERIFIED_METRIC_COUNT} distinct documented numeric fields across {STAT_CATEGORIES.length} categories. Favourites persist locally. Each metric shows unit, source, and description.</p>
+      <p className="muted">Fields are generated from the official OpenAPI schema. A documented field does not imply permission or historical coverage. Values and units require the matching endpoint context.</p>
+      <p className="badge">{VERIFIED_METRIC_COUNT} / 217 target fields documented; historical availability is separate</p>
       <article className="card nu-inset">
         <input className="nu-input" placeholder="Search metrics…" value={query} onChange={(e) => setQuery(e.target.value)} />
         <select className="nu-input" value={category} onChange={(e) => setCategory(e.target.value)}>

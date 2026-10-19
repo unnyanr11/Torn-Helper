@@ -1,170 +1,264 @@
-import { useEffect, useState } from 'react';
-import { BUILT, NAV, Page } from './nav';
-import Overview from './pages/Overview';
-import Planner from './pages/Planner';
-import Targets from './pages/Targets';
-import ComparePlayers from './pages/ComparePlayers';
-import Leaderboards from './pages/Leaderboards';
-import RoiCalculator from './pages/RoiCalculator';
-import PiMortgages from './pages/PiMortgages';
-import Bounties from './pages/Bounties';
-import StatsCatalog from './pages/StatsCatalog';
-import CustomStats from './pages/CustomStats';
-import StatIntelligence from './pages/StatIntelligence';
-import StatGrowth from './pages/StatGrowth';
-import SpyReports from './pages/SpyReports';
-import WarHits from './pages/WarHits';
-import CrimeTracker from './pages/CrimeTracker';
-import FlightTracker from './pages/FlightTracker';
-import Dibs from './pages/Dibs';
-import TargetPools from './pages/TargetPools';
-import Glossary from './pages/Glossary';
-import Assistant from './pages/Assistant';
-import Discord from './pages/Discord';
-import NotificationPrefs from './pages/NotificationPrefs';
-import Alerts from './pages/Alerts';
-import Notifications from './pages/Notifications';
-import WarRoom from './pages/WarRoom';
-import WarAnalyzer from './pages/WarAnalyzer';
-import AiWarAnalyzer from './pages/AiWarAnalyzer';
-import PayoutCalculator from './pages/PayoutCalculator';
-import LossMarketplace from './pages/LossMarketplace';
-import TornStats from './pages/TornStats';
-import Travel from './pages/Travel';
-import TravelOptimizer from './pages/TravelOptimizer';
-import OcPlanner from './pages/OcPlanner';
-import ChainQueue from './pages/ChainQueue';
-import DailyDigest from './pages/DailyDigest';
-import ReviveTracker from './pages/ReviveTracker';
-import ReviveMarketplace from './pages/ReviveMarketplace';
-import SettlementQueue from './pages/SettlementQueue';
-import OperatorDashboard from './pages/OperatorDashboard';
-import AiSettings from './pages/AiSettings';
-import Markets from './pages/Markets';
-import Stocks from './pages/Stocks';
-import Company from './pages/Company';
-import Properties from './pages/Properties';
-import Racing from './pages/Racing';
-import Community from './pages/Community';
-import LiveFeeds from './pages/LiveFeeds';
-import Alliances from './pages/Alliances';
-import WatchedFactions from './pages/WatchedFactions';
-import Recruitment from './pages/Recruitment';
-import Gym from './pages/Gym';
-import Activity from './pages/Activity';
-import Graffiti from './pages/Graffiti';
-import Reports from './pages/Reports';
-import ApiUsage from './pages/ApiUsage';
-import PublicApi from './pages/PublicApi';
-import AdminCostDashboard from './pages/AdminCostDashboard';
-import CompetitorMatrix from './pages/CompetitorMatrix';
-import Halloween from './pages/Halloween';
-import FactionOps from './pages/FactionOps';
-import FactionFinance from './pages/FactionFinance';
-import FactionUpgrades from './pages/FactionUpgrades';
-import AllianceSharing from './pages/AllianceSharing';
-import RetentionTrends from './pages/RetentionTrends';
-import ArmoryHistory from './pages/ArmoryHistory';
-import LoanReminders from './pages/LoanReminders';
-import Placeholder from './pages/Placeholder';
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { BUILT, NAV, Page } from "./nav";
+const Overview = lazy(() => import("./pages/Overview"));
+const Planner = lazy(() => import("./pages/Planner"));
+const Targets = lazy(() => import("./pages/Targets"));
+const ComparePlayers = lazy(() => import("./pages/ComparePlayers"));
+const Leaderboards = lazy(() => import("./pages/Leaderboards"));
+const RoiCalculator = lazy(() => import("./pages/RoiCalculator"));
+const PiMortgages = lazy(() => import("./pages/PiMortgages"));
+const Bounties = lazy(() => import("./pages/Bounties"));
+const StatsCatalog = lazy(() => import("./pages/StatsCatalog"));
+const CustomStats = lazy(() => import("./pages/CustomStats"));
+const StatIntelligence = lazy(() => import("./pages/StatIntelligence"));
+const StatGrowth = lazy(() => import("./pages/StatGrowth"));
+const SpyReports = lazy(() => import("./pages/SpyReports"));
+const WarHits = lazy(() => import("./pages/WarHits"));
+const CrimeTracker = lazy(() => import("./pages/CrimeTracker"));
+const FlightTracker = lazy(() => import("./pages/FlightTracker"));
+const Dibs = lazy(() => import("./pages/Dibs"));
+const TargetPools = lazy(() => import("./pages/TargetPools"));
+const Glossary = lazy(() => import("./pages/Glossary"));
+const Assistant = lazy(() => import("./pages/Assistant"));
+const Discord = lazy(() => import("./pages/Discord"));
+const NotificationPrefs = lazy(() => import("./pages/NotificationPrefs"));
+const Alerts = lazy(() => import("./pages/Alerts"));
+const Notifications = lazy(() => import("./pages/Notifications"));
+const WarRoom = lazy(() => import("./pages/WarRoom"));
+const WarAnalyzer = lazy(() => import("./pages/WarAnalyzer"));
+const AiWarAnalyzer = lazy(() => import("./pages/AiWarAnalyzer"));
+const PayoutCalculator = lazy(() => import("./pages/PayoutCalculator"));
+const LossMarketplace = lazy(() => import("./pages/LossMarketplace"));
+const TornStats = lazy(() => import("./pages/TornStats"));
+const Travel = lazy(() => import("./pages/Travel"));
+const TravelOptimizer = lazy(() => import("./pages/TravelOptimizer"));
+const OcPlanner = lazy(() => import("./pages/OcPlanner"));
+const ChainQueue = lazy(() => import("./pages/ChainQueue"));
+const DailyDigest = lazy(() => import("./pages/DailyDigest"));
+const ReviveTracker = lazy(() => import("./pages/ReviveTracker"));
+const ReviveMarketplace = lazy(() => import("./pages/ReviveMarketplace"));
+const SettlementQueue = lazy(() => import("./pages/SettlementQueue"));
+const OperatorDashboard = lazy(() => import("./pages/OperatorDashboard"));
+const AiSettings = lazy(() => import("./pages/AiSettings"));
+const Markets = lazy(() => import("./pages/Markets"));
+const Stocks = lazy(() => import("./pages/Stocks"));
+const Company = lazy(() => import("./pages/Company"));
+const Properties = lazy(() => import("./pages/Properties"));
+const Racing = lazy(() => import("./pages/Racing"));
+const Community = lazy(() => import("./pages/Community"));
+const LiveFeeds = lazy(() => import("./pages/LiveFeeds"));
+const Alliances = lazy(() => import("./pages/Alliances"));
+const WatchedFactions = lazy(() => import("./pages/WatchedFactions"));
+const Recruitment = lazy(() => import("./pages/Recruitment"));
+const Gym = lazy(() => import("./pages/Gym"));
+const Activity = lazy(() => import("./pages/Activity"));
+const Graffiti = lazy(() => import("./pages/Graffiti"));
+const Reports = lazy(() => import("./pages/Reports"));
+const ApiUsage = lazy(() => import("./pages/ApiUsage"));
+const PublicApi = lazy(() => import("./pages/PublicApi"));
+const AdminCostDashboard = lazy(() => import("./pages/AdminCostDashboard"));
+const CompetitorMatrix = lazy(() => import("./pages/CompetitorMatrix"));
+const Halloween = lazy(() => import("./pages/Halloween"));
+const FactionOps = lazy(() => import("./pages/FactionOps"));
+const FactionFinance = lazy(() => import("./pages/FactionFinance"));
+const FactionUpgrades = lazy(() => import("./pages/FactionUpgrades"));
+const AllianceSharing = lazy(() => import("./pages/AllianceSharing"));
+const RetentionTrends = lazy(() => import("./pages/RetentionTrends"));
+const ArmoryHistory = lazy(() => import("./pages/ArmoryHistory"));
+const LoanReminders = lazy(() => import("./pages/LoanReminders"));
+const Settings = lazy(() => import("./pages/Settings"));
+const PlayerIntel = lazy(() => import("./pages/PlayerIntel"));
+import { supabase } from "./lib/supabase";
 
+const SharedReport = lazy(() => import("./pages/SharedReport"));
+import { useQueryClient } from "@tanstack/react-query";
 export default function App() {
-  const [page, setPage] = useState<Page>('Overview');
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const queryClient = useQueryClient();
+  const identityRef = useRef<string | null>(null);
+  const [sharedToken, setSharedToken] = useState("");
+  const [signedIn, setSignedIn] = useState(false);
+  const [role, setRole] = useState("user");
+  useEffect(() => {
+    async function refresh() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const nextIdentity = session?.user.id ?? null;
+      if (identityRef.current !== nextIdentity) {
+        queryClient.clear();
+        identityRef.current = nextIdentity;
+      }
+      setSignedIn(!!session);
+      if (session) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", session.user.id)
+          .single();
+        setRole(data?.role ?? "user");
+      } else setRole("user");
+    }
+    void refresh();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      setTimeout(() => void refresh(), 0);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+  const [page, setPage] = useState<Page>("Overview");
+  useEffect(() => {
+    const route = () => {
+      try {
+        const hash = location.hash.replace(/^#\/?/, "");
+        setSharedToken(
+          /^report\/[a-f0-9]{32}$/.test(hash) ? hash.split("/")[1] : "",
+        );
+        const name = decodeURIComponent(
+          location.hash.replace(/^#\/?/, "").split("?")[0],
+        );
+        if (NAV.includes(name as Page)) setPage(name as Page);
+      } catch {}
+    };
+    route();
+    window.addEventListener("hashchange", route);
+    return () => window.removeEventListener("hashchange", route);
+  }, []);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
     }
   }, [theme]);
 
   return (
     <div className="layout">
-      <button className="nu-btn menu-btn" aria-label="Toggle navigation" onClick={() => setOpen(!open)}>☰</button>
-      <nav className={`sidebar nu-raised ${open ? 'open' : ''}`} aria-label="Main">
+      <button
+        className="nu-btn menu-btn"
+        aria-label="Toggle navigation"
+        onClick={() => setOpen(!open)}
+      >
+        ☰
+      </button>
+      <nav
+        className={`sidebar nu-raised ${open ? "open" : ""}`}
+        aria-label="Main"
+      >
         <h1 className="brand">Torn Command Center</h1>
-        {NAV.map((n) => (
-          <button key={n} className={`nu-btn nav-item ${n === page ? 'active' : ''}`} aria-current={n === page ? 'page' : undefined} onClick={() => { setPage(n); setOpen(false); }}>
-            {n}{!BUILT.includes(n) && <span className="tag">soon</span>}
+        {NAV.filter(
+          (n) =>
+            !["Operator Dashboard", "Admin Cost Dashboard"].includes(n) ||
+            ["payment_operator", "admin"].includes(role),
+        ).map((n) => (
+          <button
+            key={n}
+            className={`nu-btn nav-item ${n === page ? "active" : ""}`}
+            aria-current={n === page ? "page" : undefined}
+            onClick={() => {
+              setSharedToken("");
+              setPage(!signedIn && n !== "Overview" ? "Settings" : n);
+              setOpen(false);
+            }}
+          >
+            {n}
           </button>
         ))}
       </nav>
       <main className="content">
         <header className="topbar nu-raised">
-          <span className="badge demo">DEMO MODE – seeded sample data, not live</span>
-          <button className="nu-btn" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-            {theme === 'dark' ? 'Light' : 'Dark'} mode
+          <span className="badge demo">
+            {sharedToken
+              ? "SHARED SNAPSHOT · published report, not live game data"
+              : signedIn
+                ? "SIGNED IN · manual records and API observations are labelled by source"
+                : "DEMO PREVIEW · seeded sample data, not live"}
+          </span>
+          <button
+            className="nu-btn"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
+            {theme === "dark" ? "Light" : "Dark"} mode
           </button>
         </header>
-        {page === 'Overview' && <Overview />}
-        {page === 'Planner' && <Planner />}
-        {page === 'Targets' && <Targets />}
-        {page === 'Compare Players' && <ComparePlayers />}
-        {page === 'Leaderboards' && <Leaderboards />}
-        {page === 'ROI Calculator' && <RoiCalculator />}
-        {page === 'PI Mortgages' && <PiMortgages />}
-        {page === 'Bounties' && <Bounties />}
-        {page === 'Stats Catalog' && <StatsCatalog />}
-        {page === 'Custom Stats' && <CustomStats />}
-        {page === 'Stat Intelligence' && <StatIntelligence />}
-        {page === 'Stat Growth' && <StatGrowth />}
-        {page === 'Spy Reports' && <SpyReports />}
-        {page === 'War Hits' && <WarHits />}
-        {page === 'Crime Tracker' && <CrimeTracker />}
-        {page === 'Flight Tracker' && <FlightTracker />}
-        {page === 'Dibs' && <Dibs />}
-        {page === 'Target Pools' && <TargetPools />}
-        {page === 'Tornipedia' && <Glossary />}
-        {page === 'Assistant' && <Assistant />}
-        {page === 'Discord' && <Discord />}
-        {page === 'Notification Prefs' && <NotificationPrefs />}
-        {page === 'Alerts' && <Alerts />}
-        {page === 'Notifications' && <Notifications />}
-        {page === 'War Room' && <WarRoom />}
-        {page === 'War Analyzer' && <WarAnalyzer />}
-        {page === 'AI War Analyzer' && <AiWarAnalyzer />}
-        {page === 'Payouts' && <PayoutCalculator />}
-        {page === 'Losses' && <LossMarketplace />}
-        {page === 'TornStats' && <TornStats />}
-        {page === 'Travel' && <Travel />}
-        {page === 'Travel Optimizer' && <TravelOptimizer />}
-        {page === 'OC Planner' && <OcPlanner />}
-        {page === 'Chain Queue' && <ChainQueue />}
-        {page === 'Daily Digest' && <DailyDigest />}
-        {page === 'Revive Tracker' && <ReviveTracker />}
-        {page === 'Revive Marketplace' && <ReviveMarketplace />}
-        {page === 'Settlement Queue' && <SettlementQueue />}
-        {page === 'Operator Dashboard' && <OperatorDashboard />}
-        {page === 'AI Settings' && <AiSettings />}
-        {page === 'Markets' && <Markets />}
-        {page === 'Stocks' && <Stocks />}
-        {page === 'Company' && <Company />}
-        {page === 'Properties' && <Properties />}
-        {page === 'Racing' && <Racing />}
-        {page === 'Community' && <Community />}
-        {page === 'Live Feeds' && <LiveFeeds />}
-        {page === 'Alliances' && <Alliances />}
-        {page === 'Watched Factions' && <WatchedFactions />}
-        {page === 'Recruitment' && <Recruitment />}
-        {page === 'Gym' && <Gym />}
-        {page === 'Activity' && <Activity />}
-        {page === 'Graffiti' && <Graffiti />}
-        {page === 'Reports' && <Reports />}
-        {page === 'API Usage' && <ApiUsage />}
-        {page === 'Public API' && <PublicApi />}
-        {page === 'Admin Cost Dashboard' && <AdminCostDashboard />}
-        {page === 'Competitor Matrix' && <CompetitorMatrix />}
-        {page === 'Halloween' && <Halloween />}
-        {page === 'Faction' && <FactionOps />}
-        {page === 'Faction Finance' && <FactionFinance />}
-        {page === 'Faction Upgrades' && <FactionUpgrades />}
-        {page === 'Alliance Sharing' && <AllianceSharing />}
-        {page === 'Retention Trends' && <RetentionTrends />}
-        {page === 'Armory History' && <ArmoryHistory />}
-        {page === 'Loan Reminders' && <LoanReminders />}
-        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Flight Tracker','Dibs','Target Pools','Tornipedia','Assistant','Discord','Notification Prefs','Alerts','Notifications','War Room','War Analyzer','AI War Analyzer','Payouts','Losses','TornStats','Travel','Travel Optimizer','OC Planner','Chain Queue','Daily Digest','Revive Tracker','Revive Marketplace','Settlement Queue','Operator Dashboard','AI Settings','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage','Public API','Admin Cost Dashboard','Competitor Matrix','Halloween','Faction','Faction Finance','Faction Upgrades','Alliance Sharing','Retention Trends','Armory History','Loan Reminders'].includes(page) && <Placeholder name={page} />}
+        <Suspense fallback={<p role="status">Loading workspace…</p>}>
+          {sharedToken ? (
+            <SharedReport token={sharedToken} />
+          ) : (
+            <div key={signedIn ? "account" : "preview"}>
+              {page === "Overview" && <Overview demo={!signedIn} />}
+              {page === "Settings" && <Settings />}
+              {page === "Player Intel" && <PlayerIntel />}
+              {page === "Planner" && <Planner />}
+              {page === "Targets" && <Targets />}
+              {page === "Compare Players" && <ComparePlayers />}
+              {page === "Leaderboards" && <Leaderboards />}
+              {page === "ROI Calculator" && <RoiCalculator />}
+              {page === "PI Mortgages" && <PiMortgages />}
+              {page === "Bounties" && <Bounties />}
+              {page === "Stats Catalog" && <StatsCatalog />}
+              {page === "Custom Stats" && <CustomStats />}
+              {page === "Stat Intelligence" && <StatIntelligence />}
+              {page === "Stat Growth" && <StatGrowth />}
+              {page === "Spy Reports" && <SpyReports />}
+              {page === "War Hits" && <WarHits />}
+              {page === "Crime Tracker" && <CrimeTracker />}
+              {page === "Flight Tracker" && <FlightTracker />}
+              {page === "Dibs" && <Dibs />}
+              {page === "Target Pools" && <TargetPools />}
+              {page === "Tornipedia" && <Glossary />}
+              {page === "Assistant" && <Assistant />}
+              {page === "Discord" && <Discord />}
+              {page === "Notification Prefs" && <NotificationPrefs />}
+              {page === "Alerts" && <Alerts />}
+              {page === "Notifications" && <Notifications />}
+              {page === "War Room" && <WarRoom />}
+              {page === "War Analyzer" && <WarAnalyzer />}
+              {page === "AI War Analyzer" && <AiWarAnalyzer />}
+              {page === "Payouts" && <PayoutCalculator />}
+              {page === "Losses" && <LossMarketplace />}
+              {page === "TornStats" && <TornStats />}
+              {page === "Travel" && <Travel />}
+              {page === "Travel Optimizer" && <TravelOptimizer />}
+              {page === "OC Planner" && <OcPlanner />}
+              {page === "Chain Queue" && <ChainQueue />}
+              {page === "Daily Digest" && <DailyDigest />}
+              {page === "Revive Tracker" && <ReviveTracker />}
+              {page === "Revive Marketplace" && <ReviveMarketplace />}
+              {page === "Settlement Queue" && <SettlementQueue />}
+              {page === "Operator Dashboard" && <OperatorDashboard />}
+              {page === "AI Settings" && <AiSettings />}
+              {page === "Markets" && <Markets />}
+              {page === "Stocks" && <Stocks />}
+              {page === "Company" && <Company />}
+              {page === "Properties" && <Properties />}
+              {page === "Racing" && <Racing />}
+              {page === "Community" && <Community />}
+              {page === "Live Feeds" && <LiveFeeds />}
+              {page === "Alliances" && <Alliances />}
+              {page === "Watched Factions" && <WatchedFactions />}
+              {page === "Recruitment" && <Recruitment />}
+              {page === "Gym" && <Gym />}
+              {page === "Activity" && <Activity />}
+              {page === "Graffiti" && <Graffiti />}
+              {page === "Reports" && <Reports />}
+              {page === "API Usage" && <ApiUsage />}
+              {page === "Public API" && <PublicApi />}
+              {page === "Admin Cost Dashboard" && <AdminCostDashboard />}
+              {page === "Competitor Matrix" && <CompetitorMatrix />}
+              {page === "Halloween" && <Halloween />}
+              {page === "Faction" && <FactionOps />}
+              {page === "Faction Finance" && <FactionFinance />}
+              {page === "Faction Upgrades" && <FactionUpgrades />}
+              {page === "Alliance Sharing" && <AllianceSharing />}
+              {page === "Retention Trends" && <RetentionTrends />}
+              {page === "Armory History" && <ArmoryHistory />}
+              {page === "Loan Reminders" && <LoanReminders />}
+            </div>
+          )}
+        </Suspense>
       </main>
     </div>
   );

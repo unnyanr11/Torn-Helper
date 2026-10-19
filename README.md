@@ -1,87 +1,49 @@
 # Torn Command Center
 
-Free, mobile-first Torn City companion built with React + TypeScript (Vite) and a neumorphic UI. Backend: Supabase.
+React/TypeScript Torn companion with Supabase. The repository contains working manual tools alongside partial workflows; it is not a complete replacement for the services in the requirements.
 
-## Run
+The coordinated runtime repair migration has been applied to the linked Supabase project with user approval. Review [docs/IMPLEMENTATION_AUDIT.md](docs/IMPLEMENTATION_AUDIT.md) before applying it. The frontend changes depend on its schema and Edge Functions.
 
-```bash
-npm install
-npm run dev
+## Local verification
+
+```sh
+npm ci
+npm run build
+npm test
+npm run audit:schema
 ```
 
-## Supabase setup
+Tests use isolated PostgreSQL through PGlite and mocked Torn responses. They do not create users, charge AI providers, or make Torn requests in the production project. `npm test` also generates `scripts/candidate-schema.json`; the schema audit checks static table and column references against that candidate, not against an applied deployment.
 
-1. Create a Supabase project.
-2. Run the migrations in order:
-   ```bash
-   supabase db push
-   ```
-   or apply each file in `supabase/migrations/` via the SQL editor.
-3. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env.local`.
-4. Set the `TORN_KEY_ENCRYPTION_KEY` Edge Function secret (base64-encoded 32-byte key):
-   ```bash
-   openssl rand -base64 32
-   supabase secrets set TORN_KEY_ENCRYPTION_KEY=<your-base64-key>
-   ```
-5. Create a public Storage bucket named `graffiti-images` for graffiti image uploads.
-6. Set the AI provider secret for the war analyzer:
-   ```bash
-   supabase secrets set AI_PROVIDER_API_KEY=<your-openai-key>
-   ```
+To check Edge Function types with Deno installed:
 
-## Deploy Edge Functions
-
-```bash
-./scripts/deploy-functions.sh
+```sh
+deno check --no-config --node-modules-dir=manual supabase/functions/*/index.ts
 ```
 
-Or manually:
+Use Node 20.19+ or 22.12+ (validated here with Node 24.19).
 
-```bash
-supabase functions deploy verify-loss-payment
-supabase functions deploy verify-loss-funding
-```
+Copy `.env.example` to `.env.local`, enter the project's publishable key, and run `npm run dev`. The legacy `VITE_SUPABASE_ANON_KEY` variable is also accepted. Never put a service-role key or provider secret in a `VITE_` variable. Supabase Auth sessions are distinct from Torn API keys.
 
-## Schedule the cron jobs
+## Deployment order
 
-pg_cron jobs are configured via migration (see `0055_loss_payment_automation.sql` and the cron setup SQL):
+1. Approve and apply only `supabase/migrations/20261019053830_repair_runtime_security_and_marketplaces.sql` to the audited existing project.
+2. Verify database grants, RPCs and Realtime publication. Retain the old application until the coordinated deployment is ready.
+3. Configure a base64-encoded 32-byte `TORN_KEY_ENCRYPTION_KEY` in Edge Function secrets. The key is never sent to clients. AI uses each user's own key; there is no global AI credential. Model overrides are optional.
+4. Set `TCC_SCHEMA_REPAIR_APPLIED=yes` and run `npm run deploy:functions`. Each private handler validates its own user or scoped job token; the static public API and token-based report viewer have explicitly public behavior.
+5. Run staging acceptance checks before publishing the matching frontend and then verify production authentication, RLS, scheduled jobs and signed-in workflows.
 
-- `verify-loss-funding` — every 5 minutes
-- `verify-loss-payment` — every 2 minutes
+Do **not** blindly run `supabase db push` or reset this existing project. The historical numbered migrations contain duplicate definitions and differ from the deployed schema. The tested repair targets the captured current schema; a clean baseline migration remains a separate task.
 
-Verify the service role key setting:
+## Data and limitations
 
-```sql
-select current_setting('app.settings.service_role_key', true);
-```
+- Torn's API is read-only. Gameplay and payments remain manual.
+- Loss contracts use direct payment. Custody funding is disabled until real operators, verified transfer evidence, valuation rules and a reviewed operating policy exist.
+- Loss verification uses event timestamps, global attack deduplication, transactional reservations, a ten-minute reconciliation window and audited manual settlement.
+- AI processing requires provider-specific consent and that user's encrypted OpenAI/Gemini key.
+- Missing stats stay unknown. Level/activity do not establish private battle stats.
+- Third-party adapters are blocked until access, data rights and terms are verified. Authorized manual imports remain available.
+- Generated API documentation covers 234 current OpenAPI v2 read endpoints across nine groups. It does not fetch all of them. v1-only capability coverage still requires review.
+- The competitor matrix keeps partial and dependency-blocked features visible; an existing screen does not count as full delivery.
 
-## Regenerate API capability registry
-
-```bash
-node scripts/generate-capabilities.mjs
-```
-
-## Companion userscript
-
-Install via Tampermonkey from `/torn-helper.user.js` (served from `public/`).
-
-## PWA
-
-The app is installable as a PWA (manifest.json + service worker in public/).
-
-## Public API
-
-Read-only, keyless JSON API at `/functions/v1/public-api`.
-
-## Loss Marketplace
-
-Full buy/sell workflow for verified losses with Xanax-based funding detection, attack-log verification, settlement ledger, and disputes.
-
-## Status
-
-- [x] Steps 1-75: app shell through operator dashboard
-- [x] Payout workflow integration tests
-- [x] Edge Function integration tests
-- [x] Deploy script
-
-All data in Demo Mode is seeded sample data and is never presented as live.
+See [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) for the supplied specification and [src/data/competitors.ts](src/data/competitors.ts) for the coverage matrix.

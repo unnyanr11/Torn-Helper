@@ -1,89 +1,145 @@
-import { createClient } from 'jsr:@supabase/supabase-js@2';
-import { decrypt } from '../_shared/crypto.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
-Deno.serve(async (_req) => {
+import {
+  adminClient,
+  authenticate,
+  scheduled,
+  preflight,
+  json,
+} from "../_shared/http.ts";
+Deno.serve(async (req) => {
+  const early = preflight(req);
+  if (early) return early;
   try {
-    const serviceClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
-    // Get all users with active alerts
-    const { data: alerts, error: alertsError } = await serviceClient
-      .from('target_alerts')
-      .select('id, user_id, target_id, condition, active')
-      .eq('active', true);
-
-    if (alertsError) {
-      return new Response(JSON.stringify({ error: alertsError.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
-    if (!alerts || alerts.length === 0) {
-      return new Response(JSON.stringify({ ok: true, evaluated: 0 }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
-    // Group alerts by user
-    const byUser: Record<string, typeof alerts> = {};
-    alerts.forEach((a) => {
-      (byUser[a.user_id] ??= []).push(a);
-    });
-
-    const encryptionKey = Deno.env.get('TORN_KEY_ENCRYPTION_KEY') ?? '';
-    let evaluated = 0;
-    let notified = 0;
-
-    for (const [userId, userAlerts] of Object.entries(byUser)) {
-      const { data: keyRow } = await serviceClient
-        .from('torn_keys')
-        .select('encrypted_key')
-        .eq('user_id', userId)
+    const admin = adminClient(),
+      job = await scheduled(req, admin),
+      user = job ? null : await authenticate(req, admin);
+    if (!job && !user) return json({ error: "Unauthorized" }, 401);
+    let query = admin
+      .from("alert_rules")
+      .select("*")
+      .eq("enabled", true)
+      .limit(500);
+    if (user) query = query.eq("user_id", user.id);
+    const { data: rules, error } = await query;
+    if (error) throw error;
+    let notified = 0,
+      evaluated = 0;
+    for (const rule of rules ?? []) {
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("tracking_paused,timezone")
+        .eq("id", rule.user_id)
+        .single();
+      if (profile?.tracking_paused) continue;
+      const hour = Number(
+        new Intl.DateTimeFormat("en-GB", {
+          hour: "2-digit",
+          hour12: false,
+          timeZone: profile?.timezone ?? "UTC",
+        }).format(new Date()),
+      );
+      const a = rule.quiet_hours_start,
+        b = rule.quiet_hours_end;
+      if (
+        a != null &&
+        b != null &&
+        a !== b &&
+        (a < b ? hour >= a && hour < b : hour >= a || hour < b)
+      )
+        continue;
+      evaluated++;
+      let message = "";
+      let signature = "";
+      const { data: cache } = await admin
+        .from("live_feed_cache")
+        .select("payload,fetched_at")
+        .eq("user_id", rule.user_id)
+        .eq("feed_type", "overview")
         .maybeSingle();
-
-      if (!keyRow) continue;
-
-      const apiKey = await decrypt(keyRow.encrypted_key, encryptionKey);
-
-      for (const alert of userAlerts) {
-        evaluated++;
-        const url = `https://api.torn.com/user/${alert.target_id}?selections=basic&key=${apiKey}`;
-        const resp = await fetch(url);
-        const data = await resp.json();
-
-        if (data.error) continue;
-
-        const status = data.status?.state ?? '';
-        const condition = alert.condition ?? '';
-
-        // Simple condition matching: "OK", "Hospital", "Jail", "Traveling", "Abroad"
-        let met = false;
-        if (condition === 'OK') met = status === 'OK';
-        else if (condition === 'Hospital') met = status === 'Hospital';
-        else if (condition === 'Jail') met = status === 'Jail';
-        else if (condition === 'Traveling' || condition === 'Abroad') met = status === 'Traveling' || status === 'Abroad';
-
-        if (met) {
-          const { error: notifError } = await serviceClient
-            .from('notifications')
-            .insert({
-              user_id: userId,
-              title: `Target alert: ${data.name ?? alert.target_id}`,
-              body: `Target ${data.name ?? alert.target_id} is now ${status}.`,
-            });
-          if (!notifError) {
-            notified++;
-            await serviceClient.from('target_alerts').update({ active: false }).eq('id', alert.id);
-          }
+      if (
+        rule.condition_type === "energy_threshold" &&
+        cache &&
+        Date.now() - Date.parse(cache.fetched_at) < 120000
+      ) {
+        const bars = cache.payload.bars ?? cache.payload;
+        const energy = bars.energy;
+        if (
+          energy &&
+          energy.current >= Number(rule.threshold ?? energy.maximum)
+        ) {
+          message = `${rule.name}: energy ${energy.current}/${energy.maximum}`;
+          signature = cache.fetched_at;
         }
       }
+      if (
+        rule.condition_type === "cooldown_expired" &&
+        cache &&
+        Date.now() - Date.parse(cache.fetched_at) < 120000
+      ) {
+        const values = Object.values(cache.payload.cooldowns ?? {});
+        if (values.some((n) => n === 0)) {
+          message = `${rule.name}: a tracked cooldown is zero`;
+          signature = cache.fetched_at;
+        }
+      }
+      if (rule.condition_type === "target_available") {
+        const { data: observation } = await admin
+          .from("player_observations")
+          .select("torn_player_id,status,observed_at")
+          .eq("user_id", rule.user_id)
+          .eq("status", "Okay")
+          .gte("observed_at", new Date(Date.now() - 120000).toISOString())
+          .order("observed_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (observation) {
+          message = `${rule.name}: player ${observation.torn_player_id} was attackable at last observation; recheck in Torn`;
+          signature = observation.observed_at;
+        }
+      }
+      if (rule.condition_type === "loan_due") {
+        const day = new Date().toISOString().slice(0, 10);
+        const until = new Date(
+          Date.now() + Number(rule.due_soon_days ?? 3) * 86400000,
+        )
+          .toISOString()
+          .slice(0, 10);
+        const { data: loans } = await admin
+          .from("faction_loans")
+          .select("*")
+          .eq("user_id", rule.user_id)
+          .eq("status", "active")
+          .lte("due_date", until);
+        if (loans?.length) {
+          message = `${rule.name}: ${loans.length} loan(s) overdue or due by ${until}.`;
+          signature = day;
+        }
+      }
+      if (!message) continue;
+      // Bucket repeated observations to at most one notification per rule per hour.
+      const dedupe_key = `rule:${rule.id}:${signature.slice(0, 13)}`;
+      const { data: inserted, error } = await admin
+        .from("notification_events")
+        .upsert(
+          { user_id: rule.user_id, rule_id: rule.id, message, dedupe_key },
+          { onConflict: "user_id,dedupe_key", ignoreDuplicates: true },
+        )
+        .select("id");
+      if (error) throw error;
+      if (inserted?.length) {
+        const result = await admin
+          .from("notifications")
+          .insert({ user_id: rule.user_id, title: rule.name, body: message });
+        if (result.error) throw result.error;
+        notified++;
+      }
     }
-
-    return new Response(JSON.stringify({ ok: true, evaluated, notified }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-  } catch (e) {
-    return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    return json({
+      evaluated,
+      notified,
+      source:
+        "collected observations and manually entered loans; no continuous history is assumed",
+    });
+  } catch {
+    return json({ error: "Alert evaluation unavailable" }, 503);
   }
 });
