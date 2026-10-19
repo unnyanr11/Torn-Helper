@@ -41,7 +41,7 @@ supabase functions deploy fetch-estimates
 
 ## Schedule the alert job
 
-In the Supabase dashboard, create a cron job (pg_cron) calling the `evaluate-alerts` function every 5 minutes, or use Supabase's scheduled functions feature.
+pg_cron job `evaluate-alerts` runs every 5 minutes (see migration 0016_cron_evaluate_alerts.sql).
 
 ## Regenerate API capability registry
 
@@ -66,5 +66,7 @@ node scripts/generate-capabilities.mjs
 - [x] Step 13: live data feeds (travel, market, stocks, company via cached refresh)
 - [x] Step 14: alert-evaluation job (notifications table, evaluate-alerts function, Notifications UI)
 - [x] Step 15: estimate integrations (FFScouter/TornStats opt-in, fetch-estimates function, Estimates UI)
+- [x] Step 16: alliances & families (alliances, members, invitations, announcements with RLS; Alliances UI)
+- [ ] Pending: watched factions, recruitment scanner, gym tracker, activity heatmaps, graffiti wall, exports/reports, AI war analyzer, Compare Players, Leaderboards, ROI Calculator, PI Mortgages, Bounties, 217-stat catalog, custom stat columns, TornStats/FFScouter deep integration, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
 
 All data in Demo Mode is seeded sample data and is never presented as live.
