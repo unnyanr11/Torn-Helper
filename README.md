@@ -62,10 +62,14 @@ Read-only, keyless JSON API at `/functions/v1/public-api` with endpoints `/gloss
 
 Full buy/sell workflow for verified losses (spec section 7A). Contracts are direct-payment (no operator custody). Sellers claim slots (15-min expiry), submit attack evidence (deduplicated by attack ID), and earnings flow through earned → approved → paid → reconciled. Disputes supported.
 
+## War Payout Calculator
+
+Full audited payout workflow (spec section 8). Four modes (equal/proportional/weighted/hybrid), caps with iterative redistribution, floors with infeasibility detection, largest-remainder integer rounding, draft→locked→approved→paid→reconciled state machine, CSV export, and append-only audit log.
+
 ## Status (delivery checklist)
 
-- [x] Steps 1-50: app shell through competitor matrix (see git history for full list)
-- [x] Step 51: Loss Marketplace full workflow (0035 migration with 6 tables + RLS; LossMarketplace UI with Buy/Sell/My Contracts/Active Claim/Earnings/Payment Queue/Disputes tabs)
-- [ ] Pending: full payout calculator workflow (versioned policies, caps/floors, integer rounding), 217-stat catalog audit, TornStats integration, CSV/XLSX export hardening, detailed competitor matrix, Halloween tools, faction operations depth
+- [x] Steps 1-51: app shell through Loss Marketplace (see git history for full list)
+- [x] Step 52: full payout calculator workflow (0036 migration with 4 tables + RLS; PayoutCalculator page with 4 modes, caps/floors, integer rounding, state machine, CSV export, audit log)
+- [ ] Pending: 217-stat catalog audit, TornStats integration, CSV/XLSX export hardening, detailed competitor matrix, Halloween tools, faction operations depth
 
 All data in Demo Mode is seeded sample data and is never presented as live.

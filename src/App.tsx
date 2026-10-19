@@ -26,7 +26,7 @@ import Alerts from './pages/Alerts';
 import Notifications from './pages/Notifications';
 import WarRoom from './pages/WarRoom';
 import WarAnalyzer from './pages/WarAnalyzer';
-import Payouts from './pages/Payouts';
+import PayoutCalculator from './pages/PayoutCalculator';
 import LossMarketplace from './pages/LossMarketplace';
 import Travel from './pages/Travel';
 import Markets from './pages/Markets';
@@ -105,7 +105,7 @@ export default function App() {
         {page === 'Notifications' && <Notifications />}
         {page === 'War Room' && <WarRoom />}
         {page === 'War Analyzer' && <WarAnalyzer />}
-        {page === 'Payouts' && <Payouts />}
+        {page === 'Payouts' && <PayoutCalculator />}
         {page === 'Losses' && <LossMarketplace />}
         {page === 'Travel' && <Travel />}
         {page === 'Markets' && <Markets />}
