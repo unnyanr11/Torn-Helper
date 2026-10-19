@@ -1,5 +1,6 @@
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
 import { decrypt } from "../_shared/crypto.ts";
+import { personalStatValues } from "../_shared/history.ts";
 import { tornGet } from "../_shared/torn.ts";
 const endpoints: Record<string, string> = {
   travel: "/user/travel",
@@ -56,6 +57,16 @@ Deno.serve(async (req) => {
       ),
     );
     const fetched_at = new Date().toISOString();
+    let history_recorded = false;
+    if (feed_type === "overview") {
+      const result = await admin.rpc("record_personal_snapshot", {
+        owner_id: user.id,
+        observed_at: fetched_at,
+        values_json: personalStatValues(payload),
+      });
+      if (result.error) throw result.error;
+      history_recorded = result.data === true;
+    }
     const { error } = await admin
       .from("live_feed_cache")
       .upsert(
@@ -63,7 +74,7 @@ Deno.serve(async (req) => {
         { onConflict: "user_id,feed_type" },
       );
     if (error) throw error;
-    return json({ ok: true, payload, fetched_at });
+    return json({ ok: true, payload, fetched_at, history_recorded });
   } catch {
     return json(
       {

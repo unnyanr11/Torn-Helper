@@ -67,9 +67,14 @@ function scan(file) {
             names = arg.properties
               .filter(ts.isPropertyAssignment)
               .map((p) => p.name.getText(ast).replace(/^['"]|['"]$/g, ""));
-          for (const column of names)
-            if (column && !cols.has(column))
+          for (const column of names) {
+            // PostgREST embedded filters use relation.column, not a column on the root table.
+            const parts = column.split(".");
+            const scope = parts.length === 2 ? tables.get(parts[0]) : cols;
+            const name = parts.length === 2 ? parts[1] : column;
+            if (column && !scope?.has(name))
               errors.push({ file, table, column, issue: "missing column" });
+          }
         }
       }
     }

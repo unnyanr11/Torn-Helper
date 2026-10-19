@@ -18,7 +18,7 @@ Static inventory of every page module. Table references describe implemented que
 | ChainQueue | chain_target_queue | None |
 | Community | community_posts | None |
 | Company | company_snapshots | None |
-| ComparePlayers | estimates, player_observations, target_list_entries | None |
+| ComparePlayers | estimates, player_observations, target_list_entries, spy_reports, workspace_presets | None |
 | CompetitorMatrix | Calculation / static UI | None |
 | CrimeTracker | crime_logs | None |
 | CustomStats | custom_columns, custom_entries | None |
@@ -34,7 +34,7 @@ Static inventory of every page module. Table references describe implemented que
 | Graffiti | graffiti-images, graffiti_posts, graffiti_reactions | None |
 | Gym | gym_sessions | None |
 | Halloween | halloween_candy_log | None |
-| Leaderboards | gym_sessions, payout_lines, racing_records | None |
+| Leaderboards | gym_sessions, payout_lines, payout_runs, racing_records, workspace_presets | None |
 | LiveFeeds | live_feed_cache | None |
 | LoanReminders | alert_rules, faction_loans | None |
 | LossMarketplace | loss_attack_evidence, loss_claims, loss_contracts, loss_disputes, loss_settlement_entries | None |
@@ -44,10 +44,10 @@ Static inventory of every page module. Table references describe implemented que
 | Notifications | notifications | None |
 | OcPlanner | oc_plans, oc_slots | None |
 | OperatorDashboard | loss_disputes, loss_funding_records, loss_settlement_entries, profiles | None |
-| Overview | Calculation / static UI | None |
+| Overview | live_feed_cache (via function), profiles, personal_stat_snapshots (via function) | refresh-live-data |
 | PayoutCalculator | payout_audit, payout_lines, payout_policies, payout_runs, wars | None |
 | Payouts | payout_lines, payout_policies, payout_runs, wars | None |
-| PiMortgages | Calculation / static UI | None |
+| PiMortgages | mortgage_agreements, mortgage_installments, mortgage_payments, mortgage_events | apply_mortgage, decide_mortgage, record_mortgage_payment, void_mortgage_payment |
 | Placeholder | Calculation / static UI | None |
 | Planner | goals | None |
 | PlayerIntel | Calculation / static UI | player-intel |
@@ -59,17 +59,17 @@ Static inventory of every page module. Table references describe implemented que
 | RetentionTrends | faction_membership_events | None |
 | ReviveMarketplace | revive_claims, revive_contracts | None |
 | ReviveTracker | revive_logs | None |
-| RoiCalculator | Calculation / static UI | None |
+| RoiCalculator | workspace_presets | None |
 | Settings | linked_torn_accounts, profiles | account-data, link-torn-key, remove-ai-key |
 | SettlementQueue | loss_disputes, loss_settlement_entries | None |
 | SharedReport | Calculation / static UI | shared-report |
 | SpyReports | spy_reports | None |
-| StatGrowth | custom_columns, custom_entries, gym_sessions | None |
-| StatIntelligence | estimates | None |
+| StatGrowth | custom_columns, custom_entries, gym_sessions, profiles, personal_stat_snapshots | refresh-live-data |
+| StatIntelligence | estimates, spy_reports | None |
 | StatsCatalog | Calculation / static UI | None |
 | Stocks | stock_holdings | None |
 | TargetPools | target_pools | None |
-| Targets | target_list_entries, target_lists | None |
+| Targets | target_list_entries, target_lists, workspace_presets | refresh-targets |
 | TornStats | integration_connections, spy_import_jobs | None |
 | Travel | travel_observations | None |
 | TravelOptimizer | travel_profit_scenarios | None |

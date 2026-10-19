@@ -76,6 +76,7 @@ export default function App() {
   const queryClient = useQueryClient();
   const identityRef = useRef<string | null>(null);
   const [sharedToken, setSharedToken] = useState("");
+  const [accountId, setAccountId] = useState<string | null>(null);
   const [signedIn, setSignedIn] = useState(false);
   const [role, setRole] = useState("user");
   useEffect(() => {
@@ -88,6 +89,7 @@ export default function App() {
         queryClient.clear();
         identityRef.current = nextIdentity;
       }
+      setAccountId(nextIdentity);
       setSignedIn(!!session);
       if (session) {
         const { data } = await supabase
@@ -95,7 +97,7 @@ export default function App() {
           .select("role")
           .eq("id", session.user.id)
           .single();
-        setRole(data?.role ?? "user");
+        if (identityRef.current === nextIdentity) setRole(data?.role ?? "user");
       } else setRole("user");
     }
     void refresh();
@@ -187,7 +189,7 @@ export default function App() {
           {sharedToken ? (
             <SharedReport token={sharedToken} />
           ) : (
-            <div key={signedIn ? "account" : "preview"}>
+            <div key={accountId ?? "preview"}>
               {page === "Overview" && <Overview demo={!signedIn} />}
               {page === "Settings" && <Settings />}
               {page === "Player Intel" && <PlayerIntel />}

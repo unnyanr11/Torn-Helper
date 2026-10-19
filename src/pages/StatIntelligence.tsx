@@ -4,15 +4,44 @@ export default function StatIntelligence() {
   const [rows, setRows] = useState<any[]>([]),
     [error, setError] = useState("");
   useEffect(() => {
-    void supabase
-      .from("estimates")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(100)
-      .then(({ data, error }) => {
-        if (error) setError(error.message);
-        else setRows(data ?? []);
-      });
+    void Promise.all([
+      supabase
+        .from("estimates")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(100),
+      supabase
+        .from("spy_reports")
+        .select("*")
+        .order("reported_at", { ascending: false })
+        .limit(100),
+    ]).then(([estimates, spies]) => {
+      const failure = estimates.error ?? spies.error;
+      if (failure) {
+        setError(failure.message);
+        return;
+      }
+      setRows(
+        [
+          ...(estimates.data ?? []),
+          ...(spies.data ?? []).map((s) => ({
+            id: s.id,
+            torn_player_id: s.target_torn_id,
+            source: "Manually imported spy report (import timestamp)",
+            estimate_type: "spy_report",
+            created_at: s.reported_at,
+            confidence: "Unverified manual evidence",
+            value: {
+              strength: s.strength,
+              defense: s.defense,
+              speed: s.speed,
+              dexterity: s.dexterity,
+              total: s.total,
+            },
+          })),
+        ].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)),
+      );
+    });
   }, []);
   return (
     <section>

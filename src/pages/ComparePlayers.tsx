@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import SavedPresets from "../components/SavedPresets";
 import { supabase } from "../lib/supabase";
 export default function ComparePlayers() {
   const [input, setInput] = useState(""),
     [days, setDays] = useState("30"),
     [rows, setRows] = useState<any[]>([]),
     [error, setError] = useState("");
+  const latest = useRef({ input, days });
+  latest.current = { input, days };
   async function compare() {
     setError("");
     const ids = [
@@ -24,7 +27,7 @@ export default function ComparePlayers() {
       return;
     }
     const since = new Date(Date.now() - Number(days) * 86400000).toISOString();
-    const [targets, observations, estimates] = await Promise.all([
+    const [targets, observations, estimates, spies] = await Promise.all([
       supabase
         .from("target_list_entries")
         .select("*")
@@ -41,8 +44,15 @@ export default function ComparePlayers() {
         .in("torn_player_id", ids)
         .gte("created_at", since)
         .order("created_at", { ascending: false }),
+      supabase
+        .from("spy_reports")
+        .select("*")
+        .in("target_torn_id", ids)
+        .gte("reported_at", since)
+        .order("reported_at", { ascending: false }),
     ]);
-    const fail = [targets, observations, estimates].find((r) => r.error);
+    if (latest.current.input !== input || latest.current.days !== days) return;
+    const fail = [targets, observations, estimates, spies].find((r) => r.error);
     if (fail) {
       setError(fail.error!.message);
       return;
@@ -52,13 +62,35 @@ export default function ComparePlayers() {
       const o =
         observations.data?.filter((o) => Number(o.torn_player_id) === id) ?? [];
       const est = estimates.data?.find((e) => Number(e.torn_player_id) === id);
+      const spy = spies.data?.find((s) => Number(s.target_torn_id) === id);
+      const useSpy =
+        spy &&
+        (!est || Date.parse(spy.reported_at) >= Date.parse(est.created_at));
+      const value = useSpy ? spy : est?.value;
+      const distribution = ["strength", "defense", "speed", "dexterity"].map(
+        (k) =>
+          typeof value?.[k] === "number" &&
+          Number.isFinite(value[k]) &&
+          value[k] >= 0
+            ? value[k]
+            : null,
+      );
       return {
         id,
-        name: t?.player_name ?? "Unknown",
+        name: t?.player_name ?? spy?.target_name ?? "Unknown",
         level: t?.level ?? null,
         status: o[0]?.status ?? t?.status ?? "Unknown",
-        source: est?.source ?? "No evidence",
-        total: est?.value?.total ?? null,
+        source: useSpy
+          ? "Manually imported spy report"
+          : (est?.source ?? "No evidence"),
+        evidenceAt: useSpy ? spy.reported_at : est?.created_at,
+        distribution,
+        total:
+          typeof value?.total === "number" &&
+          Number.isFinite(value.total) &&
+          value.total >= 0
+            ? value.total
+            : null,
         observed: o[0]?.observed_at ?? null,
         samples: o.length,
         online: o.length
@@ -76,13 +108,32 @@ export default function ComparePlayers() {
       <p>
         Compares your authorized observations and evidence. Missing values
         remain unknown. Activity rates describe collected samples and may be
-        biased.
+        biased. Imported spy timestamps are import times. Queries return at most
+        1,000 rows per source; sample counts are not continuous coverage.
       </p>
+      <SavedPresets
+        kind="comparison"
+        config={{ version: 1, ids: input, days }}
+        onLoad={(c) => {
+          if (
+            c?.version !== 1 ||
+            typeof c.ids !== "string" ||
+            !["7", "30", "90", "365"].includes(c.days)
+          )
+            throw new Error("Invalid comparison preset");
+          setInput(c.ids);
+          setDays(c.days);
+          setRows([]);
+        }}
+      />
       <input
         aria-label="Player IDs"
         className="nu-input"
         value={input}
-        onChange={(e) => setInput(e.target.value)}
+        onChange={(e) => {
+          setInput(e.target.value);
+          setRows([]);
+        }}
         placeholder="Two to five Torn IDs"
       />
       <label>
@@ -90,7 +141,10 @@ export default function ComparePlayers() {
         <select
           className="nu-input"
           value={days}
-          onChange={(e) => setDays(e.target.value)}
+          onChange={(e) => {
+            setDays(e.target.value);
+            setRows([]);
+          }}
         >
           {[7, 30, 90, 365].map((d) => (
             <option key={d} value={d}>
@@ -113,6 +167,8 @@ export default function ComparePlayers() {
                 "Status",
                 "Stat evidence",
                 "Total",
+                "Distribution (STR / DEF / SPD / DEX)",
+                "Evidence timestamp",
                 "Difference from first",
                 "Observed online",
                 "Samples",
@@ -132,6 +188,18 @@ export default function ComparePlayers() {
                 <td>{r.status}</td>
                 <td>{r.source}</td>
                 <td>{r.total ?? "Unknown"}</td>
+                <td>
+                  {r.distribution
+                    .map((v: number | null) =>
+                      v == null ? "Unknown" : v.toLocaleString(),
+                    )
+                    .join(" / ")}
+                </td>
+                <td>
+                  {r.evidenceAt
+                    ? new Date(r.evidenceAt).toLocaleString()
+                    : "Unknown"}
+                </td>
                 <td>
                   {r.total != null && base != null
                     ? `${r.total - base} (${base ? (((r.total - base) / base) * 100).toFixed(1) + "%" : "percentage undefined"})`

@@ -72,6 +72,18 @@ beforeAll(async () => {
       "utf8",
     ),
   );
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261019062308_saved_workspaces_and_mortgage_ledger.sql",
+      "utf8",
+    ),
+  );
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261019063040_opt_in_personal_history.sql",
+      "utf8",
+    ),
+  );
   const candidate = await db.query(
     "select table_name as table,column_name as column,data_type as type from information_schema.columns where table_schema='public'",
   );
@@ -394,5 +406,339 @@ describe("reservation and reconciliation regressions", () => {
     await expect(
       asUser(other, "select claim_revive_contract($1,1)", [c.rows[0].id]),
     ).rejects.toThrow(/Insufficient/);
+  });
+});
+
+describe("mortgage lifecycle and private workspace persistence", () => {
+  let mortgage: string, payment: string;
+  it("isolates saved presets by owner and rejects invalid documents", async () => {
+    const p = await asUser(
+      buyer,
+      'insert into workspace_presets(kind,name,config) values(\'comparison\',\'My rivals\',\'{"version":1,"ids":"101,102","days":"30"}\') returning id',
+    );
+    expect(
+      (
+        await asUser(seller, "select * from workspace_presets where id=$1", [
+          p.rows[0].id,
+        ])
+      ).rows,
+    ).toHaveLength(0);
+    expect(
+      (
+        await asUser(
+          seller,
+          "update workspace_presets set config='{}' where id=$1 returning id",
+          [p.rows[0].id],
+        )
+      ).rows,
+    ).toHaveLength(0);
+    await expect(
+      asUser(
+        buyer,
+        "insert into workspace_presets(kind,name,config) values('roi','bad','[]')",
+      ),
+    ).rejects.toThrow(/check constraint/);
+    await expect(
+      asUser(
+        seller,
+        "insert into workspace_presets(user_id,kind,name,config) values($1,'roi','stolen','{}')",
+        [buyer],
+      ),
+    ).rejects.toThrow(/row-level security/);
+  });
+  it("creates an application through RPC with immutable terms and audit", async () => {
+    const r = await asUser(
+      buyer,
+      "select apply_mortgage('Borrower',456,1200,0,3,'2024-01-31','Reviewed personal ledger') as id",
+    );
+    mortgage = r.rows[0].id;
+    expect(
+      (
+        await asUser(
+          buyer,
+          "select status from mortgage_agreements where id=$1",
+          [mortgage],
+        )
+      ).rows[0].status,
+    ).toBe("application");
+    await expect(
+      asUser(buyer, "update mortgage_agreements set principal=1 where id=$1", [
+        mortgage,
+      ]),
+    ).rejects.toThrow(/permission denied/);
+    await expect(
+      asUser(seller, "select decide_mortgage($1,'active')", [mortgage]),
+    ).rejects.toThrow(/unavailable/);
+    expect(
+      (
+        await asUser(seller, "select * from mortgage_agreements where id=$1", [
+          mortgage,
+        ])
+      ).rows,
+    ).toHaveLength(0);
+  });
+  it("freezes a whole-dollar schedule and prevents activation twice", async () => {
+    await asUser(buyer, "select decide_mortgage($1,'active')", [mortgage]);
+    const s = await asUser(
+      buyer,
+      "select installment_number,due_date::text,principal,interest,balance from mortgage_installments where agreement_id=$1 order by installment_number",
+      [mortgage],
+    );
+    expect(s.rows.map((r) => r.due_date)).toEqual([
+      "2024-01-31",
+      "2024-02-29",
+      "2024-03-31",
+    ]);
+    expect(s.rows.map((r) => Number(r.principal))).toEqual([400, 400, 400]);
+    expect(Number(s.rows[2].balance)).toBe(0);
+    await expect(
+      asUser(buyer, "select decide_mortgage($1,'active')", [mortgage]),
+    ).rejects.toThrow(/Only applications/);
+    await expect(
+      asUser(
+        buyer,
+        "update mortgage_installments set paid=amount where agreement_id=$1",
+        [mortgage],
+      ),
+    ).rejects.toThrow(/permission denied/);
+  });
+  it("allocates partial payments oldest first and rejects duplicates, overpayment and forgery", async () => {
+    const r = await asUser(
+      buyer,
+      "select record_mortgage_payment($1,500,'2024-02-01','receipt-1') as id",
+      [mortgage],
+    );
+    payment = r.rows[0].id;
+    const s = await asUser(
+      buyer,
+      "select paid from mortgage_installments where agreement_id=$1 order by installment_number",
+      [mortgage],
+    );
+    expect(s.rows.map((r) => Number(r.paid))).toEqual([400, 100, 0]);
+    await expect(
+      asUser(
+        buyer,
+        "select record_mortgage_payment($1,500,'2024-02-01','receipt-1')",
+        [mortgage],
+      ),
+    ).rejects.toThrow(/unique constraint/);
+    await expect(
+      asUser(
+        buyer,
+        "select record_mortgage_payment($1,701,'2024-02-01','overpaid')",
+        [mortgage],
+      ),
+    ).rejects.toThrow(/exceeds outstanding/);
+    await expect(
+      asUser(
+        seller,
+        "select record_mortgage_payment($1,1,'2024-02-01','forged')",
+        [mortgage],
+      ),
+    ).rejects.toThrow(/unavailable/);
+    expect(
+      (
+        await asUser(
+          seller,
+          "select * from mortgage_payment_allocations where payment_id=$1",
+          [payment],
+        )
+      ).rows,
+    ).toHaveLength(0);
+  });
+  it("retains corrections, reopens settled agreements and never deletes audit evidence", async () => {
+    await asUser(
+      buyer,
+      "select record_mortgage_payment($1,700,'2024-03-01','receipt-final')",
+      [mortgage],
+    );
+    expect(
+      (
+        await asUser(
+          buyer,
+          "select status from mortgage_agreements where id=$1",
+          [mortgage],
+        )
+      ).rows[0].status,
+    ).toBe("settled");
+    await expect(
+      asUser(seller, "select void_mortgage_payment($1,'malicious')", [payment]),
+    ).rejects.toThrow(/unavailable/);
+    await asUser(
+      buyer,
+      "select void_mortgage_payment($1,'Incorrect receipt')",
+      [payment],
+    );
+    expect(
+      (
+        await asUser(
+          buyer,
+          "select status from mortgage_agreements where id=$1",
+          [mortgage],
+        )
+      ).rows[0].status,
+    ).toBe("active");
+    expect(
+      Number(
+        (
+          await asUser(
+            buyer,
+            "select sum(amount-paid) as outstanding from mortgage_installments where agreement_id=$1",
+            [mortgage],
+          )
+        ).rows[0].outstanding,
+      ),
+    ).toBe(500);
+    await expect(
+      asUser(buyer, "select void_mortgage_payment($1,'again')", [payment]),
+    ).rejects.toThrow(/current payment/);
+    await expect(
+      asUser(buyer, "delete from mortgage_events where agreement_id=$1", [
+        mortgage,
+      ]),
+    ).rejects.toThrow(/permission denied/);
+    expect(
+      (
+        await asUser(
+          buyer,
+          "select action from mortgage_events where agreement_id=$1",
+          [mortgage],
+        )
+      ).rows,
+    ).toHaveLength(5);
+  });
+  it("matches the client amortization preview on interest and monthly rounding", async () => {
+    const { amortize } = await import("../lib/finance");
+    for (const terms of [
+      {
+        principal: 1000000,
+        annualBps: 525,
+        months: 36,
+        firstDue: "2026-01-31",
+      },
+      { principal: 1, annualBps: 0, months: 600, firstDue: "2026-01-31" },
+      {
+        principal: 1000000000000,
+        annualBps: 10000,
+        months: 600,
+        firstDue: "2026-01-31",
+      },
+    ]) {
+      const r = await asUser(
+        buyer,
+        "select apply_mortgage('Schedule parity',null,$1,$2,$3,$4,'') as id",
+        [terms.principal, terms.annualBps, terms.months, terms.firstDue],
+      );
+      const id = r.rows[0].id;
+      await asUser(buyer, "select decide_mortgage($1,'active')", [id]);
+      const s = await asUser(
+        buyer,
+        "select installment_number,due_date::text,principal,interest,amount,balance from mortgage_installments where agreement_id=$1 order by installment_number",
+        [id],
+      );
+      expect(
+        s.rows.map((r) => ({
+          number: r.installment_number,
+          due: r.due_date,
+          principal: Number(r.principal),
+          interest: Number(r.interest),
+          amount: Number(r.amount),
+          balance: Number(r.balance),
+        })),
+      ).toEqual(amortize(terms));
+    }
+  });
+});
+
+describe("opt-in numeric personal history", () => {
+  it("does not collect before opt-in and rejects browser writes or forged snapshots", async () => {
+    const values = {
+      "battlestats.strength": 100,
+      "personalstats.attacks.total": 4,
+    };
+    const r = await asService(
+      "select record_personal_snapshot($1,now(),$2) as recorded",
+      [other, JSON.stringify(values)],
+    );
+    expect(r.rows[0].recorded).toBe(false);
+    await expect(
+      asUser(other, "select record_personal_snapshot($1,now(),$2)", [
+        other,
+        JSON.stringify(values),
+      ]),
+    ).rejects.toThrow(/permission denied/);
+    await expect(
+      asUser(
+        other,
+        "insert into personal_stat_snapshots(user_id,stat_values) values($1,$2)",
+        [other, JSON.stringify(values)],
+      ),
+    ).rejects.toThrow(/permission denied/);
+  });
+  it("allows explicit preference and stores only owner-readable immutable observations", async () => {
+    await asUser(
+      other,
+      "update profiles set history_enabled=true where id=$1",
+      [other],
+    );
+    const r = await asService(
+      "select record_personal_snapshot($1,now(),$2) as recorded",
+      [other, JSON.stringify({ "battlestats.strength": 100 })],
+    );
+    expect(r.rows[0].recorded).toBe(true);
+    expect(
+      (
+        await asUser(
+          buyer,
+          "select * from personal_stat_snapshots where user_id=$1",
+          [other],
+        )
+      ).rows,
+    ).toHaveLength(0);
+    expect(
+      (await asUser(other, "select * from personal_stat_snapshots")).rows,
+    ).toHaveLength(1);
+    await expect(
+      asUser(other, "delete from personal_stat_snapshots"),
+    ).rejects.toThrow(/permission denied/);
+    const duplicate = await asService(
+      "select record_personal_snapshot($1,now(),$2) as recorded",
+      [other, JSON.stringify({ "battlestats.strength": 101 })],
+    );
+    expect(duplicate.rows[0].recorded).toBe(false);
+  });
+  it("respects pause and rejects credential or malformed payloads and backdated data", async () => {
+    await asUser(
+      other,
+      "update profiles set tracking_paused=true where id=$1",
+      [other],
+    );
+    const r = await asService(
+      "select record_personal_snapshot($1,now(),$2) as recorded",
+      [other, '{"battlestats.strength":102}'],
+    );
+    expect(r.rows[0].recorded).toBe(false);
+    await asUser(
+      other,
+      "update profiles set tracking_paused=false where id=$1",
+      [other],
+    );
+    for (const values of [
+      '{"secret":1}',
+      '{"battlestats.strength":"unknown"}',
+      "[]",
+    ])
+      await expect(
+        asService("select record_personal_snapshot($1,now(),$2)", [
+          other,
+          values,
+        ]),
+      ).rejects.toThrow(/numeric|Invalid/);
+    await expect(
+      asService(
+        "select record_personal_snapshot($1,now()-interval '1 day','{\"battlestats.strength\":1}')",
+        [other],
+      ),
+    ).rejects.toThrow(/Invalid observation time/);
   });
 });

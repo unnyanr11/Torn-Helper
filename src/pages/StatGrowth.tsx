@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import HistoryExplorer from "../components/HistoryExplorer";
 import { supabase } from "../lib/supabase";
 
 interface GymRow {
@@ -30,20 +31,24 @@ function LineChart({
 }) {
   if (points.length < 2)
     return <p className="muted">Not enough data points for {label}.</p>;
-  const maxY = Math.max(...points.map((p) => p.y), 1);
+  const minY = Math.min(...points.map((p) => p.y)),
+    rangeY = Math.max(...points.map((p) => p.y)) - minY || 1;
   const w = 300,
-    h = 100;
-  const step = w / (points.length - 1);
+    h = 100,
+    first = Date.parse(points[0].x),
+    rangeX = Date.parse(points[points.length - 1].x) - first || 1;
   const path = points
     .map(
       (p, i) =>
-        `${i === 0 ? "M" : "L"}${(i * step).toFixed(1)},${(h - (p.y / maxY) * h).toFixed(1)}`,
+        `${i === 0 ? "M" : "L"}${(((Date.parse(p.x) - first) / rangeX) * w).toFixed(1)},${(h - ((p.y - minY) / rangeY) * h).toFixed(1)}`,
     )
     .join(" ");
   return (
     <div>
       <p className="muted">{label}</p>
       <svg
+        role="img"
+        aria-label={label + " by observation date"}
         width="100%"
         height={h}
         viewBox={`0 0 ${w} ${h}`}
@@ -110,6 +115,7 @@ export default function StatGrowth() {
   return (
     <section>
       <h2>Stat Growth</h2>
+      <HistoryExplorer />
       <p className="muted">
         Time-series charts computed from your own gym sessions and custom stat
         columns. All native, no external APIs.
@@ -125,7 +131,11 @@ export default function StatGrowth() {
           .map((c) => {
             const pts = entries
               .filter((e) => e.column_id === c.id)
-              .map((e) => ({ x: e.recorded_at, y: parseFloat(e.value) || 0 }));
+              .filter(
+                (e) =>
+                  e.value.trim() !== "" && Number.isFinite(Number(e.value)),
+              )
+              .map((e) => ({ x: e.recorded_at, y: Number(e.value) }));
             return (
               <article key={c.id} className="card nu-inset">
                 <h3>

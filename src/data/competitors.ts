@@ -247,10 +247,11 @@ export const COMPETITOR_MATRIX: MatrixRow[] = [
       "Per-user read permissions; explicit private-data grants where applicable",
     externalDependency: "Permitted target catalogue",
     phase: "Scope acceptance",
-    status: "blocked",
+    status: "partial",
     verification:
       "Public description checked; authenticated behavior unverified",
-    testEvidence: "Not accepted as complete; see docs/IMPLEMENTATION_AUDIT.md",
+    testEvidence:
+      "Private target layout presets: visibility, order, widths, pinning, sort/search and exclusions. Other table scopes remain incomplete.",
   },
   {
     feature: "Player lookup",
@@ -387,10 +388,11 @@ export const COMPETITOR_MATRIX: MatrixRow[] = [
       "Per-user read permissions; explicit private-data grants where applicable",
     externalDependency: "Current reference valuations",
     phase: "Scope acceptance",
-    status: "blocked",
+    status: "partial",
     verification:
       "Public description checked; authenticated behavior unverified",
-    testEvidence: "Not accepted as complete; see docs/IMPLEMENTATION_AUDIT.md",
+    testEvidence:
+      "Saved manual multi-asset dated cash flows, NPV, conventional XIRR, cash recovery and CSV. Current game valuations and sensitivity/reinvestment tools remain incomplete.",
   },
   {
     feature: "PI financing",
@@ -407,10 +409,11 @@ export const COMPETITOR_MATRIX: MatrixRow[] = [
       "Per-user read permissions; explicit private-data grants where applicable",
     externalDependency: "Lenders and reviewed operating policy",
     phase: "Scope acceptance",
-    status: "blocked",
+    status: "partial",
     verification:
       "Public description checked; authenticated behavior unverified",
-    testEvidence: "Not accepted as complete; see docs/IMPLEMENTATION_AUDIT.md",
+    testEvidence:
+      "Private applications, immutable schedules, FIFO payments, arrears, corrections and audit are tested. Lending operations, counterparty acceptance and Torn transfers remain unavailable.",
   },
   {
     feature: "Buy losses",
@@ -1582,16 +1585,17 @@ export const COMPETITOR_MATRIX: MatrixRow[] = [
     acceptanceTest:
       "Exercise the complete column presets workflow with authorized data, missing data, errors and access checks.",
     blockerVisibility: "public",
-    screen: "Custom Stats",
+    screen: "Targets",
     dataSource: "official API / authorized imports / manual input",
     permissions:
       "Per-user read permissions; explicit private-data grants where applicable",
     externalDependency: "Persisted table layout preferences",
     phase: "Scope acceptance",
-    status: "blocked",
+    status: "partial",
     verification:
       "Public description checked; authenticated behavior unverified",
-    testEvidence: "Not accepted as complete; see docs/IMPLEMENTATION_AUDIT.md",
+    testEvidence:
+      "Named private target column layouts implemented. Other tables, formulas and authorized sharing remain incomplete.",
   },
   {
     feature: "TornStats adapter",

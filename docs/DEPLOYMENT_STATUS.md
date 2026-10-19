@@ -23,3 +23,16 @@ The complete feature specification remains unfinished; see IMPLEMENTATION_AUDIT.
 The user explicitly approved publishing the matching source directly to the public `unnyanr11/Torn-Helper` repository on `main`. This supersedes the earlier publication approval block. The source in this repository matches the approved backend repair, including the public API routing correction. No independent frontend hosting target was supplied or configured, so source publication is not a claim that a hosted frontend was redeployed.
 
 Key encryption uses the project's existing server-only `TORN_KEY_ENCRYPTION_KEY` configuration. Its value was neither read nor exposed; linking a legitimate key is required to validate that configuration end to end.
+
+
+## Follow-up: workspace persistence, mortgages and opt-in history
+
+Applied `saved_workspaces_and_mortgage_ledger` and `opt_in_personal_history` successfully on 19 October 2026. These add seven RLS-protected tables and private mortgage RPC implementations, owner-only preset persistence, an explicit history opt-in and service-only observation recording.
+
+Deployed `account-data` version 2 and `refresh-live-data` version 3. Both continue to authenticate in the function body and reject unauthenticated HTTP calls with 401.
+
+Live rollback smoke validation passed application creation/activation, schedule generation, partial payment allocation, correction with retained audit, preset persistence and an opted-in official numeric snapshot. No fixture records were retained. Catalog checks confirm all seven new tables have RLS and anonymous mortgage execution, browser official-history insertion and direct payment mutation are disallowed.
+
+Local validation: 66 tests, production build, candidate schema-reference audit and all 15 Deno entrypoint checks. Security advisors return the previously documented pg_net warning and inaccessible audit-table informational notice; no additional warning was returned. The advisor results carry their own collection timestamp, so live grants/RLS were checked directly as well.
+
+This follow-up source is published to main under the user's standing approval. A separate frontend hosting deployment is still not configured. Actual key-enabled collection, signed-in browser flows and concurrent multi-session contention remain unverified. Broader unfinished features remain listed in IMPLEMENTATION_AUDIT.md.

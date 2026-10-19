@@ -51,16 +51,34 @@ Original advisor notices include [mutable search paths](https://supabase.com/doc
 - Lazy page loading, authentication cache isolation, restricted offline caching and mobile overflow fixes.
 - Deployment script covers every function and refuses to proceed until the schema repair is acknowledged. It does not perform unauthenticated financial verification probes.
 
+## Follow-up implementation: saved workspaces, finance, and history
+
+The follow-up adds the following working source and deployed database workflows. It does not claim complete competitor parity.
+
+| Area | Implemented | Remaining limit |
+|---|---|---|
+| Comparisons | Named owner-only sets; stored ID selection and window; imported spy evidence, four-stat values when actually supplied, evidence timestamps, absolute/percentage differences | Full war metrics and shared/faction populations; queries currently cap each source at 1,000 rows and disclose this |
+| Leaderboards | Metric/period selection, custom UTC dates, row limits, deterministic ties, named presets, explicit authorized population; racing separated by track; only approved/paid/reconciled payout runs | Additional verified faction/alliance/community populations and opt-in metrics |
+| Target layouts | Named private layouts; show/hide, reorder, explicit widths, pinning, sort/search and exclusions | Layouts on other tables, safe formulas and authorized sharing |
+| Mortgage records | Private applications; review/activation/decline/cancel; immutable terms and server-generated fixed monthly schedules; partial FIFO payments; arrears; unique references; settlement; corrections with retained allocations/audit; CSV schedule | No lender marketplace, counterparty acceptance, custody, late fees or verified Torn transfers. Future fixed-schedule installments can be paid early without repricing |
+| ROI | Named multi-asset dated cash flows, fees/costs via negative flows, receipts/terminal valuations, net profit, simple ROI, dated annual return for conventional flows, NPV, cash recovery and CSV | Current game-specific valuations, benefit rules, automatic scenario construction and reinvestment/sensitivity modeling |
+| Personal history | Explicit opt-in; immutable official numeric leaves from successful overview refreshes; 1/7/30/90/180/365-day/all-history windows; actual observation dates, observed changes, gap disclosure and CSV | Collection is on demand, not scheduled; no backfill, continuous coverage or automatic training/attack-log imports |
+| Evidence imports | Bounded quoted CSV/TSV parser, all-or-nothing row validation, duplicate-ID checks, no coercion of missing/malformed stats to zero; manual source labeling in comparisons/intelligence | Original spy timestamps and third-party verification are not supplied by this import |
+| Account privacy | Exports include presets, mortgage schedules/payments/allocations/audit and history; account workspace remounts on actual user-ID changes | Signed-in browser acceptance still outstanding |
+| Bounty tracker | Correct filter refresh and error handling; strict whole-number inputs and explicit public-contract blocker | Hospitalization verification, transactional marketplace and settlement remain unfinished |
+
+The migrations are `saved_workspaces_and_mortgage_ledger` and `opt_in_personal_history`. Mortgage mutations run through private authenticated functions with invoker API wrappers; browser roles have read-only ledger access. Official history insertion is service-only and rechecks opt-in/pause under a profile row lock.
+
 ## Validation and limits
 
 - TypeScript/Vite production build passes.
-- All 43 automated tests pass: credential encryption/tampering, mocked Torn errors and response normalization, payout accounting, CSV/XLSX output, report expiry/redaction, actual PostgreSQL migration and core RLS checks, reservations, delayed/out-of-order evidence, duplicate payments, fraudulent funding, account-deletion liability guard and revive claims.
+- All 66 automated tests pass: credential encryption/tampering, mocked Torn errors and response normalization, payout accounting, CSV/XLSX output, report expiry/redaction, actual PostgreSQL migration and core RLS checks, reservations, delayed/out-of-order evidence, duplicate payments, fraudulent funding, account-deletion liability guard and revive claims.
 - All current static table/column references pass against the schema produced by the proposed migration. This catches known-name drift, not every possible dynamic query or complete feature acceptance.
 - Deno type checks pass for all 15 Edge Function entrypoints.
 - Final npm audit reports zero known advisories (down from 10: three critical, two high, five moderate). Vite 8.3.4, Vitest 5.0.5, React plugin 6.1.2 and Supabase CLI 2.121.0 are pinned; the ExcelJS UUID dependency is overridden to 11.1.1 and XLSX round-trip tests pass.
 - PostgreSQL tests run through PGlite using captured production table definitions and policies. Supabase Auth/Vault/cron scaffolding is mocked; real production network scheduling and secret configuration are not validated by these tests.
 - Simultaneous claim promises are tested transactionally, but PGlite serializes its single connection. Multi-session lock contention, load and production smoke tests remain required.
-- Real Torn identities/keys and paid provider calls were not exercised. No production test users or financial records were created.
+- Real Torn identities/keys and paid provider calls were not exercised. Temporary production validation rows were created only inside rolled-back transactions; no fixture identities or financial records were retained.
 - Browser visual acceptance is not complete: the browser binary download failed in this environment. Mobile behavior, real sessions, uploads, Realtime delivery and push require staging acceptance.
 
 ## Remaining required scope
@@ -70,9 +88,9 @@ The matrix keeps every inspected competitor feature partial or blocked until its
 1. Clean baseline migrations: historical numbered files conflict with the deployed schema and each other. Do not apply the whole history to this existing project.
 2. Authoritative faction-role synchronization, shared war workspaces, cross-member dibs/officer overrides, complete roster comparisons/distributions, alliance/family sharing and revocation.
 3. Full payout revenue/cost accounting, published versioned policies, imported verified contributions, category classification, member statements and adjustment workflows. The repaired private calculation is not the entire faction accounting product.
-4. Saved comparison sets, leaderboard populations/ranges/presets and complete table-layout presets.
-5. Snapshot collection and all requested historical windows, gap accounting, full training/war/flight/activity collection, budgeted scheduling for watched factions and global API budgets. No history is fabricated before collection starts.
-6. Dedicated bounty contract verification/settlement, operational mortgage applications/agreements/installment/arrears workflows, and the expanded multi-asset ROI/cash-flow scenarios. Existing small calculators do not satisfy these workflows.
+4. Remaining comparison war-performance fields, additional authorized leaderboard populations/metrics, table presets beyond Targets, safe formulas and sharing. Private saved sets, selectable leaderboard ranges/presets and target layouts are now implemented.
+5. Scheduled snapshot collection, full training/war/flight/activity imports, budgeted watched-faction scheduling and global API budgets. Opt-in on-demand personal snapshots, observed-window changes and gap disclosure are implemented; unavailable prior history remains unknown.
+6. Dedicated bounty contract verification/settlement, a reviewed lender service with counterparty acceptance and funding, and game-specific ROI valuation/reinvestment/sensitivity tools. Private mortgage application/agreement/installment/payment/arrears bookkeeping and saved multi-asset cash-flow analysis are implemented.
 7. Authorized list imports and licensed redistribution; legitimate third-party credentials/terms/caching/attribution for FFScouter and TornStats; permitted foreign-stock feeds. Proprietary coverage/prediction accuracy is not reproduced.
 8. Operator custody, deposits, Xanax valuation, refunds, payout staffing and an operating policy before enabling prepaid loss contracts. Direct payment remains supported.
 9. API-verified revive evidence, pending/rejected evidence review, expanded fraud handling, payout batching and overdue-settlement alert workflows.

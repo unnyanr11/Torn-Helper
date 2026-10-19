@@ -1,5 +1,11 @@
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
 const ownedTables = {
+  personal_stat_snapshots: "user_id",
+  workspace_presets: "user_id",
+  mortgage_agreements: "user_id",
+  mortgage_installments: "user_id",
+  mortgage_payments: "user_id",
+  mortgage_events: "user_id",
   linked_torn_accounts: "user_id",
   integration_connections: "user_id",
   spy_import_jobs: "user_id",
@@ -106,6 +112,22 @@ Deno.serve(async (req) => {
         }
         output[table] = all;
       }
+      const allocations = [];
+      for (let offset = 0; ; offset += 500) {
+        const { data, error } = await admin
+          .from("mortgage_payment_allocations")
+          .select("*,mortgage_payments!inner(user_id)")
+          .eq("mortgage_payments.user_id", user.id)
+          .order("payment_id")
+          .order("installment_id")
+          .range(offset, offset + 499);
+        if (error) throw error;
+        allocations.push(
+          ...data.map(({ mortgage_payments: _owner, ...row }) => row),
+        );
+        if (data.length < 500) break;
+      }
+      output.mortgage_payment_allocations = allocations;
       const { data: claims, error } = await admin
         .from("loss_claims")
         .select("*")
