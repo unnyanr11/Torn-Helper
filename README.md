@@ -129,12 +129,16 @@ Create OC plans with auto-generated slots, assign members, mark readiness, and l
 
 ## Chain Target Queue
 
-Build a chain target queue, claim targets for 5 minutes, mark hit/skipped, and release claims. Status flow: open → claimed → hit/skipped.
+Build a chain target queue, claim targets for 5 minutes, mark hit/skipped, and release claims.
+
+## Daily Digest
+
+One-click morning snapshot aggregating loans (pending/overdue), chain status, top travel opportunities, and open chain targets into a single dated digest.
 
 ## Status (delivery checklist)
 
-- [x] Steps 1-68: app shell through OC planner (see git history for full list)
-- [x] Step 69: Chain target queue (0051 migration with chain_target_queue + RLS; ChainQueue page with add/claim/hit/skip/release)
-- [ ] Pending: daily digest, revive tracker
+- [x] Steps 1-69: app shell through chain target queue (see git history for full list)
+- [x] Step 70: Daily digest (0052 migration with daily_digests + RLS; DailyDigest page aggregating loans/chain/travel/targets)
+- [ ] Pending: revive tracker
 
 All data in Demo Mode is seeded sample data and is never presented as live.
