@@ -13,6 +13,7 @@ import Stocks from './pages/Stocks';
 import Company from './pages/Company';
 import Properties from './pages/Properties';
 import Racing from './pages/Racing';
+import Community from './pages/Community';
 import ApiUsage from './pages/ApiUsage';
 import Placeholder from './pages/Placeholder';
 
@@ -56,8 +57,9 @@ export default function App() {
         {page === 'Company' && <Company />}
         {page === 'Properties' && <Properties />}
         {page === 'Racing' && <Racing />}
+        {page === 'Community' && <Community />}
         {page === 'API Usage' && <ApiUsage />}
-        {!['Overview','Planner','Targets','Alerts','War Room','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','API Usage'].includes(page) && <Placeholder name={page} />}
+        {!['Overview','Planner','Targets','Alerts','War Room','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','API Usage'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );
