@@ -78,10 +78,14 @@ Opt-in adapter (spec section 7C #13). Connect with a TornStats API token (stored
 
 Immutable report snapshots with CSV and genuine XLSX export (formula-injection sanitized via cell prefixing), plus revocable 7-day expiring share links with unique tokens.
 
+## Competitor Coverage Matrix
+
+Per-feature audit table (spec section 7C #16) covering 16 features across TornStats, TornTools, YATA, and TornWise with source URL, date checked, freemium status, acceptance test, and blocker visibility. Searchable/filterable in-app.
+
 ## Status (delivery checklist)
 
-- [x] Steps 1-54: app shell through TornStats integration (see git history for full list)
-- [x] Step 55: CSV/XLSX export hardening (0038 migration with report_snapshots + report_share_grants + RLS; export.ts with sanitizeCell/toCsv/toXlsx; Reports page with snapshots, CSV/XLSX export, share links, revoke)
-- [ ] Pending: detailed competitor matrix, Halloween tools, faction operations depth
+- [x] Steps 1-55: app shell through CSV/XLSX export hardening (see git history for full list)
+- [x] Step 56: Detailed competitor coverage matrix (src/data/competitors.ts with 16 audited rows; CompetitorMatrix page with filterable table)
+- [ ] Pending: Halloween tools, faction operations depth
 
 All data in Demo Mode is seeded sample data and is never presented as live.

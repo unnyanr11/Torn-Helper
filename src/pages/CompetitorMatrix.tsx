@@ -1,28 +1,47 @@
-import { COMPETITORS } from '../data/competitors';
+import { useState } from 'react';
+import { COMPETITOR_MATRIX, MatrixRow } from '../data/competitors';
 
 export default function CompetitorMatrix() {
+  const [filter, setFilter] = useState('');
+  const rows = COMPETITOR_MATRIX.filter((r) =>
+    r.feature.toLowerCase().includes(filter.toLowerCase()) ||
+    r.competitor.toLowerCase().includes(filter.toLowerCase())
+  );
+
   return (
     <section>
       <h2>Competitor Coverage Matrix</h2>
-      <p className="muted">How Torn Command Center compares to popular Torn tools across key features. Static reference based on publicly known feature sets.</p>
-      <article className="card nu-inset" style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 600 }}>
+      <p className="muted">Per-feature competitor audit with source URL, date checked, freemium status, acceptance test, and blocker visibility (spec section 7C #16).</p>
+      <input className="nu-input" placeholder="Filter by feature or competitor" value={filter} onChange={(e) => setFilter(e.target.value)} />
+      <div style={{ overflowX: 'auto', marginTop: 12 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
-            <tr><th style={{ textAlign: 'left' }}>Feature</th><th>Torn CC</th><th>TornTools</th><th>YATA</th><th>TornStats</th></tr>
+            <tr style={{ borderBottom: '2px solid #555', textAlign: 'left' }}>
+              <th style={{ padding: 8 }}>Feature</th>
+              <th style={{ padding: 8 }}>Competitor</th>
+              <th style={{ padding: 8 }}>Source</th>
+              <th style={{ padding: 8 }}>Checked</th>
+              <th style={{ padding: 8 }}>Pricing</th>
+              <th style={{ padding: 8 }}>Acceptance test</th>
+              <th style={{ padding: 8 }}>Blocker visibility</th>
+            </tr>
           </thead>
           <tbody>
-            {COMPETITORS.map((r) => (
-              <tr key={r.feature}>
-                <td style={{ textAlign: 'left' }}>{r.feature}</td>
-                <td style={{ textAlign: 'center' }}>{r.tcc}</td>
-                <td style={{ textAlign: 'center' }}>{r.tornTools}</td>
-                <td style={{ textAlign: 'center' }}>{r.yata}</td>
-                <td style={{ textAlign: 'center' }}>{r.tornStats}</td>
+            {rows.map((r: MatrixRow, i) => (
+              <tr key={i} style={{ borderBottom: '1px solid #333' }}>
+                <td style={{ padding: 8 }}>{r.feature}</td>
+                <td style={{ padding: 8 }}>{r.competitor}</td>
+                <td style={{ padding: 8 }}>{r.sourceUrl ? <a href={r.sourceUrl} target="_blank" rel="noreferrer">link</a> : '—'}</td>
+                <td style={{ padding: 8 }}>{r.dateChecked}</td>
+                <td style={{ padding: 8 }}><span className="badge">{r.freemium}</span></td>
+                <td style={{ padding: 8 }}>{r.acceptanceTest}</td>
+                <td style={{ padding: 8 }}><span className="badge">{r.blockerVisibility}</span></td>
               </tr>
             ))}
           </tbody>
         </table>
-      </article>
+      </div>
+      {rows.length === 0 && <p className="muted">No matching rows.</p>}
     </section>
   );
 }
