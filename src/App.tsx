@@ -54,6 +54,7 @@ import FactionFinance from './pages/FactionFinance';
 import FactionUpgrades from './pages/FactionUpgrades';
 import AllianceSharing from './pages/AllianceSharing';
 import RetentionTrends from './pages/RetentionTrends';
+import ArmoryHistory from './pages/ArmoryHistory';
 import Placeholder from './pages/Placeholder';
 
 export default function App() {
@@ -140,7 +141,8 @@ export default function App() {
         {page === 'Faction Upgrades' && <FactionUpgrades />}
         {page === 'Alliance Sharing' && <AllianceSharing />}
         {page === 'Retention Trends' && <RetentionTrends />}
-        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Flight Tracker','Dibs','Target Pools','Tornipedia','Assistant','Discord','Notification Prefs','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','TornStats','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage','Public API','Admin Cost Dashboard','Competitor Matrix','Halloween','Faction','Faction Finance','Faction Upgrades','Alliance Sharing','Retention Trends'].includes(page) && <Placeholder name={page} />}
+        {page === 'Armory History' && <ArmoryHistory />}
+        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Flight Tracker','Dibs','Target Pools','Tornipedia','Assistant','Discord','Notification Prefs','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','TornStats','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage','Public API','Admin Cost Dashboard','Competitor Matrix','Halloween','Faction','Faction Finance','Faction Upgrades','Alliance Sharing','Retention Trends','Armory History'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );

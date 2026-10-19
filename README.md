@@ -106,10 +106,14 @@ Scoped resource sharing with alliance/sister factions by role. Instant revoke an
 
 Join/leave/kick event logging with 30-day retention rate, net change, and 6-month monthly breakdown.
 
+## Armory History & Loans
+
+Armory event log (added/removed/loaned/returned/sold) with member attribution, plus member loans with interest, due dates, and repaid/defaulted status tracking.
+
 ## Status (delivery checklist)
 
-- [x] Steps 1-61: app shell through alliance sharing (see git history for full list)
-- [x] Step 62: Retention trends & join-leave tracking (0044 migration with faction_membership_events + RLS; RetentionTrends page with event logging, 30-day retention, monthly breakdown)
-- [ ] Pending: AI provider wiring, armory history/loans
+- [x] Steps 1-62: app shell through retention trends (see git history for full list)
+- [x] Step 63: Armory history & loans (0045 migration with faction_armory_events + faction_loans + RLS; ArmoryHistory page with event log and loan management)
+- [ ] Pending: AI provider wiring for the war analyzer
 
 All data in Demo Mode is seeded sample data and is never presented as live.
