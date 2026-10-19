@@ -47,6 +47,7 @@ node scripts/generate-capabilities.mjs
 - [x] Step 6: target intelligence (live status refresh, observations, estimates, alert center)
 - [x] Step 7: war room (wars, 15-min target claims) and payouts (deterministic allocation, draft runs)
 - [x] Step 8: losses marketplace (direct-payment contracts, claims, evidence schema, disputes)
-- [ ] Later phases: travel, markets, company, properties, racing, community, etc.
+- [x] Step 9: travel, markets, and money tools (manual observations, watchlists, stock holdings)
+- [ ] Later phases: company, properties, racing, community, live data feeds, etc.
 
 All data in Demo Mode is seeded sample data and is never presented as live.

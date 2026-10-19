@@ -6,4 +6,4 @@ export const NAV = [
 
 export type Page = (typeof NAV)[number];
 
-export const BUILT: Page[] = ['Overview', 'Planner', 'Targets', 'Alerts', 'War Room', 'Payouts', 'Losses', 'API Usage'];
+export const BUILT: Page[] = ['Overview', 'Planner', 'Targets', 'Alerts', 'War Room', 'Payouts', 'Losses', 'Travel', 'Markets', 'Stocks', 'API Usage'];
