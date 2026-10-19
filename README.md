@@ -78,6 +78,7 @@ node scripts/generate-capabilities.mjs
 - [x] Step 24: Compare Players (client-side 2-5 player ID comparison across targets, latest estimates, observation-based online rate; Compare Players UI)
 - [x] Step 25: Leaderboards (client-side rankings for gym gains, race best times, payout totals from RLS-scoped data; Leaderboards UI)
 - [x] Step 26: ROI Calculator (client-side cost/return/duration calculator with ROI %, annualized ROI, break-even; RoiCalculator UI)
-- [ ] Pending: image uploads for graffiti, PI Mortgages, Bounties, 217-stat catalog, custom stat columns, TornStats/FFScouter deep integration, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
+- [x] Step 27: PI Mortgages (client-side mortgage calculator — monthly payment, total interest, total paid; PiMortgages UI)
+- [ ] Pending: image uploads for graffiti, Bounties, 217-stat catalog, custom stat columns, TornStats/FFScouter deep integration, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
 
 All data in Demo Mode is seeded sample data and is never presented as live.
