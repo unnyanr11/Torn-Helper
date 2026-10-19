@@ -6,5 +6,5 @@ export const NAV = [
 
 export type Page = (typeof NAV)[number];
 
-// Phase 1 pages that are implemented; others show an honest "not built yet" state.
-export const BUILT: Page[] = ['Overview'];
+// Phase 1-2 pages that are implemented; others show an honest "not built yet" state.
+export const BUILT: Page[] = ['Overview', 'API Usage'];

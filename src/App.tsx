@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BUILT, NAV, Page } from './nav';
 import Overview from './pages/Overview';
+import ApiUsage from './pages/ApiUsage';
 import Placeholder from './pages/Placeholder';
 
 export default function App() {
@@ -30,7 +31,9 @@ export default function App() {
             {theme === 'dark' ? 'Light' : 'Dark'} mode
           </button>
         </header>
-        {page === 'Overview' ? <Overview /> : <Placeholder name={page} />}
+        {page === 'Overview' && <Overview />}
+        {page === 'API Usage' && <ApiUsage />}
+        {page !== 'Overview' && page !== 'API Usage' && <Placeholder name={page} />}
       </main>
     </div>
   );
