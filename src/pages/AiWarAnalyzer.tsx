@@ -1,3 +1,4 @@
+import { functionError } from "../lib/function-error";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -41,17 +42,15 @@ export default function AiWarAnalyzer() {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return;
-    const { error } = await supabase
-      .from("ai_consents")
-      .upsert(
-        {
-          user_id: user.id,
-          provider,
-          consented: !consented,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id,provider" },
-      );
+    const { error } = await supabase.from("ai_consents").upsert(
+      {
+        user_id: user.id,
+        provider,
+        consented: !consented,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,provider" },
+    );
     if (error) setError(error.message);
     else {
       setConsented(!consented);
@@ -80,7 +79,7 @@ export default function AiWarAnalyzer() {
       body: { evidence: parsed, provider },
     });
     setLoading(false);
-    if (error) setError(error.message);
+    if (error) setError((await functionError(data, error)).message);
     else if (data?.error) setError(data.error);
     else setSummary(data.summary ?? "");
   }

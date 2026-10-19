@@ -1,6 +1,6 @@
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
 import { encrypt } from "../_shared/crypto.ts";
-import { tornGet } from "../_shared/torn.ts";
+import { LoginError, verifiedTornIdentity } from "../_shared/torn-login.ts";
 Deno.serve(async (req) => {
   const early = preflight(req);
   if (early) return early;
@@ -11,24 +11,11 @@ Deno.serve(async (req) => {
     const { apiKey, persist = true } = await req.json();
     if (typeof apiKey !== "string" || !/^[a-zA-Z0-9]{16}$/.test(apiKey))
       return json({ error: "Enter a 16-character Torn key" }, 400);
-    const [identity, info] = await Promise.all([
-      tornGet("/user/basic", apiKey),
-      tornGet("/key/info", apiKey),
-    ]);
-    const basic = identity.profile ?? identity.basic;
-    const keyInfo = info.info;
-    if (!basic?.id || Number(keyInfo?.user?.id) !== Number(basic.id))
-      return json({ error: "Could not validate key ownership" }, 400);
-    const allowed = [
-      "Public Only",
-      "Minimal Access",
-      "Limited Access",
-      "Full Access",
-      "Custom",
-    ];
-    const access = allowed.includes(keyInfo.access?.type)
-      ? keyInfo.access.type
-      : "Custom";
+    if (typeof persist !== "boolean")
+      return json({ error: "Choose whether to retain your key" }, 400);
+    const verified = await verifiedTornIdentity(apiKey);
+    const basic = { id: verified.id, name: verified.name };
+    const access = verified.access;
     const current = await admin
       .from("linked_torn_accounts")
       .select("torn_id")
@@ -55,7 +42,17 @@ Deno.serve(async (req) => {
         409,
       );
     const secret = Deno.env.get("TORN_KEY_ENCRYPTION_KEY")!;
-    const encrypted = persist ? await encrypt(apiKey, secret) : null;
+    let encrypted: string | null = null;
+    if (persist) {
+      try {
+        encrypted = await encrypt(apiKey, secret ?? "");
+      } catch {
+        throw new LoginError(
+          503,
+          "Encrypted key storage is not configured. Use a request-only key on Overview until the site owner configures storage.",
+        );
+      }
+    }
     const { error } = await admin.from("linked_torn_accounts").upsert(
       {
         user_id: user.id,
@@ -87,13 +84,15 @@ Deno.serve(async (req) => {
       key_access_level: access,
       persistent: persist,
     });
-  } catch {
+  } catch (error) {
     return json(
       {
         error:
-          "Unable to link key. Check its permissions and server encryption configuration.",
+          error instanceof LoginError
+            ? error.message
+            : "Unable to link key. Please retry shortly.",
       },
-      400,
+      error instanceof LoginError ? error.status : 503,
     );
   }
 });

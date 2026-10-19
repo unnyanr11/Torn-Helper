@@ -1,5 +1,9 @@
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
-import { decrypt } from "../_shared/crypto.ts";
+import {
+  collectOverview,
+  resolveRefreshKey,
+  refreshFailure,
+} from "../_shared/live-refresh.ts";
 import { personalStatValues } from "../_shared/history.ts";
 import { tornGet } from "../_shared/torn.ts";
 const endpoints: Record<string, string> = {
@@ -7,7 +11,7 @@ const endpoints: Record<string, string> = {
   stocks: "/torn/stocks",
   market: "/torn/items",
   company: "/user/job",
-  overview: "/user?selections=bars,cooldowns,travel,battlestats,personalstats",
+  overview: "/user",
 };
 Deno.serve(async (req) => {
   const early = preflight(req);
@@ -16,22 +20,37 @@ Deno.serve(async (req) => {
     const admin = adminClient();
     const user = await authenticate(req, admin);
     if (!user) return json({ error: "Unauthorized" }, 401);
-    const { feed_type } = await req.json();
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return json({ error: "Invalid request body" }, 400);
+    }
+    const { feed_type, apiKey } = body ?? {};
     if (!Object.hasOwn(endpoints, feed_type))
       return json({ error: "Unsupported feed" }, 400);
-    const { data: profile } = await admin
+    const { data: profile, error: profileError } = await admin
       .from("profiles")
       .select("tracking_paused")
       .eq("id", user.id)
       .single();
+    if (profileError) throw profileError;
     if (profile?.tracking_paused)
       return json({ error: "Tracking paused" }, 409);
-    const { data: cache } = await admin
+    const { data: cache, error: cacheError } = await admin
       .from("live_feed_cache")
       .select("*")
       .eq("user_id", user.id)
       .eq("feed_type", feed_type)
       .maybeSingle();
+    if (cacheError) throw cacheError;
+    // Verify request-only ownership even when an observation is cached.
+    const key = await resolveRefreshKey(
+      admin,
+      user.id,
+      apiKey,
+      Deno.env.get("TORN_KEY_ENCRYPTION_KEY"),
+    );
     if (
       cache &&
       Date.now() - Date.parse(cache.fetched_at) < cache.ttl_seconds * 1000
@@ -42,20 +61,10 @@ Deno.serve(async (req) => {
         payload: cache.payload,
         fetched_at: cache.fetched_at,
       });
-    const { data: cred } = await admin
-      .from("encrypted_credentials")
-      .select("encrypted_key")
-      .eq("user_id", user.id)
-      .eq("provider", "torn")
-      .single();
-    if (!cred) return json({ error: "Link your Torn key" }, 400);
-    const payload = await tornGet(
-      endpoints[feed_type],
-      await decrypt(
-        cred.encrypted_key,
-        Deno.env.get("TORN_KEY_ENCRYPTION_KEY")!,
-      ),
-    );
+    const payload =
+      feed_type === "overview"
+        ? await collectOverview(key)
+        : await tornGet(endpoints[feed_type], key);
     const fetched_at = new Date().toISOString();
     let history_recorded = false;
     if (feed_type === "overview") {
@@ -75,13 +84,8 @@ Deno.serve(async (req) => {
       );
     if (error) throw error;
     return json({ ok: true, payload, fetched_at, history_recorded });
-  } catch {
-    return json(
-      {
-        error:
-          "Unable to refresh this feed. Check the required key permissions.",
-      },
-      503,
-    );
+  } catch (error) {
+    const failure = refreshFailure(error);
+    return json({ error: failure.error }, failure.status);
   }
 });

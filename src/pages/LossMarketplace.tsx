@@ -1,3 +1,4 @@
+import { functionError } from "../lib/function-error";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 const tabs = [
@@ -117,17 +118,15 @@ export default function LossMarketplace() {
       );
     if (expiry && Date.parse(expiry) <= Date.now())
       throw new Error("Expiry must be in the future");
-    const { error } = await supabase
-      .from("loss_contracts")
-      .insert({
-        buyer_user_id: userId,
-        target_player_id: t,
-        quantity: q,
-        price_per_loss: p,
-        funding_method: "direct_payment",
-        status: "open",
-        expires_at: expiry ? new Date(expiry).toISOString() : null,
-      });
+    const { error } = await supabase.from("loss_contracts").insert({
+      buyer_user_id: userId,
+      target_player_id: t,
+      quantity: q,
+      price_per_loss: p,
+      funding_method: "direct_payment",
+      status: "open",
+      expires_at: expiry ? new Date(expiry).toISOString() : null,
+    });
     if (error) throw error;
     setTarget("");
     setPrice("");
@@ -139,7 +138,7 @@ export default function LossMarketplace() {
       "verify-loss-payment",
       { body: {} },
     );
-    if (error || data?.error) throw new Error(data?.error ?? error?.message);
+    if (error || data?.error) throw await functionError(data, error);
     if (data.pending)
       throw new Error(
         "Attack records are pending. No payment approved. Retry before the reconciliation window closes.",
@@ -396,7 +395,7 @@ export default function LossMarketplace() {
                   { body: {} },
                 );
                 if (error || data?.error)
-                  throw new Error(data?.error ?? error?.message);
+                  throw await functionError(data, error);
               })
             }
           >

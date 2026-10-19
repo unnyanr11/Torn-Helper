@@ -1,3 +1,4 @@
+import { functionError } from "../lib/function-error";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
@@ -86,8 +87,7 @@ export default function HistoryExplorer() {
       const r = await supabase.functions.invoke("refresh-live-data", {
         body: { feed_type: "overview" },
       });
-      if (r.error || r.data?.error)
-        throw new Error(r.data?.error ?? r.error?.message);
+      if (r.error || r.data?.error) throw await functionError(r.data, r.error);
       setMessage(
         r.data.cached
           ? "Overview cache is still fresh. Try again after 60 seconds to collect a new observation."

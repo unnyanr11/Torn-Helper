@@ -1,3 +1,4 @@
+import { functionError } from "../lib/function-error";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -54,7 +55,7 @@ export default function AiSettings() {
       { body: { provider, api_key: key } },
     );
     if (invokeError) {
-      setError(invokeError.message);
+      setError((await functionError(json, invokeError)).message);
       return;
     }
     if (json.error) {
@@ -78,7 +79,7 @@ export default function AiSettings() {
       body: { provider: prov },
     });
     if (error || data?.error) {
-      setError(data?.error ?? error?.message);
+      setError((await functionError(data, error)).message);
       return;
     }
     setSuccess(`${prov === "openai" ? "OpenAI" : "Gemini"} key removed`);

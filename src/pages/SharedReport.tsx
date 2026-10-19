@@ -1,3 +1,4 @@
+import { functionError } from "../lib/function-error";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 export default function SharedReport({ token }: { token: string }) {
@@ -12,7 +13,7 @@ export default function SharedReport({ token }: { token: string }) {
         body: { token },
       });
       if (error || data?.error)
-        throw new Error(data?.error ?? "Report unavailable or expired");
+        throw await functionError(data, error, "Report unavailable or expired");
       return data;
     },
   });

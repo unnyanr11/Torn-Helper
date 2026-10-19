@@ -1,3 +1,15 @@
+export class TornApiError extends Error {
+  constructor(
+    public code: number | null,
+    public httpStatus: number | null = null,
+  ) {
+    super(
+      code === null
+        ? "Torn API temporarily unavailable"
+        : `Torn API rejected request (code ${code})`,
+    );
+  }
+}
 export async function tornGet(
   path: string,
   apiKey: string,
@@ -9,11 +21,11 @@ export async function tornGet(
     headers: { Authorization: `ApiKey ${apiKey}` },
     signal: AbortSignal.timeout(15000),
   });
-  if (!response.ok) throw new Error("Torn API temporarily unavailable");
+  if (!response.ok) throw new TornApiError(null, response.status);
   const data = await response.json();
   if (data.error)
-    throw new Error(
-      `Torn API rejected request (code ${data.error.code ?? "unknown"})`,
+    throw new TornApiError(
+      Number.isInteger(data.error.code) ? data.error.code : null,
     );
   return data;
 }

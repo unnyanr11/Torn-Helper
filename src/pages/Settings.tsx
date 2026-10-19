@@ -1,3 +1,5 @@
+import KeyDisclosure from "../components/KeyDisclosure";
+import { functionError } from "../lib/function-error";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { downloadBlob } from "../lib/export";
@@ -8,7 +10,8 @@ export default function Settings() {
     [signedIn, setSignedIn] = useState(false),
     [identity, setIdentity] = useState<any>(null),
     [paused, setPaused] = useState(false),
-    [persist, setPersist] = useState(false);
+    [persist, setPersist] = useState(false),
+    [hasStoredKey, setHasStoredKey] = useState(false);
   useEffect(() => {
     void load().catch((e) =>
       setMessage(
@@ -22,7 +25,7 @@ export default function Settings() {
     } = await supabase.auth.getUser();
     setSignedIn(!!user);
     if (!user) return;
-    const [a, p] = await Promise.all([
+    const [a, p, credential] = await Promise.all([
       supabase
         .from("linked_torn_accounts")
         .select("torn_id,torn_name,key_access_level,revoked_at")
@@ -33,9 +36,17 @@ export default function Settings() {
         .select("tracking_paused")
         .eq("id", user.id)
         .single(),
+      supabase
+        .from("encrypted_credentials")
+        .select("provider")
+        .eq("user_id", user.id)
+        .eq("provider", "torn")
+        .maybeSingle(),
     ]);
     if (a.error) throw a.error;
     if (p.error) throw p.error;
+    if (credential.error) throw credential.error;
+    setHasStoredKey(Boolean(credential.data));
     setIdentity(a.data);
     setPaused(p.data?.tracking_paused ?? false);
   }
@@ -58,13 +69,7 @@ export default function Settings() {
       body: { apiKey: submitted, persist },
     });
     if (error || data?.error) {
-      let message = data?.error ?? error?.message ?? "Unable to sign in.";
-      if (error && "context" in error && error.context instanceof Response) {
-        try {
-          message = (await error.context.json()).error ?? message;
-        } catch {}
-      }
-      throw new Error(message);
+      throw await functionError(data, error, "Unable to sign in.");
     }
     if (typeof data?.token_hash !== "string" || data.type !== "magiclink")
       throw new Error("No valid sign-in session was returned.");
@@ -80,14 +85,14 @@ export default function Settings() {
       body: { apiKey: key, persist },
     });
     setKey("");
-    if (error || data?.error) throw new Error(data?.error ?? error?.message);
+    if (error || data?.error) throw await functionError(data, error);
     setMessage(`Linked ${data.torn_name} [${data.torn_id}]`);
   }
   async function unlink() {
     const { data, error } = await supabase.functions.invoke("remove-ai-key", {
       body: { provider: "torn" },
     });
-    if (error || data?.error) throw new Error(data?.error ?? error?.message);
+    if (error || data?.error) throw await functionError(data, error);
   }
   async function pause() {
     const {
@@ -104,7 +109,7 @@ export default function Settings() {
     const { data, error } = await supabase.functions.invoke("account-data", {
       body: { action: "export" },
     });
-    if (error || data?.error) throw new Error(data?.error ?? error?.message);
+    if (error || data?.error) throw await functionError(data, error);
     downloadBlob(
       new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }),
       "torn-account-export.json",
@@ -120,7 +125,7 @@ export default function Settings() {
     const { data, error } = await supabase.functions.invoke("account-data", {
       body: { action: "delete" },
     });
-    if (error || data?.error) throw new Error(data?.error ?? error?.message);
+    if (error || data?.error) throw await functionError(data, error);
     await supabase.auth.signOut();
   }
   return (
@@ -171,9 +176,9 @@ export default function Settings() {
             </label>
             <p>
               Without retention, the key is used for sign-in only and any
-              previously retained Torn key is removed. Ongoing API features need
-              a retained key. Keep this key private: it is your sign-in
-              credential.
+              previously retained Torn key is removed. Overview can refresh with
+              a request-only key; background features need a retained key. Keep
+              this key private: it is your sign-in credential.
             </p>
             <button
               className="nu-btn"
@@ -199,6 +204,11 @@ export default function Settings() {
                 ? `${identity.torn_name} [${identity.torn_id}] · ${identity.key_access_level}`
                 : "No active Torn key linked"}
             </p>
+            <p>
+              {hasStoredKey
+                ? "Encrypted Torn key stored for refreshes."
+                : "No Torn key stored. Use a request-only key on Overview or enable encrypted storage below."}
+            </p>
             <KeyDisclosure persist={persist} />
             <label>
               Torn API key
@@ -219,8 +229,9 @@ export default function Settings() {
               Store encrypted key for refreshes and background verification
             </label>
             <p>
-              Without storage, identity remains linked but ongoing collection
-              and verification are unavailable.
+              Without storage, identity remains linked. Use a request-only key
+              on Overview for manual refreshes; background verification needs
+              storage.
             </p>
             <button
               className="nu-btn"
@@ -282,51 +293,5 @@ export default function Settings() {
         </>
       )}
     </section>
-  );
-}
-
-function KeyDisclosure({ persist }: { persist: boolean }) {
-  return (
-    <div style={{ overflowX: "auto" }}>
-      <table>
-        <thead>
-          <tr>
-            <th>Data storage</th>
-            <th>Data sharing</th>
-            <th>Purpose</th>
-            <th>Key storage & sharing</th>
-            <th>Access level</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              Verified Torn ID/name and your app records persist until account
-              deletion. History starts when collected. Backups follow the host
-              retention policy.
-            </td>
-            <td>
-              You and authorized service operators; marketplace participants see
-              contract evidence. No key is sent to third-party tools.
-            </td>
-            <td>
-              Verify your identity and open your private workspace. Optional
-              refreshes and verification require key retention.
-            </td>
-            <td>
-              {persist
-                ? "Encrypted on the server until removed; never returned to the browser."
-                : "Used for this request only, then discarded. No raw key is stored in your browser."}
-            </td>
-            <td>
-              Minimal or Limited access for sign-in. Limited selections are
-              required for battle stats/attacks. Custom keys must expose
-              identity/key information. Missing selections reduce available
-              features.
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
   );
 }

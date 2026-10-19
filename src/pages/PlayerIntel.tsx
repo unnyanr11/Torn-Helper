@@ -1,3 +1,4 @@
+import { functionError } from "../lib/function-error";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
@@ -9,11 +10,12 @@ export default function PlayerIntel() {
   const query = useQuery({
     queryKey: ["player", player],
     enabled: !!player,
+    retry: false,
     queryFn: async () => {
       const { data, error } = await supabase.functions.invoke("player-intel", {
         body: { player_id: Number(player) },
       });
-      if (error || data?.error) throw new Error(data?.error ?? error?.message);
+      if (error || data?.error) throw await functionError(data, error);
       return data;
     },
   });
