@@ -50,6 +50,12 @@ export default function Overview() {
         Each available section is shown independently. Battle stats require
         Limited access; Custom keys need the corresponding selections.
       </p>
+      <p>
+        <a className="nu-btn" href="#Live%20Feeds">
+          Browse all Torn data: player, money, inventory, logs, faction, company
+          and more
+        </a>
+      </p>
       {query.error && <p role="alert">{query.error.message}</p>}
       {message && <p role="alert">{message}</p>}
       <details>

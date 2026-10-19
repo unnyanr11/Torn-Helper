@@ -1,5 +1,6 @@
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
 const ownedTables = {
+  torn_data_cache: "user_id",
   personal_stat_snapshots: "user_id",
   workspace_presets: "user_id",
   mortgage_agreements: "user_id",

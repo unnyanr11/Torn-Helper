@@ -1,4 +1,10 @@
-export default function KeyDisclosure({ persist }: { persist: boolean }) {
+export default function KeyDisclosure({
+  persist,
+  session = false,
+}: {
+  persist: boolean;
+  session?: boolean;
+}) {
   return (
     <div style={{ overflowX: "auto" }}>
       <table>
@@ -30,7 +36,9 @@ export default function KeyDisclosure({ persist }: { persist: boolean }) {
             <td>
               {persist
                 ? "Encrypted on the server until removed; never returned to the browser."
-                : "Used for this request only, then discarded. No raw key is stored in your browser."}
+                : session
+                  ? "Kept only in page memory until you leave or reload, never in persistent browser storage or the database."
+                  : "Used for this request only, then discarded. No raw key is saved in browser storage."}
             </td>
             <td>
               Minimal or Limited access for sign-in. Limited selections are

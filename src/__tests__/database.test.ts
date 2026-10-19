@@ -96,6 +96,12 @@ beforeAll(async () => {
       "utf8",
     ),
   );
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261019161634_api_data_browser.sql",
+      "utf8",
+    ),
+  );
   const candidate = await db.query(
     "select table_name as table,column_name as column,data_type as type from information_schema.columns where table_schema='public'",
   );
@@ -912,5 +918,78 @@ describe("server-only Torn authentication mapping and abuse limits", () => {
         ])
       ).rows[0].allowed,
     ).toBe(false);
+  });
+});
+
+describe("all-section Torn observations", () => {
+  it("keeps cached private observations isolated between accounts", async () => {
+    await asService(
+      "select public.store_torn_data($1,$2,'v2-user-money','{}','{\"money\":5}')",
+      [buyer, "a".repeat(64)],
+    );
+    expect(
+      (await asUser(buyer, "select * from public.torn_data_cache")).rows,
+    ).toHaveLength(1);
+    expect(
+      (await asUser(seller, "select * from public.torn_data_cache")).rows,
+    ).toHaveLength(0);
+    expect(
+      (await asUser(seller, "delete from public.torn_data_cache returning *"))
+        .rows,
+    ).toHaveLength(0);
+  });
+  it("does not allow browsers to forge observations or bypass the budget", async () => {
+    await expect(
+      asUser(
+        buyer,
+        "insert into public.torn_data_cache(user_id,request_hash,endpoint_id,payload) values($1,$2,'fake','{}')",
+        [buyer, "b".repeat(64)],
+      ),
+    ).rejects.toThrow(/permission denied/);
+    await expect(
+      asUser(buyer, "select public.consume_torn_data_budget($1,1)", [buyer]),
+    ).rejects.toThrow(/permission denied/);
+    await expect(
+      asUser(buyer, "select public.store_torn_data($1,$2,'fake','{}','{}')", [
+        buyer,
+        "b".repeat(64),
+      ]),
+    ).rejects.toThrow(/permission denied/);
+  });
+  it("counts request-only identity checks in the per-user request budget", async () => {
+    for (let n = 0; n < 20; n++)
+      expect(
+        (
+          await asService(
+            "select public.consume_torn_data_budget($1,3) allowed",
+            [seller],
+          )
+        ).rows[0].allowed,
+      ).toBe(true);
+    expect(
+      (
+        await asService(
+          "select public.consume_torn_data_budget($1,3) allowed",
+          [seller],
+        )
+      ).rows[0].allowed,
+    ).toBe(false);
+  });
+  it("bounds retained observations and allows owners to clear them", async () => {
+    await asService(
+      "insert into public.torn_data_cache(user_id,request_hash,endpoint_id,payload) select $1,lpad(n::text,64,'0'),'v2-user-money','{}'::jsonb from generate_series(1,101) n",
+      [other],
+    );
+    await asService(
+      "select public.store_torn_data($1,$2,'v2-user-money','{}','{}')",
+      [other, "c".repeat(64)],
+    );
+    expect(
+      (await asUser(other, "select * from public.torn_data_cache")).rows,
+    ).toHaveLength(100);
+    expect(
+      (await asUser(other, "delete from public.torn_data_cache returning *"))
+        .rows,
+    ).toHaveLength(100);
   });
 });

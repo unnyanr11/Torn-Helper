@@ -7,9 +7,9 @@ export default function ApiUsage() {
     <section>
       <h2>API Usage</h2>
       <p className="muted">
-        Capability registry. Generated entries from the official OpenAPI spec
-        are marked unverified until their access level, privacy scope and
-        refresh policy are reviewed.
+        Connected sections from the official Torn specification. Open any section
+        to fetch data through the private data browser. Access labels describe
+        documented requirements; Torn checks your actual key and role permissions.
       </p>
       <label>
         Search endpoints
@@ -45,6 +45,12 @@ export default function ApiUsage() {
                 {c.verified ? "✓ Verified" : "⚠ Needs review"}
               </span>
             </div>
+            <a
+              className="nu-btn"
+              href={`#Live%20Feeds?section=${encodeURIComponent(c.id)}`}
+            >
+              Open this data section
+            </a>
             {c.queryParams.length > 0 && (
               <p className="muted">Params: {c.queryParams.join(", ")}</p>
             )}

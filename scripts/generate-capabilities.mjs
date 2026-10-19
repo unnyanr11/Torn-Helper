@@ -15,6 +15,31 @@ const resolve = (p) =>
         .slice(1)
         .reduce((node, key) => node[key], spec)
     : p;
+// Resolve parameter schemas for the runtime form and gateway validator.
+function parameterSchema(input, depth = 0) {
+  if (!input || depth > 12) return {};
+  const node = resolve(input),
+    output = {};
+  for (const key of [
+    "type",
+    "enum",
+    "minimum",
+    "maximum",
+    "minLength",
+    "maxLength",
+    "pattern",
+    "default",
+    "format",
+  ])
+    if (node[key] !== undefined) output[key] = node[key];
+  if (node.items) output.items = parameterSchema(node.items, depth + 1);
+  for (const kind of ["oneOf", "anyOf", "allOf"])
+    if (node[kind])
+      output[kind] = node[kind].map((child) =>
+        parameterSchema(child, depth + 1),
+      );
+  return output;
+}
 const levels = {
   public: "Public Only",
   minimal: "Minimal Access",
@@ -77,7 +102,7 @@ for (const [path, methods] of Object.entries(spec.paths ?? {}))
           location: p.in,
           required: p.required ?? false,
           description: p.description ?? "",
-          schema: p.schema ?? {},
+          schema: parameterSchema(p.schema),
         })),
       requiredAccess,
       privacy,
@@ -123,16 +148,50 @@ console.log(
 );
 
 // Count actual numeric leaf fields from the official full personal-stat response.
-const metricMap=new Map();
-function walkStats(node,path=[]){
- if(node.$ref){walkStats(resolve(node),path);return;}
- for(const kind of ['allOf','oneOf','anyOf'])for(const child of node[kind]??[])walkStats(child,path);
- for(const [name,child] of Object.entries(node.properties??{}))walkStats(child,[...path,name]);
- if(['number','integer'].includes(node.type)&&path.length&&!['id','timestamp','version'].includes(path.at(-1))){
-  const id=path.join('.'),label=value=>value.replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
-  metricMap.set(id,{id,name:path.slice(1).map(label).join(' / '),category:label(path[1]??'Personal'),unit:'as documented',description:node.description??'Official numeric field; interpretation depends on the endpoint category.',source:'official-api',sourceField:id});
- }
+const metricMap = new Map();
+function walkStats(node, path = []) {
+  if (node.$ref) {
+    walkStats(resolve(node), path);
+    return;
+  }
+  for (const kind of ["allOf", "oneOf", "anyOf"])
+    for (const child of node[kind] ?? []) walkStats(child, path);
+  for (const [name, child] of Object.entries(node.properties ?? {}))
+    walkStats(child, [...path, name]);
+  if (
+    ["number", "integer"].includes(node.type) &&
+    path.length &&
+    !["id", "timestamp", "version"].includes(path.at(-1))
+  ) {
+    const id = path.join("."),
+      label = (value) =>
+        value.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    metricMap.set(id, {
+      id,
+      name: path.slice(1).map(label).join(" / "),
+      category: label(path[1] ?? "Personal"),
+      unit: "as documented",
+      description:
+        node.description ??
+        "Official numeric field; interpretation depends on the endpoint category.",
+      source: "official-api",
+      sourceField: id,
+    });
+  }
 }
 walkStats(spec.components.schemas.UserPersonalStatsFull);
-writeFileSync('src/data/verified-stats.json',JSON.stringify({specVersion:spec.info.version,sourceUrl:specUrl,metrics:[...metricMap.values()]},null,2)+'\n');
-console.log(`${metricMap.size} distinct documented numeric personal-stat fields`);
+writeFileSync(
+  "src/data/verified-stats.json",
+  JSON.stringify(
+    {
+      specVersion: spec.info.version,
+      sourceUrl: specUrl,
+      metrics: [...metricMap.values()],
+    },
+    null,
+    2,
+  ) + "\n",
+);
+console.log(
+  `${metricMap.size} distinct documented numeric personal-stat fields`,
+);

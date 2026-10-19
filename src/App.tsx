@@ -1,3 +1,4 @@
+import TornDataShortcut from "./components/TornDataShortcut";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { NAV, Page } from "./nav";
 const Overview = lazy(() => import("./pages/Overview"));
@@ -229,6 +230,7 @@ export default function App() {
             <p role="alert">Your account does not have access to this page.</p>
           ) : (
             <div key={accountId ?? "signed-out"}>
+              <TornDataShortcut page={page} />
               {page === "Overview" && <Overview />}
               {page === "Settings" && <Settings />}
               {page === "Player Intel" && <PlayerIntel />}

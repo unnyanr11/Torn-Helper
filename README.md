@@ -74,3 +74,8 @@ The backend uses Supabase Auth internally with a random, non-deliverable alias a
 The public login endpoint is rate-limited per server-HMAC request/key fingerprint and globally, bounds request bodies and derives identities only from verified Torn responses. Account linking is transactional and concurrent first-sign-in proposals converge on the same identity. A signed-in account cannot replace its key with one for a different Torn player; sign out to switch accounts.
 
 The Vercel `VITE_SUPABASE_PUBLISHABLE_KEY` remains project hosting configuration. It is distinct from the individual Torn API key entered by each user. The backend's `TORN_KEY_ENCRYPTION_KEY` is needed only for encrypted retention. Keep Supabase's email provider enabled for the internal one-time token exchange; public email signups can be disabled separately because account provisioning is server-side.
+
+
+### Browse all documented Torn data
+
+Open **Live Feeds → Torn Data Browser** after signing in. All 234 documented read endpoints are connected across player, faction, company, markets, properties, racing, forums, game reference and key information. Choose a category and section, fill any required IDs/options, then fetch. Use a request-only Torn key or an encrypted key from Settings; Full Access offers the widest permissions, while faction/company roles still apply. An optional checkbox reuses a key only in page memory until you leave/reload. Next-page controls and JSON downloads expose paginated results without polling every section. Cached observations can be cleared in the browser and are included in account exports.
