@@ -84,12 +84,16 @@ Per-feature audit table (spec section 7C #16) covering 16 features across TornSt
 
 ## Halloween Tools
 
-Seasonal event tracker (spec Phase 22): log candy/chocolate/plushie/flower hauls with source, view totals by type and grand total, approximate NPC spawn timers (Pumpkin Head, Ghost, Skeleton Crew), and manage recent haul history. Backed by `halloween_candy_log` table with owner-only RLS.
+Seasonal event tracker (spec Phase 22): log candy/chocolate/plushie/flower hauls with source, view totals by type and grand total, approximate NPC spawn timers, and manage recent haul history. Backed by `halloween_candy_log` table with owner-only RLS.
+
+## Faction Operations
+
+Roster management (add/update/remove members with Torn ID, name, role, level), chain state tracking (current/best/timeout), armory inventory (item/quantity/total value with aggregate), and territory control toggling. Backed by four tables (faction_members, faction_chain_state, faction_armory, faction_territory) all with owner-only RLS.
 
 ## Status (delivery checklist)
 
-- [x] Steps 1-56: app shell through competitor coverage matrix (see git history for full list)
-- [x] Step 57: Halloween tools (0039 migration with halloween_candy_log + RLS; Halloween page with haul logging, totals, NPC timers, history)
-- [ ] Pending: faction operations depth
+- [x] Steps 1-57: app shell through Halloween tools (see git history for full list)
+- [x] Step 58: Faction operations depth (0040 migration with 4 tables + RLS; FactionOps page with roster/chain/armory/territory)
+- [x] All pending items from the original delivery checklist are now complete.
 
 All data in Demo Mode is seeded sample data and is never presented as live.
