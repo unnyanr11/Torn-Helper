@@ -23,7 +23,7 @@ To check Edge Function types with Deno installed:
 deno check --no-config --node-modules-dir=manual supabase/functions/*/index.ts
 ```
 
-Use Node 20.19+ or 22.12+ (validated here with Node 24.19).
+Use Node 24.x (validated here with Node 24.19); the major version is pinned for reproducible Vercel builds.
 
 Copy `.env.example` to `.env.local`, enter the project's publishable key, and run `npm run dev`. The legacy `VITE_SUPABASE_ANON_KEY` variable is also accepted. Never put a service-role key or provider secret in a `VITE_` variable. Supabase Auth sessions are distinct from Torn API keys.
 
@@ -60,3 +60,6 @@ New sessions open the real sign-in flow. Deep links cannot bypass authentication
 Discord, email/push delivery and live TornStats access are explicitly unavailable until their secure server integrations are implemented and configured. No webhook or TornStats credential entry is exposed. Authorized manual spy reports remain available. These disabled capabilities are not represented as functioning production integrations.
 
 The removal of seeded data does **not** certify all workflows in REQUIREMENTS.md as complete. Real-account key linking, email delivery/redirects and hosted browser/mobile acceptance must be checked on your deployment. Review docs/IMPLEMENTATION_AUDIT.md for remaining functionality.
+
+
+If Vercel fails with `VITE_SUPABASE_PUBLISHABLE_KEY is missing or still a placeholder`, open the project's Settings → Environment Variables and set the real public project key for the **Production** environment. A local `.env.local` file is not uploaded to Vercel. Set the same variables separately for Preview if using preview deployments. Save, then redeploy the latest main commit. Do not bypass validation or substitute a service-role/secret key.

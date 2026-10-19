@@ -26,7 +26,7 @@ export function validateClientConfig(
     );
   if (!key || /your_|placeholder|example/i.test(key))
     throw new Error(
-      "Set VITE_SUPABASE_PUBLISHABLE_KEY to your project publishable key.",
+      "VITE_SUPABASE_PUBLISHABLE_KEY is missing or still a placeholder. Add your real project publishable key in Vercel Project Settings > Environment Variables for Production, then redeploy.",
     );
   if (key.startsWith("sb_secret_"))
     throw new Error(
