@@ -92,12 +92,16 @@ Roster management, chain state tracking, armory inventory, and territory control
 
 ## Faction Finance
 
-Money requests (submit → pending → approve&pay / reject) with automatic ledger withdrawal on approval, plus a manual ledger (deposit/withdrawal/loan/repayment/expense/income) with running balance. Backed by `faction_money_requests` and `faction_ledger_entries` tables with owner-only RLS.
+Money requests (submit → pending → approve&pay / reject) with automatic ledger withdrawal on approval, plus a manual ledger with running balance.
+
+## Faction Upgrade Simulation
+
+Plan respect spending across faction upgrade branches: enter current level, target level, and respect cost per level (manual input, labelled as such); app calculates per-branch and total respect needed.
 
 ## Status (delivery checklist)
 
-- [x] Steps 1-58: app shell through faction operations depth (see git history for full list)
-- [x] Step 59: Faction money requests & ledger (0041 migration with faction_money_requests + faction_ledger_entries + RLS; FactionFinance page with request workflow, approval, ledger)
-- [ ] Pending: faction upgrade simulation, deeper alliance sharing, AI provider wiring, retention trends
+- [x] Steps 1-59: app shell through faction finance (see git history for full list)
+- [x] Step 60: Faction upgrade simulation (0042 migration with faction_upgrade_simulations + RLS; FactionUpgrades page with branch sims and respect totals)
+- [ ] Pending: deeper alliance sharing, AI provider wiring, retention trends, armory history/loans
 
 All data in Demo Mode is seeded sample data and is never presented as live.
