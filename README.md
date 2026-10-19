@@ -45,12 +45,15 @@ pg_cron job `evaluate-alerts` runs every 5 minutes (see migration 0016_cron_eval
 node scripts/generate-capabilities.mjs
 ```
 
+## Companion userscript
+
+Install via Tampermonkey from `/torn-helper.user.js` (served from `public/`). It adds a floating panel on torn.com with quick links to the app and a target lookup using your Torn API key (stored locally in your browser via GM storage).
+
 ## Status (delivery checklist)
 
-- [x] Steps 1-41: app shell through fine-grained activity tracking (see git history for full list)
-- [x] Step 42: graffiti image uploads (image_url column, Supabase Storage upload/display in Graffiti UI)
-- [x] Step 43: Discord webhook integration (discord_webhooks table, owner RLS, add/send/delete webhooks; Discord UI)
-- [x] Step 44: notification preferences (notification_preferences table, email/push opt-in toggles; Notification Prefs UI)
-- [ ] Pending: companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
+- [x] Steps 1-44: app shell through notification preferences (see git history for full list)
+- [x] Step 45: companion userscript (public/torn-helper.user.js — floating panel, quick links, target lookup via Torn API)
+- [x] Step 46: assistant (0034_assistant_logs table, owner RLS; Assistant chat UI with keyword-matched glossary/tips answers, logged owner-only)
+- [ ] Pending: public API, PWA, admin cost dashboard, competitor coverage matrix
 
 All data in Demo Mode is seeded sample data and is never presented as live.
