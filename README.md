@@ -69,6 +69,7 @@ node scripts/generate-capabilities.mjs
 - [x] Step 16: alliances & families (alliances, members, invitations, announcements with RLS; Alliances UI)
 - [x] Step 17: watched factions (up to 30 per user, priority, refresh interval, pause state, RLS; Watched Factions UI)
 - [x] Step 18: recruitment scanner (requirements, candidates, review stages, match score, RLS; Recruitment UI)
-- [ ] Pending: gym tracker, activity heatmaps, graffiti wall, exports/reports, AI war analyzer, Compare Players, Leaderboards, ROI Calculator, PI Mortgages, Bounties, 217-stat catalog, custom stat columns, TornStats/FFScouter deep integration, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
+- [x] Step 19: gym tracker (manual session log, stat gains, gains-per-energy summary, RLS; Gym UI)
+- [ ] Pending: activity heatmaps, graffiti wall, exports/reports, AI war analyzer, Compare Players, Leaderboards, ROI Calculator, PI Mortgages, Bounties, 217-stat catalog, custom stat columns, TornStats/FFScouter deep integration, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
 
 All data in Demo Mode is seeded sample data and is never presented as live.
