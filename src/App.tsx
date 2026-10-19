@@ -37,6 +37,7 @@ import ChainQueue from './pages/ChainQueue';
 import DailyDigest from './pages/DailyDigest';
 import ReviveTracker from './pages/ReviveTracker';
 import ReviveMarketplace from './pages/ReviveMarketplace';
+import SettlementQueue from './pages/SettlementQueue';
 import Markets from './pages/Markets';
 import Stocks from './pages/Stocks';
 import Company from './pages/Company';
@@ -132,6 +133,7 @@ export default function App() {
         {page === 'Daily Digest' && <DailyDigest />}
         {page === 'Revive Tracker' && <ReviveTracker />}
         {page === 'Revive Marketplace' && <ReviveMarketplace />}
+        {page === 'Settlement Queue' && <SettlementQueue />}
         {page === 'Markets' && <Markets />}
         {page === 'Stocks' && <Stocks />}
         {page === 'Company' && <Company />}
@@ -158,7 +160,7 @@ export default function App() {
         {page === 'Retention Trends' && <RetentionTrends />}
         {page === 'Armory History' && <ArmoryHistory />}
         {page === 'Loan Reminders' && <LoanReminders />}
-        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Flight Tracker','Dibs','Target Pools','Tornipedia','Assistant','Discord','Notification Prefs','Alerts','Notifications','War Room','War Analyzer','AI War Analyzer','Payouts','Losses','TornStats','Travel','Travel Optimizer','OC Planner','Chain Queue','Daily Digest','Revive Tracker','Revive Marketplace','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage','Public API','Admin Cost Dashboard','Competitor Matrix','Halloween','Faction','Faction Finance','Faction Upgrades','Alliance Sharing','Retention Trends','Armory History','Loan Reminders'].includes(page) && <Placeholder name={page} />}
+        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Flight Tracker','Dibs','Target Pools','Tornipedia','Assistant','Discord','Notification Prefs','Alerts','Notifications','War Room','War Analyzer','AI War Analyzer','Payouts','Losses','TornStats','Travel','Travel Optimizer','OC Planner','Chain Queue','Daily Digest','Revive Tracker','Revive Marketplace','Settlement Queue','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage','Public API','Admin Cost Dashboard','Competitor Matrix','Halloween','Faction','Faction Finance','Faction Upgrades','Alliance Sharing','Retention Trends','Armory History','Loan Reminders'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );
