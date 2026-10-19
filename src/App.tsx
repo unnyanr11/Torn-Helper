@@ -26,6 +26,7 @@ import Alerts from './pages/Alerts';
 import Notifications from './pages/Notifications';
 import WarRoom from './pages/WarRoom';
 import WarAnalyzer from './pages/WarAnalyzer';
+import AiWarAnalyzer from './pages/AiWarAnalyzer';
 import PayoutCalculator from './pages/PayoutCalculator';
 import LossMarketplace from './pages/LossMarketplace';
 import TornStats from './pages/TornStats';
@@ -113,6 +114,7 @@ export default function App() {
         {page === 'Notifications' && <Notifications />}
         {page === 'War Room' && <WarRoom />}
         {page === 'War Analyzer' && <WarAnalyzer />}
+        {page === 'AI War Analyzer' && <AiWarAnalyzer />}
         {page === 'Payouts' && <PayoutCalculator />}
         {page === 'Losses' && <LossMarketplace />}
         {page === 'TornStats' && <TornStats />}
@@ -142,7 +144,7 @@ export default function App() {
         {page === 'Alliance Sharing' && <AllianceSharing />}
         {page === 'Retention Trends' && <RetentionTrends />}
         {page === 'Armory History' && <ArmoryHistory />}
-        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Flight Tracker','Dibs','Target Pools','Tornipedia','Assistant','Discord','Notification Prefs','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','TornStats','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage','Public API','Admin Cost Dashboard','Competitor Matrix','Halloween','Faction','Faction Finance','Faction Upgrades','Alliance Sharing','Retention Trends','Armory History'].includes(page) && <Placeholder name={page} />}
+        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Stat Growth','Spy Reports','War Hits','Crime Tracker','Flight Tracker','Dibs','Target Pools','Tornipedia','Assistant','Discord','Notification Prefs','Alerts','Notifications','War Room','War Analyzer','AI War Analyzer','Payouts','Losses','TornStats','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage','Public API','Admin Cost Dashboard','Competitor Matrix','Halloween','Faction','Faction Finance','Faction Upgrades','Alliance Sharing','Retention Trends','Armory History'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );

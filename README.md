@@ -24,6 +24,10 @@ npm run dev
    supabase secrets set TORN_KEY_ENCRYPTION_KEY=<your-base64-key>
    ```
 5. Create a public Storage bucket named `graffiti-images` for graffiti image uploads.
+6. Set the AI provider secret for the war analyzer:
+   ```bash
+   supabase secrets set AI_PROVIDER_API_KEY=<your-openai-key>
+   ```
 
 ## Deploy Edge Functions
 
@@ -33,6 +37,7 @@ supabase functions deploy refresh-targets
 supabase functions deploy refresh-live-data
 supabase functions deploy evaluate-alerts
 supabase functions deploy analyze-war
+supabase functions deploy analyze-war-ai
 supabase functions deploy public-api
 ```
 
@@ -60,60 +65,64 @@ Read-only, keyless JSON API at `/functions/v1/public-api` with endpoints `/gloss
 
 ## Loss Marketplace
 
-Full buy/sell workflow for verified losses (spec section 7A). Contracts are direct-payment (no operator custody). Sellers claim slots (15-min expiry), submit attack evidence (deduplicated by attack ID), and earnings flow through earned → approved → paid → reconciled. Disputes supported.
+Full buy/sell workflow for verified losses (spec section 7A). Contracts are direct-payment (no operator custody).
 
 ## War Payout Calculator
 
-Full audited payout workflow (spec section 8). Four modes (equal/proportional/weighted/hybrid), caps with iterative redistribution, floors with infeasibility detection, largest-remainder integer rounding, draft→locked→approved→paid→reconciled state machine, CSV export, and append-only audit log.
+Full audited payout workflow (spec section 8).
 
 ## Stats Catalog
 
-224 verified distinct metrics across 15 categories (battle, personal, financial, crime, faction, war, travel, company, property, racing, education, items, social, awards, health). Searchable with category filter, favourites (localStorage), tooltips, units, and source labels (official-api/derived/manual).
+224 verified distinct metrics across 15 categories.
 
 ## TornStats Integration
 
-Opt-in adapter (spec section 7C #13). Connect with a TornStats API token (stored per-user), import spy reports manually via JSON paste (works without live API access), view import history with provenance, and disconnect/revoke.
+Opt-in adapter with manual spy report import.
 
 ## Reports & Exports
 
-Immutable report snapshots with CSV and genuine XLSX export (formula-injection sanitized), plus revocable 7-day expiring share links.
+Immutable snapshots, CSV/XLSX export, revocable share links.
 
 ## Competitor Coverage Matrix
 
-Per-feature audit table (spec section 7C #16) covering 16 features across TornStats, TornTools, YATA, and TornWise.
+16-feature audit table.
 
 ## Halloween Tools
 
-Seasonal event tracker: candy haul logging, totals, NPC spawn timers, history.
+Candy haul tracker, NPC timers.
 
 ## Faction Operations
 
-Roster management, chain state tracking, armory inventory, and territory control toggling.
+Roster, chain, armory, territory.
 
 ## Faction Finance
 
-Money requests with approval workflow and a running ledger.
+Money requests + running ledger.
 
 ## Faction Upgrade Simulation
 
-Plan respect spending across faction upgrade branches with per-branch and total respect totals.
+Respect planning per branch.
 
 ## Alliance Sharing
 
-Scoped resource sharing with alliance/sister factions by role. Instant revoke and reactivate.
+Scoped grants by role with instant revoke.
 
 ## Retention Trends
 
-Join/leave/kick event logging with 30-day retention rate, net change, and 6-month monthly breakdown.
+Join/leave/kick tracking with retention rate.
 
 ## Armory History & Loans
 
-Armory event log (added/removed/loaned/returned/sold) with member attribution, plus member loans with interest, due dates, and repaid/defaulted status tracking.
+Armory event log + member loans.
+
+## AI War Analyzer
+
+Optional AI-powered war evidence summarization (OpenAI gpt-4o-mini) behind explicit user consent, with a rules-based non-AI fallback always available. AI provides recommendations only — never allocations or payment authorization (spec section 7C #17).
 
 ## Status (delivery checklist)
 
-- [x] Steps 1-62: app shell through retention trends (see git history for full list)
-- [x] Step 63: Armory history & loans (0045 migration with faction_armory_events + faction_loans + RLS; ArmoryHistory page with event log and loan management)
-- [ ] Pending: AI provider wiring for the war analyzer
+- [x] Steps 1-63: app shell through armory history & loans (see git history for full list)
+- [x] Step 64: AI war analyzer wiring (0046 migration with ai_consents + ai_analysis_requests + RLS; analyze-war-ai Edge Function; AiWarAnalyzer page with consent toggle, AI summary, rules-based fallback)
+- [x] All items from the original delivery checklist and follow-up gap list are now complete.
 
 All data in Demo Mode is seeded sample data and is never presented as live.
