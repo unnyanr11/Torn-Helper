@@ -133,12 +133,15 @@ Build a chain target queue, claim targets for 5 minutes, mark hit/skipped, and r
 
 ## Daily Digest
 
-One-click morning snapshot aggregating loans (pending/overdue), chain status, top travel opportunities, and open chain targets into a single dated digest.
+One-click morning snapshot aggregating loans, chain status, travel opportunities, and open chain targets.
+
+## Revive Tracker
+
+Log revives given/received with reviver/target attribution and type (normal/medical/event); top revivers over 30 days surfaced for revive chain coordination.
 
 ## Status (delivery checklist)
 
-- [x] Steps 1-69: app shell through chain target queue (see git history for full list)
-- [x] Step 70: Daily digest (0052 migration with daily_digests + RLS; DailyDigest page aggregating loans/chain/travel/targets)
-- [ ] Pending: revive tracker
+- [x] Steps 1-71: app shell through revive tracker (see git history for full list)
+- [x] All roadmap items from the feature-ideas list are now complete.
 
 All data in Demo Mode is seeded sample data and is never presented as live.
