@@ -5,6 +5,7 @@ import Planner from './pages/Planner';
 import Targets from './pages/Targets';
 import ComparePlayers from './pages/ComparePlayers';
 import Leaderboards from './pages/Leaderboards';
+import RoiCalculator from './pages/RoiCalculator';
 import Alerts from './pages/Alerts';
 import Notifications from './pages/Notifications';
 import WarRoom from './pages/WarRoom';
@@ -62,6 +63,7 @@ export default function App() {
         {page === 'Targets' && <Targets />}
         {page === 'Compare Players' && <ComparePlayers />}
         {page === 'Leaderboards' && <Leaderboards />}
+        {page === 'ROI Calculator' && <RoiCalculator />}
         {page === 'Alerts' && <Alerts />}
         {page === 'Notifications' && <Notifications />}
         {page === 'War Room' && <WarRoom />}
@@ -85,7 +87,7 @@ export default function App() {
         {page === 'Graffiti' && <Graffiti />}
         {page === 'Reports' && <Reports />}
         {page === 'API Usage' && <ApiUsage />}
-        {!['Overview','Planner','Targets','Compare Players','Leaderboards','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Estimates','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage'].includes(page) && <Placeholder name={page} />}
+        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Estimates','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );
