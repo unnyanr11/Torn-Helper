@@ -1,9 +1,9 @@
 export const NAV = [
-  'Overview', 'Planner', 'Targets', 'Compare Players', 'Leaderboards', 'ROI Calculator', 'PI Mortgages', 'Bounties', 'Stats Catalog', 'Player Intel', 'War Room', 'War Analyzer', 'Faction',
+  'Overview', 'Planner', 'Targets', 'Compare Players', 'Leaderboards', 'ROI Calculator', 'PI Mortgages', 'Bounties', 'Stats Catalog', 'Custom Stats', 'Player Intel', 'War Room', 'War Analyzer', 'Faction',
   'Alliances', 'Watched Factions', 'Recruitment', 'Gym', 'Activity', 'Graffiti', 'Payouts', 'Losses', 'Travel', 'Markets', 'Company',
   'Properties', 'Racing', 'Community', 'Live Feeds', 'Estimates', 'Alerts', 'Notifications', 'Reports', 'API Usage', 'Settings',
 ] as const;
 
 export type Page = (typeof NAV)[number];
 
-export const BUILT: Page[] = ['Overview', 'Planner', 'Targets', 'Compare Players', 'Leaderboards', 'ROI Calculator', 'PI Mortgages', 'Bounties', 'Stats Catalog', 'Alerts', 'Notifications', 'War Room', 'War Analyzer', 'Payouts', 'Losses', 'Travel', 'Markets', 'Stocks', 'Company', 'Properties', 'Racing', 'Community', 'Live Feeds', 'Estimates', 'Alliances', 'Watched Factions', 'Recruitment', 'Gym', 'Activity', 'Graffiti', 'Reports', 'API Usage'];
+export const BUILT: Page[] = ['Overview', 'Planner', 'Targets', 'Compare Players', 'Leaderboards', 'ROI Calculator', 'PI Mortgages', 'Bounties', 'Stats Catalog', 'Custom Stats', 'Alerts', 'Notifications', 'War Room', 'War Analyzer', 'Payouts', 'Losses', 'Travel', 'Markets', 'Stocks', 'Company', 'Properties', 'Racing', 'Community', 'Live Feeds', 'Estimates', 'Alliances', 'Watched Factions', 'Recruitment', 'Gym', 'Activity', 'Graffiti', 'Reports', 'API Usage'];
