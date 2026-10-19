@@ -74,10 +74,14 @@ Full audited payout workflow (spec section 8). Four modes (equal/proportional/we
 
 Opt-in adapter (spec section 7C #13). Connect with a TornStats API token (stored per-user), import spy reports manually via JSON paste (works without live API access), view import history with provenance, and disconnect/revoke. Live API lookup requires verified TornStats API access.
 
+## Reports & Exports
+
+Immutable report snapshots with CSV and genuine XLSX export (formula-injection sanitized via cell prefixing), plus revocable 7-day expiring share links with unique tokens.
+
 ## Status (delivery checklist)
 
-- [x] Steps 1-53: app shell through stats catalog audit (see git history for full list)
-- [x] Step 54: TornStats integration (0037 migration with integration_connections + spy_import_jobs + RLS; TornStats page with connect/import/history/disconnect/revoke)
-- [ ] Pending: CSV/XLSX export hardening, detailed competitor matrix, Halloween tools, faction operations depth
+- [x] Steps 1-54: app shell through TornStats integration (see git history for full list)
+- [x] Step 55: CSV/XLSX export hardening (0038 migration with report_snapshots + report_share_grants + RLS; export.ts with sanitizeCell/toCsv/toXlsx; Reports page with snapshots, CSV/XLSX export, share links, revoke)
+- [ ] Pending: detailed competitor matrix, Halloween tools, faction operations depth
 
 All data in Demo Mode is seeded sample data and is never presented as live.

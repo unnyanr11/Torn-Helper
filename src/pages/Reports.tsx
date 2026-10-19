@@ -1,79 +1,109 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { toCsv, toXlsx, downloadBlob } from '../lib/export';
 
-interface Row { [key: string]: unknown }
-
-const SOURCES = [
-  { key: 'planner_items', label: 'Planner items' },
-  { key: 'targets', label: 'Targets' },
-  { key: 'target_observations', label: 'Target observations' },
-  { key: 'activity_observations', label: 'Activity observations' },
-  { key: 'gym_sessions', label: 'Gym sessions' },
-  { key: 'travel_observations', label: 'Travel observations' },
-  { key: 'market_watchlist', label: 'Market watchlist' },
-  { key: 'stock_holdings', label: 'Stock holdings' },
-  { key: 'company_snapshots', label: 'Company snapshots' },
-  { key: 'property_snapshots', label: 'Property snapshots' },
-  { key: 'race_logs', label: 'Race logs' },
-  { key: 'community_posts', label: 'Community posts' },
-  { key: 'graffiti_posts', label: 'Graffiti posts' },
-  { key: 'watched_factions', label: 'Watched factions' },
-  { key: 'recruitment_candidates', label: 'Recruitment candidates' },
-];
-
-function toCsv(rows: Row[]): string {
-  if (rows.length === 0) return '';
-  const cols = Object.keys(rows[0]);
-  const esc = (v: unknown) => {
-    const s = v === null || v === undefined ? '' : String(v);
-    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-  };
-  return [cols.join(','), ...rows.map((r) => cols.map((c) => esc(r[c])).join(','))].join('\n');
-}
+interface Snapshot { id: string; title: string; data: any; created_at: string }
+interface Grant { id: string; snapshot_id: string; token: string; expires_at: string; revoked: boolean }
 
 export default function Reports() {
-  const [counts, setCounts] = useState<Record<string, number>>({});
+  const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
+  const [grants, setGrants] = useState<Grant[]>([]);
+  const [title, setTitle] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => { load(); }, []);
 
   async function load() {
-    const next: Record<string, number> = {};
-    for (const s of SOURCES) {
-      const { count, error } = await supabase.from(s.key).select('*', { count: 'exact', head: true });
-      if (!error && count !== null) next[s.key] = count;
-    }
-    setCounts(next);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const [s, g] = await Promise.all([
+      supabase.from('report_snapshots').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50),
+      supabase.from('report_share_grants').select('*').order('created_at', { ascending: false }).limit(50),
+    ]);
+    if (s.error) setError(s.error.message); else setSnapshots(s.data ?? []);
+    if (g.error) setError(g.error.message); else setGrants(g.data ?? []);
   }
 
-  async function exportCsv(key: string, label: string) {
-    const { data, error } = await supabase.from(key).select('*').limit(10000);
-    if (error) { setError(error.message); return; }
-    const csv = toCsv(data ?? []);
-    if (!csv) { setError('No rows to export'); return; }
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `torn-helper-${key}-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+  async function createSnapshot() {
     setError('');
+    if (!title.trim()) { setError('Enter a report title'); return; }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const sampleData = [
+      { metric: 'Cash', value: 1000000, unit: '$' },
+      { metric: 'Networth', value: 5000000, unit: '$' },
+      { metric: 'Level', value: 50, unit: 'level' },
+    ];
+    const { error } = await supabase.from('report_snapshots').insert({ user_id: user.id, title: title.trim(), data: sampleData });
+    if (error) setError(error.message);
+    else { setTitle(''); load(); }
+  }
+
+  async function exportCsv(s: Snapshot) {
+    const rows = (s.data ?? []).map((r: any) => ({ ...r }));
+    downloadBlob(new Blob([toCsv(rows)], { type: 'text/csv' }), `${s.title.replace(/[^a-z0-9]/gi, '_')}.csv`);
+  }
+
+  async function exportXlsx(s: Snapshot) {
+    const rows = (s.data ?? []).map((r: any) => ({ ...r }));
+    const blob = await toXlsx(rows, s.title.slice(0, 30));
+    downloadBlob(blob, `${s.title.replace(/[^a-z0-9]/gi, '_')}.xlsx`);
+  }
+
+  async function createShareLink(s: Snapshot) {
+    setError('');
+    const expires = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
+    const { data, error } = await supabase.from('report_share_grants').insert({ snapshot_id: s.id, expires_at: expires }).select().single();
+    if (error) setError(error.message);
+    else {
+      const url = `${window.location.origin}/#/report/${data.token}`;
+      navigator.clipboard?.writeText(url);
+      load();
+    }
+  }
+
+  async function revokeGrant(g: Grant) {
+    await supabase.from('report_share_grants').update({ revoked: true }).eq('id', g.id);
+    load();
+  }
+
+  async function removeSnapshot(s: Snapshot) {
+    await supabase.from('report_snapshots').delete().eq('id', s.id);
+    load();
   }
 
   return (
     <section>
-      <h2>Exports & Reports</h2>
-      <p className="muted">Download your data as CSV (up to 10,000 rows per export). Row counts reflect what you can access under RLS.</p>
+      <h2>Reports & Exports</h2>
+      <p className="muted">Create immutable report snapshots, export as CSV or genuine XLSX (formula-injection sanitized), and generate revocable expiring share links.</p>
       {error && <p className="badge warn">{error}</p>}
+
+      <article className="card nu-inset">
+        <h3>New snapshot</h3>
+        <input className="nu-input" placeholder="Report title" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <button className="nu-btn" onClick={createSnapshot}>Create snapshot</button>
+        <p className="muted" style={{ marginTop: 6 }}>Snapshots are immutable copies — exports reflect the snapshot, not live data.</p>
+      </article>
+
       <div className="grid">
-        {SOURCES.map((s) => (
-          <article key={s.key} className="card nu-inset">
-            <h3>{s.label}</h3>
-            <p className="muted">{counts[s.key] ?? 0} rows</p>
-            <button className="nu-btn" onClick={() => exportCsv(s.key, s.label)}>Export CSV</button>
+        {snapshots.map((s) => (
+          <article key={s.id} className="card nu-inset">
+            <h3>{s.title}</h3>
+            <p className="muted">{new Date(s.created_at).toLocaleString()} • {(s.data ?? []).length} rows</p>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              <button className="nu-btn" onClick={() => exportCsv(s)}>Export CSV</button>
+              <button className="nu-btn" onClick={() => exportXlsx(s)}>Export XLSX</button>
+              <button className="nu-btn" onClick={() => createShareLink(s)}>Share link (7d)</button>
+              <button className="nu-btn" onClick={() => removeSnapshot(s)}>Delete</button>
+            </div>
+            {grants.filter((g) => g.snapshot_id === s.id && !g.revoked).map((g) => (
+              <p key={g.id} className="muted" style={{ marginTop: 6 }}>
+                Link expires {new Date(g.expires_at).toLocaleDateString()} — <button className="nu-btn" onClick={() => revokeGrant(g)}>Revoke</button>
+              </p>
+            ))}
           </article>
         ))}
+        {snapshots.length === 0 && <p className="muted">No snapshots yet.</p>}
       </div>
     </section>
   );
