@@ -6,6 +6,7 @@ import Targets from './pages/Targets';
 import Alerts from './pages/Alerts';
 import WarRoom from './pages/WarRoom';
 import Payouts from './pages/Payouts';
+import Losses from './pages/Losses';
 import ApiUsage from './pages/ApiUsage';
 import Placeholder from './pages/Placeholder';
 
@@ -42,8 +43,9 @@ export default function App() {
         {page === 'Alerts' && <Alerts />}
         {page === 'War Room' && <WarRoom />}
         {page === 'Payouts' && <Payouts />}
+        {page === 'Losses' && <Losses />}
         {page === 'API Usage' && <ApiUsage />}
-        {!['Overview','Planner','Targets','Alerts','War Room','Payouts','API Usage'].includes(page) && <Placeholder name={page} />}
+        {!['Overview','Planner','Targets','Alerts','War Room','Payouts','Losses','API Usage'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );
