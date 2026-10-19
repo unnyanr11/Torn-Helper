@@ -19,6 +19,7 @@ import LiveFeeds from './pages/LiveFeeds';
 import Estimates from './pages/Estimates';
 import Alliances from './pages/Alliances';
 import WatchedFactions from './pages/WatchedFactions';
+import Recruitment from './pages/Recruitment';
 import ApiUsage from './pages/ApiUsage';
 import Placeholder from './pages/Placeholder';
 
@@ -68,8 +69,9 @@ export default function App() {
         {page === 'Estimates' && <Estimates />}
         {page === 'Alliances' && <Alliances />}
         {page === 'Watched Factions' && <WatchedFactions />}
+        {page === 'Recruitment' && <Recruitment />}
         {page === 'API Usage' && <ApiUsage />}
-        {!['Overview','Planner','Targets','Alerts','Notifications','War Room','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Estimates','Alliances','Watched Factions','API Usage'].includes(page) && <Placeholder name={page} />}
+        {!['Overview','Planner','Targets','Alerts','Notifications','War Room','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Estimates','Alliances','Watched Factions','Recruitment','API Usage'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );
