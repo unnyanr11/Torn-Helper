@@ -32,18 +32,28 @@ npm run dev
 ## Deploy Edge Functions
 
 ```bash
-supabase functions deploy link-torn-key
-supabase functions deploy refresh-targets
-supabase functions deploy refresh-live-data
-supabase functions deploy evaluate-alerts
-supabase functions deploy analyze-war
-supabase functions deploy analyze-war-ai
-supabase functions deploy public-api
+./scripts/deploy-functions.sh
 ```
 
-## Schedule the alert job
+Or manually:
 
-pg_cron job `evaluate-alerts` runs every 5 minutes (see migration 0016_cron_evaluate_alerts.sql).
+```bash
+supabase functions deploy verify-loss-payment
+supabase functions deploy verify-loss-funding
+```
+
+## Schedule the cron jobs
+
+pg_cron jobs are configured via migration (see `0055_loss_payment_automation.sql` and the cron setup SQL):
+
+- `verify-loss-funding` — every 5 minutes
+- `verify-loss-payment` — every 2 minutes
+
+Verify the service role key setting:
+
+```sql
+select current_setting('app.settings.service_role_key', true);
+```
 
 ## Regenerate API capability registry
 
@@ -53,95 +63,25 @@ node scripts/generate-capabilities.mjs
 
 ## Companion userscript
 
-Install via Tampermonkey from `/torn-helper.user.js` (served from `public/`). It adds a floating panel on torn.com with quick links to the app and a target lookup using your Torn API key (stored locally in your browser via GM storage).
+Install via Tampermonkey from `/torn-helper.user.js` (served from `public/`).
 
 ## PWA
 
-The app is installable as a PWA (manifest.json + service worker in public/). Add icon-192.png and icon-512.png to public/ for full install support.
+The app is installable as a PWA (manifest.json + service worker in public/).
 
 ## Public API
 
-Read-only, keyless JSON API at `/functions/v1/public-api` with endpoints `/glossary`, `/capabilities`, and `/`. CORS-enabled.
+Read-only, keyless JSON API at `/functions/v1/public-api`.
 
 ## Loss Marketplace
 
-Full buy/sell workflow for verified losses (spec section 7A). Contracts are direct-payment (no operator custody).
+Full buy/sell workflow for verified losses with Xanax-based funding detection, attack-log verification, settlement ledger, and disputes.
 
-## War Payout Calculator
+## Status
 
-Full audited payout workflow (spec section 8).
-
-## Stats Catalog
-
-224 verified distinct metrics across 15 categories.
-
-## TornStats Integration
-
-Opt-in adapter with manual spy report import.
-
-## Reports & Exports
-
-Immutable snapshots, CSV/XLSX export, revocable share links.
-
-## Competitor Coverage Matrix
-
-16-feature audit table.
-
-## Halloween Tools
-
-Candy haul tracker, NPC timers.
-
-## Faction Operations
-
-Roster, chain, armory, territory.
-
-## Faction Finance
-
-Money requests + running ledger + automated loan reminders.
-
-## Faction Upgrade Simulation
-
-Respect planning per branch.
-
-## Alliance Sharing
-
-Scoped grants by role with instant revoke.
-
-## Retention Trends
-
-Join/leave/kick tracking with retention rate.
-
-## Armory History & Loans
-
-Armory event log + member loans.
-
-## AI War Analyzer
-
-Consent-gated OpenAI summary + rules-based fallback.
-
-## Travel Profit Optimizer
-
-Compare buy/sell scenarios across destinations, ranked by profit per hour.
-
-## OC Planner
-
-Create OC plans with auto-generated slots, assign members, mark readiness, and launch.
-
-## Chain Target Queue
-
-Build a chain target queue, claim targets for 5 minutes, mark hit/skipped, and release claims.
-
-## Daily Digest
-
-One-click morning snapshot aggregating loans, chain status, travel opportunities, and open chain targets.
-
-## Revive Tracker
-
-Log revives given/received with reviver/target attribution and type (normal/medical/event); top revivers over 30 days surfaced for revive chain coordination.
-
-## Status (delivery checklist)
-
-- [x] Steps 1-71: app shell through revive tracker (see git history for full list)
-- [x] All roadmap items from the feature-ideas list are now complete.
+- [x] Steps 1-75: app shell through operator dashboard
+- [x] Payout workflow integration tests
+- [x] Edge Function integration tests
+- [x] Deploy script
 
 All data in Demo Mode is seeded sample data and is never presented as live.
