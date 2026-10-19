@@ -80,6 +80,7 @@ node scripts/generate-capabilities.mjs
 - [x] Step 26: ROI Calculator (client-side cost/return/duration calculator with ROI %, annualized ROI, break-even; RoiCalculator UI)
 - [x] Step 27: PI Mortgages (client-side mortgage calculator — monthly payment, total interest, total paid; PiMortgages UI)
 - [x] Step 28: Bounties (bounties table with owner-only RLS, add/track bounties with status filters; Bounties UI)
-- [ ] Pending: image uploads for graffiti, 217-stat catalog, custom stat columns, TornStats/FFScouter deep integration, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
+- [x] Step 29: 217-stat catalog (static searchable reference catalog of Torn stat categories and key stats; Stats Catalog UI)
+- [ ] Pending: image uploads for graffiti, custom stat columns, TornStats/FFScouter deep integration, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
 
 All data in Demo Mode is seeded sample data and is never presented as live.
