@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { toCsv, downloadBlob } from "../lib/export";
 import { calculatePayout, MemberInput, Mode } from "../lib/payout";
 
 interface Policy {
@@ -51,32 +52,7 @@ export default function PayoutCalculator() {
   const [error, setError] = useState("");
   const [mode, setMode] = useState<Mode>("proportional");
   const [pool, setPool] = useState("");
-  const [members, setMembers] = useState<MemberInput[]>([
-    {
-      id: "m1",
-      name: "Member A",
-      points: 100,
-      bonus: 0,
-      reimbursement: 0,
-      adjustment: 0,
-    },
-    {
-      id: "m2",
-      name: "Member B",
-      points: 50,
-      bonus: 0,
-      reimbursement: 0,
-      adjustment: 0,
-    },
-    {
-      id: "m3",
-      name: "Member C",
-      points: 25,
-      bonus: 0,
-      reimbursement: 0,
-      adjustment: 0,
-    },
-  ]);
+  const [members, setMembers] = useState<MemberInput[]>([]);
   const [activeRun, setActiveRun] = useState<Run | null>(null);
 
   useEffect(() => {
@@ -127,8 +103,8 @@ export default function PayoutCalculator() {
 
   async function createAndRun() {
     setError("");
-    const poolCents = parseInt(pool, 10);
-    if (isNaN(poolCents) || poolCents < 0) {
+    const poolCents = Number(pool);
+    if (!pool.trim() || !Number.isSafeInteger(poolCents) || poolCents < 0) {
       setError("Enter a valid pool amount (cents)");
       return;
     }
@@ -183,20 +159,27 @@ export default function PayoutCalculator() {
 
   function exportCsv(run: Run) {
     const rows = lines.filter((l) => l.run_id === run.id);
-    const csv = [
-      "member_id,points,share_cents,bonus,reimbursement,adjustment,owed,paid,status",
-      ...rows.map(
-        (l) =>
-          `${l.member_id},${l.eligible_points},${l.share_cents},${l.bonus_cents},${l.reimbursement_cents},${l.adjustment_cents},${l.amount_owed_cents},${l.paid_cents},${l.status}`,
+    downloadBlob(
+      new Blob(
+        [
+          toCsv(
+            rows.map((l) => ({
+              member_id: l.member_id,
+              points: l.eligible_points,
+              share_cents: l.share_cents,
+              bonus: l.bonus_cents,
+              reimbursement: l.reimbursement_cents,
+              adjustment: l.adjustment_cents,
+              owed: l.amount_owed_cents,
+              paid: l.paid_cents,
+              status: l.status,
+            })),
+          ),
+        ],
+        { type: "text/csv" },
       ),
-    ].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `payout-${run.id.slice(0, 8)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+      `payout-${run.id}.csv`,
+    );
   }
 
   const runLines = activeRun
@@ -207,11 +190,11 @@ export default function PayoutCalculator() {
     <section>
       <h2>War Payout Calculator</h2>
       <p className="muted">
-        Deterministic payout allocation with 4 modes, caps/floors,
-        largest-remainder integer rounding, and a full audit trail. All amounts
-        are integer accounting units. This is a private plan using manually
-        entered contributions; it does not authorize faction transfers. Weighted
-        mode uses points × weight; hybrid uses 50% equal and 50% proportional.
+        Deterministic payout allocation with 4 modes, largest-remainder integer
+        rounding, and a full audit trail. All amounts are integer accounting
+        units. This is a private plan using manually entered contributions; it
+        does not authorize faction transfers. Weighted mode uses points ×
+        weight; hybrid uses 50% equal and 50% proportional.
       </p>
       {error && <p className="badge warn">{error}</p>}
 
@@ -250,10 +233,18 @@ export default function PayoutCalculator() {
           value={pool}
           onChange={(e) => setPool(e.target.value)}
         />
+        {!members.length && (
+          <p>
+            No members added. Add your actual members and contributions before
+            calculating.
+          </p>
+        )}
         {members.map((m, i) => (
           <div key={m.id} style={{ display: "flex", gap: 6, marginTop: 6 }}>
             <input
               className="nu-input"
+              aria-label="Member name"
+              placeholder="Member name"
               value={m.name}
               onChange={(e) =>
                 setMembers(
@@ -311,6 +302,14 @@ export default function PayoutCalculator() {
               placeholder="Bonus"
               style={{ width: 80 }}
             />
+            <button
+              className="nu-btn"
+              onClick={() =>
+                setMembers((rows) => rows.filter((row) => row.id !== m.id))
+              }
+            >
+              Remove
+            </button>
           </div>
         ))}
         <button
@@ -319,7 +318,7 @@ export default function PayoutCalculator() {
             setMembers([
               ...members,
               {
-                id: `m${Date.now()}`,
+                id: crypto.randomUUID(),
                 name: "",
                 points: 0,
                 bonus: 0,
@@ -331,7 +330,11 @@ export default function PayoutCalculator() {
         >
           + Add member
         </button>
-        <button className="nu-btn" onClick={createAndRun}>
+        <button
+          className="nu-btn"
+          disabled={!members.length || !warId || !pool.trim()}
+          onClick={createAndRun}
+        >
           Calculate & save run
         </button>
       </article>

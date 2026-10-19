@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { downloadBlob } from "../lib/export";
-export default function Settings() {
+export default function Settings({
+  passwordRecovery = false,
+  onPasswordUpdated = () => {},
+}: {
+  passwordRecovery?: boolean;
+  onPasswordUpdated?: () => void;
+}) {
   const [email, setEmail] = useState(""),
     [password, setPassword] = useState(""),
+    [confirmation, setConfirmation] = useState(""),
     [key, setKey] = useState(""),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
@@ -12,7 +19,11 @@ export default function Settings() {
     [paused, setPaused] = useState(false),
     [persist, setPersist] = useState(true);
   useEffect(() => {
-    void load();
+    void load().catch((e) =>
+      setMessage(
+        e instanceof Error ? e.message : "Unable to load account settings.",
+      ),
+    );
   }, []);
   async function load() {
     const {
@@ -32,6 +43,8 @@ export default function Settings() {
         .eq("id", user.id)
         .single(),
     ]);
+    if (a.error) throw a.error;
+    if (p.error) throw p.error;
     setIdentity(a.data);
     setPaused(p.data?.tracking_paused ?? false);
   }
@@ -58,6 +71,28 @@ export default function Settings() {
         ? "Account created. Check your email if confirmation is required."
         : "Signed in",
     );
+  }
+  async function resetPassword() {
+    if (!email.trim()) throw new Error("Enter your email address first.");
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: window.location.origin + window.location.pathname,
+    });
+    if (error) throw error;
+    setMessage(
+      "If an account exists for that email, a password reset link will be sent.",
+    );
+  }
+  async function updatePassword() {
+    if (password.length < 8 || password !== confirmation)
+      throw new Error(
+        "Use at least 8 characters and make both passwords match.",
+      );
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) throw error;
+    setPassword("");
+    setConfirmation("");
+    setMessage("Password updated.");
+    onPasswordUpdated();
   }
   async function link() {
     const { data, error } = await supabase.functions.invoke("link-torn-key", {
@@ -107,6 +142,47 @@ export default function Settings() {
     if (error || data?.error) throw new Error(data?.error ?? error?.message);
     await supabase.auth.signOut();
   }
+  if (passwordRecovery)
+    return (
+      <section>
+        <h2>Reset your app password</h2>
+        {message && <p role="status">{message}</p>}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void run(updatePassword);
+          }}
+        >
+          <label>
+            New password
+            <input
+              className="nu-input"
+              type="password"
+              autoComplete="new-password"
+              minLength={8}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </label>
+          <label>
+            Confirm password
+            <input
+              className="nu-input"
+              type="password"
+              autoComplete="new-password"
+              minLength={8}
+              required
+              value={confirmation}
+              onChange={(e) => setConfirmation(e.target.value)}
+            />
+          </label>
+          <button className="nu-btn" disabled={busy} type="submit">
+            Save new password
+          </button>
+        </form>
+      </section>
+    );
   return (
     <section>
       <h2>Account & privacy settings</h2>
@@ -117,45 +193,57 @@ export default function Settings() {
       )}
       {!signedIn ? (
         <article className="card">
-          <h3>Sign in to your app account</h3>
-          <p>
-            This password is for Torn Command Center. Never enter your Torn
-            password.
-          </p>
-          <label>
-            Email
-            <input
-              className="nu-input"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </label>
-          <label>
-            App password
-            <input
-              className="nu-input"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </label>
-          <button
-            className="nu-btn"
-            disabled={busy}
-            onClick={() => run(() => auth(false))}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void run(() => auth(false));
+            }}
           >
-            Sign in
-          </button>
-          <button
-            className="nu-btn"
-            disabled={busy || password.length < 8}
-            onClick={() => run(() => auth(true))}
-          >
-            Create account
-          </button>
+            <h3>Sign in to your app account</h3>
+            <p>
+              This password is for Torn Command Center. Never enter your Torn
+              password.
+            </p>
+            <label>
+              Email
+              <input
+                className="nu-input"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </label>
+            <label>
+              App password
+              <input
+                className="nu-input"
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </label>
+            <button className="nu-btn" disabled={busy} type="submit">
+              Sign in
+            </button>
+            <button
+              className="nu-btn"
+              disabled={busy || password.length < 8}
+              type="button"
+              onClick={() => run(() => auth(true))}
+            >
+              Create account
+            </button>
+            <button
+              className="nu-btn"
+              type="button"
+              disabled={busy || !email.trim()}
+              onClick={() => run(resetPassword)}
+            >
+              Forgot password
+            </button>
+          </form>
         </article>
       ) : (
         <>

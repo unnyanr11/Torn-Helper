@@ -26,10 +26,15 @@ export default function AdminCostDashboard() {
     else setUsage(data ?? []);
   }
 
-  const byEndpoint: Record<string, { calls: number; cost: number }> = {};
+  const byEndpoint: Record<
+    string,
+    { calls: number; cost: number; known: boolean }
+  > = {};
   usage.forEach((u) => {
-    if (!byEndpoint[u.endpoint]) byEndpoint[u.endpoint] = { calls: 0, cost: 0 };
+    if (!byEndpoint[u.endpoint])
+      byEndpoint[u.endpoint] = { calls: 0, cost: 0, known: true };
     byEndpoint[u.endpoint].calls += 1;
+    byEndpoint[u.endpoint].known &&= u.cost_cents != null;
     byEndpoint[u.endpoint].cost += u.cost_cents ?? 0;
   });
   const totalCost = usage.reduce((s, u) => s + (u.cost_cents ?? 0), 0);
@@ -76,7 +81,7 @@ export default function AdminCostDashboard() {
                 <td style={{ textAlign: "left" }}>{ep}</td>
                 <td style={{ textAlign: "center" }}>{v.calls}</td>
                 <td style={{ textAlign: "center" }}>
-                  ${(v.cost / 100).toFixed(2)}
+                  {v.known ? "$" + (v.cost / 100).toFixed(2) : "Unknown"}
                 </td>
               </tr>
             ))}

@@ -38,7 +38,7 @@ Original advisor notices include [mutable search paths](https://supabase.com/doc
 
 ## Included local implementation
 
-- Sign-in, account creation, key replacement/removal, identity-only mode without key retention, pause tracking, personal data export and guarded account deletion.
+- Sign-in, account creation, password recovery, key replacement/removal, identity-only mode without key retention, pause tracking, personal data export and guarded account deletion. Demo dashboard values and prefilled financial examples were subsequently removed.
 - Server-side identity derivation from Torn `/user/basic` and `/key/info`. One encrypted credential format for Torn/OpenAI/Gemini. Provider-specific AI consent, own-key lookup, safe errors and a rules-based fallback.
 - Official-data overview, searchable player profile, comparisons using actual observations/evidence, corrected growth and leaderboard queries, correct public API base URL.
 - Loss contract creation in integer Torn dollars, transactional reservations, one active claim, event-time evidence validation, five-minute timing rules, fifteen-minute claims, ten-minute reconciliation grace, late-record replay, quotas and preserved partial earnings.
@@ -71,7 +71,7 @@ The migrations are `saved_workspaces_and_mortgage_ledger` and `opt_in_personal_h
 
 ## Validation and limits
 
-- TypeScript/Vite production build passes.
+- TypeScript/Vite production build passes with explicit client configuration. Missing configuration or a server/service-role key blocks production builds. The latest production cleanup has 73 passing tests; the earlier verification counts below describe their original batches.
 - All 66 automated tests pass: credential encryption/tampering, mocked Torn errors and response normalization, payout accounting, CSV/XLSX output, report expiry/redaction, actual PostgreSQL migration and core RLS checks, reservations, delayed/out-of-order evidence, duplicate payments, fraudulent funding, account-deletion liability guard and revive claims.
 - All current static table/column references pass against the schema produced by the proposed migration. This catches known-name drift, not every possible dynamic query or complete feature acceptance.
 - Deno type checks pass for all 15 Edge Function entrypoints.
@@ -105,3 +105,10 @@ These are unfinished requirements or external prerequisites, not delivered featu
 Automatic approval review rejected the attempted `repair_runtime_security_and_marketplaces` migration: it changes production RLS policies, grants, tables, privileged RPCs and cron schedules with a broad disruption/security impact. The tool required review and approval for this exact scope. The user subsequently approved the coordinated deployment. No workaround was used.
 
 The concrete proposed deployment consists of the reviewed migration, coordinated Edge Functions and matching frontend. It changes key visibility and identity/role writes, replaces direct financial mutations with RPCs, publishes coordination tables, replaces scheduled authentication, and disables unverified prepaid funding. It must be tested in staging and rechecked with advisors before a production completion claim.
+
+
+## Production cleanup limits
+
+The runtime seed-data module, unauthenticated sample dashboard and sample financial inputs have been removed. Authentication and administrator checks apply to deep links as well as navigation. No full-database wipe was performed: production audit counts showed no fixture accounts or financial rows requiring deletion. Reference catalogs, glossary definitions and isolated automated test fixtures are not account seed data.
+
+Unconfigured Discord, TornStats token collection and email/push opt-ins are blocked in both the relevant browser UI and database grants. Finishing those adapters requires secure backend implementations and actual configuration; suppressing demo values does not complete the wider feature specification. Real hosted acceptance, user-key/provider operations and other previously listed requirements remain outstanding.

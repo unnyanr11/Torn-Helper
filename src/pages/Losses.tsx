@@ -83,7 +83,7 @@ export default function Losses() {
   return (
     <section>
       <h2>Losses</h2>
-      <p className="badge demo">Direct-payment contracts — no operator custody, no automatic payouts. Settle manually in Torn.</p>
+      <p className="badge">Direct-payment contracts — no operator custody, no automatic payouts. Settle manually in Torn.</p>
       {error && <p className="badge warn">{error}</p>}
       {notice && <p className="badge ok">{notice}</p>}
       <div className="meta">

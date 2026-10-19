@@ -82,7 +82,7 @@ export default function SpyReports() {
         <textarea
           className="nu-input"
           rows={5}
-          placeholder="123456, PlayerName, 1000000, 900000, 800000, 700000"
+          placeholder="ID, Name, STR, DEF, SPD, DEX"
           value={bulk}
           onChange={(e) => setBulk(e.target.value)}
         />

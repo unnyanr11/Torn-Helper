@@ -6,6 +6,8 @@ The coordinated runtime repair migration has been applied to the linked Supabase
 
 ## Local verification
 
+Create `.env.local` from `.env.example` and set the actual Supabase project URL and publishable key before building. Production builds reject missing configuration, placeholder values, secret/service-role keys and insecure project URLs. Runtime account screens have no demo data or sample financial records.
+
 ```sh
 npm ci
 npm run build
@@ -47,3 +49,14 @@ Do **not** blindly run `supabase db push` or reset this existing project. The hi
 - The competitor matrix keeps partial and dependency-blocked features visible; an existing screen does not count as full delivery.
 
 See [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) for the supplied specification and [src/data/competitors.ts](src/data/competitors.ts) for the coverage matrix.
+
+
+## Vercel production deployment
+
+`vercel.json` configures Vite, `npm ci`, `npm run build`, the `dist` output, response security headers and revalidation of the application shell/service worker. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the Vercel deployment environment before deploying. Never put server secrets in `VITE_` variables. Set the deployed origin as the Supabase Auth Site URL and allow the same origin as a redirect URL for confirmation and password recovery.
+
+New sessions open the real sign-in flow. Deep links cannot bypass authentication or administrative role gates. A separate app-account password reset flow is available. Published shared reports remain explicitly token-accessible. Page/module loading failures show a recoverable error screen.
+
+Discord, email/push delivery and live TornStats access are explicitly unavailable until their secure server integrations are implemented and configured. No webhook or TornStats credential entry is exposed. Authorized manual spy reports remain available. These disabled capabilities are not represented as functioning production integrations.
+
+The removal of seeded data does **not** certify all workflows in REQUIREMENTS.md as complete. Real-account key linking, email delivery/redirects and hosted browser/mobile acceptance must be checked on your deployment. Review docs/IMPLEMENTATION_AUDIT.md for remaining functionality.

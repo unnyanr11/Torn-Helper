@@ -30,7 +30,7 @@ body { margin: 0; background: var(--bg); color: var(--fg); font-family: system-u
 .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .badge { font-size: .72rem; padding: 3px 10px; border-radius: 999px; box-shadow: inset 2px 2px 4px var(--lo), inset -2px -2px 4px var(--hi); color: var(--muted); }
 .badge.ok { color: var(--ok); } .badge.warn { color: var(--warn); }
-.badge.demo { color: var(--warn); font-weight: 600; }
+
 table { width: 100%; border-collapse: collapse; margin-top: 12px; }
 th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--lo); }
 th { color: var(--muted); font-size: .8rem; }

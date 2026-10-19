@@ -10,8 +10,8 @@ interface Row {
 }
 export default function RoiCalculator() {
   const [flows, setFlows] = useState<Row[]>([
-    { date: today, asset: "Property", amount: "-1000000" },
-    { date: today, asset: "Property", amount: "1100000" },
+    { date: today, asset: "", amount: "" },
+    { date: today, asset: "", amount: "" },
   ]);
   const [discount, setDiscount] = useState("0");
   const [error, setError] = useState("");

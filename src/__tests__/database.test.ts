@@ -84,6 +84,12 @@ beforeAll(async () => {
       "utf8",
     ),
   );
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261019081004_production_integration_safeguards.sql",
+      "utf8",
+    ),
+  );
   const candidate = await db.query(
     "select table_name as table,column_name as column,data_type as type from information_schema.columns where table_schema='public'",
   );
@@ -740,5 +746,78 @@ describe("opt-in numeric personal history", () => {
         [other],
       ),
     ).rejects.toThrow(/Invalid observation time/);
+  });
+});
+
+describe("unavailable integrations cannot collect client-side secrets", () => {
+  it("blocks token retrieval and forged connected status while retaining scoped metadata/deletion", async () => {
+    const r = await db.query<{ id: string }>(
+      "insert into integration_connections(user_id,provider,token_encrypted,status) values($1,'tornstats','legacy-test-secret','connected') returning id",
+      [buyer],
+    );
+    const id = r.rows[0].id;
+    await expect(
+      asUser(buyer, "select token_encrypted from integration_connections"),
+    ).rejects.toThrow(/permission denied/);
+    await expect(
+      asUser(
+        buyer,
+        "insert into integration_connections(user_id,provider,token_encrypted,status) values($1,'tornstats','plaintext','connected')",
+        [buyer],
+      ),
+    ).rejects.toThrow(/permission denied/);
+    await expect(
+      asUser(
+        buyer,
+        "update integration_connections set status='connected' where id=$1",
+        [id],
+      ),
+    ).rejects.toThrow(/permission denied/);
+    expect(
+      (
+        await asUser(
+          seller,
+          "select id from integration_connections where id=$1",
+          [id],
+        )
+      ).rows,
+    ).toHaveLength(0);
+    expect(
+      (
+        await asUser(
+          seller,
+          "delete from integration_connections where id=$1 returning id",
+          [id],
+        )
+      ).rows,
+    ).toHaveLength(0);
+    expect(
+      (
+        await asUser(
+          buyer,
+          "delete from integration_connections where id=$1 returning id",
+          [id],
+        )
+      ).rows,
+    ).toHaveLength(1);
+  });
+  it("blocks direct webhook secret reads/writes and inactive channel opt-ins", async () => {
+    await expect(
+      asUser(buyer, "select webhook_url from discord_webhooks"),
+    ).rejects.toThrow(/permission denied/);
+    await expect(
+      asUser(
+        buyer,
+        "insert into discord_webhooks(user_id,webhook_url) values($1,'https://discord.com/api/webhooks/test')",
+        [buyer],
+      ),
+    ).rejects.toThrow(/permission denied/);
+    await expect(
+      asUser(
+        buyer,
+        "insert into notification_preferences(user_id,email_enabled) values($1,true)",
+        [buyer],
+      ),
+    ).rejects.toThrow(/permission denied/);
   });
 });

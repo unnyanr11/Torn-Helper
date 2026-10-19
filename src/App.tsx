@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { BUILT, NAV, Page } from "./nav";
+import { NAV, Page } from "./nav";
 const Overview = lazy(() => import("./pages/Overview"));
 const Planner = lazy(() => import("./pages/Planner"));
 const Targets = lazy(() => import("./pages/Targets"));
@@ -68,7 +68,8 @@ const ArmoryHistory = lazy(() => import("./pages/ArmoryHistory"));
 const LoanReminders = lazy(() => import("./pages/LoanReminders"));
 const Settings = lazy(() => import("./pages/Settings"));
 const PlayerIntel = lazy(() => import("./pages/PlayerIntel"));
-import { supabase } from "./lib/supabase";
+import { canAccessPage } from "./lib/access";
+import { supabase, isRecoveryLink } from "./lib/supabase";
 
 const SharedReport = lazy(() => import("./pages/SharedReport"));
 import { useQueryClient } from "@tanstack/react-query";
@@ -78,35 +79,71 @@ export default function App() {
   const [sharedToken, setSharedToken] = useState("");
   const [accountId, setAccountId] = useState<string | null>(null);
   const [signedIn, setSignedIn] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
+  const [recovering, setRecovering] = useState(isRecoveryLink);
+  const [authError, setAuthError] = useState("");
   const [role, setRole] = useState("user");
   useEffect(() => {
+    let disposed = false;
+    let refreshVersion = 0;
     async function refresh() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      const nextIdentity = session?.user.id ?? null;
-      if (identityRef.current !== nextIdentity) {
-        queryClient.clear();
-        identityRef.current = nextIdentity;
+      if (disposed) return;
+      const version = ++refreshVersion;
+      try {
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (disposed || version !== refreshVersion) return;
+        const nextIdentity = session?.user.id ?? null;
+        if (identityRef.current !== nextIdentity) {
+          queryClient.clear();
+          setRole("user");
+          identityRef.current = nextIdentity;
+        }
+        setAccountId(nextIdentity);
+        setSignedIn(!!session);
+        if (session) {
+          const { data } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", session.user.id)
+            .single();
+          if (
+            !disposed &&
+            version === refreshVersion &&
+            identityRef.current === nextIdentity
+          )
+            setRole(data?.role ?? "user");
+        } else setRole("user");
+        setAuthError("");
+      } catch {
+        if (!disposed && version === refreshVersion)
+          setAuthError("Unable to check your session. Reload to try again.");
+      } finally {
+        if (!disposed && version === refreshVersion) setAuthReady(true);
       }
-      setAccountId(nextIdentity);
-      setSignedIn(!!session);
-      if (session) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", session.user.id)
-          .single();
-        if (identityRef.current === nextIdentity) setRole(data?.role ?? "user");
-      } else setRole("user");
     }
     void refresh();
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (identityRef.current !== (session?.user.id ?? null)) {
+        setAuthReady(false);
+        setSignedIn(false);
+        setRole("user");
+        queryClient.clear();
+      }
+      if (event === "PASSWORD_RECOVERY") setRecovering(true);
+      if (event === "SIGNED_OUT") setRecovering(false);
       setTimeout(() => void refresh(), 0);
     });
-    return () => subscription.unsubscribe();
+    return () => {
+      disposed = true;
+      refreshVersion++;
+      subscription.unsubscribe();
+    };
   }, []);
   const [page, setPage] = useState<Page>("Overview");
   useEffect(() => {
@@ -150,18 +187,15 @@ export default function App() {
         aria-label="Main"
       >
         <h1 className="brand">Torn Command Center</h1>
-        {NAV.filter(
-          (n) =>
-            !["Operator Dashboard", "Admin Cost Dashboard"].includes(n) ||
-            ["payment_operator", "admin"].includes(role),
-        ).map((n) => (
+        {NAV.filter((n) => canAccessPage(n, signedIn, role)).map((n) => (
           <button
             key={n}
             className={`nu-btn nav-item ${n === page ? "active" : ""}`}
             aria-current={n === page ? "page" : undefined}
             onClick={() => {
               setSharedToken("");
-              setPage(!signedIn && n !== "Overview" ? "Settings" : n);
+              setPage(n);
+              location.hash = encodeURIComponent(n);
               setOpen(false);
             }}
           >
@@ -171,12 +205,12 @@ export default function App() {
       </nav>
       <main className="content">
         <header className="topbar nu-raised">
-          <span className="badge demo">
+          <span className="badge">
             {sharedToken
               ? "SHARED SNAPSHOT · published report, not live game data"
               : signedIn
                 ? "SIGNED IN · manual records and API observations are labelled by source"
-                : "DEMO PREVIEW · seeded sample data, not live"}
+                : "SIGN IN · connect your account to view your data"}
           </span>
           <button
             className="nu-btn"
@@ -188,9 +222,20 @@ export default function App() {
         <Suspense fallback={<p role="status">Loading workspace…</p>}>
           {sharedToken ? (
             <SharedReport token={sharedToken} />
+          ) : !authReady ? (
+            <p role="status">Checking session…</p>
+          ) : authError ? (
+            <p role="alert">{authError}</p>
+          ) : !signedIn || recovering ? (
+            <Settings
+              passwordRecovery={recovering}
+              onPasswordUpdated={() => setRecovering(false)}
+            />
+          ) : !canAccessPage(page, signedIn, role) ? (
+            <p role="alert">Your account does not have access to this page.</p>
           ) : (
-            <div key={accountId ?? "preview"}>
-              {page === "Overview" && <Overview demo={!signedIn} />}
+            <div key={accountId ?? "signed-out"}>
+              {page === "Overview" && <Overview />}
               {page === "Settings" && <Settings />}
               {page === "Player Intel" && <PlayerIntel />}
               {page === "Planner" && <Planner />}

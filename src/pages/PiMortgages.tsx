@@ -9,9 +9,9 @@ function exportCSV(rows: Record<string, unknown>[], name: string) {
 const money = (n: number) => "$" + Number(n).toLocaleString();
 export default function PiMortgages() {
   const client = useQueryClient();
-  const [principal, setPrincipal] = useState("1000000"),
-    [rate, setRate] = useState("5"),
-    [months, setMonths] = useState("12"),
+  const [principal, setPrincipal] = useState(""),
+    [rate, setRate] = useState(""),
+    [months, setMonths] = useState(""),
     [firstDue, setFirstDue] = useState(new Date().toISOString().slice(0, 10));
   const [borrower, setBorrower] = useState(""),
     [tornId, setTornId] = useState(""),
@@ -43,7 +43,10 @@ export default function PiMortgages() {
       throw new Error("Enter a rate with at most two decimals.");
     preview = amortize(terms);
   } catch (e) {
-    previewError = (e as Error).message;
+    previewError =
+      !principal.trim() && !rate.trim() && !months.trim()
+        ? "Enter your principal, annual rate and term to preview repayments."
+        : (e as Error).message;
   }
   const agreements = useQuery({
     queryKey: ["mortgages"],

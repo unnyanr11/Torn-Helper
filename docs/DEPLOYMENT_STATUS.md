@@ -47,3 +47,16 @@ The migration takes exclusive queue/response locks, refuses a nonempty queue or 
 Live checks confirmed schema `extensions`, version 0.20.4, preserved response history and request numbering, and both schedules active. Authenticated pg_net smoke requests to `verify-loss-payment` and `evaluate-alerts` returned HTTP 200 without timeouts. The Security Advisor no longer returns `extension_in_public`; its only remaining notice is informational RLS-without-policy on the intentionally inaccessible `private.workflow_audit` table.
 
 Reference: https://supabase.com/docs/guides/database/extensions/pg_net#troubleshooting
+
+
+## Production data and launch safeguards
+
+Removed the signed-out demo dashboard, seed-data module, prefilled payout contributions and sample investment/mortgage amounts. Empty accounts show sign-in or no-data states. Test fixtures remain isolated in the automated test suite and are never used as runtime fallbacks. Source inspection found no production data seeder. A live count-only audit found zero profiles, wars, payout runs, loss contracts, saved presets, mortgage agreements, integration credentials, webhooks or temporary fixture users; no real user data was deleted.
+
+Applied migration `production_integration_safeguards`. Browser roles cannot read integration token/webhook secret columns, create/update adapter connections, or enable email/push preferences without a delivery implementation. Owner-scoped connection metadata and removal are retained. The UI no longer offers plaintext TornStats token entry, direct browser webhook sends or nonfunctional notification opt-ins. Manual spy imports remain available.
+
+Additional source changes: mandatory authenticated workspace rendering and role-checked deep links; session initialization state and account isolation; password reset/recovery; runtime error recovery; production build configuration checks including rejection of server-side keys; explicit Vercel configuration and security headers; application branding assets instead of missing template icons; service-worker cache version refresh.
+
+Validation: 73 tests pass, including server-render checks of empty financial forms, configuration/access checks, and actual PostgreSQL integration-secret privilege tests. Schema-reference audit and TypeScript/Vite build pass. The positive build used a nonsecret test publishable-key-shaped value solely to validate bundling; this does not verify the user's hosted project key. A separate negative build confirmed that server-side credentials are rejected. Live database grants match the intended safeguards. The Security Advisor returns only the informational no-policy notice for the deliberately inaccessible private audit table.
+
+Source publication is not evidence of a completed Vercel rollout. Configure the real public project environment and Auth redirect origin, redeploy the frontend, and complete signed-in browser acceptance. External delivery integrations and the other incomplete feature families remain unavailable or partial as documented.
