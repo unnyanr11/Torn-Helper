@@ -33,6 +33,7 @@ supabase functions deploy refresh-targets
 supabase functions deploy refresh-live-data
 supabase functions deploy evaluate-alerts
 supabase functions deploy analyze-war
+supabase functions deploy public-api
 ```
 
 ## Schedule the alert job
@@ -49,11 +50,20 @@ node scripts/generate-capabilities.mjs
 
 Install via Tampermonkey from `/torn-helper.user.js` (served from `public/`). It adds a floating panel on torn.com with quick links to the app and a target lookup using your Torn API key (stored locally in your browser via GM storage).
 
+## PWA
+
+The app is installable as a PWA (manifest.json + service worker in public/). Add icon-192.png and icon-512.png to public/ for full install support.
+
+## Public API
+
+Read-only, keyless JSON API at `/functions/v1/public-api` with endpoints `/glossary`, `/capabilities`, and `/`. CORS-enabled.
+
 ## Status (delivery checklist)
 
-- [x] Steps 1-44: app shell through notification preferences (see git history for full list)
-- [x] Step 45: companion userscript (public/torn-helper.user.js — floating panel, quick links, target lookup via Torn API)
-- [x] Step 46: assistant (0034_assistant_logs table, owner RLS; Assistant chat UI with keyword-matched glossary/tips answers, logged owner-only)
-- [ ] Pending: public API, PWA, admin cost dashboard, competitor coverage matrix
+- [x] Steps 1-46: app shell through assistant (see git history for full list)
+- [x] Step 47: public API (public-api Edge Function with /glossary, /capabilities, / endpoints; Public API docs page)
+- [x] Step 48: PWA (manifest.json, sw.js service worker, registration in App)
+- [x] Step 49: admin cost dashboard (AdminCostDashboard page aggregating api_usage by endpoint with cost totals)
+- [x] Step 50: competitor coverage matrix (static comparison vs TornTools/YATA/TornStats; CompetitorMatrix page)
 
-All data in Demo Mode is seeded sample data and is never presented as live.
+All planned features are now delivered. All data in Demo Mode is seeded sample data and is never presented as live.
