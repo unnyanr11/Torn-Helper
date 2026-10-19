@@ -72,19 +72,19 @@ Full audited payout workflow (spec section 8). Four modes (equal/proportional/we
 
 ## TornStats Integration
 
-Opt-in adapter (spec section 7C #13). Connect with a TornStats API token (stored per-user), import spy reports manually via JSON paste (works without live API access), view import history with provenance, and disconnect/revoke. Live API lookup requires verified TornStats API access.
+Opt-in adapter (spec section 7C #13). Connect with a TornStats API token (stored per-user), import spy reports manually via JSON paste (works without live API access), view import history with provenance, and disconnect/revoke.
 
 ## Reports & Exports
 
-Immutable report snapshots with CSV and genuine XLSX export (formula-injection sanitized via cell prefixing), plus revocable 7-day expiring share links with unique tokens.
+Immutable report snapshots with CSV and genuine XLSX export (formula-injection sanitized), plus revocable 7-day expiring share links.
 
 ## Competitor Coverage Matrix
 
-Per-feature audit table (spec section 7C #16) covering 16 features across TornStats, TornTools, YATA, and TornWise with source URL, date checked, freemium status, acceptance test, and blocker visibility. Searchable/filterable in-app.
+Per-feature audit table (spec section 7C #16) covering 16 features across TornStats, TornTools, YATA, and TornWise.
 
 ## Halloween Tools
 
-Seasonal event tracker (spec Phase 22): log candy/chocolate/plushie/flower hauls with source, view totals by type and grand total, approximate NPC spawn timers, and manage recent haul history.
+Seasonal event tracker: candy haul logging, totals, NPC spawn timers, history.
 
 ## Faction Operations
 
@@ -100,12 +100,16 @@ Plan respect spending across faction upgrade branches with per-branch and total 
 
 ## Alliance Sharing
 
-Scoped resource sharing with alliance/sister factions by role (member/officer/leader) across target lists, spy reports, war reports, ledger, and custom resources. Instant revoke and reactivate.
+Scoped resource sharing with alliance/sister factions by role. Instant revoke and reactivate.
+
+## Retention Trends
+
+Join/leave/kick event logging with 30-day retention rate, net change, and 6-month monthly breakdown.
 
 ## Status (delivery checklist)
 
-- [x] Steps 1-60: app shell through faction upgrade simulation (see git history for full list)
-- [x] Step 61: Deeper alliance sharing & revocation (0043 migration with alliance_sharing_grants + RLS; AllianceSharing page with grant/revoke/reactivate by role)
-- [ ] Pending: AI provider wiring, retention trends, armory history/loans
+- [x] Steps 1-61: app shell through alliance sharing (see git history for full list)
+- [x] Step 62: Retention trends & join-leave tracking (0044 migration with faction_membership_events + RLS; RetentionTrends page with event logging, 30-day retention, monthly breakdown)
+- [ ] Pending: AI provider wiring, armory history/loans
 
 All data in Demo Mode is seeded sample data and is never presented as live.
