@@ -121,12 +121,16 @@ Consent-gated OpenAI summary + rules-based fallback.
 
 ## Travel Profit Optimizer
 
-Compare buy/sell scenarios across destinations, ranked by profit per hour of flight time. Manual price entry (labelled as such), with best-route highlight.
+Compare buy/sell scenarios across destinations, ranked by profit per hour.
+
+## OC Planner
+
+Create OC plans with auto-generated slots, assign members, mark readiness, and launch when all slots are ready. Status flow: planning → ready → launched → completed/cancelled.
 
 ## Status (delivery checklist)
 
-- [x] Steps 1-66: app shell through loan reminders (see git history for full list)
-- [x] Step 67: Travel profit optimizer (0049 migration with travel_profit_scenarios + RLS; TravelOptimizer page with scenario CRUD, profit/hr ranking, best-route highlight)
-- [ ] Pending: OC planner, chain target queue, daily digest, revive tracker
+- [x] Steps 1-67: app shell through travel profit optimizer (see git history for full list)
+- [x] Step 68: OC planner (0050 migration with oc_plans + oc_slots + RLS; OcPlanner page with plan/slot CRUD, assignment, readiness, launch)
+- [ ] Pending: chain target queue, daily digest, revive tracker
 
 All data in Demo Mode is seeded sample data and is never presented as live.
