@@ -49,6 +49,7 @@ node scripts/generate-capabilities.mjs
 - [x] Step 8: losses marketplace (direct-payment contracts, claims, evidence schema, disputes)
 - [x] Step 9: travel, markets, and money tools (manual observations, watchlists, stock holdings)
 - [x] Step 10: company and properties (manual snapshots and property tracker)
-- [ ] Later phases: racing, community, live data feeds, etc.
+- [x] Step 11: racing (manual race log with best-time highlight)
+- [ ] Later phases: community, live data feeds, alert evaluation job, estimate integrations
 
 All data in Demo Mode is seeded sample data and is never presented as live.
