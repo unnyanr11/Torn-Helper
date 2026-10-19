@@ -72,6 +72,7 @@ node scripts/generate-capabilities.mjs
 - [x] Step 19: gym tracker (manual session log, stat gains, gains-per-energy summary, RLS; Gym UI)
 - [x] Step 20: activity heatmaps (manual observations, hourly x weekday heatmap, polling-gap labeling, RLS; Activity UI)
 - [x] Step 21: graffiti wall (alliance-scoped posts, reactions, pin/hide moderation, RLS; Graffiti UI)
-- [ ] Pending: image uploads for graffiti, exports/reports, AI war analyzer, Compare Players, Leaderboards, ROI Calculator, PI Mortgages, Bounties, 217-stat catalog, custom stat columns, TornStats/FFScouter deep integration, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
+- [x] Step 22: exports & reports (client-side CSV export across 15 data sources, row-count summary, RLS-aware; Reports UI)
+- [ ] Pending: image uploads for graffiti, AI war analyzer, Compare Players, Leaderboards, ROI Calculator, PI Mortgages, Bounties, 217-stat catalog, custom stat columns, TornStats/FFScouter deep integration, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
 
 All data in Demo Mode is seeded sample data and is never presented as live.
