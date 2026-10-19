@@ -125,12 +125,16 @@ Compare buy/sell scenarios across destinations, ranked by profit per hour.
 
 ## OC Planner
 
-Create OC plans with auto-generated slots, assign members, mark readiness, and launch when all slots are ready. Status flow: planning → ready → launched → completed/cancelled.
+Create OC plans with auto-generated slots, assign members, mark readiness, and launch.
+
+## Chain Target Queue
+
+Build a chain target queue, claim targets for 5 minutes, mark hit/skipped, and release claims. Status flow: open → claimed → hit/skipped.
 
 ## Status (delivery checklist)
 
-- [x] Steps 1-67: app shell through travel profit optimizer (see git history for full list)
-- [x] Step 68: OC planner (0050 migration with oc_plans + oc_slots + RLS; OcPlanner page with plan/slot CRUD, assignment, readiness, launch)
-- [ ] Pending: chain target queue, daily digest, revive tracker
+- [x] Steps 1-68: app shell through OC planner (see git history for full list)
+- [x] Step 69: Chain target queue (0051 migration with chain_target_queue + RLS; ChainQueue page with add/claim/hit/skip/release)
+- [ ] Pending: daily digest, revive tracker
 
 All data in Demo Mode is seeded sample data and is never presented as live.
