@@ -10,6 +10,7 @@ import PiMortgages from './pages/PiMortgages';
 import Bounties from './pages/Bounties';
 import StatsCatalog from './pages/StatsCatalog';
 import CustomStats from './pages/CustomStats';
+import StatIntelligence from './pages/StatIntelligence';
 import Alerts from './pages/Alerts';
 import Notifications from './pages/Notifications';
 import WarRoom from './pages/WarRoom';
@@ -24,7 +25,6 @@ import Properties from './pages/Properties';
 import Racing from './pages/Racing';
 import Community from './pages/Community';
 import LiveFeeds from './pages/LiveFeeds';
-import Estimates from './pages/Estimates';
 import Alliances from './pages/Alliances';
 import WatchedFactions from './pages/WatchedFactions';
 import Recruitment from './pages/Recruitment';
@@ -72,6 +72,7 @@ export default function App() {
         {page === 'Bounties' && <Bounties />}
         {page === 'Stats Catalog' && <StatsCatalog />}
         {page === 'Custom Stats' && <CustomStats />}
+        {page === 'Stat Intelligence' && <StatIntelligence />}
         {page === 'Alerts' && <Alerts />}
         {page === 'Notifications' && <Notifications />}
         {page === 'War Room' && <WarRoom />}
@@ -86,7 +87,6 @@ export default function App() {
         {page === 'Racing' && <Racing />}
         {page === 'Community' && <Community />}
         {page === 'Live Feeds' && <LiveFeeds />}
-        {page === 'Estimates' && <Estimates />}
         {page === 'Alliances' && <Alliances />}
         {page === 'Watched Factions' && <WatchedFactions />}
         {page === 'Recruitment' && <Recruitment />}
@@ -95,7 +95,7 @@ export default function App() {
         {page === 'Graffiti' && <Graffiti />}
         {page === 'Reports' && <Reports />}
         {page === 'API Usage' && <ApiUsage />}
-        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Estimates','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage'].includes(page) && <Placeholder name={page} />}
+        {!['Overview','Planner','Targets','Compare Players','Leaderboards','ROI Calculator','PI Mortgages','Bounties','Stats Catalog','Custom Stats','Stat Intelligence','Alerts','Notifications','War Room','War Analyzer','Payouts','Losses','Travel','Markets','Stocks','Company','Properties','Racing','Community','Live Feeds','Alliances','Watched Factions','Recruitment','Gym','Activity','Graffiti','Reports','API Usage'].includes(page) && <Placeholder name={page} />}
       </main>
     </div>
   );

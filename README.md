@@ -23,11 +23,6 @@ npm run dev
    openssl rand -base64 32
    supabase secrets set TORN_KEY_ENCRYPTION_KEY=<your-base64-key>
    ```
-5. Set third-party estimate API keys (optional, only if you use those sources):
-   ```bash
-   supabase secrets set FFSCOUTER_API_KEY=<your-key>
-   supabase secrets set TORNSTATS_API_KEY=<your-key>
-   ```
 
 ## Deploy Edge Functions
 
@@ -36,7 +31,6 @@ supabase functions deploy link-torn-key
 supabase functions deploy refresh-targets
 supabase functions deploy refresh-live-data
 supabase functions deploy evaluate-alerts
-supabase functions deploy fetch-estimates
 supabase functions deploy analyze-war
 ```
 
@@ -66,7 +60,6 @@ node scripts/generate-capabilities.mjs
 - [x] Step 12: community (posts with categories and moderation flag)
 - [x] Step 13: live data feeds (travel, market, stocks, company via cached refresh)
 - [x] Step 14: alert-evaluation job (notifications table, evaluate-alerts function, Notifications UI)
-- [x] Step 15: estimate integrations (FFScouter/TornStats opt-in, fetch-estimates function, Estimates UI)
 - [x] Step 16: alliances & families (alliances, members, invitations, announcements with RLS; Alliances UI)
 - [x] Step 17: watched factions (up to 30 per user, priority, refresh interval, pause state, RLS; Watched Factions UI)
 - [x] Step 18: recruitment scanner (requirements, candidates, review stages, match score, RLS; Recruitment UI)
@@ -82,6 +75,7 @@ node scripts/generate-capabilities.mjs
 - [x] Step 28: Bounties (bounties table with owner-only RLS, add/track bounties with status filters; Bounties UI)
 - [x] Step 29: 217-stat catalog (static searchable reference catalog of Torn stat categories and key stats; Stats Catalog UI)
 - [x] Step 30: custom stat columns (custom_columns + custom_entries with owner-only RLS, define columns and log values; Custom Stats UI)
-- [ ] Pending: image uploads for graffiti, TornStats/FFScouter deep integration, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
+- [x] Step 31: native Stat Intelligence engine (in-app estimate computation from own observations/target data, trend history bars, confidence flagging; no third-party estimate APIs; Stat Intelligence UI)
+- [ ] Pending: image uploads for graffiti, Discord, web push/email, companion userscript, assistant, public API, PWA, admin cost dashboard, competitor coverage matrix
 
 All data in Demo Mode is seeded sample data and is never presented as live.
