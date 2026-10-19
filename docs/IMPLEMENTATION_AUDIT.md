@@ -34,7 +34,7 @@ Audit date: 19 October 2026. Repository: `unnyanr11/Torn-Helper`, baseline `cfa9
 | Private data cached by service worker | General GET caching includes cross-origin requests | Same-origin shell/assets only; no API/Auth/private cache |
 | Companion stores raw Torn key | `GM_setValue` key persistence and HTML insertion | Credential-free manual links, old-key removal and safe DOM construction |
 
-Original advisor notices include [mutable search paths](https://supabase.com/docs/guides/database/database-linter?lint=0011_function_search_path_mutable), [public SECURITY DEFINER execution](https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable), and [pg_net in public](https://supabase.com/docs/guides/database/database-linter?lint=0014_extension_in_public). The repair pins search paths and removes direct execution of trigger functions. Relocating pg_net is not included because it requires a separate extension compatibility review.
+Original advisor notices include [mutable search paths](https://supabase.com/docs/guides/database/database-linter?lint=0011_function_search_path_mutable), [public SECURITY DEFINER execution](https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable), and [pg_net in public](https://supabase.com/docs/guides/database/database-linter?lint=0014_extension_in_public). The repair pins search paths and removes direct execution of trigger functions. Relocation was deferred in the original repair. A subsequent compatibility review and the `relocate_pg_net_extension` migration resolved the pg_net warning while preserving queued-response history and request numbering; see DEPLOYMENT_STATUS.md.
 
 ## Included local implementation
 

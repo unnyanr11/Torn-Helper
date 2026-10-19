@@ -36,3 +36,14 @@ Live rollback smoke validation passed application creation/activation, schedule 
 Local validation: 66 tests, production build, candidate schema-reference audit and all 15 Deno entrypoint checks. Security advisors return the previously documented pg_net warning and inaccessible audit-table informational notice; no additional warning was returned. The advisor results carry their own collection timestamp, so live grants/RLS were checked directly as well.
 
 This follow-up source is published to main under the user's standing approval. A separate frontend hosting deployment is still not configured. Actual key-enabled collection, signed-in browser flows and concurrent multi-session contention remain unverified. Broader unfinished features remain listed in IMPLEMENTATION_AUDIT.md.
+
+
+## pg_net warning resolved
+
+On 19 October 2026, migration `relocate_pg_net_extension` recreated pg_net 0.20.4 in the `extensions` registration schema using Supabase's documented procedure. Its callable API remains in `net`.
+
+The migration takes exclusive queue/response locks, refuses a nonempty queue or active worker/job, preserves stored response rows and the request sequence, keeps the installed version and uses `DROP EXTENSION` without CASCADE so unexpected dependencies abort atomically. Both net-calling cron jobs were briefly paused through `cron.alter_job` and then restored to their original active state and schedules.
+
+Live checks confirmed schema `extensions`, version 0.20.4, preserved response history and request numbering, and both schedules active. Authenticated pg_net smoke requests to `verify-loss-payment` and `evaluate-alerts` returned HTTP 200 without timeouts. The Security Advisor no longer returns `extension_in_public`; its only remaining notice is informational RLS-without-policy on the intentionally inaccessible `private.workflow_audit` table.
+
+Reference: https://supabase.com/docs/guides/database/extensions/pg_net#troubleshooting
