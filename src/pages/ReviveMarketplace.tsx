@@ -11,7 +11,30 @@ export default function ReviveMarketplace() {
   const [tTornId, setTTornId] = useState(''); const [tName, setTName] = useState(''); const [qty, setQty] = useState(''); const [price, setPrice] = useState(''); const [notes, setNotes] = useState('');
   const [sellerTornId, setSellerTornId] = useState(''); const [sellerName, setSellerName] = useState('');
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    // Realtime subscriptions
+    const contractsChannel = supabase
+      .channel('revive_contracts_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'revive_contracts' }, (payload) => {
+        console.log('contract change', payload);
+        load();
+      })
+      .subscribe();
+
+    const claimsChannel = supabase
+      .channel('revive_claims_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'revive_claims' }, (payload) => {
+        console.log('claim change', payload);
+        load();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(contractsChannel);
+      supabase.removeChannel(claimsChannel);
+    };
+  }, []);
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -64,7 +87,7 @@ export default function ReviveMarketplace() {
   return (
     <section>
       <h2>Revive Marketplace</h2>
-      <p className="muted">Buy revives for a target or sell your revive services. Direct-payment model — settle in Torn manually.</p>
+      <p className="muted">Buy revives for a target or sell your revive services. Realtime updates via Supabase subscriptions.</p>
       {error && <p className="badge warn">{error}</p>}
 
       <article className="card nu-inset">
