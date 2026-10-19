@@ -115,7 +115,10 @@ describe("Torn key-based app sessions", () => {
     const broken = backend();
     await expect(
       loginWithTorn(broken as any, apiKey, true, "bad-config", upstream()),
-    ).rejects.toThrow();
+    ).rejects.toMatchObject({
+      status: 503,
+      message: expect.stringContaining("Turn off key retention"),
+    });
     expect(broken.auth.admin.createUser).not.toHaveBeenCalled();
   });
   it("cleans up a losing first-login race and signs in only the canonical mapping", async () => {
@@ -187,4 +190,20 @@ it("preserves a potentially committed mapping after an uncertain transport failu
     loginWithTorn(admin as any, apiKey, false, undefined, upstream()),
   ).rejects.toThrow(/network response lost/);
   expect(admin.auth.admin.deleteUser).not.toHaveBeenCalled();
+});
+
+it("reports absent retention configuration without touching accounts", async () => {
+  const admin = backend();
+  const stages: string[] = [];
+  await expect(
+    loginWithTorn(admin as any, apiKey, true, undefined, upstream(), (stage) =>
+      stages.push(stage),
+    ),
+  ).rejects.toMatchObject({
+    status: 503,
+    message: expect.stringContaining("Encrypted key storage is not configured"),
+  });
+  expect(stages).toEqual(["verify_torn", "encrypt_key"]);
+  expect(admin.from).not.toHaveBeenCalled();
+  expect(admin.auth.admin.createUser).not.toHaveBeenCalled();
 });

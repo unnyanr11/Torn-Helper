@@ -100,10 +100,24 @@ export async function loginWithTorn(
   persist: boolean,
   secret: string | undefined,
   fetcher: typeof fetch = fetch,
+  onStage: (stage: string) => void = () => {},
 ) {
+  onStage("verify_torn");
   const identity = await verifiedTornIdentity(apiKey, fetcher);
   // Encrypt before creating anything: configuration errors cannot leave half-created accounts.
-  const ciphertext = persist ? await encrypt(apiKey, secret ?? "") : null;
+  onStage("encrypt_key");
+  let ciphertext: string | null = null;
+  if (persist) {
+    try {
+      ciphertext = await encrypt(apiKey, secret ?? "");
+    } catch {
+      throw new LoginError(
+        503,
+        "Encrypted key storage is not configured. Turn off key retention to sign in, or ask the site owner to configure it.",
+      );
+    }
+  }
+  onStage("lookup_identity");
   const lookup = await admin
     .from("linked_torn_accounts")
     .select("user_id")
@@ -115,6 +129,7 @@ export async function loginWithTorn(
   try {
     if (!proposed) {
       // Random, non-deliverable internal alias prevents email-address squatting. Never derived from client input.
+      onStage("create_account");
       const result = await admin.auth.admin.createUser({
         email: `${crypto.randomUUID()}@torn-login.invalid`,
         email_confirm: true,
@@ -125,6 +140,7 @@ export async function loginWithTorn(
       proposed = result.data.user.id;
       created = proposed;
     }
+    onStage("complete_identity");
     const complete = await admin.rpc("complete_torn_login", {
       player_id: identity.id,
       proposed_user: proposed,
@@ -143,12 +159,14 @@ export async function loginWithTorn(
     }
     // The mapping may now own real account data; never delete this account on later errors.
     created = undefined;
+    onStage("load_account");
     const user = await admin.auth.admin.getUserById(canonical);
     if (user.error || !user.data.user?.email)
       throw user.error ?? new Error("Account unavailable");
     const banned = (user.data.user as { banned_until?: string }).banned_until;
     if (banned && Date.parse(banned) > Date.now())
       throw new LoginError(403, "This app account is unavailable.");
+    onStage("create_session");
     const link = await admin.auth.admin.generateLink({
       type: "magiclink",
       email: user.data.user.email,
