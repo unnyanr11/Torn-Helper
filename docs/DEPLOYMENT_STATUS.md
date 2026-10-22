@@ -286,3 +286,13 @@ statuses expire after one minute. Individual rechecks are available.
 Validation: 157 tests and production build pass, including immediate populated
 rendering, filtering, freshness, inactivity and response-identity validation.
 Browser and legitimate-key acceptance testing remain unavailable in this session.
+
+
+### Official Torn attack action — 2026-10-22
+
+At the user's request, each built-in levelling target now has an Attack action
+opening that player's official Torn attack page in a new tab. The link contains
+only the target ID, uses noopener/noreferrer, and is available without an API key.
+No attack is initiated by this app. Other target-list websites remain unlinked.
+Validation: existing render coverage checks all 32 attack links; 157 tests and
+production build pass.
