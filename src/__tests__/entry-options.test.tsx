@@ -2,7 +2,7 @@ import { describe,it,expect,vi } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { QueryClient,QueryClientProvider } from '@tanstack/react-query';
 import { CAPABILITIES } from '../api/capabilities';
-import { observedChoices,numberChoices,itemCategories,mergeChoices } from '../lib/entry-options';
+import { observedChoices,numberChoices,itemCategories,itemTypes,mergeChoices } from '../lib/entry-options';
 import SelectEntry from '../components/SelectEntry';
 import DataEntry from '../components/DataEntry';
 import MultiChoiceEntry from '../components/MultiChoiceEntry';
@@ -20,6 +20,12 @@ describe('choices across all tool forms',()=>{
   expect(itemCategories(data).map(o=>o.value)).toEqual(['Flower','Medical']);
   expect(observedChoices(data,'item','Flower')).toEqual([{value:'2',label:'Second [2]'}]);
   expect(observedChoices(data,'itemName','Flower')).toEqual([{value:'Second',label:'Second'}]);
+ });
+ it('keeps category and weapon type separate when filtering saved references',()=>{
+  const data=[row('/torn/items',{items:[{id:1,name:'Primary item',type:'Weapon',sub_type:'Primary'},{id:2,name:'Medical item',type:'Medical',sub_type:null},{id:3,name:'Melee item',type:'Weapon',sub_type:'Melee'}]})];
+  expect(itemCategories(data).map(o=>o.value)).toEqual(['Medical','Weapon']);expect(itemTypes(data,'Medical')).toEqual([]);
+  expect(itemTypes(data,'Weapon').map(o=>o.value)).toEqual(['Melee','Primary']);
+  expect(observedChoices(data,'item','Weapon','Primary')).toEqual([{value:'1',label:'Primary item [1]'}]);
  });
  it('filters numeric presets against bounds and step without treating presets as observed data',()=>{
   expect(numberChoices('money',1,5000,1).map(o=>Number(o.value))).toEqual([100,500,1000,5000]);

@@ -343,3 +343,39 @@ records, duplicate names with different IDs, invalid data, and privacy disclosur
 No full catalogue was present in the backend cache at implementation time and no
 legitimate user key was available for live acceptance testing. The real catalogue
 loads when the signed-in user supplies their linked key through this UI.
+
+
+## Permanent shared item reference catalogue — 2026-10-22
+
+Applied migrations 20261022050717 and 20261022051838. Public reference tables now
+retain item ID/name, category (Torn type), optional weapon type (Torn sub_type),
+and import timestamps without automatic expiry. They contain no inventory, API
+keys or prices. The authenticated read RPC returns the entire catalogue as a JSON
+aggregate, avoiding REST's default 1,000-row limit. Client writes and mutation RPCs
+are denied; RLS is enabled on both tables.
+
+The existing authenticated torn-data gateway remains the upstream importer. An
+invoker trigger captures only trusted All-item observations and stores sanitized
+metadata atomically. Category-only, empty, malformed or paginated responses cannot
+replace the catalogue. Failed refreshes preserve the previous snapshot. Existing
+IDs are retained; explicit refreshes can add/update metadata at most once a day.
+No periodic refresh or new Edge Function is required. Concurrent database saves
+use a short lease; simultaneous first-ever upstream requests can still overlap.
+
+A complete existing official All-items response was available in torn_data_cache.
+Ran scripts/import-cached-items.sql and verified 1,502 permanent rows, 23 categories
+and 11 non-null item types. This bootstrap needed no additional Torn API call.
+Existing account/observation records were unchanged. Security advisors show no new
+findings; pre-existing private workflow-audit and password-protection findings
+remain outside this change.
+
+Frontend dropdowns automatically read the persistent catalogue through a shared
+query with no automatic refetch. Category and weapon type are separate dropdowns.
+A backend-only reload is available; an explicit upstream refresh is optional.
+Live prices retain their existing separate collection behavior. The item catalogue
+remains after observations expire or are cleared.
+
+Validation: 176 tests and production build pass, including database permission
+boundaries, retention, 1,205-row RPC reads, trusted trigger capture, price exclusion
+and invalid refresh rollback. Shared parser Deno check passes. Live RLS/grants and
+bootstrap counts were verified; no authenticated browser check was performed.

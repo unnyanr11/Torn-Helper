@@ -11,7 +11,7 @@ describe('full official item catalogue',()=>{
   expect(parsed).toHaveLength(1600);expect(new Set(parsed.map(i=>i.id)).size).toBe(1600);expect(parsed.find(i=>i.id===1600)?.name).toBe('Item 1600');expect(parsed[0]).not.toHaveProperty('price');
  });
  it('supports the official legacy dictionary shape without mistaking the key for an array offset',()=>{
-  expect(parseItemCatalogue({items:{'206':{name:'Named item',type:'Drug'}}})).toEqual([{id:206,name:'Named item',type:'Drug'}]);
+  expect(parseItemCatalogue({items:{'206':{name:'Named item',type:'Drug'}}})).toEqual([{id:206,name:'Named item',type:'Drug',sub_type:null}]);
  });
  it('preserves separate IDs for items sharing a name',()=>{
   const result=parseItemCatalogue({items:[{id:1,name:'Same'},{id:2,name:'Same'}]});
@@ -21,10 +21,10 @@ describe('full official item catalogue',()=>{
   for(const payload of [{},{items:[]},{items:[{id:0,name:'Bad'}]},{items:[{id:1,name:''}]},{items:[{id:1,name:'First'},{id:1,name:'Conflicting'}]}])expect(()=>parseItemCatalogue(payload)).toThrow();
  });
  it('deduplicates identical records without changing their IDs',()=>{
-  const item={id:123,name:'Named item',type:'Tool'};expect(parseItemCatalogue({items:[item,item]})).toEqual([item]);
+  const item={id:123,name:'Named item',type:'Tool',sub_type:null};expect(parseItemCatalogue({items:[item,item]})).toEqual([item]);
  });
  it('offers an explicit full import using a request-only or encrypted saved key',()=>{
   const html=renderToStaticMarkup(<QueryClientProvider client={new QueryClient()}><ItemCatalogueLoader/></QueryClientProvider>);
-  expect(html).toContain('Load all Torn items');expect(html).toContain('Fetch all item names and IDs');expect(html).toContain('type="password"');expect(html).toContain('Public Only');expect(html).toContain('Used for this request only');expect(html).not.toContain('href="http');
+  expect(html).toContain('Load all Torn items');expect(html).toContain('Fetch all item names and IDs once');expect(html).toContain('type="password"');expect(html).toContain('Public Only');expect(html).toContain('Used for this request only');expect(html).not.toContain('href="http');
  });
 });

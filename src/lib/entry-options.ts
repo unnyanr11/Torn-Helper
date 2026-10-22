@@ -7,10 +7,10 @@ export function mergeChoices(...groups:Choice[][]):Choice[]{
  return [...unique.values()];
 }
 const obj=(v:unknown):Record<string,any>=>v&&typeof v==='object'&&!Array.isArray(v)?v as Record<string,any>:{};
-export function observedChoices(rows:CachedChoiceRow[],source:EntrySource,category=''):Choice[]{
+export function observedChoices(rows:CachedChoiceRow[],source:EntrySource,category='',itemType=''):Choice[]{
  if(source==='item'||source==='itemName'){
-  if(!category)return catalogueChoices(rows,'/torn/items','items',source==='itemName');
-  const filtered=rows.map(row=>({...row,payload:{...obj(row.payload),items:Array.isArray(obj(row.payload).items)?obj(row.payload).items.filter((i:any)=>i?.type===category):[]}}));
+  if(!category&&!itemType)return catalogueChoices(rows,'/torn/items','items',source==='itemName');
+  const filtered=rows.map(row=>({...row,payload:{...obj(row.payload),items:Array.isArray(obj(row.payload).items)?obj(row.payload).items.filter((i:any)=>(!category||i?.type===category)&&(!itemType||i?.sub_type===itemType)):[]}}));
   return catalogueChoices(filtered,'/torn/items','items',source==='itemName');
  }
  if(source==='stock')return catalogueChoices(rows,'/torn/stocks','stocks');
@@ -37,6 +37,11 @@ export function observedChoices(rows:CachedChoiceRow[],source:EntrySource,catego
 }
 export function itemCategories(rows:CachedChoiceRow[]):Choice[]{
  const types:string[]=[];for(const row of rows)if(CAPABILITIES.find(c=>c.id===row.endpoint_id)?.path==='/torn/items'&&Array.isArray(obj(row.payload).items))for(const item of obj(row.payload).items)if(typeof item?.type==='string')types.push(item.type);
+ return choicesFrom(types.sort());
+}
+
+export function itemTypes(rows:CachedChoiceRow[],category=''):Choice[]{
+ const types:string[]=[];for(const row of rows)if(CAPABILITIES.find(c=>c.id===row.endpoint_id)?.path==='/torn/items'&&Array.isArray(obj(row.payload).items))for(const item of obj(row.payload).items)if((!category||item?.type===category)&&typeof item?.sub_type==='string')types.push(item.sub_type);
  return choicesFrom(types.sort());
 }
 export type NumberKind='count'|'money'|'signedMoney'|'percent'|'level'|'minutes'|'seconds'|'days'|'months'|'energy'|'width'|'weight'|'decimal';
