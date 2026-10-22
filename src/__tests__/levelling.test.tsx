@@ -36,6 +36,6 @@ describe('ready-made levelling catalogue',()=>{
  it('renders populated lists immediately with dropdowns, attribution and official Torn attack actions',()=>{
   const html=renderToStaticMarkup(<QueryClientProvider client={new QueryClient()}><LevellingCatalogue/></QueryClientProvider>);
   expect(html).toContain('Ready-made levelling lists');expect(html).toContain('32 real community-listed targets');expect(html).toContain('svyatoslavy');expect(html).toContain('2117366');expect(html).toContain('Not checked');
-  expect(html).toContain('Built-in list');expect(html).toContain('Status filter');expect(html).toContain('Community reported');expect(html).toContain('href="https://www.torn.com/loader.php?sid=attack&amp;user2ID=2117366"');expect(html.match(/>Attack<\/a>/g)).toHaveLength(32);expect(html).toContain('rel="noopener noreferrer"');expect(html).not.toContain('oran.pw');
+  expect(html).toContain('Built-in list');expect(html).toContain('Status filter');expect(html).toContain('Community reported');expect(html).toContain('href="https://www.torn.com/page.php?sid=attack&amp;user2ID=2117366"');expect(html.match(/>Attack<\/a>/g)).toHaveLength(32);expect(html).toContain('rel="noopener noreferrer"');expect(html).not.toContain('oran.pw');
  });
 });
