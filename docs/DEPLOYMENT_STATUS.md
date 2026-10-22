@@ -547,3 +547,39 @@ category navigation, bounded rendering, pixel-density limits and handler cleanup
 No signed-in-browser or legitimate Torn-key acceptance test was performed; this
 change needs no backend migration or Edge Function deployment. Existing ExcelJS
 chunk-size warning remains nonfatal.
+
+## Player Intel linked-key message and lookup — 2026-10-22
+
+Player Intel used a legacy function that accepted only retained encrypted keys.
+When sign-in had linked the Torn identity without retaining its key, the function
+incorrectly returned “Link a Torn key in Settings.” The page also used the player
+ID as its query trigger, so pressing lookup again with the same ID did not reliably
+start another attempt.
+
+The page now uses the shared authenticated torn-data gateway and the registered
+/user/{id}/profile endpoint. It reads only retained-key metadata to choose its
+initial mode: an existing encrypted key, or a request-only key. An absent retained
+key is explained separately from identity linking. Request-only keys are cleared
+at lookup start, are never put in query keys or browser storage, and are forwarded
+only for that request. The gateway continues enforcing linked-account ownership,
+tracking pause and permissions. Stored-key/decryption errors keep their specific
+gateway messages rather than being translated into an unlinked identity.
+
+Lookups are explicit actions and can be repeated for the same ID. Successful
+observations join the owner-scoped shared cache; saved profiles display without a
+new Torn request. IDs, matching profile responses and cancellation are validated.
+Fresh public observations still record status, level and last action in the
+existing owner-protected player_observations table, using the actual fetched_at
+instead of relabelling a cached observation as new. A history write failure warns
+without hiding the successfully fetched profile. No private battle stats are
+inferred and no database grants or policies changed.
+
+Validation: 237 tests pass, including nine new Player Intel tests. The final
+owner-readiness guard and repeated-ID scenario were rechecked in the targeted
+suite; production TypeScript/Vite build and whitespace checks pass. Read-only
+backend checks confirmed the reported active identity had no retained key, and
+verified the existing authenticated history insert grant and owner policy. Logs
+and advisors were inspected; no schema or Edge Function deployment was needed.
+Legitimate Torn-key and signed-in-browser acceptance tests were not performed.
+Build validation used a configuration-only publishable key. Existing nonfatal
+ExcelJS chunk warning remains.
