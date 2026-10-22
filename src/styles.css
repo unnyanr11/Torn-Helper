@@ -1526,7 +1526,6 @@ details[open] > summary {
 .connected-insights .personal-summary p { font-size:.75rem; line-height:1.7; }
 .observed-price-chart { width:100%; max-height:220px; margin:1rem 0; }
 /* Simple task-first interface */
-.simple-layout *, .simple-layout *::before, .simple-layout *::after { animation:none!important; }
 .simple-layout { display:grid; grid-template-columns:210px minmax(0,1fr); gap:0; padding:0; max-width:none; }
 .simple-layout .sidebar { position:sticky; top:0; height:100vh; width:auto; border-radius:0; padding:20px 14px; background:var(--surface-solid); box-shadow:none; backdrop-filter:none; border:0; border-right:1px solid var(--border); }
 .simple-layout .brand { padding:8px 10px 24px; font-size:21px; font-weight:700; letter-spacing:-.03em; }
@@ -1534,11 +1533,11 @@ details[open] > summary {
 .simple-layout .topbar { padding:0 0 18px; margin:0 0 24px; min-height:0; }
 .simple-layout .topbar h1 { font-size:24px; margin:0; letter-spacing:-.025em; }
 .simple-layout .nav-scroll { overflow:auto; padding:0; }
-.simple-layout .nav-item { border-radius:5px; min-height:42px; padding:9px 12px; margin:3px 0; transform:none!important; box-shadow:none; font-size:14px; }
+.simple-layout .nav-item { border-radius:5px; min-height:42px; padding:9px 12px; margin:3px 0; box-shadow:none; font-size:14px; }
 .simple-layout .nav-item.active { background:var(--hi); color:var(--fg); border:1px solid var(--border); }
 .more-tools { display:grid; gap:8px; font-size:12px; margin:22px 6px; }
 .simple-account { margin:16px 6px 0; font-size:11px; color:var(--muted); }
-.simple-layout .card { border-radius:7px; padding:18px; background:var(--surface-solid); box-shadow:none; backdrop-filter:none; transform:none!important; margin-bottom:16px; }
+.simple-layout .card { border-radius:7px; padding:18px; background:var(--surface-solid); box-shadow:none; backdrop-filter:none; margin-bottom:16px; }
 .simple-layout .card::before,.simple-layout .card::after { display:none; }
 .simple-layout .nu-btn { border-radius:5px; padding:8px 13px; min-height:36px; box-shadow:none; transform:none; }
 .simple-layout .nu-btn::before,.simple-layout .nu-btn::after { display:none; }

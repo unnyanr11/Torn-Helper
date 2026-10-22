@@ -511,3 +511,39 @@ owner/hash cache columns; no database or Edge Function changes were required.
 Build validation used a configuration-only publishable key. Browser QA, actual
 cross-tab browser acceptance and legitimate Torn-key acceptance were not run.
 The existing nonfatal ExcelJS chunk warning remains.
+
+## Galaxy startup and atmospheric interface motion — 2026-10-22
+
+The first opening in a tab now shows a short procedural galaxy flight: a spiral
+star field approaches, stretches into a star tunnel and fades into the workspace.
+The scene uses a local Canvas 2D renderer; there is no video, downloaded image,
+external animation service or additional Torn request. The application bundle,
+auth check and normal workspace mount in parallel beneath the intro. Replaying
+the scene preserves the existing workspace and form state.
+
+Skip intro and Escape dismiss immediately. The intro plays automatically only
+once per tab session, with Replay intro available in the header. The canvas has a
+bounded duration, mobile particle limits, a pixel-density cap, hidden-tab drawing
+pause and cleanup for animation/resize handlers. A timeout dismisses the overlay
+if the renderer cannot finish. During the overlay, the underlying app is inert,
+keyboard focus stays on Skip and scroll is locked; cleanup restores both.
+
+The existing category navigation remains. Visual updates include a floating brand
+mark, drifting aurora backgrounds, star texture, animated navigation indicators,
+page entrances, staggered dashboard cards, button lift/press feedback, input focus
+glows, expanding-detail transitions and smooth bar changes. Workspace entry
+animations pause behind the intro and resume on arrival. Mobile layout and small
+landscape viewports have separate styling; no data values or fetch behavior changed.
+
+The header includes a persistent Reduce motion preference. System reduced-motion
+settings always take precedence: the flight is skipped, interface animation is
+disabled, and Replay is unavailable. The preference and tab-seen marker contain no
+account data or API key. Printing excludes the decorative scene and controls.
+
+Validation: 228 tests pass, including eight new startup/motion/renderer checks.
+Production TypeScript/Vite build and whitespace checks pass. Tests verify skip
+markup, first-visit behavior, reduced-motion defaults, storage failure fallback,
+category navigation, bounded rendering, pixel-density limits and handler cleanup.
+No signed-in-browser or legitimate Torn-key acceptance test was performed; this
+change needs no backend migration or Edge Function deployment. Existing ExcelJS
+chunk-size warning remains nonfatal.
