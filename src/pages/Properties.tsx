@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import ChoiceInput from "../components/ChoiceInput";
 import { useTornChoices } from "../hooks/useTornChoices";
 import { catalogueChoices } from "../lib/torn-choices";
@@ -59,9 +60,9 @@ export default function Properties() {
           <option value="pi">Private Island</option>
           <option value="other">Other</option>
         </select>
-        <input className="nu-input" placeholder="Daily upkeep" value={upkeep} onChange={(e) => setUpkeep(e.target.value)} />
-        <input className="nu-input" placeholder="Daily rent income" value={rent} onChange={(e) => setRent(e.target.value)} />
-        <input className="nu-input" placeholder="Property value (optional)" value={value} onChange={(e) => setValue(e.target.value)} />
+        <SelectEntry kind="money" type="number" step="any" className="nu-input" placeholder="Daily upkeep" value={upkeep} onChange={(e) => setUpkeep(e.target.value)} />
+        <SelectEntry kind="money" type="number" step="any" className="nu-input" placeholder="Daily rent income" value={rent} onChange={(e) => setRent(e.target.value)} />
+        <SelectEntry kind="money" type="number" step="any" className="nu-input" placeholder="Property value (optional)" value={value} onChange={(e) => setValue(e.target.value)} />
         <button className="nu-btn" onClick={addProperty}>Add property</button>
       </article>
       <div className="grid">

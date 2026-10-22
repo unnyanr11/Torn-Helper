@@ -1,3 +1,4 @@
+import DataEntry from "../components/DataEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -57,8 +58,8 @@ export default function Activity() {
           <option value="player">Player</option>
           <option value="faction">Faction</option>
         </select>
-        <input className="nu-input" placeholder="Subject ID" value={subjectId} onChange={(e) => setSubjectId(e.target.value)} />
-        <input className="nu-input" placeholder="Name (optional)" value={subjectName} onChange={(e) => setSubjectName(e.target.value)} />
+        <DataEntry source={subjectType==='faction'?'faction':'player'} className="nu-input" placeholder="Subject ID" value={subjectId} onChange={(e) => setSubjectId(e.target.value)} />
+        <DataEntry source={subjectType==='faction'?'factionName':'playerName'} className="nu-input" placeholder="Name (optional)" value={subjectName} onChange={(e) => setSubjectName(e.target.value)} />
         <select className="nu-input" value={status} onChange={(e) => setStatus(e.target.value)}>
           <option value="online">Online</option>
           <option value="idle">Idle</option>

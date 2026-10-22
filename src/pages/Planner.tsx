@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -49,7 +50,7 @@ export default function Planner() {
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Add goal</h3>
-        <input className="nu-input" placeholder="Goal title" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <SelectEntry options={["Reach level 15", "Increase battle stats", "Save for a property", "Build a stock portfolio"].map(value=>({value,label:value}))} className="nu-input" placeholder="Goal title" value={title} onChange={(e) => setTitle(e.target.value)} />
         <select className="nu-input" value={kind} onChange={(e) => setKind(e.target.value)}>
           <option value="levelling">Levelling</option>
           <option value="money">Money</option>

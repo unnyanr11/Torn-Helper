@@ -1,3 +1,5 @@
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -54,19 +56,19 @@ export default function Company() {
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Log daily snapshot</h3>
-        <input
+        <DataEntry source="companyName"
           className="nu-input"
           placeholder="Company name (optional)"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-        <input
+        <SelectEntry kind="signedMoney" type="number" step="any"
           className="nu-input"
           placeholder="Daily profit"
           value={profit}
           onChange={(e) => setProfit(e.target.value)}
         />
-        <input
+        <SelectEntry kind="count" type="number" step="any"
           className="nu-input"
           placeholder="Employees"
           value={employees}

@@ -1,3 +1,5 @@
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -50,9 +52,9 @@ export default function Dibs() {
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>New dib</h3>
-        <input className="nu-input" placeholder="Target Torn ID" value={targetId} onChange={(e) => setTargetId(e.target.value)} />
-        <input className="nu-input" placeholder="Target name (optional)" value={targetName} onChange={(e) => setTargetName(e.target.value)} />
-        <input className="nu-input" placeholder="Claim window (minutes)" type="number" min="1" value={minutes} onChange={(e) => setMinutes(e.target.value)} />
+        <DataEntry source="player" onNameChange={setTargetName} type="number" min="1" step="1" className="nu-input" placeholder="Target Torn ID" value={targetId} onChange={(e) => setTargetId(e.target.value)} />
+        <DataEntry source="playerName" className="nu-input" placeholder="Target name (optional)" value={targetName} onChange={(e) => setTargetName(e.target.value)} />
+        <SelectEntry kind="minutes" className="nu-input" placeholder="Claim window (minutes)" type="number" min="1" value={minutes} onChange={(e) => setMinutes(e.target.value)} />
         <button className="nu-btn" onClick={add}>Claim dib</button>
       </article>
       <div className="grid">

@@ -1,3 +1,5 @@
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -50,10 +52,10 @@ export default function FactionUpgrades() {
 
       <article className="card nu-inset">
         <h3>Add / update branch simulation</h3>
-        <input className="nu-input" placeholder="Branch name (e.g. Candy, Strikes, Terror)" value={branch} onChange={(e) => setBranch(e.target.value)} />
-        <input className="nu-input" type="number" min="0" placeholder="Current level" value={curLvl} onChange={(e) => setCurLvl(e.target.value)} />
-        <input className="nu-input" type="number" min="1" placeholder="Target level" value={tgtLvl} onChange={(e) => setTgtLvl(e.target.value)} />
-        <input className="nu-input" type="number" min="0" placeholder="Respect per level" value={rspPerLvl} onChange={(e) => setRspPerLvl(e.target.value)} />
+        <DataEntry source="upgrade" className="nu-input" placeholder="Branch name (e.g. Candy, Strikes, Terror)" value={branch} onChange={(e) => setBranch(e.target.value)} />
+        <SelectEntry kind="count" className="nu-input" type="number" min="0" placeholder="Current level" value={curLvl} onChange={(e) => setCurLvl(e.target.value)} />
+        <SelectEntry kind="level" className="nu-input" type="number" min="1" placeholder="Target level" value={tgtLvl} onChange={(e) => setTgtLvl(e.target.value)} />
+        <SelectEntry kind="count" className="nu-input" type="number" min="0" placeholder="Respect per level" value={rspPerLvl} onChange={(e) => setRspPerLvl(e.target.value)} />
         <input className="nu-input" placeholder="Notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} />
         <button className="nu-btn" onClick={saveSim}>Save simulation</button>
         <p className="muted" style={{ marginTop: 6 }}>Respect costs vary by branch and level — verify current values in-game before relying on totals.</p>

@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -58,7 +59,7 @@ export default function Alerts() {
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Add alert rule</h3>
-        <input className="nu-input" placeholder="Rule name" value={name} onChange={(e) => setName(e.target.value)} />
+        <SelectEntry options={["Energy reminder", "Nerve reminder", "Travel arrival", "Cooldown reminder"].map(value=>({value,label:value}))} className="nu-input" placeholder="Rule name" value={name} onChange={(e) => setName(e.target.value)} />
         <select className="nu-input" value={conditionType} onChange={(e) => setConditionType(e.target.value)}>
           <option value="target_available">Target available</option>
           <option value="energy_threshold">Energy threshold</option>

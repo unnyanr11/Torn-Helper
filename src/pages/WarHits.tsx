@@ -1,3 +1,5 @@
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -52,9 +54,9 @@ export default function WarHits() {
           <option value="">Select war…</option>
           {wars.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
         </select>
-        <input className="nu-input" placeholder="Attacker name" value={attacker} onChange={(e) => setAttacker(e.target.value)} />
-        <input className="nu-input" placeholder="Target Torn ID" value={targetId} onChange={(e) => setTargetId(e.target.value)} />
-        <input className="nu-input" placeholder="Hits" type="number" min="1" value={hitCount} onChange={(e) => setHitCount(e.target.value)} />
+        <DataEntry source="playerName" className="nu-input" placeholder="Attacker name" value={attacker} onChange={(e) => setAttacker(e.target.value)} />
+        <DataEntry source="player" type="number" min="1" step="1" className="nu-input" placeholder="Target Torn ID" value={targetId} onChange={(e) => setTargetId(e.target.value)} />
+        <SelectEntry kind="count" className="nu-input" placeholder="Hits" type="number" min="1" value={hitCount} onChange={(e) => setHitCount(e.target.value)} />
         <button className="nu-btn" onClick={add}>Log</button>
       </article>
       <article className="card nu-raised">

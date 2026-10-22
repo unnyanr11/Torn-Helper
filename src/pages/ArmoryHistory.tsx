@@ -1,3 +1,6 @@
+import { recordChoices } from "../lib/entry-options";
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -81,7 +84,7 @@ export default function ArmoryHistory() {
 
       <article className="card nu-inset">
         <h3>Log armory event</h3>
-        <input className="nu-input" placeholder="Item name" value={eItem} onChange={(e) => setEItem(e.target.value)} />
+        <DataEntry source="itemName" className="nu-input" placeholder="Item name" value={eItem} onChange={(e) => setEItem(e.target.value)} />
         <select className="nu-input" value={eType} onChange={(e) => setEType(e.target.value)}>
           <option value="added">Added</option>
           <option value="removed">Removed</option>
@@ -89,8 +92,8 @@ export default function ArmoryHistory() {
           <option value="returned">Returned</option>
           <option value="sold">Sold</option>
         </select>
-        <input className="nu-input" type="number" min="1" placeholder="Quantity" value={eQty} onChange={(e) => setEQty(e.target.value)} />
-        <input className="nu-input" placeholder="Member name (for loaned/returned)" value={eMember} onChange={(e) => setEMember(e.target.value)} />
+        <SelectEntry kind="count" className="nu-input" type="number" min="1" placeholder="Quantity" value={eQty} onChange={(e) => setEQty(e.target.value)} />
+        <DataEntry source="playerName" className="nu-input" placeholder="Member name (for loaned/returned)" value={eMember} onChange={(e) => setEMember(e.target.value)} />
         <input className="nu-input" placeholder="Notes (optional)" value={eNotes} onChange={(e) => setENotes(e.target.value)} />
         <button className="nu-btn" onClick={addArmoryEvent}>Log event</button>
       </article>
@@ -108,10 +111,10 @@ export default function ArmoryHistory() {
 
       <article className="card nu-inset">
         <h3>New loan</h3>
-        <input className="nu-input" placeholder="Borrower Torn ID" value={lTornId} onChange={(e) => setLTornId(e.target.value)} />
-        <input className="nu-input" placeholder="Borrower name" value={lName} onChange={(e) => setLName(e.target.value)} />
-        <input className="nu-input" type="number" placeholder="Principal ($)" value={lPrincipal} onChange={(e) => setLPrincipal(e.target.value)} />
-        <input className="nu-input" type="number" step="0.1" placeholder="Interest rate (%)" value={lRate} onChange={(e) => setLRate(e.target.value)} />
+        <DataEntry options={recordChoices(loans,'borrower_torn_id','borrower_name',false)} source="player" onNameChange={setLName} type="number" min="1" step="1" className="nu-input" placeholder="Borrower Torn ID" value={lTornId} onChange={(e) => setLTornId(e.target.value)} />
+        <DataEntry options={recordChoices(loans,'borrower_torn_id','borrower_name',true)} source="playerName" className="nu-input" placeholder="Borrower name" value={lName} onChange={(e) => setLName(e.target.value)} />
+        <SelectEntry kind="money" className="nu-input" type="number" placeholder="Principal ($)" value={lPrincipal} onChange={(e) => setLPrincipal(e.target.value)} />
+        <SelectEntry kind="percent" className="nu-input" type="number" step="0.1" placeholder="Interest rate (%)" value={lRate} onChange={(e) => setLRate(e.target.value)} />
         <input className="nu-input" type="date" value={lDue} onChange={(e) => setLDue(e.target.value)} />
         <input className="nu-input" placeholder="Notes (optional)" value={lNotes} onChange={(e) => setLNotes(e.target.value)} />
         <button className="nu-btn" onClick={addLoan}>Create loan</button>

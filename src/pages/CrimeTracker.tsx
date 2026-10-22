@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import ChoiceInput from "../components/ChoiceInput";
 import { useTornChoices } from "../hooks/useTornChoices";
 import { catalogueChoices } from "../lib/torn-choices";
@@ -49,8 +50,8 @@ export default function CrimeTracker() {
       <article className="card nu-inset">
         <h3>Log crimes</h3>
         <ChoiceInput label="Crime" value={crimeName} onChange={setCrimeName} options={catalogueChoices(choices.data??[],"/torn/crimes","crimes",true)} required/>
-        <input className="nu-input" placeholder="Attempts" type="number" min="1" value={attempts} onChange={(e) => setAttempts(e.target.value)} />
-        <input className="nu-input" placeholder="Successes" type="number" min="0" value={successes} onChange={(e) => setSuccesses(e.target.value)} />
+        <SelectEntry kind="count" className="nu-input" placeholder="Attempts" type="number" min="1" value={attempts} onChange={(e) => setAttempts(e.target.value)} />
+        <SelectEntry kind="count" className="nu-input" placeholder="Successes" type="number" min="0" value={successes} onChange={(e) => setSuccesses(e.target.value)} />
         <button className="nu-btn" onClick={add}>Log</button>
       </article>
       <div className="grid">

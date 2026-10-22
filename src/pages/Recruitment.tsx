@@ -1,3 +1,6 @@
+import { recordChoices } from "../lib/entry-options";
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -96,13 +99,13 @@ export default function Recruitment() {
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Requirements</h3>
-        <input
+        <SelectEntry kind="level" type="number" step="any"
           className="nu-input"
           placeholder="Min level"
           value={minLevel}
           onChange={(e) => setMinLevel(e.target.value)}
         />
-        <input
+        <SelectEntry kind="level" type="number" step="any"
           className="nu-input"
           placeholder="Max level"
           value={maxLevel}
@@ -111,19 +114,19 @@ export default function Recruitment() {
       </article>
       <article className="card nu-inset">
         <h3>Add candidate</h3>
-        <input
+        <DataEntry options={recordChoices(candidates,'torn_player_id','player_name',false)} source="player" onNameChange={setPlayerName} type="number" min="1" step="1"
           className="nu-input"
           placeholder="Torn player ID"
           value={playerId}
           onChange={(e) => setPlayerId(e.target.value)}
         />
-        <input
+        <DataEntry options={recordChoices(candidates,'torn_player_id','player_name',true)} source="playerName"
           className="nu-input"
           placeholder="Player name"
           value={playerName}
           onChange={(e) => setPlayerName(e.target.value)}
         />
-        <input
+        <SelectEntry kind="level" type="number" step="any"
           className="nu-input"
           placeholder="Level"
           value={level}

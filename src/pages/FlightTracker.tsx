@@ -1,3 +1,5 @@
+import SelectEntry from "../components/SelectEntry";
+import { ROUTES } from "../lib/travel-profit";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -45,7 +47,7 @@ export default function FlightTracker() {
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Log flight</h3>
-        <input className="nu-input" placeholder="Destination" value={destination} onChange={(e) => setDestination(e.target.value)} />
+        <SelectEntry options={ROUTES.map(r=>({value:r.country,label:r.country}))} allowCustom={false} className="nu-input" placeholder="Destination" value={destination} onChange={(e) => setDestination(e.target.value)} />
         <label>Departure<input className="nu-input" type="datetime-local" value={departs} onChange={(e) => setDeparts(e.target.value)} /></label>
         <label>Arrival<input className="nu-input" type="datetime-local" value={arrives} onChange={(e) => setArrives(e.target.value)} /></label>
         <button className="nu-btn" onClick={add}>Log flight</button>

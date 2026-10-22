@@ -1,6 +1,6 @@
 import ChoiceInput from "../components/ChoiceInput";
 import { useTornChoices } from "../hooks/useTornChoices";
-import { catalogueChoices } from "../lib/torn-choices";
+import { observedChoices } from "../lib/entry-options";
 import { functionError } from "../lib/function-error";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -37,7 +37,7 @@ export default function PlayerIntel() {
           if (/^[1-9]\d*$/.test(input)) setPlayer(input);
         }}
       >
-        <ChoiceInput label="Player" value={input} onChange={setInput} options={catalogueChoices(choices.data??[],"/faction/members","members")} inputMode="numeric" required/>
+        <ChoiceInput label="Player" value={input} onChange={setInput} options={observedChoices(choices.data??[],"player")} inputMode="numeric" required/>
         <button className="nu-btn">Look up player</button>
       </form>
       {query.isFetching && <p>Loading profile…</p>}

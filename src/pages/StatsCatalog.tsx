@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from 'react';
 import { STATS_CATALOG, STAT_CATEGORIES, VERIFIED_METRIC_COUNT } from '../data/statsCatalog';
 
@@ -28,7 +29,7 @@ export default function StatsCatalog() {
       <p className="muted">Fields are generated from the official OpenAPI schema. A documented field does not imply permission or historical coverage. Values and units require the matching endpoint context.</p>
       <p className="badge">{VERIFIED_METRIC_COUNT} / 217 target fields documented; historical availability is separate</p>
       <article className="card nu-inset">
-        <input className="nu-input" placeholder="Search metrics…" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <SelectEntry label="Metric" value={query} onChange={e=>setQuery(e.target.value)} options={STATS_CATALOG.filter(s=>category==='all'||s.category===category).map(s=>({value:s.name,label:s.name}))} emptyText="All metrics"/>
         <select className="nu-input" value={category} onChange={(e) => setCategory(e.target.value)}>
           <option value="all">All categories</option>
           {STAT_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}

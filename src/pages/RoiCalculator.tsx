@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import { useState } from "react";
 import SavedPresets from "../components/SavedPresets";
 import { analyzeCashFlows, CashFlow } from "../lib/finance";
@@ -69,7 +70,7 @@ export default function RoiCalculator() {
       />
       <label>
         Annual discount rate for NPV (%)
-        <input
+        <SelectEntry kind="percent" label="Annual discount rate (%)"
           className="nu-input"
           type="number"
           min="-99.99"
@@ -102,7 +103,7 @@ export default function RoiCalculator() {
                   />
                 </td>
                 <td>
-                  <input
+                  <SelectEntry options={["Cash","Stocks","Property","Items","Other"].map(value=>({value,label:value}))}
                     aria-label={`Asset ${i + 1}`}
                     className="nu-input"
                     maxLength={80}
@@ -111,7 +112,7 @@ export default function RoiCalculator() {
                   />
                 </td>
                 <td>
-                  <input
+                  <SelectEntry kind="signedMoney"
                     aria-label={`Amount ${i + 1}`}
                     className="nu-input"
                     type="number"

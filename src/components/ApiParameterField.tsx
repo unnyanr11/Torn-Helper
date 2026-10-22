@@ -1,6 +1,7 @@
 import type { Capability } from '../api/types';
 import type { Choice } from '../lib/torn-choices';
 import ChoiceInput from './ChoiceInput';
+import SelectEntry from './SelectEntry';
 type Parameter=Capability['parameters'][number];
 export default function ApiParameterField({parameter,value,onChange,choices}:{parameter:Parameter;value:string;onChange:(v:string)=>void;choices:Choice[]}){
  const schema=parameter.schema,label=parameter.name+(parameter.required?' (required)':' (optional)');
@@ -18,5 +19,6 @@ export default function ApiParameterField({parameter,value,onChange,choices}:{pa
   return <label>{label} · UTC<input className="nu-input" type="datetime-local" value={valid?new Date(n*1000).toISOString().slice(0,16):''} required={parameter.required} onChange={e=>onChange(e.target.value?String(Math.floor(Date.parse(e.target.value+'Z')/1000)):'')}/></label>;
  }
  if(parameter.location==='path'||choices.length)return <ChoiceInput label={label} value={value} onChange={onChange} options={choices} required={parameter.required} inputMode={schema.type==='integer'?'numeric':'text'}/>;
- return <label>{label}<input className="nu-input" type={['integer','number'].includes(schema.type)?'number':'text'} step={schema.type==='integer'?1:'any'} min={schema.minimum} max={schema.maximum} required={parameter.required} maxLength={1024} value={value} onChange={e=>onChange(e.target.value)}/></label>;
+ if(['integer','number'].includes(schema.type))return <SelectEntry label={label} kind={schema.type==='integer'?'count':'decimal'} className="nu-input" type="number" step={schema.type==='integer'?1:'any'} min={schema.minimum} max={schema.maximum} required={parameter.required} value={value} onChange={e=>onChange(e.target.value)}/>;
+ return <label>{label}<input className="nu-input" type="text" step={schema.type==='integer'?1:'any'} min={schema.minimum} max={schema.maximum} required={parameter.required} maxLength={1024} value={value} onChange={e=>onChange(e.target.value)}/></label>;
 }

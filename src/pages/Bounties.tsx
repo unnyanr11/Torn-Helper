@@ -1,3 +1,5 @@
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -101,19 +103,19 @@ export default function Bounties() {
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Add bounty</h3>
-        <input
+        <DataEntry source="player" onNameChange={setTargetName} type="number" min="1" step="1"
           className="nu-input"
           placeholder="Target Torn ID"
           value={targetId}
           onChange={(e) => setTargetId(e.target.value)}
         />
-        <input
+        <DataEntry source="playerName"
           className="nu-input"
           placeholder="Target name (optional)"
           value={targetName}
           onChange={(e) => setTargetName(e.target.value)}
         />
-        <input
+        <SelectEntry kind="money"
           className="nu-input"
           placeholder="Amount ($)"
           type="number"

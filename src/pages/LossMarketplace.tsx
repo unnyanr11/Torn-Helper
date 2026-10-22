@@ -1,3 +1,5 @@
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { functionError } from "../lib/function-error";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
@@ -190,7 +192,7 @@ export default function LossMarketplace() {
           <h3>Create direct-payment contract</h3>
           <label>
             Target Torn ID
-            <input
+            <DataEntry source="player" label="Target Torn ID" type="number" min="1" step="1"
               className="nu-input"
               value={target}
               onChange={(e) => setTarget(e.target.value)}
@@ -198,7 +200,7 @@ export default function LossMarketplace() {
           </label>
           <label>
             Torn dollars per loss
-            <input
+            <SelectEntry kind="money" label="Price per loss (Torn dollars)"
               className="nu-input"
               type="number"
               min="1"
@@ -208,7 +210,7 @@ export default function LossMarketplace() {
           </label>
           <label>
             Loss quantity
-            <input
+            <SelectEntry kind="count" label="Quantity"
               className="nu-input"
               type="number"
               min="1"
@@ -257,7 +259,7 @@ export default function LossMarketplace() {
                 Eligibility: identity verified; stat suitability unknown.
                 Payment depends on the buyer.
               </p>
-              <input
+              <SelectEntry kind="count"
                 aria-label="Quantity to claim"
                 className="nu-input"
                 type="number"

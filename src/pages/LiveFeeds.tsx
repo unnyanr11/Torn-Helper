@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useRef, useState } from "react";
 import { CAPABILITIES } from "../api/capabilities";
 import type { Capability } from "../api/types";
@@ -177,12 +178,7 @@ export default function LiveFeeds() {
       </label>
       <label>
         Search this category
-        <input
-          className="nu-input"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search section names"
-        />
+        <SelectEntry label="Filter sections" value={search} disabled={busy} onChange={e=>setSearch(e.target.value)} options={CAPABILITIES.filter(c=>c.group===group).map(c=>({value:c.summary,label:c.summary}))} emptyText="All sections in this category"/>
       </label>
       <label>
         Data section

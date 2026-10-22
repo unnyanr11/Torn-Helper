@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -54,11 +55,11 @@ export default function Gym() {
       <article className="card nu-inset">
         <h3>Log session</h3>
         <input className="nu-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-        <input className="nu-input" placeholder="Energy spent" value={energy} onChange={(e) => setEnergy(e.target.value)} />
-        <input className="nu-input" placeholder="Strength gain" value={str} onChange={(e) => setStr(e.target.value)} />
-        <input className="nu-input" placeholder="Defense gain" value={def} onChange={(e) => setDef(e.target.value)} />
-        <input className="nu-input" placeholder="Speed gain" value={spd} onChange={(e) => setSpd(e.target.value)} />
-        <input className="nu-input" placeholder="Dexterity gain" value={dex} onChange={(e) => setDex(e.target.value)} />
+        <SelectEntry kind="energy" type="number" step="any" className="nu-input" placeholder="Energy spent" value={energy} onChange={(e) => setEnergy(e.target.value)} />
+        <SelectEntry kind="decimal" type="number" step="any" className="nu-input" placeholder="Strength gain" value={str} onChange={(e) => setStr(e.target.value)} />
+        <SelectEntry kind="decimal" type="number" step="any" className="nu-input" placeholder="Defense gain" value={def} onChange={(e) => setDef(e.target.value)} />
+        <SelectEntry kind="decimal" type="number" step="any" className="nu-input" placeholder="Speed gain" value={spd} onChange={(e) => setSpd(e.target.value)} />
+        <SelectEntry kind="decimal" type="number" step="any" className="nu-input" placeholder="Dexterity gain" value={dex} onChange={(e) => setDex(e.target.value)} />
         <button className="nu-btn" onClick={addSession}>Log</button>
       </article>
       <article className="card nu-raised">

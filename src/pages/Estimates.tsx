@@ -1,3 +1,4 @@
+import DataEntry from "../components/DataEntry";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -132,7 +133,7 @@ export default function Estimates() {
       </article>
       <article className="card nu-inset">
         <h3>Fetch estimates</h3>
-        <input
+        <DataEntry source="player" type="number" min="1" step="1"
           className="nu-input"
           placeholder="Target ID"
           value={targetId}

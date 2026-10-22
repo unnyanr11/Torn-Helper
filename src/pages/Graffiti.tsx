@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -77,7 +78,7 @@ export default function Graffiti() {
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Alliance ID</h3>
-        <input className="nu-input" placeholder="Alliance ID" value={allianceId} onChange={(e) => setAllianceId(e.target.value)} />
+        <SelectEntry label="Alliance" value={allianceId} onChange={e=>setAllianceId(e.target.value)} options={posts.map(p=>({value:p.alliance_id,label:p.alliance_id}))}/>
       </article>
       <article className="card nu-inset">
         <h3>New post</h3>

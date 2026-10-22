@@ -1,3 +1,5 @@
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -197,26 +199,26 @@ export default function FactionFinance() {
 
       <article className="card nu-inset">
         <h3>Submit money request</h3>
-        <input
+        <DataEntry source="player" onNameChange={setRName} type="number" min="1" step="1"
           className="nu-input"
           placeholder="Requester Torn ID"
           value={rTornId}
           onChange={(e) => setRTornId(e.target.value)}
         />
-        <input
+        <DataEntry source="playerName"
           className="nu-input"
           placeholder="Requester name"
           value={rName}
           onChange={(e) => setRName(e.target.value)}
         />
-        <input
+        <SelectEntry kind="money"
           className="nu-input"
           type="number"
           placeholder="Amount ($)"
           value={rAmount}
           onChange={(e) => setRAmount(e.target.value)}
         />
-        <input
+        <SelectEntry options={["Training supplies","Medical supplies","War expenses","Loan","Other"].map(value=>({value,label:value}))}
           className="nu-input"
           placeholder="Reason"
           value={rReason}
@@ -271,7 +273,7 @@ export default function FactionFinance() {
           <option value="expense">Expense</option>
           <option value="income">Income</option>
         </select>
-        <input
+        <SelectEntry kind="money"
           className="nu-input"
           type="number"
           placeholder="Amount"

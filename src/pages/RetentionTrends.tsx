@@ -1,3 +1,5 @@
+import { recordChoices } from "../lib/entry-options";
+import DataEntry from "../components/DataEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -78,8 +80,8 @@ export default function RetentionTrends() {
 
       <article className="card nu-inset">
         <h3>Log membership event</h3>
-        <input className="nu-input" placeholder="Member Torn ID" value={mTornId} onChange={(e) => setMTornId(e.target.value)} />
-        <input className="nu-input" placeholder="Member name" value={mName} onChange={(e) => setMName(e.target.value)} />
+        <DataEntry options={recordChoices(events,'member_torn_id','member_name',false)} source="player" onNameChange={setMName} type="number" min="1" step="1" className="nu-input" placeholder="Member Torn ID" value={mTornId} onChange={(e) => setMTornId(e.target.value)} />
+        <DataEntry options={recordChoices(events,'member_torn_id','member_name',true)} source="playerName" className="nu-input" placeholder="Member name" value={mName} onChange={(e) => setMName(e.target.value)} />
         <select className="nu-input" value={mType} onChange={(e) => setMType(e.target.value)}>
           <option value="joined">Joined</option>
           <option value="left">Left</option>

@@ -1569,3 +1569,8 @@ details[open] > summary {
 .travel-profit-tool .personal-summary span { font-size:12px; color:var(--muted); }
 .travel-profit-tool details > summary { padding:8px 0; }
 .travel-profit-tool details > label { display:grid; gap:6px; margin-bottom:10px; }
+
+.entry-select { min-width:0; max-width:100%; }
+.entry-select > span { font-size:12px; color:var(--muted); overflow-wrap:anywhere; }
+.entry-select select,.entry-select input { width:100%; min-width:0; max-width:100%; }
+.choice-field small { color:var(--muted); font-size:11px; }

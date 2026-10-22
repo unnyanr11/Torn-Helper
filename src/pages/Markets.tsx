@@ -1,3 +1,6 @@
+import { recordChoices } from "../lib/entry-options";
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -64,19 +67,19 @@ export default function Markets() {
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Add watchlist item</h3>
-        <input
+        <DataEntry options={recordChoices(items,'item_id','item_name',false)} source="item" onNameChange={setItemName} type="number" min="1" step="1"
           className="nu-input"
           placeholder="Torn item ID"
           value={itemId}
           onChange={(e) => setItemId(e.target.value)}
         />
-        <input
+        <DataEntry options={recordChoices(items,'item_id','item_name',true)} source="itemName"
           className="nu-input"
           placeholder="Item name (optional)"
           value={itemName}
           onChange={(e) => setItemName(e.target.value)}
         />
-        <input
+        <SelectEntry kind="money" type="number" step="any"
           className="nu-input"
           placeholder="Alert threshold price (optional)"
           value={threshold}

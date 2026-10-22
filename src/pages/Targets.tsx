@@ -1,3 +1,6 @@
+import { recordChoices } from "../lib/entry-options";
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
 import LevellingCatalogue from "../components/LevellingCatalogue";
 import SavedPresets from "../components/SavedPresets";
@@ -235,7 +238,7 @@ export default function Targets() {
       {refreshResult && <p className="badge ok">{refreshResult}</p>}
       <article className="card nu-inset">
         <h3>Custom lists</h3>
-        <input
+        <SelectEntry options={["Levelling targets","Chain targets","War targets"].map(value=>({value,label:value}))}
           className="nu-input"
           placeholder="New list name"
           value={listName}
@@ -348,13 +351,7 @@ export default function Targets() {
         </label>
         <label>
           Search
-          <input
-            className="nu-input"
-            value={layout.filter}
-            onChange={(e) =>
-              setLayout((v) => ({ ...v, filter: e.target.value }))
-            }
-          />
+          <SelectEntry label="Filter target list" value={layout.filter} onChange={e=>setLayout(v=>({...v,filter:e.target.value}))} options={entries.map(e=>({value:e.player_name??String(e.torn_player_id),label:`${e.player_name??e.torn_player_id}`}))} emptyText="All targets"/>
         </label>
         <label>
           <input
@@ -390,7 +387,7 @@ export default function Targets() {
             </button>
             <label>
               Width (80–600 px)
-              <input
+              <SelectEntry kind="width" label="Column width (px)"
                 className="nu-input"
                 type="number"
                 min="80"
@@ -423,19 +420,19 @@ export default function Targets() {
           <h3>
             {activeList.name} <span className="badge">{activeList.mode}</span>
           </h3>
-          <input
+          <DataEntry options={recordChoices(entries,'torn_player_id','player_name',false)} source="player" onNameChange={setPlayerName} type="number" min="1" step="1"
             className="nu-input"
             placeholder="Torn player ID"
             value={playerId}
             onChange={(e) => setPlayerId(e.target.value)}
           />
-          <input
+          <DataEntry options={recordChoices(entries,'torn_player_id','player_name',true)} source="playerName"
             className="nu-input"
             placeholder="Player name (optional)"
             value={playerName}
             onChange={(e) => setPlayerName(e.target.value)}
           />
-          <input
+          <SelectEntry kind="level" type="number" step="any"
             className="nu-input"
             placeholder="Level (optional)"
             value={level}

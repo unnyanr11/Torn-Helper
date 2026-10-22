@@ -1,3 +1,5 @@
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -227,26 +229,26 @@ export default function ReviveMarketplace() {
 
       <article className="card nu-inset">
         <h3>Create revive request</h3>
-        <input
+        <DataEntry source="player" onNameChange={setTName} type="number" min="1" step="1"
           className="nu-input"
           placeholder="Target Torn ID"
           value={tTornId}
           onChange={(e) => setTTornId(e.target.value)}
         />
-        <input
+        <DataEntry source="playerName"
           className="nu-input"
           placeholder="Target name (optional)"
           value={tName}
           onChange={(e) => setTName(e.target.value)}
         />
-        <input
+        <SelectEntry kind="count"
           className="nu-input"
           type="number"
           placeholder="Quantity"
           value={qty}
           onChange={(e) => setQty(e.target.value)}
         />
-        <input
+        <SelectEntry kind="money"
           className="nu-input"
           type="number"
           placeholder="Price per revive ($)"

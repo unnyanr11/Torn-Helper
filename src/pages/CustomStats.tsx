@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import ChoiceInput from "../components/ChoiceInput";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
@@ -58,7 +59,7 @@ export default function CustomStats() {
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>New column</h3>
-        <input className="nu-input" placeholder="Column name" value={name} onChange={(e) => setName(e.target.value)} />
+        <SelectEntry options={["Daily networth","Chain hits","Battle stats","Energy spent"].map(value=>({value,label:value}))} className="nu-input" placeholder="Column name" value={name} onChange={(e) => setName(e.target.value)} />
         <ChoiceInput label="Unit (optional)" value={unit} onChange={setUnit} options={["$","hits","points","count","%","seconds","minutes","days","stats"].map(value=>({value,label:value}))}/>
         <select className="nu-input" value={type} onChange={(e) => setType(e.target.value)}>
           <option value="number">Number</option>
@@ -72,7 +73,7 @@ export default function CustomStats() {
           <option value="">Select column…</option>
           {columns.map((c) => <option key={c.id} value={c.id}>{c.name}{c.unit ? ` (${c.unit})` : ''}</option>)}
         </select>
-        <input className="nu-input" placeholder="Value" value={value} onChange={(e) => setValue(e.target.value)} />
+        <SelectEntry key={selectedCol} kind={columns.find(c=>c.id===selectedCol)?.type==='number'?'decimal':undefined} type={columns.find(c=>c.id===selectedCol)?.type==='number'?'number':'text'} step="any" className="nu-input" placeholder="Value" value={value} onChange={(e) => setValue(e.target.value)} options={entries.filter(e=>e.column_id===selectedCol).map(e=>({value:e.value,label:e.value}))}/>
         <button className="nu-btn" onClick={addEntry}>Log</button>
       </article>
       <div className="grid">

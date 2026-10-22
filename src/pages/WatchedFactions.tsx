@@ -1,3 +1,6 @@
+import { recordChoices } from "../lib/entry-options";
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -50,10 +53,10 @@ export default function WatchedFactions() {
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Watch a faction</h3>
-        <input className="nu-input" placeholder="Faction ID" value={factionId} onChange={(e) => setFactionId(e.target.value)} />
-        <input className="nu-input" placeholder="Faction name" value={factionName} onChange={(e) => setFactionName(e.target.value)} />
-        <input className="nu-input" placeholder="Priority (1-30)" value={priority} onChange={(e) => setPriority(e.target.value)} />
-        <input className="nu-input" placeholder="Refresh interval (minutes)" value={interval} onChange={(e) => setInterval(e.target.value)} />
+        <DataEntry options={recordChoices(items,'faction_id','faction_name',false)} source="faction" onNameChange={setFactionName} type="number" min="1" step="1" className="nu-input" placeholder="Faction ID" value={factionId} onChange={(e) => setFactionId(e.target.value)} />
+        <DataEntry options={recordChoices(items,'faction_id','faction_name',true)} source="factionName" className="nu-input" placeholder="Faction name" value={factionName} onChange={(e) => setFactionName(e.target.value)} />
+        <SelectEntry options={Array.from({length:30},(_,i)=>({value:String(i+1),label:String(i+1)}))} allowCustom={false} className="nu-input" placeholder="Priority (1-30)" value={priority} onChange={(e) => setPriority(e.target.value)} />
+        <SelectEntry kind="minutes" type="number" step="any" className="nu-input" placeholder="Refresh interval (minutes)" value={interval} onChange={(e) => setInterval(e.target.value)} />
         <button className="nu-btn" onClick={addWatch}>Watch</button>
       </article>
       <article className="card nu-raised">

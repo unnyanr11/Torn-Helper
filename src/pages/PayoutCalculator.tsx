@@ -1,3 +1,5 @@
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { toCsv, downloadBlob } from "../lib/export";
@@ -226,7 +228,7 @@ export default function PayoutCalculator() {
             </option>
           ))}
         </select>
-        <input
+        <SelectEntry kind="money"
           className="nu-input"
           placeholder="Total pool (cents)"
           type="number"
@@ -241,7 +243,7 @@ export default function PayoutCalculator() {
         )}
         {members.map((m, i) => (
           <div key={m.id} style={{ display: "flex", gap: 6, marginTop: 6 }}>
-            <input
+            <DataEntry source="playerName"
               className="nu-input"
               aria-label="Member name"
               placeholder="Member name"
@@ -255,7 +257,7 @@ export default function PayoutCalculator() {
               }
               style={{ flex: 1 }}
             />
-            <input
+            <SelectEntry kind="count"
               className="nu-input"
               type="number"
               value={m.points}
@@ -271,7 +273,7 @@ export default function PayoutCalculator() {
               placeholder="Points"
               style={{ width: 80 }}
             />
-            <input
+            <SelectEntry kind="weight"
               aria-label="Weight"
               className="nu-input"
               type="number"
@@ -286,7 +288,7 @@ export default function PayoutCalculator() {
               }
               style={{ width: 70 }}
             />
-            <input
+            <SelectEntry kind="signedMoney"
               className="nu-input"
               type="number"
               value={m.bonus}

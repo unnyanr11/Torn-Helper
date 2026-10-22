@@ -1,3 +1,5 @@
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -94,10 +96,10 @@ export default function Losses() {
       {tab === 'buy' && (
         <article className="card nu-inset">
           <h3>Create buy-losses contract</h3>
-          <input className="nu-input" placeholder="Target Torn player ID" value={targetId} onChange={(e) => setTargetId(e.target.value)} />
-          <input className="nu-input" placeholder="Target name (optional)" value={targetName} onChange={(e) => setTargetName(e.target.value)} />
-          <input className="nu-input" placeholder="Quantity of losses" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
-          <input className="nu-input" placeholder="Price per loss (Torn cash)" value={price} onChange={(e) => setPrice(e.target.value)} />
+          <DataEntry source="player" onNameChange={setTargetName} type="number" min="1" step="1" className="nu-input" placeholder="Target Torn player ID" value={targetId} onChange={(e) => setTargetId(e.target.value)} />
+          <DataEntry source="playerName" className="nu-input" placeholder="Target name (optional)" value={targetName} onChange={(e) => setTargetName(e.target.value)} />
+          <SelectEntry kind="count" type="number" step="any" className="nu-input" placeholder="Quantity of losses" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+          <SelectEntry kind="money" type="number" step="any" className="nu-input" placeholder="Price per loss (Torn cash)" value={price} onChange={(e) => setPrice(e.target.value)} />
           <button className="nu-btn" onClick={createContract}>Create contract</button>
         </article>
       )}

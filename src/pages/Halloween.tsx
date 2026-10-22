@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -64,8 +65,8 @@ export default function Halloween() {
           <option value="flower">Flower</option>
           <option value="other">Other</option>
         </select>
-        <input className="nu-input" type="number" min="0" placeholder="Count" value={count} onChange={(e) => setCount(e.target.value)} />
-        <input className="nu-input" placeholder="Source (e.g. trick-or-treat, NPC)" value={source} onChange={(e) => setSource(e.target.value)} />
+        <SelectEntry kind="count" className="nu-input" type="number" min="0" placeholder="Count" value={count} onChange={(e) => setCount(e.target.value)} />
+        <SelectEntry options={["Trick-or-treat","NPC","Basket exchange","Other"].map(value=>({value,label:value}))} className="nu-input" placeholder="Source (e.g. trick-or-treat, NPC)" value={source} onChange={(e) => setSource(e.target.value)} />
         <button className="nu-btn" onClick={addLog}>Add haul</button>
       </article>
 

@@ -1,3 +1,6 @@
+import { recordChoices } from "../lib/entry-options";
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -144,19 +147,19 @@ export default function ChainQueue() {
 
       <article className="card nu-inset">
         <h3>Add target</h3>
-        <input
+        <DataEntry options={recordChoices(queue,'torn_player_id','player_name',false)} source="player" onNameChange={setPName} type="number" min="1" step="1"
           className="nu-input"
           placeholder="Torn player ID"
           value={tornId}
           onChange={(e) => setTornId(e.target.value)}
         />
-        <input
+        <DataEntry options={recordChoices(queue,'torn_player_id','player_name',true)} source="playerName"
           className="nu-input"
           placeholder="Player name (optional)"
           value={pName}
           onChange={(e) => setPName(e.target.value)}
         />
-        <input
+        <SelectEntry kind="level"
           className="nu-input"
           type="number"
           placeholder="Level (optional)"

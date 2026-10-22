@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -56,15 +57,15 @@ export default function AllianceSharing() {
 
       <article className="card nu-inset">
         <h3>Create sharing grant</h3>
-        <input className="nu-input" placeholder="Alliance / sister-faction name" value={alliance} onChange={(e) => setAlliance(e.target.value)} />
-        <select className="nu-input" value={resType} onChange={(e) => setResType(e.target.value)}>
+        <SelectEntry label="Alliance / sister-faction name" value={alliance} onChange={e=>setAlliance(e.target.value)} options={grants.map(g=>({value:g.alliance_name,label:g.alliance_name}))}/>
+        <select className="nu-input" value={resType} onChange={(e) => {setResType(e.target.value);setResId('');}}>
           <option value="target_list">Target list</option>
           <option value="spy_report">Spy report</option>
           <option value="war_report">War report</option>
           <option value="ledger">Ledger</option>
           <option value="custom">Custom</option>
         </select>
-        <input className="nu-input" placeholder="Resource ID (optional)" value={resId} onChange={(e) => setResId(e.target.value)} />
+        <SelectEntry label="Resource (optional)" value={resId} onChange={e=>setResId(e.target.value)} options={grants.filter(g=>g.resource_type===resType&&g.resource_id).map(g=>({value:g.resource_id,label:g.resource_id}))} emptyText="All resources of this type"/>
         <select className="nu-input" value={role} onChange={(e) => setRole(e.target.value)}>
           <option value="member">Member</option>
           <option value="officer">Officer</option>

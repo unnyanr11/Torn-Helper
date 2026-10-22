@@ -1,3 +1,4 @@
+import DataEntry from "../components/DataEntry";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
@@ -214,7 +215,7 @@ export default function Leaderboards() {
       {metric === "racing" && (
         <label>
           Exact track (blank for separate rankings for every track)
-          <input
+          <DataEntry source="track" label="Track (optional)"
             className="nu-input"
             value={track}
             onChange={(e) => patch("track", e.target.value)}

@@ -1,3 +1,5 @@
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -162,7 +164,7 @@ export default function OcPlanner() {
 
       <article className="card nu-inset">
         <h3>New OC plan</h3>
-        <input
+        <DataEntry source="oc"
           className="nu-input"
           placeholder="OC name (e.g. 'Bank Heist')"
           value={pName}
@@ -176,7 +178,7 @@ export default function OcPlanner() {
           <option value="standard">Standard</option>
           <option value="event">Event</option>
         </select>
-        <input
+        <SelectEntry kind="count"
           className="nu-input"
           type="number"
           min="1"
@@ -240,7 +242,7 @@ export default function OcPlanner() {
                       </span>
                       {s.status === "open" && (
                         <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
-                          <input
+                          <DataEntry source="playerName"
                             className="nu-input"
                             placeholder="Member name"
                             value={sMember}

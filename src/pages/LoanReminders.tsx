@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -45,7 +46,7 @@ export default function LoanReminders() {
 
       <article className="card nu-inset">
         <h3>Reminder threshold</h3>
-        <input className="nu-input" type="number" min="0" placeholder="Days before due date" value={dueSoonDays} onChange={(e) => setDueSoonDays(e.target.value)} />
+        <SelectEntry kind="days" className="nu-input" type="number" min="0" placeholder="Days before due date" value={dueSoonDays} onChange={(e) => setDueSoonDays(e.target.value)} />
         <button className="nu-btn" onClick={saveThreshold}>Save threshold</button>
         <p className="muted" style={{ marginTop: 6 }}>Reminders fire when a loan's due date is within this many days (or already past).</p>
       </article>

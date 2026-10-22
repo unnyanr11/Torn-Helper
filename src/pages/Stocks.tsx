@@ -1,3 +1,5 @@
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -70,19 +72,19 @@ export default function Stocks() {
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Add / update holding</h3>
-        <input
+        <DataEntry source="stock"
           className="nu-input"
           placeholder="Stock ID (e.g. TCP)"
           value={stockId}
           onChange={(e) => setStockId(e.target.value)}
         />
-        <input
+        <SelectEntry kind="count" type="number" step="any"
           className="nu-input"
           placeholder="Shares"
           value={shares}
           onChange={(e) => setShares(e.target.value)}
         />
-        <input
+        <SelectEntry kind="money" type="number" step="any"
           className="nu-input"
           placeholder="Average cost (optional)"
           value={avgCost}

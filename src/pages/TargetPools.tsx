@@ -1,9 +1,15 @@
+import SelectEntry from "../components/SelectEntry";
+import MultiChoiceEntry from '../components/MultiChoiceEntry';
+import { useTornChoices } from '../hooks/useTornChoices';
+import { observedChoices,mergeChoices } from '../lib/entry-options';
+import { STARTER_TARGETS } from '../data/levelling-targets';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 interface Pool { id: string; name: string; description: string; target_torn_ids: number[] }
 
 export default function TargetPools() {
+  const choices=useTornChoices();
   const [pools, setPools] = useState<Pool[]>([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -41,9 +47,9 @@ export default function TargetPools() {
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>New pool</h3>
-        <input className="nu-input" placeholder="Pool name" value={name} onChange={(e) => setName(e.target.value)} />
+        <SelectEntry options={["Levelling targets", "Chain targets", "War targets", "Revive targets"].map(value=>({value,label:value}))} className="nu-input" placeholder="Pool name" value={name} onChange={(e) => setName(e.target.value)} />
         <input className="nu-input" placeholder="Description (optional)" value={description} onChange={(e) => setDescription(e.target.value)} />
-        <input className="nu-input" placeholder="Target IDs (comma separated)" value={ids} onChange={(e) => setIds(e.target.value)} />
+        <MultiChoiceEntry label="Targets" value={ids} onChange={setIds} options={mergeChoices(observedChoices(choices.data??[],'player'),STARTER_TARGETS.map(t=>({value:String(t.id),label:`${t.name} [${t.id}] · community catalogue`})))} />
         <button className="nu-btn" onClick={add}>Create pool</button>
       </article>
       <div className="grid">

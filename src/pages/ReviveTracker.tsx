@@ -1,3 +1,5 @@
+import { recordChoices } from "../lib/entry-options";
+import DataEntry from "../components/DataEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -55,10 +57,10 @@ export default function ReviveTracker() {
 
       <article className="card nu-inset">
         <h3>Log a revive</h3>
-        <input className="nu-input" placeholder="Reviver Torn ID" value={rTornId} onChange={(e) => setRTornId(e.target.value)} />
-        <input className="nu-input" placeholder="Reviver name" value={rName} onChange={(e) => setRName(e.target.value)} />
-        <input className="nu-input" placeholder="Target Torn ID" value={tTornId} onChange={(e) => setTTornId(e.target.value)} />
-        <input className="nu-input" placeholder="Target name (optional)" value={tName} onChange={(e) => setTName(e.target.value)} />
+        <DataEntry options={recordChoices(logs,'reviver_torn_id','reviver_name',false)} source="player" onNameChange={setRName} type="number" min="1" step="1" className="nu-input" placeholder="Reviver Torn ID" value={rTornId} onChange={(e) => setRTornId(e.target.value)} />
+        <DataEntry options={recordChoices(logs,'reviver_torn_id','reviver_name',true)} source="playerName" className="nu-input" placeholder="Reviver name" value={rName} onChange={(e) => setRName(e.target.value)} />
+        <DataEntry source="player" onNameChange={setTName} type="number" min="1" step="1" className="nu-input" placeholder="Target Torn ID" value={tTornId} onChange={(e) => setTTornId(e.target.value)} />
+        <DataEntry source="playerName" className="nu-input" placeholder="Target name (optional)" value={tName} onChange={(e) => setTName(e.target.value)} />
         <select className="nu-input" value={rType} onChange={(e) => setRType(e.target.value)}>
           <option value="normal">Normal</option>
           <option value="medical">Medical</option>

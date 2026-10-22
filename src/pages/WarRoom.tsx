@@ -1,3 +1,4 @@
+import DataEntry from "../components/DataEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -59,7 +60,7 @@ export default function WarRoom() {
       <article className="card nu-inset">
         <h3>Create war</h3>
         <input className="nu-input" placeholder="War name" value={warName} onChange={(e) => setWarName(e.target.value)} />
-        <input className="nu-input" placeholder="Enemy faction (optional)" value={enemyName} onChange={(e) => setEnemyName(e.target.value)} />
+        <DataEntry source="factionName" className="nu-input" placeholder="Enemy faction (optional)" value={enemyName} onChange={(e) => setEnemyName(e.target.value)} />
         <button className="nu-btn" onClick={createWar}>Create</button>
         <div className="meta">
           {wars.map((w) => (
@@ -71,7 +72,7 @@ export default function WarRoom() {
         <article className="card nu-raised">
           <h3>{activeWar.name} <span className="badge">{activeWar.status}</span></h3>
           <p className="muted">Enemy: {activeWar.enemy_faction_name ?? '—'}</p>
-          <input className="nu-input" placeholder="Torn target ID to claim" value={targetId} onChange={(e) => setTargetId(e.target.value)} />
+          <DataEntry source="player" type="number" min="1" step="1" className="nu-input" placeholder="Torn target ID to claim" value={targetId} onChange={(e) => setTargetId(e.target.value)} />
           <button className="nu-btn" onClick={claimTarget}>Claim target (15 min)</button>
           <p className="muted">Claims coordinate app users only — they do not reserve targets in Torn.</p>
           <table>

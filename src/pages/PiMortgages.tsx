@@ -1,3 +1,5 @@
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
@@ -140,7 +142,7 @@ export default function PiMortgages() {
         <h3>Application and repayment preview</h3>
         <label>
           Borrower name
-          <input
+          <DataEntry source="playerName" label="Borrower"
             className="nu-input"
             value={borrower}
             maxLength={80}
@@ -149,7 +151,7 @@ export default function PiMortgages() {
         </label>
         <label>
           Borrower Torn ID (optional)
-          <input
+          <DataEntry source="player" label="Borrower Torn ID" onNameChange={setBorrower}
             className="nu-input"
             type="number"
             min="1"
@@ -159,7 +161,7 @@ export default function PiMortgages() {
         </label>
         <label>
           Principal ($)
-          <input
+          <SelectEntry kind="money" label="Principal ($)"
             className="nu-input"
             type="number"
             min="1"
@@ -171,7 +173,7 @@ export default function PiMortgages() {
         </label>
         <label>
           Annual rate (%)
-          <input
+          <SelectEntry kind="percent" label="Annual interest rate (%)"
             className="nu-input"
             type="number"
             min="0"
@@ -183,7 +185,7 @@ export default function PiMortgages() {
         </label>
         <label>
           Term (months)
-          <input
+          <SelectEntry kind="months" label="Term (months)"
             className="nu-input"
             type="number"
             min="1"
@@ -357,7 +359,7 @@ export default function PiMortgages() {
                 <legend>Record a payment manually</legend>
                 <label>
                   Amount ($)
-                  <input
+                  <SelectEntry kind="money" label="Payment amount ($)"
                     className="nu-input"
                     type="number"
                     min="1"

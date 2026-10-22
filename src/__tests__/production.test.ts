@@ -87,8 +87,11 @@ describe("production screens start without generated account or financial data",
       expect(html).not.toContain('type="email"');
       expect(html).not.toContain("App password");
       expect(html).not.toMatch(
-        /Member [ABC]|value="(?:1000000|1100000|5|12)"|DEMO_WIDGETS|DEMO PREVIEW/,
+        /Member [ABC]|DEMO_WIDGETS|DEMO PREVIEW/,
       );
+      // Unselected numeric presets are choices, not seeded balances or contributions.
+      expect(html).not.toMatch(/<option[^>]*value="(?:1000000|1100000|5|12)"[^>]*selected/);
+      expect(html).not.toMatch(/<input[^>]*value="(?:1000000|1100000|5|12)"/);
     }
     client.clear();
   });

@@ -1,6 +1,6 @@
 import ChoiceInput from "../components/ChoiceInput";
 import { useTornChoices } from "../hooks/useTornChoices";
-import { catalogueChoices } from "../lib/torn-choices";
+import { observedChoices } from "../lib/entry-options";
 import { useEffect, useRef, useState } from "react";
 import SavedPresets from "../components/SavedPresets";
 import KeyDisclosure from "../components/KeyDisclosure";
@@ -246,7 +246,7 @@ export default function ComparePlayers() {
           );
         }}
       >
-        {[0,1,2,3,4].map(index=><ChoiceInput key={index} label={`Player ${index+1}${index>1?' (optional)':''}`} value={input.split(',')[index]?.trim()??''} onChange={value=>{reset();const ids=input.split(',');while(ids.length<5)ids.push('');ids[index]=value;setInput(ids.join(','));}} options={catalogueChoices(savedChoices.data??[],"/faction/members","members")} inputMode="numeric" required={index<2} disabled={busy}/>)}
+        {[0,1,2,3,4].map(index=><ChoiceInput key={index} label={`Player ${index+1}${index>1?' (optional)':''}`} value={input.split(',')[index]?.trim()??''} onChange={value=>{reset();const ids=input.split(',');while(ids.length<5)ids.push('');ids[index]=value;setInput(ids.join(','));}} options={observedChoices(savedChoices.data??[],"player")} inputMode="numeric" required={index<2} disabled={busy}/>)}
         <label>
           Comparison window
           <select

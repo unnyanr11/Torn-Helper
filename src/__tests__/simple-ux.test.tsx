@@ -24,11 +24,11 @@ describe('dropdown-first standalone UX',()=>{
   const array=renderToStaticMarkup(<ApiParameterField parameter={parameter({type:'array',items:{enum:['alpha','beta']}})} value="alpha" onChange={()=>{}} choices={[]}/>);
   expect(array).toContain('multiple');expect(array).toContain('value="alpha" selected');
  });
- it('offers bounded page sizes and date pickers, keeping arbitrary amounts numeric',()=>{
+ it('offers bounded page sizes and date pickers, offering numeric presets with custom entry',()=>{
   const field=(name:string,schema:any)=>renderToStaticMarkup(<ApiParameterField parameter={{name,location:'query',required:false,description:'',schema}} value="" onChange={()=>{}} choices={[]}/>);
   expect(field('limit',{type:'integer',maximum:50})).toContain('50 records');expect(field('limit',{type:'integer',maximum:50})).not.toContain('100 records');
   expect(field('from',{type:'integer'})).toContain('type="datetime-local"');
-  expect(field('offset',{type:'integer',minimum:0})).toContain('type="number"');
+  expect(field('offset',{type:'integer',minimum:0})).toContain('<select');expect(field('offset',{type:'integer',minimum:0})).toContain('Enter a custom value');
  });
  it('blocks optional external integrations and competitor pages even by direct navigation',()=>{
   for(const page of ['Discord','TornStats','Competitor Matrix','AI Settings','AI War Analyzer','Assistant'])expect(canAccessPage(page,true,'admin')).toBe(false);

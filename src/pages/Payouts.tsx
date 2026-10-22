@@ -1,3 +1,5 @@
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -100,14 +102,14 @@ export default function Payouts() {
           <option value="proportional">Proportional to hits</option>
           <option value="equal_per_hit">Equal per hit</option>
         </select>
-        <input className="nu-input" placeholder="Distributable pool (Torn cash)" value={pool} onChange={(e) => setPool(e.target.value)} />
+        <SelectEntry kind="money" type="number" step="any" className="nu-input" placeholder="Distributable pool (Torn cash)" value={pool} onChange={(e) => setPool(e.target.value)} />
         <button className="nu-btn" onClick={addMember}>Add member</button>
         <button className="nu-btn" onClick={calculate}>Calculate preview</button>
         <button className="nu-btn" onClick={saveRun} disabled={preview.length === 0}>Save draft run</button>
         {members.map((m, i) => (
           <div key={i} style={{ display: 'flex', gap: 8 }}>
-            <input className="nu-input" placeholder="Member name" value={m.member_name} onChange={(e) => updateMember(i, 'member_name', e.target.value)} />
-            <input className="nu-input" placeholder="Hits" value={m.hits} onChange={(e) => updateMember(i, 'hits', e.target.value)} />
+            <DataEntry source="playerName" className="nu-input" placeholder="Member name" value={m.member_name} onChange={(e) => updateMember(i, 'member_name', e.target.value)} />
+            <SelectEntry kind="count" type="number" step="any" className="nu-input" placeholder="Hits" value={m.hits} onChange={(e) => updateMember(i, 'hits', e.target.value)} />
           </div>
         ))}
       </article>

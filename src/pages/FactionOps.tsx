@@ -1,3 +1,6 @@
+import { recordChoices } from "../lib/entry-options";
+import DataEntry from "../components/DataEntry";
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -229,25 +232,25 @@ export default function FactionOps() {
 
       <article className="card nu-inset">
         <h3>Roster ({members.length})</h3>
-        <input
+        <DataEntry options={recordChoices(members,'torn_id','name',false)} source="player" onNameChange={setMName} type="number" min="1" step="1"
           className="nu-input"
           placeholder="Torn ID"
           value={mTornId}
           onChange={(e) => setMTornId(e.target.value)}
         />
-        <input
+        <DataEntry options={recordChoices(members,'torn_id','name',true)} source="playerName"
           className="nu-input"
           placeholder="Name"
           value={mName}
           onChange={(e) => setMName(e.target.value)}
         />
-        <input
+        <SelectEntry options={["Member","Officer","Leader","Co-leader","Recruit"].map(value=>({value,label:value}))}
           className="nu-input"
           placeholder="Role"
           value={mRole}
           onChange={(e) => setMRole(e.target.value)}
         />
-        <input
+        <SelectEntry kind="level"
           className="nu-input"
           type="number"
           placeholder="Level"
@@ -288,21 +291,21 @@ export default function FactionOps() {
             {chain.chain_timeout_seconds}s
           </p>
         )}
-        <input
+        <SelectEntry kind="count"
           className="nu-input"
           type="number"
           placeholder="Current chain"
           value={chainCur}
           onChange={(e) => setChainCur(e.target.value)}
         />
-        <input
+        <SelectEntry kind="count"
           className="nu-input"
           type="number"
           placeholder="Best chain"
           value={chainBest}
           onChange={(e) => setChainBest(e.target.value)}
         />
-        <input
+        <SelectEntry kind="seconds"
           className="nu-input"
           type="number"
           placeholder="Timeout (seconds)"
@@ -316,20 +319,20 @@ export default function FactionOps() {
 
       <article className="card nu-inset">
         <h3>Armory (total value: {totalArmoryValue.toLocaleString()})</h3>
-        <input
+        <DataEntry source="itemName"
           className="nu-input"
           placeholder="Item name"
           value={aItem}
           onChange={(e) => setAItem(e.target.value)}
         />
-        <input
+        <SelectEntry kind="count"
           className="nu-input"
           type="number"
           placeholder="Quantity"
           value={aQty}
           onChange={(e) => setAQty(e.target.value)}
         />
-        <input
+        <SelectEntry kind="money"
           className="nu-input"
           type="number"
           placeholder="Total value ($)"
@@ -366,7 +369,7 @@ export default function FactionOps() {
         <h3>
           Territory ({controlledCount}/{territories.length} controlled)
         </h3>
-        <input
+        <DataEntry source="territory"
           className="nu-input"
           placeholder="Territory name"
           value={tName}

@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import ChoiceInput from "../components/ChoiceInput";
 import { useTornChoices } from "../hooks/useTornChoices";
 import { catalogueChoices } from "../lib/torn-choices";
@@ -54,7 +55,7 @@ export default function Racing() {
         <ChoiceInput label="Track" value={track} onChange={setTrack} options={catalogueChoices(choices.data??[],"/racing/tracks","tracks",true)} required/>
         <ChoiceInput label="Car (optional)" value={car} onChange={setCar} options={catalogueChoices(choices.data??[],"/racing/cars","cars",true)}/>
         <ChoiceInput label="Finishing position" value={position} onChange={setPosition} options={Array.from({length:100},(_,i)=>({value:String(i+1),label:String(i+1)}))} allowCustom={false}/>
-        <input className="nu-input" placeholder="Time (ms)" value={timeMs} onChange={(e) => setTimeMs(e.target.value)} />
+        <SelectEntry label="Time (ms)" className="nu-input" type="number" min="1" step="1" value={timeMs} onChange={e=>setTimeMs(e.target.value)} options={records.filter(r=>r.track_name===track&&r.time_ms!==null).map(r=>({value:String(r.time_ms),label:`Previous: ${r.time_ms} ms`}))}/>
         <button className="nu-btn" onClick={addRecord}>Log race</button>
       </article>
       <article className="card nu-raised">

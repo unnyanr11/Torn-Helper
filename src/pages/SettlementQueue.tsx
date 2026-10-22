@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -193,13 +194,8 @@ export default function SettlementQueue() {
 
       <article className="card nu-inset">
         <h3>Raise a dispute</h3>
-        <input
-          className="nu-input"
-          placeholder="Claim ID"
-          value={disputeClaimId}
-          onChange={(e) => setDisputeClaimId(e.target.value)}
-        />
-        <input
+        <SelectEntry label="Claim" value={disputeClaimId} onChange={e=>setDisputeClaimId(e.target.value)} options={settlements.map(s=>({value:s.claim_id,label:`${s.claim_id} · ${s.status} · $${s.amount_owed.toLocaleString()}`}))}/>
+        <SelectEntry options={["Payment not received","Incorrect payment amount","Contract terms not met","Other"].map(value=>({value,label:value}))}
           className="nu-input"
           placeholder="Reason"
           value={disputeReason}

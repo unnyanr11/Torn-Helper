@@ -296,3 +296,27 @@ only the target ID, uses noopener/noreferrer, and is available without an API ke
 No attack is initiated by this app. Other target-list websites remain unlinked.
 Validation: existing render coverage checks all 32 attack links; 157 tests and
 production build pass.
+
+
+## Dropdowns throughout the application — 2026-10-22
+
+Audited all 88 TSX pages/shared components. Replaced 137 page input controls with
+dropdowns or the multi-target picker, plus shared travel/API numeric controls.
+The full file-by-file inventory is in DROPDOWN_AUDIT.md. Player, faction, item,
+stock, company, upgrade, territory and crime choices use collected official data
+and existing page records; empty/error states retain custom entry. Choosing a
+known ID fills the matching name where applicable. Item selection supports
+category filtering; target pools support several selected IDs with removal.
+
+Numeric amounts, counts, levels, terms, percentages and timers offer presets with
+an exact-value fallback retaining input limits and step. Presets are user choices,
+never seeded account records; no value is selected automatically. Existing saved
+custom values remain selectable. Catalogue searches, claims, sharing resources,
+travel overrides and common goal/list templates also use dropdowns. Free-form
+content, passwords, calendar/file pickers, transaction references and boolean
+controls retain suitable inputs. Custom stat text values remain supported.
+
+No schema changes, new write paths or third-party integrations were introduced.
+The private shared cache query retains its existing user filter and session cache
+clearing. Validation: 163 tests and production build pass. Browser and legitimate
+Torn-key acceptance checks were not performed.

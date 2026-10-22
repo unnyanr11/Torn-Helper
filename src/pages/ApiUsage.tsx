@@ -1,3 +1,4 @@
+import SelectEntry from "../components/SelectEntry";
 import { useState } from "react";
 import { CAPABILITIES } from "../api/capabilities";
 
@@ -13,11 +14,7 @@ export default function ApiUsage() {
       </p>
       <label>
         Search endpoints
-        <input
-          className="nu-input"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        />
+        <SelectEntry label="Endpoint" value={filter} onChange={e=>setFilter(e.target.value)} options={CAPABILITIES.map(c=>({value:c.path,label:`${c.group} · ${c.path}`}))} emptyText="All endpoints"/>
       </label>
       <p>
         {CAPABILITIES.length} official read endpoints; browsing does not poll
