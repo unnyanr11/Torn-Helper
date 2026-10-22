@@ -35,7 +35,7 @@ export default function StartupExperience({ready,children}:{ready:boolean;childr
   <div className="galaxy-vignette" aria-hidden="true"/>
   <div className="galaxy-wordmark"><span className="galaxy-mark" aria-hidden="true">T<span>.</span></span><span>TORN HELPER<small>YOUR PERSONAL COMMAND CENTER</small></span></div>
   <button ref={skip} type="button" className="galaxy-skip" onClick={()=>dismiss(true)}>Skip intro <span aria-hidden="true">↗</span></button>
-  <div className="galaxy-copy"><p className="galaxy-eyebrow"><span/>A LITTLE PERSPECTIVE. A BIGGER PICTURE.</p><h1 id="galaxy-title">Welcome to<br/><em>your orbit.</em></h1><p id="galaxy-description">All your Torn tools. One universe.</p><div className="galaxy-status" role="status"><span className="galaxy-status-line" aria-hidden="true"/>{ready?'Your workspace is ready':'Opening your workspace…'}</div></div>
+  <div className="galaxy-copy"><p className="galaxy-eyebrow"><span/>A LITTLE PERSPECTIVE. A BIGGER PICTURE.</p><h1 id="galaxy-title">Welcome to<br/><em>Torn Helper</em></h1><p id="galaxy-description">All your Torn tools. One universe.</p><div className="galaxy-status" role="status"><span className="galaxy-status-line" aria-hidden="true"/>{ready?'Your workspace is ready':'Opening your workspace…'}</div></div>
   <span className="galaxy-coordinate" aria-hidden="true">T / WORKSPACE · EST. 2026</span>
  </section>}</>;
 }

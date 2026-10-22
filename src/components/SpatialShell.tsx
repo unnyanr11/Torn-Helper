@@ -36,7 +36,7 @@ export default function SpatialShell({page,signedIn,role,shared,onNavigate,child
   <button className="nu-btn menu-btn" aria-label={open?'Close navigation':'Open navigation'} aria-expanded={open} aria-controls="simple-navigation" onClick={()=>setOpen(!open)}>Menu</button>
   {open&&<button className="navigation-backdrop" aria-label="Close navigation" onClick={()=>setOpen(false)}/>}
   <nav id="simple-navigation" className={`sidebar ${open?'open':''}`} aria-label="Main">
-   <button className="brand cosmic-brand" onClick={()=>navigate(signedIn?'Overview':'Settings')}><span className="cosmic-brand-mark" aria-hidden="true">T<span>.</span></span><span>Torn Helper<small>YOUR PERSONAL ORBIT</small></span></button>
+   <button className="brand cosmic-brand" onClick={()=>navigate(signedIn?'Overview':'Settings')}><span className="cosmic-brand-mark" aria-hidden="true">T<span>.</span></span><span>Torn Helper<small>YOUR PERSONAL WORKSPACE</small></span></button>
    <div className="nav-scroll">{Object.entries(NAV_GROUPS).map(([category,names])=>{const pages=allowed.filter(p=>names.includes(p));return pages.length?<details className="tool-category" key={category} open><summary>{category}</summary>{pages.map(p=><button key={p} className={`nav-item ${p===page&&!shared?'active':''}`} aria-current={p===page&&!shared?'page':undefined} onClick={()=>navigate(p)}><span className="cosmic-nav-dot" aria-hidden="true"/>{label(p)}<span className="cosmic-nav-arrow" aria-hidden="true">↗</span></button>)}</details>:null;})}</div>
    <small className="simple-account"><span className="cosmic-account-ring" aria-hidden="true"/>{signedIn?'Account connected':'Sign in with your Torn key'}</small>
   </nav>
