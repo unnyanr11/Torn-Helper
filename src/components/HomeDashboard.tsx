@@ -1,0 +1,15 @@
+import { useEffect,useState } from 'react';
+import type { DataEntry } from '../lib/connected-data';
+import { homeData,homeEntry,freshnessLabel,durationLabel,remainingAtObservation } from '../lib/home-dashboard';
+const finite=(n:unknown):n is number=>typeof n==='number'&&Number.isFinite(n)&&n>=0;
+export default function HomeDashboard({entries}:{entries:Record<string,DataEntry>}){
+ const [now,setNow]=useState(Date.now);useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(timer);},[]);
+ const {bars,cooldowns,travel}=homeData(entries),barEntry=homeEntry(entries,'/user/bars'),cooldownEntry=homeEntry(entries,'/user/cooldowns'),travelEntry=homeEntry(entries,'/user/travel');
+ const observation=(entry:DataEntry|undefined)=>entry?.observation?<small>{freshnessLabel(entry.observation.fetched_at,now)}{entry.error?' · showing saved data':''}</small>:<small>{entry?.error?'Unavailable · check key permissions or retry':'Not collected · refresh essentials below'}</small>;
+ const flight=remainingAtObservation(travel.time_left,travelEntry?.observation?.fetched_at,now);
+ return <section className="home-dashboard" aria-label="Your daily overview"><h3>Your daily overview</h3><div className="home-grid">
+  {(['energy','nerve','happy','life'] as const).map(name=>{const value=bars[name],known=finite(value?.current)&&finite(value?.maximum)&&value.maximum>0;return <article key={name} className="card home-resource"><h4>{name==='happy'?'Happiness':name.charAt(0).toUpperCase()+name.slice(1)}</h4><strong>{known?`${value.current.toLocaleString()} / ${value.maximum.toLocaleString()}`:'Not available'}</strong>{known&&<progress aria-label={`${name} at last check`} value={Math.min(value.current,value.maximum)} max={value.maximum}/>}<span>At last check</span>{observation(barEntry)}</article>;})}
+  <article className="card"><h4>Cooldowns</h4><dl className="home-cooldowns">{(['drug','medical','booster'] as const).map(name=>{const seconds=remainingAtObservation(cooldowns[name],cooldownEntry?.observation?.fetched_at,now);return <div key={name}><dt>{name.charAt(0).toUpperCase()+name.slice(1)}</dt><dd>{seconds===null?'Not available':durationLabel(seconds)}</dd></div>;})}</dl><p>Countdowns estimate time remaining from the last observation. Refresh to confirm changes in game.</p>{observation(cooldownEntry)}</article>
+  <article className="card"><h4>Travel</h4><strong>{flight===null?'Not available':flight>0?`${durationLabel(flight)} estimated remaining`:travel.time_left>0?'Arrival time passed · refresh to confirm':'No flight at last check'}</strong>{typeof travel.destination==='string'&&<p>Last destination: {travel.destination}</p>}{finite(travel.arrival_at)&&travel.arrival_at>0&&<p>Recorded arrival: {new Date(travel.arrival_at*1000).toLocaleString()}</p>}{observation(travelEntry)}<a className="nu-btn" href="#Travel">Open travel calculator</a></article>
+ </div><p className="muted">These are collected observations. Bars are not projected forward, and missing values stay unavailable.</p></section>;
+}

@@ -192,7 +192,7 @@ export default function App() {
         ) : (
           <div key={accountId ?? "signed-out"}>
             <TornDataShortcut page={page} />
-            {page === "Overview" && <Overview />}
+            {page === "Overview" && <Overview accountId={accountId??undefined}/>}
             {page === "Settings" && <Settings />}
             {page === "Player Intel" && <PlayerIntel />}
             {page === "Planner" && <Planner />}

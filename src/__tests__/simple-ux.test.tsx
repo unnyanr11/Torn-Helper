@@ -15,7 +15,7 @@ describe('dropdown-first standalone UX',()=>{
  });
  it('shows known choices first while preserving stored custom values and manual entry',()=>{
   const html=renderToStaticMarkup(<ChoiceInput label="Player" value="99" onChange={()=>{}} options={[{value:'1',label:'Known player'}]}/>);
-  expect(html).toContain('<select');expect(html).toContain('Known player');expect(html).toContain('value="99" selected');expect(html).toContain('Enter a different value');expect(html).not.toContain('<input');
+  expect(html).toContain('<select');expect(html).toContain('Known player');expect(html).toContain('value="99" selected');expect(html).toContain('Enter a custom value');expect(html).not.toContain('<input');
  });
  it('renders documented boolean and array enum selections without comma-separated typing',()=>{
   const parameter=(schema:any)=>({name:'selection',location:'query',required:false,description:'',schema});

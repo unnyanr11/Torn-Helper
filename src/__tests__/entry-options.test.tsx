@@ -19,7 +19,7 @@ describe('choices across all tool forms',()=>{
   const data=[row('/torn/items',{items:[{id:1,name:'First',type:'Medical'},{id:2,name:'Second',type:'Flower'}]})];
   expect(itemCategories(data).map(o=>o.value)).toEqual(['Flower','Medical']);
   expect(observedChoices(data,'item','Flower')).toEqual([{value:'2',label:'Second [2]'}]);
-  expect(observedChoices(data,'itemName','Flower')).toEqual([{value:'Second',label:'Second'}]);
+  expect(observedChoices(data,'itemName','Flower')).toEqual([{value:'Second',label:'Second [2]'}]);
  });
  it('keeps category and weapon type separate when filtering saved references',()=>{
   const data=[row('/torn/items',{items:[{id:1,name:'Primary item',type:'Weapon',sub_type:'Primary'},{id:2,name:'Medical item',type:'Medical',sub_type:null},{id:3,name:'Melee item',type:'Weapon',sub_type:'Melee'}]})];

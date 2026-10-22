@@ -9,9 +9,9 @@ export function mergeChoices(...groups:Choice[][]):Choice[]{
 const obj=(v:unknown):Record<string,any>=>v&&typeof v==='object'&&!Array.isArray(v)?v as Record<string,any>:{};
 export function observedChoices(rows:CachedChoiceRow[],source:EntrySource,category='',itemType=''):Choice[]{
  if(source==='item'||source==='itemName'){
-  if(!category&&!itemType)return catalogueChoices(rows,'/torn/items','items',source==='itemName');
-  const filtered=rows.map(row=>({...row,payload:{...obj(row.payload),items:Array.isArray(obj(row.payload).items)?obj(row.payload).items.filter((i:any)=>(!category||i?.type===category)&&(!itemType||i?.sub_type===itemType)):[]}}));
-  return catalogueChoices(filtered,'/torn/items','items',source==='itemName');
+  const filtered=!category&&!itemType?rows:rows.map(row=>({...row,payload:{...obj(row.payload),items:Array.isArray(obj(row.payload).items)?obj(row.payload).items.filter((i:any)=>(!category||i?.type===category)&&(!itemType||i?.sub_type===itemType)):[]}}));
+  const options=catalogueChoices(filtered,'/torn/items','items');
+  return source==='itemName'?mergeChoices(options.map(o=>({value:o.label.replace(/ \[\d+\]$/,''),label:o.label}))):options;
  }
  if(source==='stock')return catalogueChoices(rows,'/torn/stocks','stocks');
  if(source==='track')return catalogueChoices(rows,'/racing/tracks','tracks',true);

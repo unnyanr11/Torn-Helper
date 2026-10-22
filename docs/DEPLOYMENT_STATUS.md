@@ -379,3 +379,35 @@ Validation: 176 tests and production build pass, including database permission
 boundaries, retention, 1,205-row RPC reads, trusted trigger capture, price exclusion
 and invalid refresh rollback. Shared parser Deno check passes. Live RLS/grants and
 bootstrap counts were verified; no authenticated browser check was performed.
+
+
+## Easier first-use and daily home experience — 2026-10-22
+
+Overview now offers a goal selector: levelling, money, progress, faction or exploring
+all tools. Goal-specific internal shortcuts appear after selection; every category
+remains available. The preference is stored per account on the current device,
+contains only a version/goal, and can be changed. No game values or API keys are
+stored in this preference and it does not affect authorization.
+
+The default refresh collects only profile, bars, cooldowns and travel (four sections,
+no related expansion). Bulk groups remain behind an advanced-options expander;
+all collected records/history remain available under All connected data. Area deep
+links expand detailed data directly. Active requests now receive the abort signal.
+Request-only keys retain their existing collection-only lifetime and disclosures.
+
+Daily cards show actual observed energy, nerve, happiness and life, plus estimated
+cooldown/travel countdowns. Collection times and snapshot labels remain visible;
+missing/denied observations stay unavailable. Bars are never projected forward and
+estimated arrival is not presented as a confirmed arrival. No background polling
+of the Torn API was added.
+
+Item selectors support optional name/ID search alongside native dropdowns, category
+and weapon-type filters. The same search appears for large known-choice lists and
+travel item selection. Searching preserves selected/custom values and never submits
+the surrounding form. There is no result truncation; name-valued item fields also
+include IDs in their visible labels. Existing permanent catalogue storage is reused.
+
+Validation: 184 tests and production build pass. Tests cover goal validation/account
+isolation, accessible internal shortcuts, the four-section collector, unknown/stale
+values, countdown calculations, name/ID search with 1,502 results and retained custom
+values. Browser and legitimate-key acceptance checks were not performed.

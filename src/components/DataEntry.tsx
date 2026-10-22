@@ -10,7 +10,7 @@ export default function DataEntry({source,onNameChange,...props}:SelectEntryProp
   {isItem&&<ItemCatalogueLoader disabled={props.disabled}/>}
   {isItem&&<label>Item category<select className="nu-input" disabled={props.disabled} value={category} onChange={e=>{setCategory(e.target.value);setItemType('');}}><option value="">All categories</option>{categories.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}</select></label>}
   {isItem&&types.length>0&&<label>Item type<select className="nu-input" disabled={props.disabled} value={itemType} onChange={e=>setItemType(e.target.value)}><option value="">All types</option>{types.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}</select></label>}
-  <SelectEntry {...props} options={options} onChange={e=>{if(onNameChange){const selected=options.find(o=>o.value===e.target.value);onNameChange(selected&&selected.label!==selected.value?selected.label.replace(/ \[\d+\]$/,''):'');}props.onChange(e);}}/>
+  <SelectEntry {...props} searchable={isItem||options.length>40} options={options} onChange={e=>{if(onNameChange){const selected=options.find(o=>o.value===e.target.value);onNameChange(selected&&selected.label!==selected.value?selected.label.replace(/ \[\d+\]$/,''):'');}props.onChange(e);}}/>
   {!options.length&&<small>{cache.isError?'Saved choices could not be loaded. You can enter a custom value.':'No collected choices yet. Load the related data, or choose a custom value.'}</small>}
  </span>;
 }
