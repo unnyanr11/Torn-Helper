@@ -1,7 +1,7 @@
 import { CAPABILITIES } from '../api/capabilities';
 import { dataLabel, observationKey, PERSONAL_REQUESTS, type PersonalRequest, type TornObservation } from './personal-data';
 export type ConnectedRequest = PersonalRequest & { areas: string[] };
-export type DataEntry = { observation?: TornObservation; previous?: unknown; error?: string };
+export type DataEntry = { observation?: TornObservation; previous?: unknown; error?: string; restored?: boolean };
 export const AREAS = ['Personal', 'Crimes', 'Inventory', 'Investments', 'Faction', 'Company', 'Properties', 'Combat', 'Racing', 'Progress'];
 export function request(path: string, area: string, parameters: Record<string, string> = {}, label?: string): ConnectedRequest {
   const capability = CAPABILITIES.find(c => c.path === path);

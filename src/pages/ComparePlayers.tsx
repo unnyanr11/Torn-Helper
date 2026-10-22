@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import SavedPresets from "../components/SavedPresets";
 import KeyDisclosure from "../components/KeyDisclosure";
 import { supabase } from "../lib/supabase";
+import { useQueryClient } from '@tanstack/react-query';
+import { invokeTornData } from '../lib/torn-data-client';
 import { functionError } from "../lib/function-error";
 import {
   COMPARISON_METRICS,
@@ -28,6 +30,7 @@ type Evidence = {
   observed: string | null;
 };
 export default function ComparePlayers() {
+  const queryClient=useQueryClient();
   const savedChoices=useTornChoices();
   const [input, setInput] = useState(""),
     [days, setDays] = useState("30"),
@@ -168,7 +171,7 @@ export default function ComparePlayers() {
       ) => {
         if (token !== generation.current)
           throw new Error("Comparison changed; fetch cancelled.");
-        const { data, error } = await supabase.functions.invoke("torn-data", {
+        const { data, error } = await invokeTornData(queryClient, {
           body: {
             endpoint_id,
             parameters,

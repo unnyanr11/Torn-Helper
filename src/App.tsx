@@ -1,3 +1,4 @@
+import { cancelTornRequests } from "./lib/torn-request-state";
 import SpatialShell from "./components/SpatialShell";
 import TornDataShortcut from "./components/TornDataShortcut";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
@@ -99,6 +100,7 @@ export default function App() {
         if (disposed || version !== refreshVersion) return;
         const nextIdentity = session?.user.id ?? null;
         if (identityRef.current !== nextIdentity) {
+          cancelTornRequests(queryClient);
           queryClient.clear();
           setRole("user");
           identityRef.current = nextIdentity;
@@ -134,6 +136,7 @@ export default function App() {
         setAuthReady(false);
         setSignedIn(false);
         setRole("user");
+        cancelTornRequests(queryClient);
         queryClient.clear();
       }
       setTimeout(() => void refresh(), 0);

@@ -1,15 +1,10 @@
 import { useMemo } from 'react';
 import { useItemCatalogue } from './useItemCatalogue';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../lib/supabase';
+import { useCurrentObservations } from './useSavedObservations';
 import type { CachedChoiceRow } from '../lib/torn-choices';
 export function useTornChoices() {
-  const permanent=useItemCatalogue();
-  const recent=useQuery({queryKey:['torn-choices'],staleTime:60000,retry:false,queryFn:async():Promise<CachedChoiceRow[]>=>{
-    const {data:{user}}=await supabase.auth.getUser();if(!user)return[];
-    const r=await supabase.from('torn_data_cache').select('endpoint_id,payload,fetched_at').eq('user_id',user.id).gte('fetched_at',new Date(Date.now()-86400000).toISOString()).order('fetched_at',{ascending:false}).limit(100);
-    if(r.error)throw r.error;return r.data??[];
-  }});
-  const data=useMemo(()=>permanent.data?.items.length?[{endpoint_id:'v2-torn-items',payload:{items:permanent.data.items},fetched_at:permanent.data.fetched_at??undefined},...(recent.data??[])]:recent.data,[permanent.data,recent.data]);
-  return {...recent,data,isError:recent.isError&&(!permanent.data?.items.length)||permanent.isError&&(!recent.data?.length)};
+ const permanent=useItemCatalogue(),recent=useCurrentObservations();
+ const rows=useMemo(():CachedChoiceRow[]=>Object.values(recent.data??{}).flatMap(entry=>entry.observation?[{endpoint_id:entry.observation.endpoint_id,payload:entry.observation.payload,fetched_at:entry.observation.fetched_at}]:[]).sort((a,b)=>Date.parse(b.fetched_at!)-Date.parse(a.fetched_at!)),[recent.data]);
+ const data=useMemo(()=>permanent.data?.items.length?[{endpoint_id:'v2-torn-items',payload:{items:permanent.data.items},fetched_at:permanent.data.fetched_at??undefined},...rows]:rows,[permanent.data,rows]);
+ return {...recent,entries:recent.data??{},data,isError:recent.isError&&!permanent.data?.items.length||permanent.isError&&!rows.length};
 }

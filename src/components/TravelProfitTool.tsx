@@ -2,10 +2,10 @@ import SelectEntry from "./SelectEntry";
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { CAPABILITIES } from '../api/capabilities';
+import { invokeTornData } from '../lib/torn-data-client';
 import { supabase } from '../lib/supabase';
 import { functionError } from '../lib/function-error';
 import { useTornChoices } from '../hooks/useTornChoices';
-import { type CachedChoiceRow } from '../lib/torn-choices';
 import { createTravelClient, scanItemMarket, type MarketScan } from '../lib/travel-client';
 import { destinationItems, flightEstimate, METHODS, ROUTES, shopItems, shopQuote, travelProfit, tripCost, type FlyMethod } from '../lib/travel-profit';
 import type { TornObservation } from '../lib/personal-data';
@@ -16,16 +16,19 @@ type Quote={itemId:string;country:string;detail:TornObservation;market:MarketSca
 type Saved={id:string;destination:string;item_name:string;profit_total:number;profit_per_hour:number;flight_minutes:number};
 export default function TravelProfitTool(){
  const cache=useTornChoices(),queryClient=useQueryClient();
- const [country,setCountry]=useState('Mexico'),[category,setCategory]=useState(''),[itemId,setItemId]=useState('');
+ const previous=queryClient.getQueryData<{country:string;category:string;itemId:string;method:FlyMethod;quantity:number;paidLegs:number;fee:number;waiting:number;book:boolean;quote:Quote|null;costOverride:string;timeOverride:string;businessPrice:number|null;businessTime:string}>(['travel-workspace']);
+ const [country,setCountry]=useState(previous?.country??'Mexico'),[category,setCategory]=useState(previous?.category??''),[itemId,setItemId]=useState(previous?.itemId??'');
  const [mode,setMode]=useState('request'),[key,setKey]=useState('');
- const [method,setMethod]=useState<FlyMethod>('Standard'),[quantity,setQuantity]=useState(10),[paidLegs,setPaidLegs]=useState(2),[fee,setFee]=useState(5),[waiting,setWaiting]=useState(0),[book,setBook]=useState(false);
- const [costOverride,setCostOverride]=useState(''),[timeOverride,setTimeOverride]=useState('');
- const [quote,setQuote]=useState<Quote|null>(null),[busy,setBusy]=useState(false),[loading,setLoading]=useState(false),[revision,setRevision]=useState(0),[error,setError]=useState(''),[saveMessage,setSaveMessage]=useState(''),[saving,setSaving]=useState(false),[saved,setSaved]=useState<Saved[]>([]);
- const [businessPrice,setBusinessPrice]=useState<number|null>(null),[businessTime,setBusinessTime]=useState('');
+ const [method,setMethod]=useState<FlyMethod>(previous?.method??'Standard'),[quantity,setQuantity]=useState(previous?.quantity??10),[paidLegs,setPaidLegs]=useState(previous?.paidLegs??2),[fee,setFee]=useState(previous?.fee??5),[waiting,setWaiting]=useState(previous?.waiting??0),[book,setBook]=useState(previous?.book??false);
+ const [costOverride,setCostOverride]=useState(previous?.costOverride??''),[timeOverride,setTimeOverride]=useState(previous?.timeOverride??'');
+ const [quote,setQuote]=useState<Quote|null>(previous?.quote??null),[busy,setBusy]=useState(false),[loading,setLoading]=useState(false),[revision,setRevision]=useState(0),[error,setError]=useState(''),[saveMessage,setSaveMessage]=useState(''),[saving,setSaving]=useState(false),[saved,setSaved]=useState<Saved[]>([]);
+
+ const [businessPrice,setBusinessPrice]=useState<number|null>(previous?.businessPrice??null),[businessTime,setBusinessTime]=useState(previous?.businessTime??'');
+ useEffect(()=>{queryClient.setQueryData(['travel-workspace'],{country,category,itemId,method,quantity,paidLegs,fee,waiting,book,quote,costOverride,timeOverride,businessPrice,businessTime});},[country,category,itemId,method,quantity,paidLegs,fee,waiting,book,quote,costOverride,timeOverride,businessPrice,businessTime]);
  const businessController=useRef<AbortController|null>(null);
  const pending=useRef<AbortController|null>(null),loadingController=useRef<AbortController|null>(null);
  const fetchSection=useMemo(()=>createTravelClient(async(id,parameters,apiKey,signal)=>{
-   const r=await supabase.functions.invoke('torn-data',{body:{endpoint_id:id,parameters,...(apiKey===undefined?{}:{apiKey})},signal});
+   const r=await invokeTornData(queryClient,{body:{endpoint_id:id,parameters,...(apiKey===undefined?{}:{apiKey})},signal});
    if(r.error||r.data?.error)throw await functionError(r.data,r.error);
    return r.data;
  }),[]);
@@ -52,7 +55,7 @@ export default function TravelProfitTool(){
  const sell=current&&current.market.cacheTimes.length<=1?current.market.price:null;
  const result=travelProfit({buy:buy?.buy_price??null,sell,quantity,cost,roundTripMinutes:roundTrip,waitMinutes:waiting,feePercent:fee});
  const displayResult=!busy?result:null;
- function storeObservation(r:TornObservation){queryClient.setQueryData<CachedChoiceRow[]>(['torn-choices'],old=>[{endpoint_id:r.endpoint_id,payload:r.payload,fetched_at:r.fetched_at},...(old??[])].slice(0,100));}
+
  async function loadSaved(){const r=await supabase.from('travel_profit_scenarios').select('id,destination,item_name,profit_total,profit_per_hour,flight_minutes').order('created_at',{ascending:false}).limit(25);if(r.error)throw r.error;setSaved(r.data??[]);}
  useEffect(()=>{let alive=true;void supabase.from('travel_profit_scenarios').select('id,destination,item_name,profit_total,profit_per_hour,flight_minutes').order('created_at',{ascending:false}).limit(25).then(r=>{if(alive){if(r.error)setSaveMessage(r.error.message);else setSaved(r.data??[]);}});return()=>{alive=false;pending.current?.abort();loadingController.current?.abort();businessController.current?.abort();};},[]);
  async function loadData(){
@@ -60,7 +63,7 @@ export default function TravelProfitTool(){
   const failures:string[]=[];
   for(const path of ['/torn/items','/user/travel']){
    try{
-    const r=await fetchSection(path,path==='/torn/items'?{cat:'All'}:{},apiKey,control.signal);if(control.signal.aborted)return;storeObservation(r);
+    const r=await fetchSection(path,path==='/torn/items'?{cat:'All'}:{},apiKey,control.signal);if(control.signal.aborted)return;
     if(path==='/user/travel'){
      const travel=(r.payload as any)?.travel;
      if(METHODS.includes(travel?.method))setMethod(travel.method);
@@ -71,17 +74,17 @@ export default function TravelProfitTool(){
   if(!control.signal.aborted){setLoading(false);setError(failures.join(' '));}
  }
  useEffect(()=>{
-  pending.current?.abort();const control=new AbortController();pending.current=control;setQuote(null);setBusy(false);setError('');setSaveMessage('');
+  pending.current?.abort();const control=new AbortController();pending.current=control;setQuote(old=>old?.itemId===itemId&&old.country===country?old:null);setBusy(false);setError('');setSaveMessage('');
   if(!itemId||!ready)return()=>control.abort();
   const timer=setTimeout(()=>{void(async()=>{
    setBusy(true);
    try{
     if(!travelRow?.fetched_at||Date.now()-Date.parse(travelRow.fetched_at)>60000){
-      try{const personal=await fetchSection('/user/travel',{},apiKey,control.signal);if(control.signal.aborted)return;storeObservation(personal);}
+      try{await fetchSection('/user/travel',{},apiKey,control.signal);if(control.signal.aborted)return;}
       catch(e){if(control.signal.aborted)return;setError(`Travel details could not be refreshed; route assumptions remain editable. ${e instanceof Error?e.message:''}`);}
     }
     const detail=await fetchSection('/torn/{ids}/items',{ids:itemId},apiKey,control.signal);
-    if(control.signal.aborted)return;storeObservation(detail);
+    if(control.signal.aborted)return;
     const market=await scanItemMarket(Number(itemId),p=>fetchSection('/market/{id}/itemmarket',p,apiKey,control.signal),control.signal);
     if(!control.signal.aborted)setQuote({itemId,country,detail,market});
    }catch(e){if(!control.signal.aborted)setError(e instanceof Error?e.message:'Unable to fetch prices.');}
@@ -90,7 +93,7 @@ export default function TravelProfitTool(){
   return()=>{clearTimeout(timer);control.abort();};
  },[itemId,country,mode,key,revision]);
  useEffect(()=>{
-  businessController.current?.abort();const control=new AbortController();businessController.current=control;setBusinessPrice(null);setBusinessTime('');
+  businessController.current?.abort();const control=new AbortController();businessController.current=control;
   if(method!=='Business'||!businessId||!ready||paidLegs===0)return()=>control.abort();
   void scanItemMarket(businessId,p=>fetchSection('/market/{id}/itemmarket',p,apiKey,control.signal),control.signal).then(scan=>{if(!control.signal.aborted&&scan.cacheTimes.length<=1){setBusinessPrice(scan.price);setBusinessTime(scan.fetched_at);}}).catch(()=>{});
   return()=>control.abort();
@@ -126,7 +129,7 @@ export default function TravelProfitTool(){
   <div className="travel-fields"><label>Paid legs / tickets budgeted<select className="nu-input" value={paidLegs} onChange={e=>setPaidLegs(Number(e.target.value))}>{[0,1,2].map(n=><option key={n}>{n}</option>)}</select></label><label>Shopping / waiting time<select className="nu-input" value={waiting} onChange={e=>setWaiting(Number(e.target.value))}>{[0,5,10,15,30,60,120].map(n=><option key={n} value={n}>{n} minutes</option>)}</select></label><label>Travel-time book assumption<select className="nu-input" value={book?'yes':'no'} onChange={e=>setBook(e.target.value==='yes')}><option value="no">No book reduction</option><option value="yes">25% reduction · estimated routes only</option></select></label><label>Total trip travel cost override ($)<SelectEntry label="Travel cost override ($)" kind="money" className="nu-input" type="number" min="0" step="1" options={estimatedCost===null?[]:[{value:String(estimatedCost),label:`Estimated: ${estimatedCost.toLocaleString()}`}]} value={costOverride} onChange={e=>setCostOverride(e.target.value)} emptyText="Use calculated cost"/></label><label>Round-trip flight time override (minutes)<SelectEntry label="Round-trip time override (minutes)" kind="minutes" className="nu-input" type="number" min="0.01" step="any" options={flight.minutes===null?[]:[{value:String(flight.minutes*2),label:`Calculated: ${flight.minutes*2} minutes`}]} value={timeOverride} onChange={e=>setTimeOverride(e.target.value)} emptyText="Use calculated duration"/></label></div></details>
   </article>
   {itemId&&<article className="card"><h3>{chosen?.name??'Selected item'} · {country}</h3><dl className="data-metrics"><div><dt>Foreign shop price per item</dt><dd>{money(buy?.buy_price??null)}</dd></div><div><dt>{current?.market.complete?'Lowest scanned item-market price':'Lowest observed item-market price'}</dt><dd>{money(sell)}</dd></div><div><dt>Total travel cost · {costOverride!==''?'your override':'estimate'}</dt><dd>{money(cost)}</dd></div><div><dt>Round-trip flight time</dt><dd>{roundTrip===null?'Unknown':`${roundTrip.toLocaleString(undefined,{maximumFractionDigits:2})} minutes`}</dd></div></dl>
-  {current&&<p>Shop: {buy?.shop??'Not returned'}. Item catalogue collected {new Date(current.detail.fetched_at).toLocaleString()}. Market checked {current.market.count} listings across {current.market.pages} pages; {current.market.complete?'all returned pages scanned':'more pages remain'}. Market cache times: {current.market.cacheTimes.map(t=>new Date(t*1000).toLocaleString()).join(', ')||'not provided'}.</p>}
+  {current&&<p>Shop: {buy?.shop??'Not returned'}. Item catalogue collected {new Date(current.detail.fetched_at).toLocaleString()}. Market observed {new Date(current.market.fetched_at).toLocaleString()}. Checked {current.market.count} listings across {current.market.pages} pages; {current.market.complete?'all returned pages scanned':'more pages remain'}. Market cache times: {current.market.cacheTimes.map(t=>new Date(t*1000).toLocaleString()).join(', ')||'not provided'}.</p>}
   {current?.market.cacheTimes.length!==undefined&&current.market.cacheTimes.length>1&&<p role="alert">Market cache changed during scanning. Refresh prices before using this estimate.</p>}
   {current&&!current.market.complete&&<button className="nu-btn" disabled={busy||!ready} onClick={()=>void scanMore()}>Scan more market pages</button>}
   <p>{timeOverride!==''?'Using your round-trip time override.':flight.source} Profit per hour includes both flight legs plus your selected waiting time.</p>

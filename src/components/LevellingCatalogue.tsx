@@ -5,16 +5,19 @@ import { filterStarterTargets,targetAvailability,targetObservation,type TargetOb
 import { useTornChoices } from '../hooks/useTornChoices';
 import { createTravelClient } from '../lib/travel-client';
 import { functionError } from '../lib/function-error';
+import { invokeTornData } from '../lib/torn-data-client';
 import { supabase } from '../lib/supabase';
 import KeyDisclosure from './KeyDisclosure';
 export default function LevellingCatalogue(){
  const cache=useTornChoices(),client=useQueryClient();
- const [maximum,setMaximum]=useState(1000),[availability,setAvailability]=useState('All'),[sort,setSort]=useState('stats');
+ const preferences=client.getQueryData<{maximum:number;availability:string;sort:string}>(['levelling-preferences']);
+ const [maximum,setMaximum]=useState(preferences?.maximum??1000),[availability,setAvailability]=useState(preferences?.availability??'All'),[sort,setSort]=useState(preferences?.sort??'stats');
+ useEffect(()=>{client.setQueryData(['levelling-preferences'],{maximum,availability,sort});},[maximum,availability,sort]);
  const [mode,setMode]=useState('request'),[key,setKey]=useState(''),[memory,setMemory]=useState(false),[busy,setBusy]=useState(false),[done,setDone]=useState(0),[total,setTotal]=useState(0),[message,setMessage]=useState(''),[error,setError]=useState('');
  const [observations,setObservations]=useState<Record<number,TargetObservation>>({}),[now,setNow]=useState(Date.now),[selected,setSelected]=useState<number|null>(null);
  const control=useRef<AbortController|null>(null),live=useRef(true);
  const fetchProfile=useMemo(()=>createTravelClient(async(endpoint_id,parameters,apiKey,signal)=>{
-  const r=await supabase.functions.invoke('torn-data',{body:{endpoint_id,parameters,...(apiKey===undefined?{}:{apiKey})},signal});
+  const r=await invokeTornData(client,{body:{endpoint_id,parameters,...(apiKey===undefined?{}:{apiKey})},signal});
   if(r.error||r.data?.error){const e=await functionError(r.data,r.error);throw Object.assign(e,{status:r.error?.context?.status??503});}return r.data;
  }),[]);
  useEffect(()=>{live.current=true;const timer=setInterval(()=>setNow(Date.now()),15000);return()=>{live.current=false;clearInterval(timer);control.current?.abort();};},[]);
@@ -39,7 +42,6 @@ export default function LevellingCatalogue(){
     setDone(++count);
    }
    if(!controller.signal.aborted)setMessage(`Checked ${count} target profiles. Statuses expire after one minute; recheck a target before using it.`);
-   if(!controller.signal.aborted)void client.invalidateQueries({queryKey:['torn-choices']});
   }catch(e){if(!controller.signal.aborted)setError(e instanceof Error?e.message:'Unable to refresh targets.');}
   finally{if(live.current&&control.current===controller&&!controller.signal.aborted)setBusy(false);}
  }

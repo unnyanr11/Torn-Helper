@@ -1595,3 +1595,6 @@ details[open] > summary {
 .entry-select input[type=search] { width:100%; }
 @media(max-width:650px) { .home-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .home-grid strong { font-size:17px; } }
 @media(max-width:380px) { .home-grid { grid-template-columns:minmax(0,1fr); } .home-grid .card:nth-last-child(-n+2) { grid-column:auto; } }
+.home-refresh { align-self:flex-start; margin-top:auto; }
+.home-freshness { display:block; padding:5px 8px; border-radius:8px; background:var(--surface); }
+.home-freshness.needs-attention { border-left:3px solid var(--accent); }

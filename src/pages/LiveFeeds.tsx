@@ -1,8 +1,11 @@
+import { observationKey,type TornObservation } from "../lib/personal-data";
 import SelectEntry from "../components/SelectEntry";
 import { useEffect, useRef, useState } from "react";
 import { CAPABILITIES } from "../api/capabilities";
 import type { Capability } from "../api/types";
 import { supabase } from "../lib/supabase";
+import { useQueryClient } from '@tanstack/react-query';
+import { invokeTornData,cancelTornRequests } from '../lib/torn-data-client';
 import { functionError } from "../lib/function-error";
 import { downloadBlob } from "../lib/export";
 import KeyDisclosure from "../components/KeyDisclosure";
@@ -38,30 +41,28 @@ function initialSection() {
     CAPABILITIES.find((c) => c.path === "/user/profile")!
   );
 }
-type Result = {
-  endpoint_id: string;
-  payload: unknown;
-  fetched_at: string;
-  cached: boolean;
-  parameters: Record<string, string>;
-  next_parameters: Record<string, string> | null;
-};
+type Result = TornObservation;
 export default function LiveFeeds() {
-  const first = initialSection();
+  const queryClient=useQueryClient();
+  const remembered=queryClient.getQueryData<{sectionId:string;values:Record<string,string>}>(['data-browser-selection']);
+  const deepLink=new URLSearchParams(location.hash.split('?')[1]??'').has('section');
+  const first=(!deepLink&&CAPABILITIES.find(c=>c.id===remembered?.sectionId))||initialSection();
   const savedChoices = useTornChoices();
   const [group, setGroup] = useState(first.group),
     [sectionId, setSectionId] = useState(first.id),
     [search, setSearch] = useState("");
-  const [values, setValues] = useState<Record<string, string>>(initialValues),
+  const [values, setValues] = useState<Record<string, string>>(()=>!deepLink&&remembered?remembered.values:initialValues()),
     [key, setKey] = useState(""),
     [keyMode, setKeyMode] = useState("request"),
     [memory, setMemory] = useState(false);
-  const [result, setResult] = useState<Result | null>(null),
+  const [requestedResult, setResult] = useState<Result | null>(null),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [message, setMessage] = useState("");
+  useEffect(()=>{queryClient.setQueryData(['data-browser-selection'],{sectionId,values});},[sectionId,values]);
   const generation = useRef(0);
   const section = CAPABILITIES.find((c) => c.id === sectionId)!;
+  const result=requestedResult??savedChoices.entries[observationKey(section.id,Object.fromEntries(Object.entries(values).filter(([,v])=>v.trim()!=='')))]?.observation;
   const available = CAPABILITIES.filter(
     (c) =>
       c.group === group &&
@@ -69,6 +70,7 @@ export default function LiveFeeds() {
   );
   useEffect(() => {
     const route = () => {
+      if(decodeURIComponent(location.hash.split('?')[0].slice(1))!=='Live Feeds')return;
       const next = initialSection();
       generation.current++;
       setGroup(next.group);
@@ -102,7 +104,7 @@ export default function LiveFeeds() {
     const submitted = key;
     if (!memory) setKey("");
     try {
-      const { data, error } = await supabase.functions.invoke("torn-data", {
+      const { data, error } = await invokeTornData(queryClient, {
         body: {
           endpoint_id: section.id,
           parameters,
@@ -129,12 +131,16 @@ export default function LiveFeeds() {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return;
+    cancelTornRequests(queryClient);
+    await queryClient.cancelQueries({queryKey:["torn-observations"]});
     const removed = await supabase
       .from("torn_data_cache")
       .delete()
       .eq("user_id", user.id);
     if (removed.error) setError(removed.error.message);
     else {
+      queryClient.removeQueries({queryKey:["torn-observations"]});
+      queryClient.removeQueries({queryKey:["travel-workspace"]});
       setResult(null);
       setMessage("Saved data-browser observations removed.");
     }
@@ -153,7 +159,7 @@ export default function LiveFeeds() {
         Torn still controls access to other players, faction and company data.
       </p>
       <p>
-        Data loads only when requested. Successful results are cached privately
+        Data loads only when requested. Saved observations appear without a Torn call. Successful results are cached privately
         for 60 seconds. Up to 100 recent requests are saved; older-than-24-hour
         records are removed on your next successful fetch. Export or clear
         observations below.

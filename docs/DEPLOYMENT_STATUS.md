@@ -448,3 +448,66 @@ References: official Torn OpenAPI (/user/bars and /user/log schemas) at
 https://www.torn.com/swagger/openapi.json and energy rules at
 https://wiki.torn.com/wiki/Energy. Actual bar timing is used rather than hardcoding
 subscriber regeneration rates.
+
+## Saved data first and selective updates — 2026-10-22
+
+Overview now displays its daily cards before the refresh form. Each major card has
+an individual refresh action; a dropdown also offers bars, cooldowns, travel,
+profile or only essentials that need updating. With a request-only key, a card's
+refresh action selects the section and focuses the key field. Saved values remain
+visible during refreshes and failures. Freshness labels use actual observation
+timestamps and mark older sections as needing refresh; estimates stay labelled.
+
+One owner-scoped React Query cache now supplies Overview, dropdown choices and
+saved data-browser results. Returning to a tool can immediately reuse observations
+already in memory; restoring older observations reads the private Supabase cache,
+without a Torn request. A restore merges with newer in-flight results rather than
+overwriting them. The permanent shared item catalogue remains unchanged.
+
+All six frontend Torn gateway consumers now use a shared request client: Overview,
+travel, levelling, comparisons, catalogue imports and the data browser. It reuses
+responses younger than 60 seconds, normalizes blank parameters and combines
+simultaneous identical requests within the tab. Requests with distinct supplied
+credentials are kept separate using temporary fingerprints. Raw keys are not put
+in query data, query keys, browser storage or saved tool selections. Each consumer
+can cancel independently; the network request is aborted when no consumers remain.
+Errors are not cached, and switching accounts cancels pending requests and clears
+private state. Responses arriving for a different identity are rejected.
+
+Where Web Locks are supported, essential refreshes are coordinated across tabs.
+Inside the lock, the client rechecks the existing owner/hash database cache and
+reuses a recent bar, cooldown, travel or profile record before invoking the Torn
+gateway. Other sections retain gateway caching and per-tab request sharing. No
+cross-tab guarantee is claimed for browsers without Web Locks. Restored paginated
+records are displayed as snapshots, but are not reused as fresh complete API
+responses because the existing table does not retain next-page parameters.
+
+Automatic updates default to Off and are opt-in for the existing encrypted-key
+mode only. Economy targets approximately five-minute checks; Active targets
+approximately one-minute bar/cooldown checks and faster travel checks during a
+recorded flight. Profile checks are no more frequent than fifteen minutes. Only
+one overdue section is selected per scheduler check, and fresh sections are
+skipped. The scheduler pauses while hidden/offline, cancels an active automatic
+request on that transition, stops on errors without an automatic retry, and ends
+when leaving Overview. Stored-key/encryption availability is still enforced by
+the existing backend; request-only keys are never retained for this scheduler.
+Energy, cooldown and flight clocks continue calculating locally without API calls.
+
+Travel selections, calculation inputs and dated quotes are remembered in tab
+memory. Levelling filters and data-browser section/parameters are also remembered;
+explicit browser deep links take precedence. These preferences contain no key and
+are cleared with account changes. Saved market prices retain their collection
+times and are not presented as newly fetched quotes. Clearing browser observations
+also cancels pending clients and removes the remembered travel quote.
+
+Validation: 220 tests pass, including 20 new cache/scheduling/cancellation checks;
+the final normalized-parameter scenario was also rechecked in the targeted suite.
+Tests cover deduplication, independent cancellation, last-consumer aborts, owner
+isolation, late responses, errors, original timestamps, bounded retention,
+pagination metadata, simulated cross-tab locking, visible/online gating, refresh
+policies and saved-first UI rendering. Production TypeScript/Vite build and
+whitespace checks pass. A read-only Supabase schema query confirmed the existing
+owner/hash cache columns; no database or Edge Function changes were required.
+Build validation used a configuration-only publishable key. Browser QA, actual
+cross-tab browser acceptance and legitimate Torn-key acceptance were not run.
+The existing nonfatal ExcelJS chunk warning remains.

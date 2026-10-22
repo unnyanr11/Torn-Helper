@@ -1,5 +1,6 @@
 import { useEffect,useRef,useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { invokeTornData } from '../lib/torn-data-client';
 import { supabase } from '../lib/supabase';
 import { functionError } from '../lib/function-error';
 import { useItemCatalogue,readSavedCatalogue,type SavedItemCatalogue } from '../hooks/useItemCatalogue';
@@ -19,7 +20,7 @@ export default function ItemCatalogueLoader({disabled=false}:{disabled?:boolean}
    const due=refresh&&(!saved.fetched_at||Date.now()-Date.parse(saved.fetched_at)>=86400000);
    if(!saved.item_count||due){
     const parameters:Record<string,string>={cat:'All',...(refresh?{timestamp:String(Math.floor(Date.now()/1000))}:{})};
-    const r=await supabase.functions.invoke('torn-data',{body:{endpoint_id:'v2-torn-items',parameters,...(apiKey?{apiKey}:{})},signal:controller.signal});
+    const r=await invokeTornData(client,{body:{endpoint_id:'v2-torn-items',parameters,...(apiKey?{apiKey}:{})},signal:controller.signal});
     if(controller.signal.aborted)return;if(r.error||r.data?.error)throw await functionError(r.data,r.error);
     if(r.data?.endpoint_id!=='v2-torn-items'||r.data?.next_parameters)throw new Error('Torn did not return the complete item catalogue.');
     parseItemCatalogue(r.data.payload);
