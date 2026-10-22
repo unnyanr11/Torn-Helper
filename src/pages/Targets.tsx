@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import LevellingCatalogue from "../components/LevellingCatalogue";
 import SavedPresets from "../components/SavedPresets";
 import { supabase } from "../lib/supabase";
 
@@ -228,10 +229,12 @@ export default function Targets() {
   return (
     <section>
       <h2>Targets</h2>
+      <LevellingCatalogue/>
+      <details className="card"><summary>My custom target lists</summary>
       {error && <p className="badge warn">{error}</p>}
       {refreshResult && <p className="badge ok">{refreshResult}</p>}
       <article className="card nu-inset">
-        <h3>Levelling lists</h3>
+        <h3>Custom lists</h3>
         <input
           className="nu-input"
           placeholder="New list name"
@@ -530,6 +533,7 @@ export default function Targets() {
           )}
         </article>
       )}
+      </details>
     </section>
   );
 }

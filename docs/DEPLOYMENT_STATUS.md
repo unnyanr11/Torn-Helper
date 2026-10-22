@@ -265,3 +265,24 @@ Validation: 152 tests and production build pass. Tests cover country/category
 filtering, missing prices, full/partial scans, fee-adjusted losses, round-trip time,
 method matching, queue spacing/cancellation, stale responses and cache changes.
 Browser and legitimate-key acceptance testing remain unavailable in this session.
+
+
+## Ready-made levelling lists — 2026-10-22
+
+Targets now opens with 32 real community-reported targets from the first levelling
+table in Baldr’s public official Torn forum guide (thread 16034448). Three built-in
+subsets and status/sort dropdowns work immediately without creating database lists.
+Existing custom lists remain available below. No external website integration,
+outbound links, automatic database seeding or schema changes were added.
+
+Names, levels and battle totals are explicitly reported values until applicable
+profile fields are refreshed. Battle totals remain unverified community claims;
+public profiles cannot verify private battle stats. The retrieval date is not a spy
+date. Live profile checks use the existing Torn gateway, encrypted saved keys or a
+request-only key with explicit optional page-memory retention, cancellation and
+3.4-second spacing. Available requires a fresh Okay status and observed inactivity;
+statuses expire after one minute. Individual rechecks are available.
+
+Validation: 157 tests and production build pass, including immediate populated
+rendering, filtering, freshness, inactivity and response-identity validation.
+Browser and legitimate-key acceptance testing remain unavailable in this session.
