@@ -1,12 +1,13 @@
 import { afterEach, it, expect, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 vi.mock("../lib/supabase", () => ({ supabase: {} }));
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import LiveFeeds from "../pages/LiveFeeds";
 import TornDataShortcut from "../components/TornDataShortcut";
 afterEach(() => vi.unstubAllGlobals());
 it("renders all data groups without fetching or retaining a key by default", () => {
   vi.stubGlobal("location", { hash: "#Live%20Feeds" });
-  const html = renderToStaticMarkup(<LiveFeeds />);
+  const html = renderToStaticMarkup(<QueryClientProvider client={new QueryClient()}><LiveFeeds /></QueryClientProvider>);
   expect(html).toContain("234");
   for (const category of [
     "Faction",
@@ -25,7 +26,7 @@ it("opens endpoint deep links with the required ID fields", () => {
   vi.stubGlobal("location", {
     hash: "#Live%20Feeds?section=v2-user-%7BcrimeId%7D-crimes",
   });
-  const html = renderToStaticMarkup(<LiveFeeds />);
+  const html = renderToStaticMarkup(<QueryClientProvider client={new QueryClient()}><LiveFeeds /></QueryClientProvider>);
   expect(html).toContain("crimeId");
   expect(html).toContain("Section options and pagination");
   expect(html).toContain("Fetch selected data");

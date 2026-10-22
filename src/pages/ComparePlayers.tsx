@@ -1,3 +1,6 @@
+import ChoiceInput from "../components/ChoiceInput";
+import { useTornChoices } from "../hooks/useTornChoices";
+import { catalogueChoices } from "../lib/torn-choices";
 import { useEffect, useRef, useState } from "react";
 import SavedPresets from "../components/SavedPresets";
 import KeyDisclosure from "../components/KeyDisclosure";
@@ -25,6 +28,7 @@ type Evidence = {
   observed: string | null;
 };
 export default function ComparePlayers() {
+  const savedChoices=useTornChoices();
   const [input, setInput] = useState(""),
     [days, setDays] = useState("30"),
     [metric, setMetric] = useState<MetricId>("attackswon");
@@ -242,21 +246,7 @@ export default function ComparePlayers() {
           );
         }}
       >
-        <label>
-          Player IDs
-          <input
-            className="nu-input"
-            aria-label="Player IDs"
-            value={input}
-            onChange={(event) => {
-              reset();
-              setInput(event.target.value);
-            }}
-            placeholder="Two to five Torn IDs"
-            disabled={busy}
-            required
-          />
-        </label>
+        {[0,1,2,3,4].map(index=><ChoiceInput key={index} label={`Player ${index+1}${index>1?' (optional)':''}`} value={input.split(',')[index]?.trim()??''} onChange={value=>{reset();const ids=input.split(',');while(ids.length<5)ids.push('');ids[index]=value;setInput(ids.join(','));}} options={catalogueChoices(savedChoices.data??[],"/faction/members","members")} inputMode="numeric" required={index<2} disabled={busy}/>)}
         <label>
           Comparison window
           <select

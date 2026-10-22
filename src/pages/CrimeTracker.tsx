@@ -1,9 +1,13 @@
+import ChoiceInput from "../components/ChoiceInput";
+import { useTornChoices } from "../hooks/useTornChoices";
+import { catalogueChoices } from "../lib/torn-choices";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 interface CrimeLog { id: string; crime_name: string; attempts: number; successes: number; recorded_at: string }
 
 export default function CrimeTracker() {
+  const choices=useTornChoices();
   const [logs, setLogs] = useState<CrimeLog[]>([]);
   const [crimeName, setCrimeName] = useState('');
   const [attempts, setAttempts] = useState('1');
@@ -44,7 +48,7 @@ export default function CrimeTracker() {
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Log crimes</h3>
-        <input className="nu-input" placeholder="Crime name" value={crimeName} onChange={(e) => setCrimeName(e.target.value)} />
+        <ChoiceInput label="Crime" value={crimeName} onChange={setCrimeName} options={catalogueChoices(choices.data??[],"/torn/crimes","crimes",true)} required/>
         <input className="nu-input" placeholder="Attempts" type="number" min="1" value={attempts} onChange={(e) => setAttempts(e.target.value)} />
         <input className="nu-input" placeholder="Successes" type="number" min="0" value={successes} onChange={(e) => setSuccesses(e.target.value)} />
         <button className="nu-btn" onClick={add}>Log</button>

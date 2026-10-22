@@ -5,6 +5,9 @@ import { supabase } from "../lib/supabase";
 import { functionError } from "../lib/function-error";
 import { downloadBlob } from "../lib/export";
 import KeyDisclosure from "../components/KeyDisclosure";
+import ApiParameterField from "../components/ApiParameterField";
+import { useTornChoices } from "../hooks/useTornChoices";
+import { parameterChoices } from "../lib/torn-choices";
 import TornDataView from "../components/TornDataView";
 const groups: Record<string, string> = {
   user: "My player & player lookups",
@@ -44,6 +47,7 @@ type Result = {
 };
 export default function LiveFeeds() {
   const first = initialSection();
+  const savedChoices = useTornChoices();
   const [group, setGroup] = useState(first.group),
     [sectionId, setSectionId] = useState(first.id),
     [search, setSearch] = useState("");
@@ -268,59 +272,7 @@ export default function LiveFeeds() {
           {parameters.length > 0 && (
             <details open={parameters.some((p) => p.required)}>
               <summary>Section options and pagination</summary>
-              {parameters.map((parameter) => {
-                const options = parameter.schema.enum;
-                return (
-                  <label
-                    style={{ display: "block", marginBottom: "0.8rem" }}
-                    key={parameter.name}
-                  >
-                    {parameter.name}
-                    {parameter.required ? " (required)" : " (optional)"}
-                    {Array.isArray(options) ? (
-                      <select
-                        className="nu-input"
-                        required={parameter.required}
-                        value={values[parameter.name] ?? ""}
-                        onChange={(event) =>
-                          setValues({
-                            ...values,
-                            [parameter.name]: event.target.value,
-                          })
-                        }
-                      >
-                        <option value="">Choose…</option>
-                        {options.map((option: string | number) => (
-                          <option key={String(option)} value={String(option)}>
-                            {String(option)}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <input
-                        className="nu-input"
-                        required={parameter.required}
-                        maxLength={1024}
-                        value={values[parameter.name] ?? ""}
-                        onChange={(event) =>
-                          setValues({
-                            ...values,
-                            [parameter.name]: event.target.value,
-                          })
-                        }
-                        placeholder={
-                          parameter.schema.type === "array"
-                            ? "Comma-separated values"
-                            : undefined
-                        }
-                      />
-                    )}
-                    {parameter.description && (
-                      <small>{clean(parameter.description)}</small>
-                    )}
-                  </label>
-                );
-              })}
+              {parameters.map(parameter => <div key={parameter.name} style={{marginBottom:'0.8rem'}}><ApiParameterField parameter={parameter} value={values[parameter.name]??''} onChange={value=>setValues({...values,[parameter.name]:value})} choices={parameterChoices(savedChoices.data??[],section.path,parameter.name)}/>{parameter.description&&<small>{clean(parameter.description)}</small>}</div>)}
             </details>
           )}
           <button className="nu-btn" disabled={busy || !ready}>

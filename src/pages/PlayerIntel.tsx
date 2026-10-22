@@ -1,8 +1,12 @@
+import ChoiceInput from "../components/ChoiceInput";
+import { useTornChoices } from "../hooks/useTornChoices";
+import { catalogueChoices } from "../lib/torn-choices";
 import { functionError } from "../lib/function-error";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 export default function PlayerIntel() {
+  const choices = useTornChoices();
   const preset =
     new URLSearchParams(location.hash.split("?")[1] ?? "").get("player") ?? "";
   const [input, setInput] = useState(preset),
@@ -33,17 +37,7 @@ export default function PlayerIntel() {
           if (/^[1-9]\d*$/.test(input)) setPlayer(input);
         }}
       >
-        <label>
-          Player Torn ID
-          <input
-            className="nu-input"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            inputMode="numeric"
-            required
-            pattern="[1-9][0-9]*"
-          />
-        </label>
+        <ChoiceInput label="Player" value={input} onChange={setInput} options={catalogueChoices(choices.data??[],"/faction/members","members")} inputMode="numeric" required/>
         <button className="nu-btn">Look up player</button>
       </form>
       {query.isFetching && <p>Loading profile…</p>}
@@ -66,13 +60,7 @@ export default function PlayerIntel() {
               ? "Stale"
               : "Recent observation"}
           </p>
-          <a
-            href={`https://www.torn.com/profiles.php?XID=${p.id}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Open Torn profile
-          </a>
+
           <button
             className="nu-btn"
             disabled={query.isFetching}

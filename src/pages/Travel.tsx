@@ -1,3 +1,6 @@
+import ChoiceInput from "../components/ChoiceInput";
+import { useTornChoices } from "../hooks/useTornChoices";
+import { catalogueChoices } from "../lib/torn-choices";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
@@ -24,6 +27,7 @@ const DESTINATIONS = [
 ];
 
 export default function Travel() {
+  const choices = useTornChoices();
   const [obs, setObs] = useState<Observation[]>([]);
   const [destination, setDestination] = useState(DESTINATIONS[0]);
   const [itemName, setItemName] = useState("");
@@ -82,12 +86,7 @@ export default function Travel() {
             </option>
           ))}
         </select>
-        <input
-          className="nu-input"
-          placeholder="Item name"
-          value={itemName}
-          onChange={(e) => setItemName(e.target.value)}
-        />
+        <ChoiceInput label="Item" value={itemName} onChange={setItemName} options={catalogueChoices(choices.data??[],"/torn/items","items",true)} required/>
         <input
           className="nu-input"
           placeholder="Price"

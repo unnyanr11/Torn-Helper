@@ -1,3 +1,4 @@
+import ChoiceInput from "../components/ChoiceInput";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -58,7 +59,7 @@ export default function CustomStats() {
       <article className="card nu-inset">
         <h3>New column</h3>
         <input className="nu-input" placeholder="Column name" value={name} onChange={(e) => setName(e.target.value)} />
-        <input className="nu-input" placeholder="Unit (optional, e.g. $, hits)" value={unit} onChange={(e) => setUnit(e.target.value)} />
+        <ChoiceInput label="Unit (optional)" value={unit} onChange={setUnit} options={["$","hits","points","count","%","seconds","minutes","days","stats"].map(value=>({value,label:value}))}/>
         <select className="nu-input" value={type} onChange={(e) => setType(e.target.value)}>
           <option value="number">Number</option>
           <option value="text">Text</option>

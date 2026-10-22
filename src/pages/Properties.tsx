@@ -1,9 +1,13 @@
+import ChoiceInput from "../components/ChoiceInput";
+import { useTornChoices } from "../hooks/useTornChoices";
+import { catalogueChoices } from "../lib/torn-choices";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 interface Property { id: string; property_name: string; property_type: string; upkeep: string; rent_income: string; value: string | null; }
 
 export default function Properties() {
+  const choices = useTornChoices();
   const [props, setProps] = useState<Property[]>([]);
   const [name, setName] = useState('');
   const [type, setType] = useState('house');
@@ -48,7 +52,7 @@ export default function Properties() {
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Add property</h3>
-        <input className="nu-input" placeholder="Property name" value={name} onChange={(e) => setName(e.target.value)} />
+        <ChoiceInput label="Property" value={name} onChange={setName} options={catalogueChoices(choices.data??[],"/torn/properties","properties",true)} required/>
         <select className="nu-input" value={type} onChange={(e) => setType(e.target.value)}>
           <option value="house">House</option>
           <option value="apartment">Apartment</option>

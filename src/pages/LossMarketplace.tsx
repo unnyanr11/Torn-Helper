@@ -350,11 +350,9 @@ export default function LossMarketplace() {
                 armour removed. Check the target yourself before attacking.
               </p>
               <a
-                href={`https://www.torn.com/loader.php?sid=attack&user2ID=${contract?.target_player_id}`}
-                target="_blank"
-                rel="noreferrer"
+                href={`#Player%20Intel?player=${contract?.target_player_id}`}
               >
-                Open manual Torn attack page
+                View target details
               </a>
               <button
                 className="nu-btn"

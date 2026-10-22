@@ -1,9 +1,13 @@
+import ChoiceInput from "../components/ChoiceInput";
+import { useTornChoices } from "../hooks/useTornChoices";
+import { catalogueChoices } from "../lib/torn-choices";
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 interface RaceRecord { id: string; track_name: string; car_name: string | null; position: number | null; time_ms: number | null; raced_at: string; }
 
 export default function Racing() {
+  const choices = useTornChoices();
   const [records, setRecords] = useState<RaceRecord[]>([]);
   const [track, setTrack] = useState('');
   const [car, setCar] = useState('');
@@ -47,9 +51,9 @@ export default function Racing() {
       {best && <p className="badge ok">Best time: {best.time_ms} ms on {best.track_name}</p>}
       <article className="card nu-inset">
         <h3>Log a race</h3>
-        <input className="nu-input" placeholder="Track name" value={track} onChange={(e) => setTrack(e.target.value)} />
-        <input className="nu-input" placeholder="Car name (optional)" value={car} onChange={(e) => setCar(e.target.value)} />
-        <input className="nu-input" placeholder="Position" value={position} onChange={(e) => setPosition(e.target.value)} />
+        <ChoiceInput label="Track" value={track} onChange={setTrack} options={catalogueChoices(choices.data??[],"/racing/tracks","tracks",true)} required/>
+        <ChoiceInput label="Car (optional)" value={car} onChange={setCar} options={catalogueChoices(choices.data??[],"/racing/cars","cars",true)}/>
+        <ChoiceInput label="Finishing position" value={position} onChange={setPosition} options={Array.from({length:100},(_,i)=>({value:String(i+1),label:String(i+1)}))} allowCustom={false}/>
         <input className="nu-input" placeholder="Time (ms)" value={timeMs} onChange={(e) => setTimeMs(e.target.value)} />
         <button className="nu-btn" onClick={addRecord}>Log race</button>
       </article>

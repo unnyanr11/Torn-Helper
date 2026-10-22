@@ -15,7 +15,7 @@ const wait = (milliseconds: number, signal: AbortSignal) => new Promise<void>(re
   const timer = setTimeout(finish, milliseconds);
   signal.addEventListener('abort', finish, { once: true });
 });
-const initialArea = () => { const area = new URLSearchParams(location.hash.split('?')[1] ?? '').get('area'); return area && AREAS.includes(area) ? area : 'All'; };
+const initialArea = () => { const area = new URLSearchParams(location.hash.split('?')[1] ?? '').get('area'); return area && AREAS.includes(area) ? area : 'Personal'; };
 export default function MyTorn() {
   const client = useQueryClient();
   const [entries, setEntries] = useState<Record<string, DataEntry>>({});
@@ -28,7 +28,7 @@ export default function MyTorn() {
   const control = useRef<AbortController | null>(null);
   useEffect(() => {
     let alive = true;
-    const route = () => { const next = initialArea(); setArea(next); if (next !== 'All') setSelected([next]); };
+    const route = () => { const next = initialArea(); setArea(next); setSearch(''); if (next !== 'All') setSelected([next]); };
     window.addEventListener('hashchange', route);
     void (async () => {
       const { data: auth } = await supabase.auth.getUser();
@@ -73,7 +73,7 @@ export default function MyTorn() {
         onProgress: (count, size, message) => { setDone(count); setTotal(size); setStatus(message); },
       });
       if (!result.stopped) setStatus(`Finished checking ${result.done} sections. More related records and history pages can be opened below.`);
-      if (!controller.signal.aborted) await Promise.all([client.invalidateQueries({ queryKey: ['personal-history'] }), client.invalidateQueries({ queryKey: ['personal-history-start'] })]);
+      if (!controller.signal.aborted) await Promise.all([client.invalidateQueries({ queryKey: ['personal-history'] }), client.invalidateQueries({ queryKey: ['personal-history-start'] }), client.invalidateQueries({ queryKey: ['torn-choices'] })]);
     } catch (failure) {
       if (!controller.signal.aborted) { setError(failure instanceof Error ? failure.message : 'Unable to load Torn data.'); setStatus('Collection stopped. Successful observations remain available.'); }
     } finally { if (control.current === controller && !controller.signal.aborted) setBusy(false); }
@@ -83,21 +83,21 @@ export default function MyTorn() {
   const loaded = Object.values(entries).filter(e => e.observation).length, denied = Object.values(entries).filter(e => e.error).length;
   const visible = requests.filter(r => (area === 'All' || r.areas.includes(area)) && `${r.label} ${r.capability.summary}`.toLowerCase().includes(search.toLowerCase()) && (showUnloaded || entries[observationKey(r.capability.id, r.parameters)]));
   return <section className="my-torn">
-    <div className="personal-heading"><div><p className="eyebrow">YOUR CONNECTED TORN WORKSPACE</p><h2>{player?.name ? `${player.name}’s Torn` : 'Your world, connected.'}</h2>{player && <p className="personal-identity">Level {player.level ?? 'unknown'} · {player.rank ?? 'Rank unavailable'} · {player.title ?? 'Title unavailable'}</p>}<p>Personal stats, crime details, inventory, investments, faction, company, properties, combat, racing and progress.</p></div><span className="personal-count">{AREAS.length}<small>connected groups</small></span></div>
-    <article className="card personal-connect"><h3>Load your connected data</h3><p>Full Access provides the widest coverage. Torn still checks your faction permissions, company role and account eligibility for each section.</p>
-      <fieldset disabled={busy}><legend>Choose data groups</legend><div className="connection-choices">{AREAS.map(a => <label key={a}><input type="checkbox" checked={selected.includes(a)} onChange={e => setSelected(old => e.target.checked ? [...old,a] : old.filter(v => v !== a))}/>{a}</label>)}</div></fieldset>
+    <h2>{player?.name ? `${player.name}’s dashboard` : 'My dashboard'}</h2><p>Choose a group, refresh your data, then view the results below.</p>
+    <article className="card personal-connect"><h3>Refresh data</h3>
+      <label>Data group<select className="nu-input" aria-label="Data group" disabled={busy} value={selected.length===AREAS.length?'All':selected[0]??'Personal'} onChange={e=>{const next=e.target.value;setSelected(next==='All'?AREAS:[next]);setArea(next);setSearch('');}}><option value="All">All groups (takes longer)</option>{AREAS.map(a=><option key={a}>{a}</option>)}</select></label>
       <form onSubmit={event => { event.preventDefault(); void collect(); }}><label>Key to use<select className="nu-input" value={mode} disabled={busy} onChange={e => { setMode(e.target.value); setKey(''); }}><option value="request">Request-only key for this collection</option><option value="stored">Encrypted key saved in Settings</option></select></label>
       {mode === 'request' && <><KeyDisclosure persist={false} session/><label>Torn API key<input className="nu-input" type="password" autoComplete="off" spellCheck={false} value={key} disabled={busy} minLength={16} maxLength={16} required onChange={e => setKey(e.target.value.trim())}/></label></>}
       <p>This loads available private money, inventory, logs, messages, faction and company records into your workspace. Your request-only key stays in memory for this collection, then is discarded.</p>
-      <button className="nu-btn" disabled={busy || !selected.length || (mode === 'request' && !/^[A-Za-z0-9]{16}$/.test(key))}>{busy ? 'Collecting connected Torn data…' : selected.length === AREAS.length ? 'Load all connected data' : 'Load selected data groups'}</button>{busy && <button className="nu-btn" type="button" onClick={stop}>Stop collection</button>}</form>
-      <p>Keep this page open. A full collection can take 10–20 minutes. Requests are spaced to respect quotas; related detail is discovered as data arrives. Automatic expansion is capped at 120 additional requests (20 per source, up to 100 crime details). Every additional related record has a direct lookup below. Histories load one API page per section; use “More history pages” to continue.</p>
+      <button className="nu-btn" disabled={busy || !selected.length || (mode === 'request' && !/^[A-Za-z0-9]{16}$/.test(key))}>{busy ? 'Collecting connected Torn data…' : selected.length === AREAS.length ? 'Refresh all groups' : 'Refresh selected group'}</button>{busy && <button className="nu-btn" type="button" onClick={stop}>Stop collection</button>}</form>
+      <details><summary>Collection time and limits</summary><p>Keep this page open. All groups can take 10–20 minutes. Related detail loads as records arrive. Bulk expansion is limited to 120 extra requests; further records and history pages can be opened individually.</p></details>
       {(busy || done > 0) && <progress className="collection-progress" aria-label="Connected sections checked" value={done} max={Math.max(1,total)}/>}
       <p role="status">{status}</p>{error && <p role="alert">{error}</p>}
     </article>
-    <ConnectedInsights entries={entries}/>
-    <HistoryExplorer/>
+    {loaded>0&&<ConnectedInsights entries={entries}/>}
+    <details className="card"><summary>Trends and history settings</summary><HistoryExplorer/></details>
     <div className="personal-summary"><article className="card"><strong>{loaded}</strong><span>Sections with data</span></article><article className="card"><strong>{denied}</strong><span>Sections needing attention</span></article><article className="card"><strong>{requests.length}</strong><span>Known sections and lookups</span></article></div>
-    <div className="personal-filters"><label>Find a section<input className="nu-input" type="search" placeholder="Battle stats, inventory, company…" value={search} onChange={e => setSearch(e.target.value)}/></label><label>Focus<select className="nu-input" value={area} onChange={e => setArea(e.target.value)}>{['All',...AREAS].map(a => <option key={a}>{a}</option>)}</select></label></div>
+    <div className="personal-filters"><label>Show section<select className="nu-input" value={search} onChange={e=>setSearch(e.target.value)}><option value="">All sections in this group</option>{[...new Set(requests.filter(r=>area==='All'||r.areas.includes(area)).map(r=>r.label))].sort().map(name=><option key={name}>{name}</option>)}</select></label></div>
     <label><input type="checkbox" checked={showUnloaded} onChange={e => setShowUnloaded(e.target.checked)}/> Show sections without observations</label>
     <p>Observations show their collection time. Refresh changes compare actual observations in memory. Only the latest 100 requests are retained in the private cache for up to 24 hours; opted-in numeric history is stored separately.</p>
     <div className="personal-sections">{visible.map(row => {

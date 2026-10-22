@@ -1,0 +1,7 @@
+import { useState } from 'react';
+import type { Choice } from '../lib/torn-choices';
+export default function ChoiceInput({label,value,onChange,options,required=false,disabled=false,inputMode,allowCustom=true}:{label:string;value:string;onChange:(v:string)=>void;options:Choice[];required?:boolean;disabled?:boolean;inputMode?:'numeric'|'text';allowCustom?:boolean}){
+  const [custom,setCustom]=useState(false);
+  const known=options.some(o=>o.value===value);
+  return <div className="choice-field"><label>{label}{custom?<input className="nu-input" aria-label={label} value={value} required={required} disabled={disabled} inputMode={inputMode} pattern={inputMode==='numeric'?'[0-9]+':undefined} onChange={e=>onChange(e.target.value)}/>:<select className="nu-input" aria-label={label} value={value} required={required} disabled={disabled||(!options.length&&!value&&!allowCustom)} onChange={e=>{if(e.target.value==='__custom__'){setCustom(true);onChange('');}else onChange(e.target.value);}}><option value="">{options.length?'Choose…':'No saved choices yet'}</option>{value&&!known&&<option value={value}>{value}</option>}{options.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}{allowCustom&&<option value="__custom__">Enter a different value…</option>}</select>}</label>{custom&&<button type="button" className="choice-alternative" onClick={()=>setCustom(false)}>Choose from saved options</button>}{!options.length&&!custom&&<small>Load the relevant data group in Overview to populate this list.</small>}</div>;
+}

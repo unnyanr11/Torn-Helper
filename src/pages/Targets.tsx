@@ -489,11 +489,9 @@ export default function Targets() {
                           )
                         ) : (
                           <a
-                            href={`https://www.torn.com/loader.php?sid=attack&user2ID=${e.torn_player_id}`}
-                            target="_blank"
-                            rel="noreferrer"
+                            href={`#Player%20Intel?player=${e.torn_player_id}`}
                           >
-                            Attack
+                            View player
                           </a>
                         )}
                       </td>

@@ -192,3 +192,34 @@ insert snapshots or execute the recording RPC; service_role can record. Security
 advisor findings remain the pre-existing private workflow audit INFO and disabled
 password-breach protection WARN. No legitimate Torn key was available for positive
 private-data acceptance checks; browser QA was unavailable in this managed session.
+
+## Simple standalone UX (2026-10-22)
+
+Replaced the spatial shell with a compact, task-first layout: seven primary tools,
+a More tools dropdown, system fonts, light/dark themes, plain surfaces and a mobile
+menu. The floating dock, ambient scene and pointer-motion hook are no longer used.
+Overview defaults to the Personal group, uses one group selector and refresh action,
+and puts history settings and collection limits in expandable sections. Result
+sections can be selected from a dropdown instead of a typed search.
+
+Known players, crimes, racing tracks/cars/positions, items, properties and custom
+stat units now use dropdowns. Comparison has individual player selectors. API forms
+use documented enum/boolean dropdowns, multi-selects for array enums, bounded page
+size selectors, UTC date pickers and cached catalogue IDs. Unknown IDs and custom
+names retain explicit manual-entry fallbacks; credentials, notes and custom amounts
+remain inputs. Lists are populated from owner-protected observations, with empty
+states rather than invented game records. Data group refresh invalidates the shared
+choice catalogue.
+
+External profile/attack navigation now uses internal player lookup. Competitor
+comparison, Discord/TornStats and optional external AI integration pages are blocked
+from navigation and direct routing. External signup/pricing links and the external
+font import were removed. The official Torn API and the existing Supabase backend
+remain the app's required data infrastructure. No external website UI or content was
+embedded, imported or connected.
+
+Validation: 143 tests and production build pass. Render tests cover dropdowns,
+custom-value preservation, current cache choices, enum arrays, date/page controls,
+access restrictions and navigation. Static UI audit finds no external URLs in
+components, pages, the stylesheet or index. Browser QA remains unavailable in this
+managed session; no positive private-data key test was performed.
