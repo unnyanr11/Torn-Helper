@@ -223,3 +223,45 @@ custom-value preservation, current cache choices, enum arrays, date/page control
 access restrictions and navigation. Static UI audit finds no external URLs in
 components, pages, the stylesheet or index. Browser QA remains unavailable in this
 managed session; no positive private-data key test was performed.
+
+## Category navigation and automatic travel comparison (2026-10-22)
+
+Restored all authorized tools under the prior Workspace, Intelligence, Operations,
+Faction, Economy, Explore and Account groups. The simple visual treatment remains;
+the More tools selector is removed. Optional external integrations remain blocked.
+
+Travel and Travel Optimizer now share one calculator: location → item category →
+item. Categories and items come from actual Torn item catalogue entries with a
+returned buy price for the selected country. Loading items also retrieves the
+owner's travel method/timestamps. Selecting an item automatically refreshes its
+shop catalogue entry and scans item-market listings through the existing validated
+gateway. Request-only keys stay in page memory with explicit disclosure; saved
+keys remain supported. Requests are debounced, serialized at 3.4 seconds, cancellable
+and protected against late updates when country/item changes.
+
+Market scans examine five pages per action, then provide a continuation button.
+A complete scan is labeled separately from a partial lowest-observed quote. Empty
+or invalid listings stay unknown, and mixed global-cache timestamps block the
+estimate until refresh. No foreign stock quantities or guaranteed sale proceeds
+are inferred. No third-party travel feed or external navigation was introduced.
+
+Profit includes quantity, selling fee (default regular market 5%), direct trip
+travel budget, both flight legs and optional shopping/waiting time. Negative results
+are shown. A matching personal outbound duration is preferred; the return is
+estimated equal. Otherwise published official route times are labeled estimates,
+with book/time overrides. Route metadata was checked against the official Torn
+Travel wiki on 2026-10-22; it is configuration, not seeded observations. The travel
+API does not return an actual charged fare: airstrip/private cash fares are
+estimated zero excluding overhead, standard paid legs use reference fares, and
+business tickets use fetched ticket listings when available or an explicit budget.
+Users can override costs/time. Capacity is user-selected, not claimed API capacity.
+
+Saved estimates preserve current calculated profit/per-hour values. The legacy
+integer `flight_minutes` field rounds total duration upward to a whole minute;
+profit/hour is calculated using the exact displayed duration. Historical manual
+observations remain accessible and unmodified.
+
+Validation: 152 tests and production build pass. Tests cover country/category
+filtering, missing prices, full/partial scans, fee-adjusted losses, round-trip time,
+method matching, queue spacing/cancellation, stale responses and cache changes.
+Browser and legitimate-key acceptance testing remain unavailable in this session.

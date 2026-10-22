@@ -1,6 +1,6 @@
 import { CAPABILITIES } from '../api/capabilities';
 export type Choice = { value:string; label:string };
-export type CachedChoiceRow = { endpoint_id:string; payload:unknown };
+export type CachedChoiceRow = { endpoint_id:string; payload:unknown; fetched_at?:string };
 const object=(v:unknown):Record<string,any>=>v&&typeof v==='object'&&!Array.isArray(v)?v as Record<string,any>:{};
 export function catalogueChoices(rows:CachedChoiceRow[], path:string, key:string, byName=false):Choice[] {
   const id=CAPABILITIES.find(c=>c.path===path)?.id;

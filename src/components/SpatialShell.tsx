@@ -1,9 +1,9 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { NAV, type Page } from '../nav';
 import { canAccessPage } from '../lib/access';
-const labels: Partial<Record<Page,string>> = { 'Live Feeds':'Data browser', 'Stat Growth':'Trends', 'Player Intel':'Player lookup' };
+import { NAV_GROUPS } from '../lib/navigation';
+const labels: Partial<Record<Page,string>> = { 'Live Feeds':'Torn Data Browser' };
 const label = (p: Page) => labels[p] ?? p;
-const primary: Page[] = ['Overview','Targets','Player Intel','Compare Players','Stat Growth','Live Feeds','Settings'];
 export default function SpatialShell({ page, signedIn, role, shared, onNavigate, children }: { page: Page; signedIn: boolean; role: string; shared: boolean; onNavigate:(page:Page)=>void; children:ReactNode }) {
   const [theme,setTheme] = useState(() => { try { return localStorage.getItem('tcc-theme') === 'dark' ? 'dark' : 'light'; } catch { return 'light'; } });
   const [open,setOpen] = useState(false);
@@ -19,7 +19,6 @@ export default function SpatialShell({ page, signedIn, role, shared, onNavigate,
     document.addEventListener('keydown',close);return()=>document.removeEventListener('keydown',close);
   },[]);
   const allowed=NAV.filter(p=>canAccessPage(p,signedIn,role));
-  const more=allowed.filter(p=>!primary.includes(p));
   const navigate=(p:Page)=>{onNavigate(p);setOpen(false);window.scrollTo({top:0,behavior:'instant'});};
   return <div className={`layout simple-layout ${open?'navigation-open':''}`}>
     <a className="skip-link" href="#workspace-content" onClick={e=>{e.preventDefault();document.getElementById('workspace-content')?.focus();}}>Skip to content</a>
@@ -27,8 +26,10 @@ export default function SpatialShell({ page, signedIn, role, shared, onNavigate,
     {open && <button className="navigation-backdrop" aria-label="Close navigation" onClick={()=>setOpen(false)}/>}
     <nav id="simple-navigation" className={`sidebar ${open?'open':''}`} aria-label="Main">
       <button className="brand" onClick={()=>navigate(signedIn?'Overview':'Settings')}>Torn Helper</button>
-      <div className="nav-scroll">{primary.filter(p=>allowed.includes(p)).map(p=><button key={p} className={`nav-item ${p===page&&!shared?'active':''}`} aria-current={p===page&&!shared?'page':undefined} onClick={()=>navigate(p)}>{label(p)}</button>)}
-      {!!more.length&&<label className="more-tools">More tools<select className="nu-input" aria-label="More tools" value={more.includes(page)?page:''} onChange={e=>{if(e.target.value)navigate(e.target.value as Page);}}><option value="">Choose a tool…</option>{more.map(p=><option key={p} value={p}>{label(p)}</option>)}</select></label>}</div>
+      <div className="nav-scroll">{Object.entries(NAV_GROUPS).map(([category,names])=>{
+        const pages=allowed.filter(p=>names.includes(p));
+        return pages.length?<details className="tool-category" key={category} open><summary>{category}</summary>{pages.map(p=><button key={p} className={`nav-item ${p===page&&!shared?'active':''}`} aria-current={p===page&&!shared?'page':undefined} onClick={()=>navigate(p)}>{label(p)}</button>)}</details>:null;
+      })}</div>
       <small className="simple-account">{signedIn?'Account connected':'Sign in with your Torn key'}</small>
     </nav>
     <main id="workspace-content" className="content" tabIndex={-1}><header className="topbar"><h1>{shared?'Shared snapshot':signedIn?label(page):'Torn Helper'}</h1><button className="nu-btn" aria-label={theme==='dark'?'Switch to light mode':'Switch to dark mode'} onClick={()=>setTheme(theme==='dark'?'light':'dark')}>{theme==='dark'?'Light mode':'Dark mode'}</button></header><div className="workspace-stage">{children}</div><footer className="workspace-footer">Torn Helper · {shared?'Published snapshot':'Your personal tools'}</footer></main>

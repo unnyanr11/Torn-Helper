@@ -16,13 +16,14 @@ const render = (signedIn: boolean, role: string, shared = false) =>
     </SpatialShell>,
   );
 describe("simple navigation preserves the application's access model", () => {
-  it("keeps authorized tools accessible through primary navigation and a dropdown", () => {
+  it("keeps every authorized tool in category-based navigation", () => {
     const html = render(true, "admin"),
       nav = html.split('aria-label="Main"')[1].split("</nav>")[0];
     for (const page of NAV.filter((page) => canAccessPage(page, true, "admin")))
-      expect(nav).toContain(({ "Live Feeds": "Data browser", "Stat Growth": "Trends", "Player Intel": "Player lookup" } as Record<string,string>)[page] ?? page);
+      expect(nav).toContain(page === "Live Feeds" ? "Torn Data Browser" : page);
     expect(html).toContain('id="workspace-content"');
-    expect(html).toContain('aria-label="More tools"');
+    for(const group of ["Workspace","Intelligence","Operations","Faction","Economy","Explore","Account"])expect(html).toContain(`<summary>${group}</summary>`);
+    expect(html).not.toContain('aria-label="More tools"');
     expect(html).not.toContain("spatial-dock");
     expect(html).not.toContain("scene-orb");
   });
@@ -36,7 +37,7 @@ describe("simple navigation preserves the application's access model", () => {
       for (const page of NAV.filter(
         (page) => !canAccessPage(page, signedIn, role),
       ))
-        expect(nav).not.toContain(`>${page}</option>`);
+        expect(nav).not.toContain(`>${page}</button>`);
     }
   });
   it("labels shared reports as published snapshots rather than a private live workspace", () => {

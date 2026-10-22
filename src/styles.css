@@ -1559,3 +1559,13 @@ details[open] > summary {
 @media(max-width:800px) { .simple-layout { display:block; padding:0; } .simple-layout .content { padding:65px 16px 20px; } .simple-layout .sidebar { position:fixed; left:0; top:0; width:240px; z-index:50; transform:translateX(-100%); visibility:hidden; } .simple-layout .sidebar.open { transform:translateX(0); visibility:visible; } .simple-layout .menu-btn { display:block; position:fixed; top:12px; left:16px; z-index:60; } }
 .simple-layout .personal-filters { grid-template-columns:minmax(0,650px); }
 @media(max-width:800px) { .simple-layout .sidebar { top:56px; bottom:0; height:calc(100dvh - 56px); max-height:none; min-height:0; } }
+.tool-category { margin:0 0 16px; border:0!important; padding:0!important; }
+.tool-category > summary { padding:10px 10px 7px; color:var(--muted); text-transform:uppercase; letter-spacing:.12em; font-size:10px; font-weight:700; }
+.tool-category > .nav-item { padding-left:16px; }
+.travel-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr)); gap:16px; margin:12px 0; }
+.travel-fields label { display:grid; gap:6px; align-content:start; }
+.travel-profit-tool .personal-summary > article { padding:12px; border:1px solid var(--border); border-radius:5px; display:grid; gap:6px; }
+.travel-profit-tool .personal-summary strong { font-size:20px; overflow-wrap:anywhere; }
+.travel-profit-tool .personal-summary span { font-size:12px; color:var(--muted); }
+.travel-profit-tool details > summary { padding:8px 0; }
+.travel-profit-tool details > label { display:grid; gap:6px; margin-bottom:10px; }
