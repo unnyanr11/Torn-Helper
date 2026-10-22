@@ -12,7 +12,10 @@ import HistoryExplorer from './HistoryExplorer';
 import HomeDashboard from './HomeDashboard';
 import WorkspaceWelcome from './WorkspaceWelcome';
 import { useWorkspaceFocus } from '../hooks/useWorkspaceFocus';
-import { ESSENTIAL_PATHS } from '../lib/home-dashboard';
+import { ESSENTIAL_PATHS, homeEntry } from '../lib/home-dashboard';
+import { CAPABILITIES } from '../api/capabilities';
+import type { TornObservation } from '../lib/personal-data';
+import { syncEnergyLogs, type EnergyLogCoverage } from '../lib/energy-log-sync';
 const wait = (milliseconds: number, signal: AbortSignal) => new Promise<void>(resolve => {
   if (signal.aborted) return resolve();
   const finish = () => { clearTimeout(timer); signal.removeEventListener('abort', finish); resolve(); };
@@ -30,6 +33,7 @@ export default function MyTorn({accountId}:{accountId?:string}) {
   const [busy, setBusy] = useState(false), [status, setStatus] = useState(''), [error, setError] = useState('');
   const [done, setDone] = useState(0), [total, setTotal] = useState(0), [area, setArea] = useState(initialArea), [search, setSearch] = useState('');
   const [showUnloaded, setShowUnloaded] = useState(false);
+  const [energyCoverage,setEnergyCoverage]=useState<EnergyLogCoverage>();
   const control = useRef<AbortController | null>(null);
   useEffect(() => {
     let alive = true;
@@ -83,6 +87,36 @@ export default function MyTorn({accountId}:{accountId?:string}) {
       if (!controller.signal.aborted) { setError(failure instanceof Error ? failure.message : 'Unable to load Torn data.'); setStatus('Collection stopped. Successful observations remain available.'); }
     } finally { if (control.current === controller && !controller.signal.aborted) setBusy(false); }
   }
+  async function updateEnergy(kind:'bars'|'logs') {
+    if(busy || (mode==='request'&&!/^[A-Za-z0-9]{16}$/.test(key)))return;
+    const controller=new AbortController();control.current=controller;
+    const secret=key;setKey('');setBusy(true);setError('');setDone(0);setTotal(kind==='bars'?1:2);setStatus('Checking energy…');
+    const save=(observation:TornObservation)=>{const id=observationKey(observation.endpoint_id,observation.parameters);setEntries(old=>({...old,[id]:{observation,previous:old[id]?.observation?.payload}}));};
+    const fetch=async(path:string,parameters:Record<string,string>):Promise<TornObservation>=>{
+      const endpoint=CAPABILITIES.find(c=>c.path===path)!;
+      const response=await supabase.functions.invoke('torn-data',{body:{endpoint_id:endpoint.id,parameters,...(mode==='request'?{apiKey:secret}:{})},signal:controller.signal});
+      if(response.error||response.data?.error)throw new Error((await functionError(response.data,response.error)).message);
+      if(controller.signal.aborted)throw new DOMException('Cancelled','AbortError');
+      return response.data;
+    };
+    try {
+      if(kind==='bars'){
+        const observation=await fetch('/user/bars',{timestamp:String(Math.floor(Date.now()/1000))});save(observation);setEnergyCoverage(undefined);setDone(1);setStatus('Energy baseline confirmed. Refill ticks now update locally without API calls.');
+      }else{
+        const baseline=homeEntry(entries,'/user/bars')?.observation?.fetched_at;
+        if(!baseline)throw new Error('Refresh energy to establish a starting value first.');
+        const previous=energyCoverage?.baseline===baseline&&energyCoverage.complete?energyCoverage:undefined;
+        // Mark incomplete before fetching: a failed or cancelled multi-page check must not appear complete.
+        setEnergyCoverage({baseline,from:Math.floor(Date.parse(baseline)/1000),to:0,complete:false,pages:0});
+        let pages=0;
+        const coverage=await syncEnergyLogs({baseline,since:previous?.to,signal:controller.signal,fetch:parameters=>fetch('/user/log',parameters),pause:wait,onPage:observation=>{save(observation);setDone(++pages);}});
+        setEnergyCoverage({...coverage,from:previous&&previous.to>=coverage.from?previous.from:coverage.from});
+        setStatus(coverage.complete?'Recent logs checked. Later actions require another log check.':'More log pages remain. Refresh energy once to establish a new baseline with fewer API calls.');
+      }
+      await client.invalidateQueries({queryKey:['torn-choices']});
+    }catch(failure){if(!controller.signal.aborted){setError(failure instanceof Error?failure.message:'Unable to update energy.');setStatus('Energy check stopped. The last confirmed value remains available.');}}
+    finally{if(control.current===controller&&!controller.signal.aborted)setBusy(false);}
+  }
   function stop() { control.current?.abort(); setBusy(false); setStatus('Collection stopped. Loaded observations remain available.'); void client.invalidateQueries({ queryKey: ['personal-history'] }); }
   const player = entryPayload(entries, '/user/profile').profile;
   const loaded = Object.values(entries).filter(e => e.observation).length, denied = Object.values(entries).filter(e => e.error).length;
@@ -95,6 +129,10 @@ export default function MyTorn({accountId}:{accountId?:string}) {
        <label>Key to use<select className="nu-input" value={mode} disabled={busy} onChange={e=>{setMode(e.target.value);setKey('');}}><option value="request">Use a key for this refresh</option><option value="stored">Use my encrypted key from Settings</option></select></label>
        {mode==='request'&&<><p>Your key is sent to this platform’s backend and the official Torn API for this refresh, then discarded. It is never saved in browser storage.</p><details><summary>Key privacy and access</summary><KeyDisclosure persist={false} session/></details><label>Torn API key<input className="nu-input" type="password" autoComplete="off" spellCheck={false} value={key} disabled={busy} minLength={16} maxLength={16} required onChange={e=>setKey(e.target.value.trim())}/></label></>}
        <button className="nu-btn" disabled={busy||(mode==='request'&&!/^[A-Za-z0-9]{16}$/.test(key))}>{busy?'Refreshing…':'Refresh essentials'}</button>{busy&&<button className="nu-btn" type="button" onClick={stop}>Stop refresh</button>}
+       <details><summary>Energy timer and activity logs</summary><p>Refill ticks use the last confirmed timing and make no API calls. Sync logs to apply explicit energy gains and costs. Notifications alone do not confirm an amount.</p><p>Logs require Full Access or a suitable Custom key. Restricted log categories can omit actions; this remains an estimate. A check loads at most two pages, then recommends a new baseline if history is incomplete.</p>
+        <button className="nu-btn" type="button" disabled={busy||(mode==='request'&&!/^[A-Za-z0-9]{16}$/.test(key))} onClick={()=>void updateEnergy('bars')}>Refresh energy baseline</button>
+        <button className="nu-btn" type="button" disabled={busy||!homeEntry(entries,'/user/bars')?.observation||(mode==='request'&&!/^[A-Za-z0-9]{16}$/.test(key))} onClick={()=>void updateEnergy('logs')}>Sync energy logs</button>
+       </details>
        <details open={new URLSearchParams(location.hash.split('?')[1]??'').has('area')}><summary>Load more data and advanced options</summary><p>Choose a group for detailed records. All groups can take 10–20 minutes. Related detail is limited to 120 extra requests, with further records available individually.</p>
         <label>Data group<select className="nu-input" aria-label="Data group" disabled={busy} value={selected.length===AREAS.length?'All':selected[0]??'Personal'} onChange={e=>{const next=e.target.value;setSelected(next==='All'?AREAS:[next]);setArea(next);setSearch('');}}><option value="All">All groups (takes longer)</option>{AREAS.map(a=><option key={a}>{a}</option>)}</select></label>
         <p>This collection can include private money, inventory, logs, messages, faction and company records, depending on the group and your key permissions.</p>
@@ -104,7 +142,7 @@ export default function MyTorn({accountId}:{accountId?:string}) {
       {(busy||done>0)&&<progress className="collection-progress" aria-label="Connected sections checked" value={done} max={Math.max(1,total)}/>}
       <p role="status">{status}</p>{error&&<p role="alert">{error}</p>}
     </article>
-    <HomeDashboard entries={entries}/>
+    <HomeDashboard entries={entries} energyCoverage={energyCoverage}/>
     <details className="card home-connected" open={new URLSearchParams(location.hash.split('?')[1]??'').has('area')}><summary>All connected data · {loaded} sections with observations</summary>
     {loaded>0&&<ConnectedInsights entries={entries}/>}
     <details className="card"><summary>Trends and history settings</summary><HistoryExplorer/></details>

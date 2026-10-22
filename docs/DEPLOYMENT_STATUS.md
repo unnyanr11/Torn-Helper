@@ -411,3 +411,40 @@ Validation: 184 tests and production build pass. Tests cover goal validation/acc
 isolation, accessible internal shortcuts, the four-section collector, unknown/stale
 values, countdown calculations, name/ID search with 1,502 results and retained custom
 values. Browser and legitimate-key acceptance checks were not performed.
+
+## Energy refill timer and activity reconciliation — 2026-10-22
+
+Energy now has a clearly labelled local estimate alongside its last confirmed value.
+This supersedes the previous snapshot-only energy behavior; other bars still show
+snapshots. The estimator uses the bar's increment, interval and next-tick timing,
+caps natural regeneration at the normal maximum, and preserves stacked energy.
+The clock projection is constant-time and makes no API requests. Collected logs
+are replayed only when observations change, using explicit energy_used,
+energy_increased and energy_decreased amounts rather than notification prose.
+
+Overview provides Refresh energy baseline (one bar request) and Sync energy logs
+(at most two pages, spaced requests, incremental overlap after a complete check).
+Duplicate log IDs are ignored. New confirmed bars supersede older logs. Unknown
+energy events, conflicting IDs, same-second energy actions, impossible amounts,
+invalid timing and baselines older than 24 hours pause the estimate. Incomplete,
+failed or cancelled log checks cannot claim complete coverage. Refreshing the bar
+is recommended instead of replaying long histories. No schema or Edge Function
+change and no automatic API polling were needed.
+
+Logs require Full Access or appropriate Custom permissions. Custom category/type
+restrictions can omit actions, and page completion cannot prove every energy event
+was visible. The interface displays checked-through time and explains that later
+actions elsewhere in Torn are unknown until another request. A restored cache has
+unconfirmed coverage. This is an estimate, not a live notification subscription.
+Request-only keys stay in the active request closure and are not persisted.
+
+Validation: 200 tests pass, including 16 new energy/timing/log-pagination checks.
+Production TypeScript/Vite build and git diff whitespace checks pass. Build used a
+configuration-only publishable key, not an API acceptance test. No browser QA or
+legitimate Torn-key acceptance test was performed. Existing ExcelJS chunk-size
+warning remains nonfatal.
+
+References: official Torn OpenAPI (/user/bars and /user/log schemas) at
+https://www.torn.com/swagger/openapi.json and energy rules at
+https://wiki.torn.com/wiki/Energy. Actual bar timing is used rather than hardcoding
+subscriber regeneration rates.
