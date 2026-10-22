@@ -320,3 +320,26 @@ No schema changes, new write paths or third-party integrations were introduced.
 The private shared cache query retains its existing user filter and session cache
 clearing. Validation: 163 tests and production build pass. Browser and legitimate
 Torn-key acceptance checks were not performed.
+
+
+## Full Torn item catalogue import — 2026-10-22
+
+Each item/name selector now includes Load all Torn items. It sends one explicit
+request through the existing Torn gateway for /torn/items with cat=All, validates
+all returned names/IDs/categories and updates the shared private observation cache
+used throughout the app. The parser imposes no item-count cap and supports the
+official v2 array and legacy keyed catalogue formats. Invalid/empty/conflicting
+records or paginated responses preserve existing choices. No live prices are
+claimed from this metadata import. The original observation is retained for
+existing tools when additional metadata is available.
+
+Request-only keys are cleared at request start and are never stored by the client;
+encrypted saved keys remain optional. Requests abort on leaving. No schema or
+backend changes, third-party connections, or guessed item records were added.
+The official Torn specification identifies items as Public Only access.
+
+Validation: 169 tests and production build pass. The parser test exercises 1,600
+records, duplicate names with different IDs, invalid data, and privacy disclosure.
+No full catalogue was present in the backend cache at implementation time and no
+legitimate user key was available for live acceptance testing. The real catalogue
+loads when the signed-in user supplies their linked key through this UI.
