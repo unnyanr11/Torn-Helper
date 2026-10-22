@@ -150,3 +150,45 @@ not returned by the API.
 Validation: 130 tests pass; TypeScript and production build pass. No legitimate
 Torn key was available for positive live-key testing. Browser QA was unavailable
 in this managed session; renderer checks use server-rendered API fixtures.
+
+## Connected data groups (2026-10-22)
+
+Overview connects ten selectable groups: Personal, Crimes, Inventory, Investments,
+Faction, Company, Properties, Combat, Racing and Progress. Existing tracker pages
+open the matching group. The collector deduplicates identical requests, discovers
+crime statistics/actions, inventory item details/listings, owned-stock chart history,
+property sale/rental listings, property details, race details, track/class records,
+attack logs, chain reports, ranked war reports and organized crime details from
+actual returned IDs. Required IDs and filters are preserved in individual-browser
+links; API pagination can continue there. All requests still pass through the
+existing authenticated, owner-verifying, allowlisted gateway.
+
+Collection remains explicit and cancellable, with one quota retry, 3.4-second request
+spacing and per-section permission errors. Automatic expansion is bounded at 120
+additional calls, 20 per source (100 for crime catalogues); every remaining related
+lookup remains individually accessible. A complete set can take 10–20 minutes.
+Cache restoration is limited to 100 private requests/24 hours; it is not a full
+historical archive.
+
+Connected insights calculate estimates only from available inventory quantities and
+catalogue market prices, and owned stock shares with observed stock prices. Missing
+prices stay unknown; faction-owned inventory is excluded. Quotes have separate
+observation dates and estimates do not imply realized proceeds. Education completion
+is joined to the course catalogue. Combat counts explicitly describe the returned
+outgoing sample. Returned stock price history is charted by its actual timestamps.
+
+The deployed `torn-data` v3 records fresh, unfiltered current personal-stat observations
+through the existing service-only snapshot RPC. Existing opt-in, pause and minimum
+interval controls remain in force. Current battle, job, crime skill and net-worth
+fields present in `cat=all` can be explored in History Explorer. No schedule, backfill
+or inventory-value history is implied. Cached or timestamp-filtered observations
+are not recorded as fresh history. A history-write failure preserves the fetched
+response and reports a warning.
+
+Validation: 138 tests pass, production TypeScript/Vite build passes, and Deno checks
+the deployed function. Live gateway rejects unauthenticated calls with 401. Live
+history table RLS is enabled; authenticated clients can read owner rows but cannot
+insert snapshots or execute the recording RPC; service_role can record. Security
+advisor findings remain the pre-existing private workflow audit INFO and disabled
+password-breach protection WARN. No legitimate Torn key was available for positive
+private-data acceptance checks; browser QA was unavailable in this managed session.

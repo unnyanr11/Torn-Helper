@@ -121,7 +121,7 @@ export default function HistoryExplorer() {
     <article className="card">
       <h3>Collected personal-stat history</h3>
       <p>
-        Official API observations collected on successful overview refreshes
+        Official API observations collected on successful overview or all-personal-stat refreshes
         after you opt in. There is no background schedule or backfill. Private
         battle and personal stats stay owner-only. Missing fields and periods
         stay unknown.

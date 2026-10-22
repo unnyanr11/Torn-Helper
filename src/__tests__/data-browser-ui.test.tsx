@@ -30,8 +30,8 @@ it("opens endpoint deep links with the required ID fields", () => {
   expect(html).toContain("Section options and pagination");
   expect(html).toContain("Fetch selected data");
 });
-it("connects native trackers to their actual official data section", () => {
+it("connects native trackers to their connected data group", () => {
   expect(renderToStaticMarkup(<TornDataShortcut page="Stocks" />)).toContain(
-    "section=v2-user-stocks",
+    "Overview?area=Investments",
   );
 });

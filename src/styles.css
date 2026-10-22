@@ -1520,3 +1520,9 @@ details[open] > summary {
 .personal-lookups { margin:1rem 0; }
 .personal-lookups > summary { cursor:pointer; }
 .personal-identity { font-weight:600; }
+.connection-choices { display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr)); gap:.5rem 1rem; }
+.connection-choices label { display:flex; gap:.6rem; align-items:center; margin:.3rem 0; }
+.connected-insights .personal-summary { grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr)); }
+.connected-insights .personal-summary strong { font-size:1.7rem; overflow-wrap:anywhere; }
+.connected-insights .personal-summary p { font-size:.75rem; line-height:1.7; }
+.observed-price-chart { width:100%; max-height:220px; margin:1rem 0; }

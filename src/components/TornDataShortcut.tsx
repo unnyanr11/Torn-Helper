@@ -21,6 +21,9 @@ const sections: Record<string, string> = {
   Notifications: "v2-user-notifications",
 };
 export default function TornDataShortcut({ page }: { page: string }) {
+  const areas: Record<string,string> = { Stocks: 'Investments', Markets: 'Inventory', Company: 'Company', Properties: 'Properties', Racing: 'Racing', 'Crime Tracker': 'Crimes', Gym: 'Progress', 'War Hits': 'Combat', 'Stat Growth': 'Personal', 'Stat Intelligence': 'Personal', Faction: 'Faction', 'Faction Finance': 'Faction', 'Faction Upgrades': 'Faction', 'Armory History': 'Faction' };
+  const area = areas[page];
+  if (area) return <p><a className="nu-btn" href={`#Overview?area=${encodeURIComponent(area)}`}>Open connected Torn data for {page}</a></p>;
   const section = sections[page];
   return section ? (
     <p>

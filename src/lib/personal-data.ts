@@ -1,6 +1,6 @@
 import { CAPABILITIES } from '../api/capabilities';
 import type { Capability } from '../api/types';
-export type TornObservation = { endpoint_id: string; payload: unknown; fetched_at: string; cached?: boolean; parameters: Record<string, string>; next_parameters: Record<string, string> | null };
+export type TornObservation = { endpoint_id: string; payload: unknown; fetched_at: string; cached?: boolean; parameters: Record<string, string>; next_parameters: Record<string, string> | null; history_recorded?: boolean; history_warning?: string };
 export function dataLabel(value: string): string {
   const words: Record<string, string> = { battlestats: 'Battle stats', personalstats: 'Personal statistics', workstats: 'Working stats', networth: 'Net worth', jobpoints: 'Job points', weaponexp: 'Weapon experience' };
   return words[value] ?? value.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[_-]/g, ' ').replace(/^./, c => c.toUpperCase());

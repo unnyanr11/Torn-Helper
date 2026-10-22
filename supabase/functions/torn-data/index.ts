@@ -1,4 +1,5 @@
 import { adminClient, authenticate, json, preflight } from "../_shared/http.ts";
+import { personalStatValues } from "../_shared/history.ts";
 import { LoginError } from "../_shared/torn-login.ts";
 import { resolveRefreshKey } from "../_shared/live-refresh.ts";
 import {
@@ -75,7 +76,22 @@ Deno.serve(async (req) => {
       if (saved.error) throw saved.error;
       fetched_at = saved.data;
     }
+    let history_recorded = false;
+    let history_warning: string | undefined;
+    if (!fresh && compiled.endpoint.path === "/user/personalstats" &&
+        (!compiled.parameters.cat || compiled.parameters.cat === "all") &&
+        !compiled.parameters.timestamp && !compiled.parameters.stat) {
+      const recorded = await admin.rpc("record_personal_snapshot", {
+        owner_id: user.id,
+        observed_at: fetched_at,
+        values_json: personalStatValues(payload as Record<string, unknown>),
+      });
+      if (recorded.error) history_warning = "Data loaded, but numeric history could not be recorded. Try again later.";
+      else history_recorded = recorded.data === true;
+    }
     return json({
+      history_recorded,
+      ...(history_warning ? { history_warning } : {}),
       payload,
       fetched_at,
       cached: Boolean(fresh),
