@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabase";
 import { functionError } from "../lib/function-error";
 import { downloadBlob } from "../lib/export";
 import KeyDisclosure from "../components/KeyDisclosure";
+import TornDataView from "../components/TornDataView";
 const groups: Record<string, string> = {
   user: "My player & player lookups",
   faction: "Faction",
@@ -21,6 +22,10 @@ function clean(text: string) {
     .replace(/<[^>]*>/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+function initialValues() {
+  const params = new URLSearchParams(location.hash.split("?")[1] ?? "");
+  return Object.fromEntries(initialSection().parameters.filter(p => params.has(p.name)).map(p => [p.name, params.get(p.name)!]));
 }
 function initialSection() {
   const params = new URLSearchParams(location.hash.split("?")[1] ?? "");
@@ -42,7 +47,7 @@ export default function LiveFeeds() {
   const [group, setGroup] = useState(first.group),
     [sectionId, setSectionId] = useState(first.id),
     [search, setSearch] = useState("");
-  const [values, setValues] = useState<Record<string, string>>({}),
+  const [values, setValues] = useState<Record<string, string>>(initialValues),
     [key, setKey] = useState(""),
     [keyMode, setKeyMode] = useState("request"),
     [memory, setMemory] = useState(false);
@@ -63,7 +68,7 @@ export default function LiveFeeds() {
       generation.current++;
       setGroup(next.group);
       setSectionId(next.id);
-      setValues({});
+      setValues(initialValues());
       setResult(null);
       setError("");
       setBusy(false);
@@ -136,6 +141,7 @@ export default function LiveFeeds() {
   return (
     <section>
       <h2>Torn Data Browser</h2>
+      <p><a className="nu-btn" href="#Overview">My Torn — load all personal data as a dashboard ↗</a></p>
       <p>
         All {CAPABILITIES.length} documented Torn read sections are connected.
         Choose what to fetch. Full Access offers the widest key permissions;
@@ -364,16 +370,8 @@ export default function LiveFeeds() {
           {error && (
             <p>The observation below is from your last successful request.</p>
           )}
-          <pre
-            style={{
-              whiteSpace: "pre-wrap",
-              overflowWrap: "anywhere",
-              maxHeight: "65vh",
-              overflow: "auto",
-            }}
-          >
-            {JSON.stringify(result.payload, null, 2)}
-          </pre>
+          <TornDataView value={result.payload} />
+          <details><summary>Developer view: raw response</summary><pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere", maxHeight: "65vh", overflow: "auto" }}>{JSON.stringify(result.payload, null, 2)}</pre></details>
         </article>
       )}
       <button

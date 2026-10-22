@@ -122,3 +122,31 @@ Replaced the shared visual system and application shell across every page with l
 Motion includes route entrances, staggered navigation, cards revealed as they enter the viewport, pointer lighting, subtle card tilt, button sheen/press effects, dock lift and ambient orbs. Pointer work is event-driven with at most one scheduled animation frame, not a permanent JavaScript loop. Focused input cards do not tilt. Large cards reveal on first intersection; unsupported observer environments keep content visible. The system reduced-motion preference and the explicit Reduce animations button disable motion; theme/motion preferences persist locally. Fonts have system fallbacks. Phone privacy disclosures remain scrollable with readable column widths and keyboard focus. The dock appears for authenticated workspaces, not on the sign-in form.
 
 Updated theme colors, favicon/PWA icon and shell-cache version. Supabase authentication, page access checks, privacy controls and API integrations are preserved. Validation: all 125 tests pass, including grouped-navigation coverage of authorized destinations, exclusion of privileged routes and shared-report labels. TypeScript/Vite production build passes. Browser QA at 1440×1000 and 390×844 covered dark/light sign-in, reduced motion, mobile menu/Escape, signed-in API catalog (234 cards), navigation filtering and the data browser. No document-level horizontal overflow or JavaScript page errors were observed. Signed-in visual QA used a local mocked session with every backend request intercepted; no production accounts or fake game records were created.
+
+## Complete personal-data dashboard (2026-10-19)
+
+Overview now hosts My Torn: 64 owner datasets / 66 parameterized section requests,
+including Friends, Enemies and Targets separately. Collection prioritizes profile,
+bars, battle stats, all personal stats (`cat=all`), money, net worth, work stats and
+skills. Every successful section appears immediately in rich metrics, resource bars,
+expandable groups and pageable record lists. The general data browser uses the same
+renderer, preserving its optional raw developer view and JSON export.
+
+Explicit collection uses either a request-only key scoped to the collection or the
+existing encrypted key. Existing owner-only cache observations can be restored for
+24 hours; there is no private-data or API-key browser-storage addition. Responses
+remain subject to existing cache limits. Collection is sequential, spaced 3.4 seconds
+apart to accommodate three upstream requests per request-only fetch, with one
+65-second retry on quota errors. Users can stop it; leaving the page cancels further
+requests. Per-section errors preserve prior observations and identity/configuration
+failures stop collection. Numeric deltas compare actual observations in memory.
+
+Long histories show a single API page, with explicit browser links to continue.
+Detailed crime/trade lookups require IDs and are linked separately. Other-player
+lookups, global search and API metadata are not mislabeled personal datasets.
+The dashboard does not promise access to data Torn denies or historical records
+not returned by the API.
+
+Validation: 130 tests pass; TypeScript and production build pass. No legitimate
+Torn key was available for positive live-key testing. Browser QA was unavailable
+in this managed session; renderer checks use server-rendered API fixtures.
