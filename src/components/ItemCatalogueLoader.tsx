@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import { functionError } from '../lib/function-error';
 import { useItemCatalogue,readSavedCatalogue,type SavedItemCatalogue } from '../hooks/useItemCatalogue';
 import { parseItemCatalogue } from '../lib/item-catalogue';
-import KeyDisclosure from './KeyDisclosure';
+import TornConnectionPanel from './TornConnectionPanel';
 export default function ItemCatalogueLoader({disabled=false}:{disabled?:boolean}){
  const client=useQueryClient(),catalogue=useItemCatalogue(),[mode,setMode]=useState('request'),[key,setKey]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState(''),[refresh,setRefresh]=useState(false);
  const request=useRef<AbortController|null>(null),count=catalogue.data?.item_count??0;
@@ -41,8 +41,8 @@ export default function ItemCatalogueLoader({disabled=false}:{disabled?:boolean}
   {catalogue.data?.fetched_at&&<p>Last import: {new Date(catalogue.data.fetched_at).toLocaleString()}.</p>}
   {catalogue.isError&&<p role="alert">Unable to read the saved catalogue. <button type="button" className="nu-btn" disabled={busy} onClick={()=>void catalogue.refetch()}>Retry backend read</button></p>}
   {count>0&&<label><input type="checkbox" checked={refresh} disabled={busy||disabled} onChange={e=>setRefresh(e.target.checked)}/> Refresh from Torn for newly added or renamed items (at most once per 24 hours)</label>}
-  {(!count||refresh)&&<><label>Key to use<select className="nu-input" value={mode} disabled={busy||disabled} onChange={e=>{setMode(e.target.value);setKey('');}}><option value="request">Use a key for this import</option><option value="stored">Use my saved encrypted key</option></select></label>
-  {mode==='request'&&<><label>Torn API key<input className="nu-input" type="password" autoComplete="off" spellCheck={false} maxLength={16} value={key} disabled={busy||disabled} onChange={e=>setKey(e.target.value.trim())}/></label><KeyDisclosure persist={false}/></>}
+  {(!count||refresh)&&<><TornConnectionPanel mode={mode} onMode={setMode} keyValue={key} onKey={setKey} disabled={busy||disabled}/>
+
   <p>Public Only access is sufficient for the items endpoint. Use a key belonging to your linked Torn account; Custom keys need the items selection. The key is cleared when this import starts.</p>
   <button type="button" className="nu-btn" disabled={disabled||busy||mode==='request'&&!/^[A-Za-z0-9]{16}$/.test(key)} onClick={()=>void load()}>{busy?'Saving catalogue…':refresh?'Refresh saved catalogue':'Fetch all item names and IDs once'}</button></>}
   {count>0&&!refresh&&<p>The saved catalogue has no automatic expiry. Live prices still refresh separately.</p>}

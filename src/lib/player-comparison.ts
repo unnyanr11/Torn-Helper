@@ -61,8 +61,9 @@ export async function fetchPlayerComparisons(
   days: string,
   request: SectionRequest,
   now = Date.now(),
+  range?:{from?:string;to?:string},
 ) {
-  if (!["7", "30", "90", "365"].includes(days))
+  if (!["7", "30", "90", "365"].includes(days)&&!range?.from)
     throw new Error("Choose a valid comparison window.");
   if (
     ids.length < 2 ||
@@ -71,8 +72,10 @@ export async function fetchPlayerComparisons(
   )
     throw new Error("Invalid player IDs.");
   const names = COMPARISON_METRICS.map((metric) => metric.id).join(",");
-  const current = Math.floor(now / 60000) * 60;
-  const past = current - Number(days) * 86400;
+  const end=range?.to?Math.min(now,Date.parse(range.to)-1000):now;
+  const current = Math.floor(end / 60000) * 60;
+  const past = range?.from?Math.floor(Date.parse(range.from)/1000):current - Number(days) * 86400;
+  if(!Number.isFinite(past)||!Number.isFinite(current)||past>=current)throw new Error('Choose a time window ending after its start and no later than now.');
   const rows: {
     id: number;
     profile: any;

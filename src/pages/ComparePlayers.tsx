@@ -1,9 +1,10 @@
-import ChoiceInput from "../components/ChoiceInput";
-import { useTornChoices } from "../hooks/useTornChoices";
-import { observedChoices } from "../lib/entry-options";
+import PlayerPicker from "../components/PlayerPicker";
+import DateWindowPicker from '../components/DateWindowPicker';
+import { dateBounds,type DateWindow } from '../lib/date-window';
+
 import { useEffect, useRef, useState } from "react";
 import SavedPresets from "../components/SavedPresets";
-import KeyDisclosure from "../components/KeyDisclosure";
+import TornConnectionPanel from '../components/TornConnectionPanel';
 import { supabase } from "../lib/supabase";
 import { useQueryClient } from '@tanstack/react-query';
 import { invokeTornData } from '../lib/torn-data-client';
@@ -31,8 +32,7 @@ type Evidence = {
 };
 export default function ComparePlayers() {
   const queryClient=useQueryClient();
-  const savedChoices=useTornChoices();
-  const [input, setInput] = useState(""),
+  const [input, setInput] = useState(new URLSearchParams(location.hash.split("?")[1]??"").get("players")??""),
     [days, setDays] = useState("30"),
     [metric, setMetric] = useState<MetricId>("attackswon");
   const [rows, setRows] = useState<LiveRow[]>([]),
@@ -42,52 +42,53 @@ export default function ComparePlayers() {
   const [key, setKey] = useState(""),
     [mode, setMode] = useState("request"),
     [view, setView] = useState<{ ids: string; days: string } | null>(null);
-  const generation = useRef(0);
+  const [slots,setSlots]=useState(2);
+  const [from,setFrom]=useState(''),[to,setTo]=useState('');
+  const generation = useRef(0),controller=useRef<AbortController|null>(null);
+  useEffect(()=>{const change=()=>{const ids=new URLSearchParams(location.hash.split('?')[1]??'').get('players');if(ids){reset();setInput(ids);}};addEventListener('hashchange',change);return()=>removeEventListener('hashchange',change);},[]);
   useEffect(
     () => () => {
-      generation.current++;
+      generation.current++;controller.current?.abort();
     },
     [],
   );
   function reset() {
-    generation.current++;
-    setRows([]);
-    setEvidence([]);
+    generation.current++;controller.current?.abort();
     setError("");
-    setView(null);
     setBusy(false);
   }
-  async function compare(idsInput = input, window = days) {
+  async function compare(idsInput = input, window = days, dates:DateWindow={period:window,from,to}) {
+    const bounds=dateBounds(dates);
     const ids = comparisonIds(idsInput);
     if (mode === "request" && !/^[A-Za-z0-9]{16}$/.test(key))
       throw new Error(
         "Enter a request-only Torn key, or choose your stored key.",
       );
+    controller.current?.abort();const abort=new AbortController();controller.current=abort;
     const token = ++generation.current,
       submitted = key;
     setKey("");
     setBusy(true);
     setError("");
-    setRows([]);
-    setEvidence([]);
-    setView({ ids: idsInput, days: window });
+
     try {
       const local = async () => {
-        const since = new Date(
-          Date.now() - Number(window) * 86400000,
-        ).toISOString();
+        const since = bounds.from!;
+        const until=bounds.to??new Date(Date.now()+1000).toISOString();
         const [estimates, spies, targets, observations] = await Promise.all([
           supabase
             .from("estimates")
             .select("*")
             .in("torn_player_id", ids)
             .gte("created_at", since)
+            .lt("created_at", until)
             .order("created_at", { ascending: false }),
           supabase
             .from("spy_reports")
             .select("*")
             .in("target_torn_id", ids)
             .gte("reported_at", since)
+            .lt("reported_at", until)
             .order("reported_at", { ascending: false }),
           supabase
             .from("target_list_entries")
@@ -98,6 +99,7 @@ export default function ComparePlayers() {
             .select("*")
             .in("torn_player_id", ids)
             .gte("observed_at", since)
+            .lt("observed_at", until)
             .order("observed_at", { ascending: false }),
         ]);
         if (
@@ -162,7 +164,7 @@ export default function ComparePlayers() {
       };
       if (mode === "saved") {
         const saved = await local();
-        if (token === generation.current) setEvidence(saved);
+        if (token === generation.current){setEvidence(saved);setRows([]);setView({ids:idsInput,days:window});}
         return;
       }
       const request = async (
@@ -176,7 +178,7 @@ export default function ComparePlayers() {
             endpoint_id,
             parameters,
             ...(mode === "request" ? { apiKey: submitted } : {}),
-          },
+          },signal:abort.signal,
         });
         if (error || data?.error) {
           const problem = await functionError(data, error);
@@ -186,13 +188,13 @@ export default function ComparePlayers() {
         return data;
       };
       const [official, saved] = await Promise.allSettled([
-        fetchPlayerComparisons(ids, window, request),
+        fetchPlayerComparisons(ids, window, request,Date.now(),bounds),
         local(),
       ]);
       if (token !== generation.current) return;
-      if (saved.status === "fulfilled") setEvidence(saved.value);
       if (official.status === "rejected") throw official.reason;
-      setRows(official.value);
+      if (saved.status === "fulfilled") setEvidence(saved.value);else setEvidence([]);
+      setRows(official.value);setView({ids:idsInput,days:window});
       if (saved.status === "rejected")
         setError(
           "Live Torn data loaded; saved battle-stat evidence could not be read.",
@@ -212,7 +214,6 @@ export default function ComparePlayers() {
   const metricLabel = COMPARISON_METRICS.find((item) => item.id === metric)!;
   return (
     <section>
-      <h2>Compare Players</h2>
       <p>
         Load a saved preset or enter 2–5 player IDs to fetch profiles and seven
         public statistics from Torn. Trends compare Torn's actual dated values
@@ -222,21 +223,22 @@ export default function ComparePlayers() {
       <SavedPresets
         kind="comparison"
         loadLabel="Load & fetch comparison"
-        config={{ version: 1, ids: input, days, metric }}
+        config={{ version: 1, ids: input, days, metric,from,to }}
         onLoad={async (config) => {
           if (
             config?.version !== 1 ||
             typeof config.ids !== "string" ||
-            !["7", "30", "90", "365"].includes(config.days) ||
+            !["7", "30", "90", "365", "today", "custom"].includes(config.days) ||
             (config.metric !== undefined &&
               !COMPARISON_METRICS.some((item) => item.id === config.metric))
           )
             throw new Error("Invalid comparison preset.");
           comparisonIds(config.ids);
+          const dates={period:config.days,from:config.from??"",to:config.to??""};dateBounds(dates);setFrom(dates.from);setTo(dates.to);
           setInput(config.ids);
           setDays(config.days);
           setMetric(config.metric ?? "attackswon");
-          await compare(config.ids, config.days);
+          await compare(config.ids, config.days,dates);
         }}
       />
       <form
@@ -249,78 +251,21 @@ export default function ComparePlayers() {
           );
         }}
       >
-        {[0,1,2,3,4].map(index=><ChoiceInput key={index} label={`Player ${index+1}${index>1?' (optional)':''}`} value={input.split(',')[index]?.trim()??''} onChange={value=>{reset();const ids=input.split(',');while(ids.length<5)ids.push('');ids[index]=value;setInput(ids.join(','));}} options={observedChoices(savedChoices.data??[],"player")} inputMode="numeric" required={index<2} disabled={busy}/>)}
-        <label>
-          Comparison window
-          <select
-            className="nu-input"
-            value={days}
-            disabled={busy}
-            onChange={(event) => {
-              reset();
-              setDays(event.target.value);
-            }}
-          >
-            {[7, 30, 90, 365].map((value) => (
-              <option value={value} key={value}>
-                {value} days
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Key to use
-          <select
-            className="nu-input"
-            value={mode}
-            disabled={busy}
-            onChange={(event) => {
-              setMode(event.target.value);
-              setKey("");
-            }}
-          >
-            <option value="request">Request-only Torn key</option>
-            <option value="stored">My encrypted key from Settings</option>
-            <option value="saved">
-              Saved observations only (no API request)
-            </option>
-          </select>
-        </label>
-        {mode === "request" && (
-          <>
-            <KeyDisclosure persist={false} />
-            <label>
-              Torn API key
-              <input
-                className="nu-input"
-                type="password"
-                autoComplete="off"
-                spellCheck={false}
-                minLength={16}
-                maxLength={16}
-                value={key}
-                onChange={(event) => setKey(event.target.value.trim())}
-                required
-                disabled={busy}
-              />
-            </label>
-            <p>
-              The key is used for this comparison only and cleared from the form
-              when fetching starts. Observations are saved privately in the
-              data-browser cache.
-            </p>
-          </>
-        )}
+        {[0,1,2,3,4].slice(0,Math.max(slots,input.split(',').reduce((n,value,index)=>value.trim()?index+1:n,2))).map(index=><PlayerPicker key={index} label={`Player ${index+1}${index>1?' (optional)':''}`} value={input.split(',')[index]?.trim()??''} onChange={value=>{reset();const ids=input.split(',');while(ids.length<5)ids.push('');ids[index]=value;setInput(ids.join(','));}} required={index<2} disabled={busy}/>)}
+        {Math.max(slots,input.split(',').reduce((n,value,index)=>value.trim()?index+1:n,2))<5&&<button type="button" className="nu-btn" disabled={busy} onClick={()=>setSlots(n=>Math.max(n,input.split(',').reduce((count,value,index)=>value.trim()?index+1:count,2))+1)}>Add another player</button>}
+        <DateWindowPicker allowAll={false} value={{period:days,from,to}} disabled={busy} onChange={value=>{reset();setDays(value.period);setFrom(value.from);setTo(value.to);}}/>
+        <TornConnectionPanel mode={mode} onMode={setMode} keyValue={key} onKey={setKey} disabled={busy} allowSaved/>
         <button className="nu-btn" disabled={busy}>
           {busy
             ? "Fetching player data and trends…"
             : "Fetch / refresh comparison"}
         </button>
+        {busy&&<button type="button" className="nu-btn" onClick={()=>{reset();setError('Comparison cancelled. Previous results remain visible.');}}>Cancel comparison</button>}
       </form>
-      {error && <p role="alert">{error}</p>}
+      {error && <p role="alert">{error}</p>}{busy&&view&&<p role="status">Previous results stay visible while this comparison loads.</p>}
       {view && (
         <p>
-          Requested players: {view.ids} · {view.days}-day comparison. Torn may
+          Requested players: {view.ids} · {view.days==='today'?'Today (UTC)':view.days==='custom'?'Custom date':view.days+'-day'} comparison. Torn may
           return the nearest available date; observation timestamps are shown
           below.
         </p>

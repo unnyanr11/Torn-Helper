@@ -7,7 +7,7 @@ import { createTravelClient } from '../lib/travel-client';
 import { functionError } from '../lib/function-error';
 import { invokeTornData } from '../lib/torn-data-client';
 import { supabase } from '../lib/supabase';
-import KeyDisclosure from './KeyDisclosure';
+import TornConnectionPanel from './TornConnectionPanel';
 export default function LevellingCatalogue(){
  const cache=useTornChoices(),client=useQueryClient();
  const preferences=client.getQueryData<{maximum:number;availability:string;sort:string}>(['levelling-preferences']);
@@ -52,7 +52,7 @@ export default function LevellingCatalogue(){
   <label>Status filter<select className="nu-input" value={availability} onChange={e=>setAvailability(e.target.value)}>{['All','Available','Not checked','Check again','Recently active','Activity unknown','Hospital','Jail','Traveling','Abroad','Federal'].map(s=><option key={s}>{s}</option>)}</select></label>
   <label>Sort by<select className="nu-input" value={sort} onChange={e=>setSort(e.target.value)}><option value="stats">Lowest reported battle total</option><option value="level">Highest level</option><option value="name">Name</option></select></label></div>
   <p>Reported battle totals are community claims, not current private stats from Torn. Live status starts as “Not checked”. No target is guaranteed to be an easy win.</p>
-  <details><summary>Refresh live target status</summary><label>Key to use<select className="nu-input" disabled={busy} value={mode} onChange={e=>{setMode(e.target.value);setKey('');setMemory(false);}}><option value="request">Use a key for this refresh</option><option value="stored">Use my saved encrypted key</option></select></label>{mode==='request'&&<><label>Torn API key<input className="nu-input" type="password" autoComplete="off" maxLength={16} value={key} disabled={busy} onChange={e=>setKey(e.target.value.trim())}/></label><label><input type="checkbox" checked={memory} disabled={busy} onChange={e=>setMemory(e.target.checked)}/> Keep this key in page memory for rechecks; leaving clears it</label><details><summary>Key privacy</summary><KeyDisclosure persist={false} session={memory}/></details></>}
+  <details><summary>Refresh live target status</summary><TornConnectionPanel mode={mode} onMode={value=>{setMode(value);setMemory(false);}} keyValue={key} onKey={setKey} memory={memory} onMemory={setMemory} disabled={busy}/>
   <button className="nu-btn" disabled={busy||!ready} onClick={()=>void refresh()}>{busy?'Checking targets…':`Refresh ${sourceRows.length} targets`}</button>{busy&&<button className="nu-btn" onClick={stop}>Stop refresh</button>}
   <p>Requests are spaced to respect Torn quotas. A full list takes about two minutes. A fresh “Okay” status plus no observed action for 30 days qualifies for the Available filter; private battle stats remain unknown.</p>
   </details>

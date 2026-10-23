@@ -171,6 +171,8 @@ export default function App() {
   }, []);
   return (
     <SpatialShell
+      key={accountId??"signed-out"}
+      accountId={accountId}
       page={page}
       signedIn={signedIn}
       role={role}

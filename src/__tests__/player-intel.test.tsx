@@ -8,6 +8,7 @@ import PlayerIntel from '../pages/PlayerIntel';
 import { observationKey } from '../lib/personal-data';
 const cache=vi.hoisted(()=>({entries:{} as Record<string,any>}));
 vi.mock('../lib/supabase',()=>({supabase:{}}));
+vi.mock('../hooks/useSavedObservations',()=>({useCurrentObservations:()=>({owner:'owner-a',data:cache.entries})}));
 vi.mock('../hooks/useTornChoices',()=>({useTornChoices:()=>({owner:'owner-a',data:[],entries:cache.entries})}));
 afterEach(()=>{vi.unstubAllGlobals();cache.entries={};});
 const response=(id=4317919):TornObservation=>({endpoint_id:PLAYER_PROFILE_ENDPOINT,parameters:{id:String(id)},payload:{profile:{id,name:'Unnyan',level:12,status:{state:'Okay'},last_action:{status:'Idle'}}},fetched_at:'2026-10-22T10:00:00Z',next_parameters:null,cached:false});
@@ -37,18 +38,18 @@ describe('Player Intel supports the shared key flow',()=>{
   expect(profileHistory('owner-a',response())).toEqual({user_id:'owner-a',torn_player_id:4317919,status:'Okay',level:12,last_action:'Idle',observed_at:'2026-10-22T10:00:00Z'});
  });
  it('offers a request-only key when identity is linked without a retained key',()=>{
-  vi.stubGlobal('location',{hash:'#Player%20Intel?player=4317919'});const client=new QueryClient();client.setQueryData(['torn-key-status','owner-a'],{hasStoredKey:false});
+  vi.stubGlobal('location',{hash:'#Player%20Intel?player=4317919'});const client=new QueryClient();client.setQueryData(['torn-connection','owner-a'],{hasStoredKey:false,identity:{torn_id:4317919,torn_name:'Unnyan'}});
   const html=renderToStaticMarkup(<QueryClientProvider client={client}><PlayerIntel/></QueryClientProvider>);
-  expect(html).toContain('identity can be linked without retaining a key');expect(html).toContain('type="password"');expect(html).toContain('Use a key for this lookup');expect(html).not.toContain('Link a Torn key in Settings');
+  expect(html).toContain('Request-only key');expect(html).toContain('Key retained');expect(html).toContain('type="password"');expect(html).toContain('Use a request-only key');expect(html).not.toContain('Link a Torn key in Settings');
  });
  it('defaults to the existing encrypted key when retained, without asking for another key',()=>{
-  vi.stubGlobal('location',{hash:'#Player%20Intel'});const client=new QueryClient();client.setQueryData(['torn-key-status','owner-a'],{hasStoredKey:true});
+  vi.stubGlobal('location',{hash:'#Player%20Intel'});const client=new QueryClient();client.setQueryData(['torn-connection','owner-a'],{hasStoredKey:true,identity:{torn_id:4317919,torn_name:'Unnyan'}});
   const html=renderToStaticMarkup(<QueryClientProvider client={client}><PlayerIntel/></QueryClientProvider>);
   expect(html).toContain('value="stored" selected');expect(html).not.toContain('type="password"');expect(html).toContain('Look up player');
  });
  it('shows saved profiles without an automatic lookup and retains honest snapshot labels',()=>{
   vi.stubGlobal('location',{hash:'#Player%20Intel?player=4317919'});cache.entries={[observationKey(PLAYER_PROFILE_ENDPOINT,{id:'4317919'})]:{observation:response()}};
-  const client=new QueryClient();client.setQueryData(['torn-key-status','owner-a'],{hasStoredKey:false});
-  const html=renderToStaticMarkup(<QueryClientProvider client={client}><PlayerIntel/></QueryClientProvider>);expect(html).toContain('Unnyan');expect(html).toContain('Saved snapshot');expect(html).toContain('Refresh observation');expect(html).not.toContain('Loading profile');
+  const client=new QueryClient();client.setQueryData(['torn-connection','owner-a'],{hasStoredKey:false,identity:{torn_id:4317919,torn_name:'Unnyan'}});
+  const html=renderToStaticMarkup(<QueryClientProvider client={client}><PlayerIntel/></QueryClientProvider>);expect(html).toContain('Unnyan');expect(html).toContain('Saved snapshot');expect(html).toContain('Refresh profile');expect(html).not.toContain('Loading profile');
  });
 });

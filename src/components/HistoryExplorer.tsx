@@ -1,4 +1,9 @@
 import { functionError } from "../lib/function-error";
+import TornConnectionPanel from "./TornConnectionPanel";
+import DateWindowPicker from "./DateWindowPicker";
+import { defaultWindow,dateBounds } from "../lib/date-window";
+import { useTornConnection } from "../hooks/useTornConnection";
+import { invokeTornData } from "../lib/torn-data-client";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
@@ -6,17 +11,20 @@ import { historySummary } from "../lib/history";
 import { toCsv, downloadBlob } from "../lib/export";
 export default function HistoryExplorer() {
   const client = useQueryClient();
-  const [period, setPeriod] = useState("30"),
-    [metric, setMetric] = useState(""),
+  const connection=useTornConnection();
+  const [window,setWindow]=useState(defaultWindow),[mode,setMode]=useState("stored"),[key,setKey]=useState("");
+  let bounds:ReturnType<typeof dateBounds>={},rangeError="";try{bounds=dateBounds(window);}catch(e){rangeError=(e as Error).message;}
+  const [metric, setMetric] = useState(""),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false);
   const prefs = useQuery({
-    queryKey: ["history-preference"],
+    queryKey: ["history-preference",connection.owner],
+    enabled:!!connection.owner,
     queryFn: async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) throw new Error("Sign in to view history.");
+      if (!user||user.id!==connection.owner) throw new Error("Sign in to view history for this account.");
       const r = await supabase
         .from("profiles")
         .select("history_enabled,tracking_paused")
@@ -27,20 +35,19 @@ export default function HistoryExplorer() {
     },
   });
   const history = useQuery({
-    queryKey: ["personal-history", period],
+    queryKey: ["personal-history",connection.owner,window],
+    enabled:!!connection.owner&&!rangeError,
     queryFn: async () => {
       const rows: any[] = [];
       for (let offset = 0; offset < 20000; offset += 500) {
         let q = supabase
           .from("personal_stat_snapshots")
           .select("id,captured_at,stat_values,source")
+          .eq("user_id",connection.owner!)
           .order("captured_at")
           .order("id");
-        if (period !== "all")
-          q = q.gte(
-            "captured_at",
-            new Date(Date.now() - Number(period) * 86400000).toISOString(),
-          );
+        if(bounds.from)q=q.gte('captured_at',bounds.from);
+        if(bounds.to)q=q.lt('captured_at',bounds.to);
         const r = await q.range(offset, offset + 499);
         if (r.error) throw r.error;
         rows.push(...r.data);
@@ -52,11 +59,13 @@ export default function HistoryExplorer() {
     },
   });
   const started = useQuery({
-    queryKey: ["personal-history-start"],
+    queryKey: ["personal-history-start",connection.owner],
+    enabled:!!connection.owner,
     queryFn: async () => {
       const r = await supabase
         .from("personal_stat_snapshots")
         .select("captured_at")
+        .eq("user_id",connection.owner!)
         .order("captured_at")
         .limit(1);
       if (r.error) throw r.error;
@@ -73,7 +82,7 @@ export default function HistoryExplorer() {
         .update({ history_enabled: !prefs.data.history_enabled })
         .eq("id", prefs.data.userId);
       if (r.error) throw r.error;
-      await client.invalidateQueries({ queryKey: ["history-preference"] });
+      await client.invalidateQueries({ queryKey: ["history-preference",connection.owner] });
     } catch (e) {
       setMessage((e as any).message);
     } finally {
@@ -84,20 +93,19 @@ export default function HistoryExplorer() {
     setBusy(true);
     setMessage("");
     try {
-      const r = await supabase.functions.invoke("refresh-live-data", {
-        body: { feed_type: "overview" },
-      });
+      const secret=mode==='request'?key:undefined;setKey('');
+      const r = await invokeTornData(client,{body:{endpoint_id:'v2-user-personalstats',parameters:{cat:'all'},...(secret?{apiKey:secret}:{})}});
       if (r.error || r.data?.error) throw await functionError(r.data, r.error);
       setMessage(
         r.data.cached
-          ? "Overview cache is still fresh. Try again after 60 seconds to collect a new observation."
+          ? "Personal-stat cache is still fresh. Try again after 60 seconds to collect a new observation."
           : r.data.history_recorded
             ? "Observation recorded."
             : "No new numeric observation was recorded. Check the collection preference, key permissions and tracking pause.",
       );
       await Promise.all([
         client.invalidateQueries({ queryKey: ["personal-history"] }),
-        client.invalidateQueries({ queryKey: ["personal-history-start"] }),
+        client.invalidateQueries({ queryKey: ["personal-history-start",connection.owner] }),
       ]);
     } catch (e) {
       setMessage((e as any).message);
@@ -147,31 +155,21 @@ export default function HistoryExplorer() {
           ? "Disable new collection"
           : "Enable personal history collection"}
       </button>
+      <TornConnectionPanel mode={mode} onMode={setMode} keyValue={key} onKey={setKey} disabled={busy}/>
       <button
         className="nu-btn"
         disabled={
-          busy || !prefs.data?.history_enabled || prefs.data?.tracking_paused
+          busy || !prefs.data?.history_enabled || prefs.data?.tracking_paused || mode==='request'&&!/^[A-Za-z0-9]{16}$/.test(key) || mode==='stored'&&connection.status.data?.hasStoredKey===false
         }
         onClick={collect}
       >
-        {busy ? "Working…" : "Collect / refresh overview"}
+        {busy ? "Working…" : "Collect personal stats"}
       </button>
       {message && <p role="status">{message}</p>}
       {err && <p role="alert">{err.message}</p>}
-      <label>
-        Window
-        <select
-          className="nu-input"
-          value={period}
-          onChange={(e) => setPeriod(e.target.value)}
-        >
-          {["1", "7", "30", "90", "180", "365", "all"].map((d) => (
-            <option key={d} value={d}>
-              {d === "all" ? "All collected history" : d + " days"}
-            </option>
-          ))}
-        </select>
-      </label>
+      <DateWindowPicker value={window} onChange={setWindow}/>
+      {rangeError&&<p role="alert">{rangeError}</p>}
+      {(!prefs.data?.history_enabled||prefs.data?.tracking_paused)&&<p>Enable history collection and resume tracking in Settings before collecting new values.</p>}
       <label>
         Observed metric path
         <select

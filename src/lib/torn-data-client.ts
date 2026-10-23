@@ -49,6 +49,7 @@ export async function invokeTornData(client:QueryClient,options:Options):Promise
    if(!result.error&&!result.data?.error&&result.data?.endpoint_id===endpoint_id){
     const observation=result.data as TornObservation;
     client.setQueryData<Record<string,DataEntry>>(cacheKey,old=>mergeObservation(old??{},observation));
+    if(!observation.cached)client.setQueryData(['torn-verification',owner],{at:new Date().toISOString(),endpoint:CAPABILITIES.find(c=>c.id===endpoint_id)?.path??endpoint_id,mode:apiKey===undefined?'stored':'request'});
    }
    return result;
   };

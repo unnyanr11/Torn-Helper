@@ -20,6 +20,11 @@ const deferred=<T,>()=>{let resolve!:(v:T)=>void;const promise=new Promise<T>(do
 beforeEach(()=>{vi.useFakeTimers();vi.setSystemTime(now);mocks.owner='owner-a';mocks.invoke.mockReset();mocks.read.mockReset();mocks.read.mockResolvedValue({data:null,error:null});mocks.invoke.mockImplementation(async(_name:string,options:any)=>({data:{...sample(),endpoint_id:options.body.endpoint_id,parameters:options.body.parameters},error:null}));});
 afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();});
 describe('shared private observations',()=>{
+ it('records live access per owner and never treats cached data as a new verification',async()=>{
+  const cache=client();await invokeTornData(cache,opts());expect(cache.getQueryData(['torn-verification','owner-a'])).toEqual({at:new Date(now).toISOString(),endpoint:'/user/bars',mode:'stored'});
+  expect(cache.getQueryData(['torn-verification','owner-b'])).toBeUndefined();
+  const cached=client();mocks.invoke.mockResolvedValue({data:{...sample(),cached:true},error:null});await invokeTornData(cached,opts());expect(cached.getQueryData(['torn-verification','owner-a'])).toBeUndefined();
+ });
  it('reuses a fresh response across tools without changing its collection time',async()=>{
   const cache=client();await invokeTornData(cache,opts());const second=await invokeTornData(cache,opts('/user/bars',{comment:' '}));
   expect(mocks.invoke).toHaveBeenCalledTimes(1);expect(second.data.cached).toBe(true);expect(second.data.fetched_at).toBe(new Date(now).toISOString());

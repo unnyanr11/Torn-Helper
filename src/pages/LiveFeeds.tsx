@@ -8,7 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { invokeTornData,cancelTornRequests } from '../lib/torn-data-client';
 import { functionError } from "../lib/function-error";
 import { downloadBlob } from "../lib/export";
-import KeyDisclosure from "../components/KeyDisclosure";
+import TornConnectionPanel from '../components/TornConnectionPanel';
 import ApiParameterField from "../components/ApiParameterField";
 import { useTornChoices } from "../hooks/useTornChoices";
 import { parameterChoices } from "../lib/torn-choices";
@@ -223,54 +223,7 @@ export default function LiveFeeds() {
             void fetchSection();
           }}
         >
-          <label>
-            Key to use
-            <select
-              className="nu-input"
-              value={keyMode}
-              disabled={busy}
-              onChange={(event) => {
-                setKeyMode(event.target.value);
-                setKey("");
-                setMemory(false);
-              }}
-            >
-              <option value="request">Enter a key for this request</option>
-              <option value="stored">Use my encrypted key from Settings</option>
-            </select>
-          </label>
-          {keyMode === "request" && (
-            <>
-              <KeyDisclosure persist={false} session={memory} />
-              <label>
-                Torn API key
-                <input
-                  className="nu-input"
-                  type="password"
-                  autoComplete="off"
-                  spellCheck={false}
-                  required
-                  minLength={16}
-                  maxLength={16}
-                  value={key}
-                  onChange={(event) => setKey(event.target.value.trim())}
-                />
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={memory}
-                  onChange={(event) => setMemory(event.target.checked)}
-                />{" "}
-                Keep this key in memory while this page is open, for loading
-                more sections and pages
-              </label>
-              <p>
-                Leaving this page or reloading clears the key. It is never saved
-                in browser storage or in these observations.
-              </p>
-            </>
-          )}
+          <TornConnectionPanel mode={keyMode} onMode={value=>{setKeyMode(value);setMemory(false);}} keyValue={key} onKey={setKey} memory={memory} onMemory={setMemory} disabled={busy}/>
           {parameters.length > 0 && (
             <details open={parameters.some((p) => p.required)}>
               <summary>Section options and pagination</summary>

@@ -1,9 +1,11 @@
+import { useQueryClient } from "@tanstack/react-query";
 import KeyDisclosure from "../components/KeyDisclosure";
 import { functionError } from "../lib/function-error";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { downloadBlob } from "../lib/export";
 export default function Settings() {
+  const client=useQueryClient();
   const [key, setKey] = useState(""),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
@@ -56,6 +58,8 @@ export default function Settings() {
     try {
       await action();
       await load();
+      client.removeQueries({queryKey:["torn-verification"]});
+      await client.invalidateQueries({queryKey:["torn-connection"]});
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Request failed");
     } finally {

@@ -583,3 +583,15 @@ and advisors were inspected; no schema or Edge Function deployment was needed.
 Legitimate Torn-key and signed-in-browser acceptance tests were not performed.
 Build validation used a configuration-only publishable key. Existing nonfatal
 ExcelJS chunk warning remains.
+
+## Workspace flow improvements — 23 October 2026
+
+- Unified Torn connection controls across Overview, Player Intel, Compare Players, Data Browser, Travel, levelling refresh, custom target refresh, item import and personal history. Identity, retained-key metadata, endpoint access and the last successful live check have separate labels. Cached observations do not count as a new permission check; removing/relinking a key clears the session check. Raw keys remain outside browser storage and query keys.
+- Player Intel now keeps the last successful profile during edits, failed requests and cancellation. Search is always available with Recent, My faction and My targets suggestions, plus direct IDs and official Torn profile URLs. Search filters local choices without Torn calls. Same-page route parameters update the selection.
+- Public profile Overview, Activity, Stats and History sections share cached observations. Public stats load lazily on opening their section with a saved key, or on an explicit request-only action. Private battle stats remain unknown. Compare and official Torn Attack actions are visible; target lists and private notes use existing owner-protected tables.
+- Category navigation opens the active group and adds local tool search, favourites and recent tools scoped by account. Theme, motion and intro replay live in Appearance; the galaxy intro and reduced-motion behavior remain available.
+- Personal and player history support Today (UTC), 7/30 days and custom inclusive dates, retaining longer collection windows. Comparisons also support Today/custom dates and carry selected player IDs between tools. Dated comparisons use actual Torn boundaries, and missing observations remain unknown.
+- Travel keeps country → category → item and groups buying price, market price, selling fees, trip budget, flight/wait time and profit/hour with observation timestamps. No third-party stock service or stock availability claim was added.
+- Custom target refresh now uses the shared cached gateway, supports both credential modes, cancellation, paced requests and a maximum of 50 targets per action. Notes preserve existing target flags and status.
+
+Validation: 245 tests passed, TypeScript and the production Vite build passed, and `git diff --check` passed. Read-only inspection confirmed existing owner policies for target lists/entries, profile observations and personal history; no migration or Edge Function deployment is required. Current Supabase changelog/docs were checked; no relevant client API change was required. The existing ExcelJS chunk-size warning remains nonfatal. Build validation used a configuration-only publishable key. No real Torn key or authenticated browser session was available, so real-key permissions and end-to-end signed-in acceptance remain unverified. No seeded or test records were inserted into the live database for this pass.

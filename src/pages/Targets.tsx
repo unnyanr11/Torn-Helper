@@ -1,7 +1,12 @@
+import TornConnectionPanel from '../components/TornConnectionPanel';
+import { useQueryClient } from '@tanstack/react-query';
+import { invokeTornData } from '../lib/torn-data-client';
+import { lookupPlayerProfile } from '../lib/player-intel';
+import { functionError } from '../lib/function-error';
 import { recordChoices } from "../lib/entry-options";
 import DataEntry from "../components/DataEntry";
 import SelectEntry from "../components/SelectEntry";
-import { useEffect, useState } from "react";
+import { useEffect, useState,useRef } from "react";
 import LevellingCatalogue from "../components/LevellingCatalogue";
 import SavedPresets from "../components/SavedPresets";
 import { supabase } from "../lib/supabase";
@@ -23,6 +28,9 @@ interface Entry {
 }
 
 export default function Targets() {
+  const client=useQueryClient(),pending=useRef<AbortController|null>(null);
+  const [mode,setMode]=useState('stored'),[key,setKey]=useState('');
+  useEffect(()=>()=>pending.current?.abort(),[]);
   const [layout, setLayout] = useState({
     version: 1,
     columns: ["id", "name", "level", "status", "checked", "attack"],
@@ -36,6 +44,7 @@ export default function Targets() {
   const [lists, setLists] = useState<TargetList[]>([]);
   const [activeList, setActiveList] = useState<TargetList | null>(null);
   const [entries, setEntries] = useState<Entry[]>([]);
+  const activeListRef=useRef<string|null>(null);activeListRef.current=activeList?.id??null;
   const [listName, setListName] = useState("");
   const [playerId, setPlayerId] = useState("");
   const [playerName, setPlayerName] = useState("");
@@ -70,7 +79,7 @@ export default function Targets() {
       .eq("list_id", listId)
       .order("created_at");
     if (error) setError(error.message);
-    else setEntries(data ?? []);
+    else if(activeListRef.current===listId)setEntries(data ?? []);
   }
 
   async function addList() {
@@ -126,35 +135,21 @@ export default function Targets() {
   }
 
   async function refreshStatus() {
-    if (!activeList) return;
-    setRefreshing(true);
-    setRefreshResult("");
-    const { data: sessionData } = await supabase.auth.getSession();
-    const token = sessionData.session?.access_token;
-    if (!token) {
-      setError("Not signed in");
-      setRefreshing(false);
-      return;
-    }
-    const res = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/refresh-targets`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ listId: activeList.id }),
-      },
-    );
-    const data = await res.json();
-    setRefreshing(false);
-    if (!res.ok) {
-      setError(data.error ?? "Refresh failed");
-      return;
-    }
-    setRefreshResult(`Refreshed ${data.refreshed} target(s)`);
-    loadEntries(activeList.id);
+    if(!activeList||refreshing)return;
+    const listId=activeList.id,selected=entries.filter(e=>!e.excluded).slice(0,50),control=new AbortController();
+    pending.current=control;setRefreshing(true);setRefreshResult('');setError('');const secret=mode==='request'?key:undefined;setKey('');let done=0;
+    try{
+      for(const entry of selected){
+        if(control.signal.aborted)break;
+        const observation=await lookupPlayerProfile(String(entry.torn_player_id),secret,control.signal,async(body,signal)=>{const r=await invokeTornData(client,{body,signal});if(r.error||r.data?.error)throw await functionError(r.data,r.error);return r.data;});
+        const p=(observation.payload as any).profile;
+        const r=await supabase.from('target_list_entries').update({player_name:p.name,level:p.level??null,status:p.status?.state??null,last_checked_at:observation.fetched_at}).eq('id',entry.id).eq('list_id',listId);if(r.error)throw r.error;if(control.signal.aborted)break;
+        done++;setRefreshResult(`Checked ${done} of ${selected.length} targets.`);
+        if(done<selected.length&&!control.signal.aborted)await new Promise<void>(resolve=>{const finish=()=>{clearTimeout(timer);control.signal.removeEventListener('abort',finish);resolve();};const timer=setTimeout(finish,3400);control.signal.addEventListener('abort',finish,{once:true});});
+      }
+      if(!control.signal.aborted)await loadEntries(listId);
+    }catch(e){if(!control.signal.aborted){setError(e instanceof Error?e.message:'Unable to refresh targets.');await loadEntries(listId);}}
+    finally{if(pending.current===control){pending.current=null;setRefreshing(false);}}
   }
 
   const visible = entries
@@ -252,6 +247,7 @@ export default function Targets() {
             <button
               key={l.id}
               className={`nu-btn ${activeList?.id === l.id ? "active" : ""}`}
+              disabled={refreshing}
               onClick={() => setActiveList(l)}
             >
               {l.name}
@@ -441,13 +437,15 @@ export default function Targets() {
           <button className="nu-btn" onClick={addEntry}>
             Add target
           </button>
+          <TornConnectionPanel mode={mode} onMode={setMode} keyValue={key} onKey={setKey} disabled={refreshing}/>
+          <p>Checks up to 50 included targets per refresh, reusing recent profiles. Requests are spaced to respect Torn quotas.</p>
           <button
             className="nu-btn"
             onClick={refreshStatus}
-            disabled={refreshing}
+            disabled={refreshing||mode==='request'&&!/^[A-Za-z0-9]{16}$/.test(key)}
           >
             {refreshing ? "Refreshing…" : "Refresh status"}
-          </button>
+          </button>{refreshing&&<button className="nu-btn" onClick={()=>{pending.current?.abort();pending.current=null;setRefreshing(false);setRefreshResult('Stopped. Checked targets are saved.');if(activeList)void loadEntries(activeList.id);}}>Stop refresh</button>}
           <div style={{ overflowX: "auto" }}>
             <table
               style={{

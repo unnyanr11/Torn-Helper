@@ -9,7 +9,7 @@ import { observationKey } from '../lib/personal-data';
 import { AREAS, browserLink, CONNECTED_REQUESTS, mergeRequests, relatedRequests, restoreRequest, type ConnectedRequest, type DataEntry } from '../lib/connected-data';
 import { collectConnected } from '../lib/connected-collection';
 import TornDataView from './TornDataView';
-import KeyDisclosure from './KeyDisclosure';
+import TornConnectionPanel from './TornConnectionPanel';
 import ConnectedInsights from './ConnectedInsights';
 import HistoryExplorer from './HistoryExplorer';
 import HomeDashboard from './HomeDashboard';
@@ -132,8 +132,7 @@ export default function MyTorn({accountId}:{accountId?:string}) {
     {saved.isLoading&&<p role="status">Loading your saved observations…</p>}{saved.isError&&<p role="alert">Saved observations could not be restored. <button type="button" className="nu-btn" onClick={()=>void saved.refetch()}>Retry saved data</button></p>}
     <article ref={refreshForm} className="card personal-connect"><h3>Refresh essentials</h3><p>Saved data appears first. Refresh only what you need; recent essentials are reused.</p>
       <form onSubmit={event=>{event.preventDefault();void collect(target==='essentials'?'essentials':'single',target);}}>
-       <label>Key to use<select className="nu-input" value={mode} disabled={busy} onChange={e=>{setMode(e.target.value);setUpdates('off');setKey('');}}><option value="request">Use a key for this refresh</option><option value="stored">Use my encrypted key from Settings</option></select></label>
-       {mode==='request'&&<><p>Your key is sent to this platform’s backend and the official Torn API for this refresh, then discarded. It is never saved in browser storage.</p><details><summary>Key privacy and access</summary><KeyDisclosure persist={false} session/></details><label>Torn API key<input className="nu-input" ref={keyInput} type="password" autoComplete="off" spellCheck={false} value={key} disabled={busy} minLength={16} maxLength={16} required onChange={e=>setKey(e.target.value.trim())}/></label></>}
+       <TornConnectionPanel mode={mode} onMode={value=>{setMode(value);setUpdates('off');}} keyValue={key} onKey={setKey} disabled={busy} inputRef={keyInput}/>
        <label>What to refresh<select className="nu-input" disabled={busy} value={target} onChange={e=>setTarget(e.target.value)}><option value="essentials">Only essentials that need updating</option><option value="/user/bars">Bars only</option><option value="/user/cooldowns">Cooldowns only</option><option value="/user/travel">Travel only</option><option value="/user/profile">Profile only</option></select></label>
        <label>Automatic updates<select className="nu-input" value={updates} disabled={mode!=='stored'} onChange={e=>{setUpdates(e.target.value as UpdateMode);if(e.target.value==='off'){automaticControl.current?.abort();setStatus('Automatic updates turned off.');}}}><option value="off">Off · refresh myself</option><option value="economy">Economy · about every 5 minutes while visible</option><option value="active">Active · bars and cooldowns about every minute</option></select></label><p>Requires an encrypted key saved in Settings. Updates pause when this page is hidden or offline, and stop after an error. Profile checks run less often; travel checks speed up during a recorded flight. Request-only keys are never retained.</p>
        <button className="nu-btn" disabled={busy||(mode==='request'&&!/^[A-Za-z0-9]{16}$/.test(key))}>{busy?'Refreshing…':target==='essentials'?'Refresh essentials':'Refresh selected section'}</button>{busy&&<button className="nu-btn" type="button" onClick={stop}>Stop refresh</button>}
