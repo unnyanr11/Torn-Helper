@@ -1,4 +1,5 @@
 import { adminClient, json, preflight } from "../_shared/http.ts";
+import { tornEncryptionSecret } from "../_shared/torn-key-storage.ts";
 import type { LoginAdmin } from "../_shared/torn-login.ts";
 import {
   boundedLoginBody,
@@ -6,13 +7,10 @@ import {
   loginWithTorn,
   LoginError,
 } from "../_shared/torn-login.ts";
-if (!Deno.env.get("TORN_KEY_ENCRYPTION_KEY")) {
-  console.warn("torn_login_retention_not_configured");
-}
 Deno.serve(async (req) => {
   const early = preflight(req);
   if (early) return early;
-  let stage = "request";
+  let stage = "request",encryptionReady=false;
   try {
     const { apiKey, persist } = await boundedLoginBody(req);
     const admin = adminClient();
@@ -35,12 +33,15 @@ Deno.serve(async (req) => {
         { error: "Too many sign-in attempts. Wait a minute and retry." },
         429,
       );
+    stage="load_encryption";
+    const encryptionSecret=await tornEncryptionSecret(admin,Deno.env.get("TORN_KEY_ENCRYPTION_KEY"));
+    encryptionReady=true;
     return json(
       await loginWithTorn(
         admin as unknown as LoginAdmin,
         apiKey,
         persist,
-        Deno.env.get("TORN_KEY_ENCRYPTION_KEY"),
+        encryptionSecret,
         fetch,
         (next) => {
           stage = next;
@@ -59,9 +60,7 @@ Deno.serve(async (req) => {
             typeof rawCode === "string" && /^[a-zA-Z0-9_]{1,50}$/.test(rawCode)
               ? rawCode
               : "unexpected",
-          retention_configured: Boolean(
-            Deno.env.get("TORN_KEY_ENCRYPTION_KEY"),
-          ),
+          retention_configured: encryptionReady,
         }),
       );
     }

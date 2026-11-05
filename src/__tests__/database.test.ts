@@ -102,6 +102,7 @@ beforeAll(async () => {
       "utf8",
     ),
   );
+  await db.exec(readFileSync("supabase/migrations/20261105110222_server_only_torn_key_retention.sql","utf8"));
   const candidate = await db.query(
     "select table_name as table,column_name as column,data_type as type from information_schema.columns where table_schema='public'",
   );
@@ -153,6 +154,10 @@ describe("actual PostgreSQL migration and access controls", () => {
       ),
     ).rejects.toThrow(/permission denied/i);
   });
+  it("restricts backend encryption material to the service role",async()=>{
+    await expect(asUser(seller,"select public.get_torn_key_encryption_secret()" )).rejects.toThrow(/permission denied/i);
+    const r=await asService("select length(decode(public.get_torn_key_encryption_secret(),'base64')) as n");expect(r.rows[0].n).toBe(32);
+  });
   it("keeps ciphertext server-only while exposing key status", async () => {
     await db.query(
       "insert into encrypted_credentials(user_id,provider,encrypted_key) values($1,'torn','test-ciphertext')",
@@ -161,6 +166,7 @@ describe("actual PostgreSQL migration and access controls", () => {
     await expect(
       asUser(seller, "select encrypted_key from encrypted_credentials"),
     ).rejects.toThrow(/permission denied/i);
+    await expect(asUser(seller,"delete from encrypted_credentials where provider='torn'")).rejects.toThrow(/permission denied/i);
     const r = await asUser(
       seller,
       "select provider from encrypted_credentials",

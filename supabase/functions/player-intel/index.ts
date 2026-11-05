@@ -1,5 +1,5 @@
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
-import { decrypt } from "../_shared/crypto.ts";
+import { decryptBackendTornKey } from "../_shared/torn-key-storage.ts";
 import { tornGet } from "../_shared/torn.ts";
 Deno.serve(async (req) => {
   const early = preflight(req);
@@ -27,7 +27,8 @@ Deno.serve(async (req) => {
     if (!credential) return json({ error: "Link a Torn key in Settings" }, 409);
     const payload = await tornGet(
       `/user/${player_id}/profile`,
-      await decrypt(
+      await decryptBackendTornKey(
+        admin,
         credential.encrypted_key,
         Deno.env.get("TORN_KEY_ENCRYPTION_KEY")!,
       ),

@@ -1,4 +1,6 @@
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
+import { retentionPolicyError } from "../_shared/torn-key-policy.ts";
+import { tornEncryptionSecret } from "../_shared/torn-key-storage.ts";
 import { encrypt } from "../_shared/crypto.ts";
 import { LoginError, verifiedTornIdentity } from "../_shared/torn-login.ts";
 Deno.serve(async (req) => {
@@ -11,8 +13,8 @@ Deno.serve(async (req) => {
     const { apiKey, persist = true } = await req.json();
     if (typeof apiKey !== "string" || !/^[a-zA-Z0-9]{16}$/.test(apiKey))
       return json({ error: "Enter a 16-character Torn key" }, 400);
-    if (typeof persist !== "boolean")
-      return json({ error: "Choose whether to retain your key" }, 400);
+    const policyError=retentionPolicyError(persist);if(policyError)return json({error:policyError},409);
+    const secret=await tornEncryptionSecret(admin,Deno.env.get("TORN_KEY_ENCRYPTION_KEY"));
     const verified = await verifiedTornIdentity(apiKey);
     const basic = { id: verified.id, name: verified.name };
     const access = verified.access;
@@ -41,18 +43,9 @@ Deno.serve(async (req) => {
         { error: "This Torn identity is already linked to another account" },
         409,
       );
-    const secret = Deno.env.get("TORN_KEY_ENCRYPTION_KEY")!;
-    let encrypted: string | null = null;
-    if (persist) {
-      try {
-        encrypted = await encrypt(apiKey, secret ?? "");
-      } catch {
-        throw new LoginError(
-          503,
-          "Encrypted key storage is not configured. Use a request-only key on Overview until the site owner configures storage.",
-        );
-      }
-    }
+    let encrypted: string;
+    try { encrypted = await encrypt(apiKey, secret ?? ""); }
+    catch { throw new LoginError(503,"Encrypted backend key storage is not configured. Ask the site owner to configure it before linking."); }
     const { error } = await admin.from("linked_torn_accounts").upsert(
       {
         user_id: user.id,
@@ -64,25 +57,17 @@ Deno.serve(async (req) => {
       { onConflict: "user_id" },
     );
     if (error) throw error;
-    const result = encrypted
-      ? await admin
-          .from("encrypted_credentials")
-          .upsert(
-            { user_id: user.id, provider: "torn", encrypted_key: encrypted },
-            { onConflict: "user_id,provider" },
-          )
-      : await admin
-          .from("encrypted_credentials")
-          .delete()
-          .eq("user_id", user.id)
-          .eq("provider", "torn");
+    const result = await admin.from("encrypted_credentials").upsert(
+      { user_id: user.id, provider: "torn", encrypted_key: encrypted },
+      { onConflict: "user_id,provider" },
+    );
     if (result.error) throw result.error;
     return json({
       linked: true,
       torn_id: basic.id,
       torn_name: basic.name,
       key_access_level: access,
-      persistent: persist,
+      persistent: true,
     });
   } catch (error) {
     return json(

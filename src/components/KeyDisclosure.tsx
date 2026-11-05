@@ -2,10 +2,12 @@ export default function KeyDisclosure({
   persist,
   session = false,
   browserCopy = false,
+  requiredBackend = false,
 }: {
   persist: boolean;
   session?: boolean;
   browserCopy?: boolean;
+  requiredBackend?: boolean;
 }) {
   return (
     <div
@@ -42,7 +44,9 @@ export default function KeyDisclosure({
               requires retention.
             </td>
             <td>
-              {persist
+              {requiredBackend
+                ? `Encrypted backend storage is required while the app account is active; the server key is never returned to the frontend. ${browserCopy?'A separate user-entered copy is also saved in this browser.':'This form will not retain a browser copy.'} Account deletion removes the backend key; key revocation is available in Torn.`
+                : persist
                 ? browserCopy ? "A separate copy of your entered key is saved in this browser. The backend copy is encrypted for updates and is never downloaded or returned to the frontend. Use a trusted device." : "Encrypted on the server until removed; the server copy is never returned to the browser. A separate copy saved in Settings may exist on this device."
                 : session
                   ? "This form keeps the request-only key in page memory until you leave or reload; it does not persist it. Copies saved separately in Settings are unchanged."

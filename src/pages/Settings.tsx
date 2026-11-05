@@ -14,7 +14,7 @@ export default function Settings() {
     [signedIn, setSignedIn] = useState(false),
     [identity, setIdentity] = useState<any>(null),
     [paused, setPaused] = useState(false),
-    [persist, setPersist] = useState(false),
+    [rememberBrowser, setRememberBrowser] = useState(false),
     [hasStoredKey, setHasStoredKey] = useState(false),
     [ownerId,setOwnerId]=useState<string|null>(null);
   useEffect(() => {
@@ -71,14 +71,14 @@ export default function Settings() {
   }
   async function activeOwner(){const session=await supabase.auth.getSession();return session.data.session?.user.id??null;}
   async function saveBrowserCopy(account:string,tornId:number,submitted:string,retained:boolean){
-    try{await commitVerifiedBrowserKey({ownerId:account,tornId,key:submitted,persist:retained},activeOwner,()=>localStorage);notifyBrowserKeyChange(account);return retained?' Browser copy saved; backend copy is encrypted.':' Persistent copies removed.';}
-    catch{return retained?' The backend copy is encrypted, but this browser could not save its copy. Background updates can still use the backend copy.':' The backend copy was removed, but this browser could not confirm removal of its local copy. Clear this site’s browser storage.';}
+    try{await commitVerifiedBrowserKey({ownerId:account,tornId,key:submitted,persist:retained},activeOwner,()=>localStorage);notifyBrowserKeyChange(account);return retained?' Browser copy saved; backend copy is encrypted.':' Browser copy not retained; encrypted backend storage remains enabled.';}
+    catch{return retained?' The backend copy is encrypted, but this browser could not save its copy. Background updates can still use the backend copy.':' The encrypted backend copy is retained. This browser could not confirm removal of an older local copy; clear this site’s browser storage.';}
   }
   async function signIn() {
     const submitted = key;
     setKey("");
     const { data, error } = await supabase.functions.invoke("sign-in-torn", {
-      body: { apiKey: submitted, persist },
+      body: { apiKey: submitted, persist:true },
     });
     if (error || data?.error) {
       throw await functionError(data, error, "Unable to sign in.");
@@ -92,28 +92,19 @@ export default function Settings() {
     if (verified.error) throw verified.error;
     const account=verified.data.user?.id??verified.data.session?.user.id;
     if(!account)throw new Error('A verified session was not returned.');
-    const storageMessage=await saveBrowserCopy(account,Number(data.torn_id),submitted,data.persistent===true);
+    const storageMessage=await saveBrowserCopy(account,Number(data.torn_id),submitted,rememberBrowser);
     setMessage(`Signed in as ${data.torn_name} [${data.torn_id}].${storageMessage}`);
   }
   async function link() {
     const account=await activeOwner();if(!account)throw new Error('Sign in first.');
     const submitted=key.trim();setKey('');
     const { data, error } = await supabase.functions.invoke("link-torn-key", {
-      body: { apiKey: submitted, persist },
+      body: { apiKey: submitted, persist:true },
     });
     setKey("");
     if (error || data?.error) throw await functionError(data, error);
-    const storageMessage=await saveBrowserCopy(account,Number(data.torn_id),submitted,data.persistent===true);
+    const storageMessage=await saveBrowserCopy(account,Number(data.torn_id),submitted,rememberBrowser);
     setMessage(`Linked ${data.torn_name} [${data.torn_id}].${storageMessage}`);
-  }
-  async function unlink() {
-    const account=await activeOwner();if(!account)throw new Error('Sign in first.');
-    const { data, error } = await supabase.functions.invoke("remove-ai-key", {
-      body: { provider: "torn" },
-    });
-    if (error || data?.error) throw await functionError(data, error);
-    try{removeBrowserTornKey(localStorage,account);notifyBrowserKeyChange(account);setMessage('Browser and backend key copies removed.');}
-    catch{setMessage('Backend key removed. This browser blocked local removal; clear this site’s browser storage.');}
   }
   async function pause() {
     const {
@@ -173,7 +164,7 @@ export default function Settings() {
               creates your app account automatically; later sign-ins return to
               it. No email address or app password is required.
             </p>
-            <KeyDisclosure persist={persist} browserCopy={persist} />
+            <KeyDisclosure persist browserCopy={rememberBrowser} requiredBackend/>
             <label>
               Torn API key
               <input
@@ -191,13 +182,13 @@ export default function Settings() {
             <label>
               <input
                 type="checkbox"
-                checked={persist}
-                onChange={(e) => setPersist(e.target.checked)}
+                checked={rememberBrowser}
+                onChange={(e) => setRememberBrowser(e.target.checked)}
               />
-              Save a copy in this browser and an encrypted copy on the backend for updates
+              Also save a copy in this browser (optional)
             </label>
             <p>
-              The browser copy comes only from the key you enter here; the backend copy is never downloaded. Use a trusted device. Without retention, sign-in removes your previous backend key and this account’s local browser copy. Background updates require the encrypted backend copy. Keep this key private: it is your sign-in credential.
+              Continuing requires encrypted backend key storage while your app account is active. It is used for updates and never returned to the frontend. The optional browser copy comes only from your input; use a trusted device. You can replace the key, pause tracking, delete your account, or revoke the key in Torn.
             </p>
             <button
               className="nu-btn"
@@ -226,9 +217,9 @@ export default function Settings() {
             <p>
               {hasStoredKey
                 ? "Encrypted backend key stored for updates; it is never returned to the frontend."
-                : "No Torn key stored. Use a request-only key on Overview or enable encrypted storage below."}
+                : "No backend key is stored. Link a key below to enable automatic updates."}
             </p>
-            <KeyDisclosure persist={persist} browserCopy={persist} />
+            <KeyDisclosure persist browserCopy={rememberBrowser} requiredBackend/>
             <label>
               Torn API key
               <input
@@ -242,13 +233,13 @@ export default function Settings() {
             <label>
               <input
                 type="checkbox"
-                checked={persist}
-                onChange={(e) => setPersist(e.target.checked)}
+                checked={rememberBrowser}
+                onChange={(e) => setRememberBrowser(e.target.checked)}
               />{" "}
-              Save in this browser and encrypt on the backend for updates
+              Also save a copy in this browser (optional)
             </label>
             <p>
-              Both storage locations are disclosed: this browser keeps the copy you enter, and the backend keeps an encrypted copy for updates. Turning storage off while linking removes both persistent copies. Identity remains linked.
+              The encrypted backend copy is required while your app account is active. This checkbox controls only the separate browser copy. There is no standalone backend-key removal action. You can replace your key, pause tracking, delete your account, or revoke the key in Torn.
             </p>
             <button
               className="nu-btn"
@@ -256,13 +247,6 @@ export default function Settings() {
               onClick={() => run(link)}
             >
               Link or replace key
-            </button>
-            <button
-              className="nu-btn"
-              disabled={busy}
-              onClick={() => run(unlink)}
-            >
-              Remove browser and backend copies
             </button>
           </article>
           {ownerId&&<BrowserTornKeyCard key={ownerId} ownerId={ownerId} disabled={busy}/>}

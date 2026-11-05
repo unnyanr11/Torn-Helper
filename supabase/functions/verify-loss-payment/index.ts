@@ -5,7 +5,7 @@ import {
   preflight,
   json,
 } from "../_shared/http.ts";
-import { decrypt } from "../_shared/crypto.ts";
+import { decryptBackendTornKey } from "../_shared/torn-key-storage.ts";
 import { tornGet, normalizeAttacks, qualifies } from "../_shared/torn.ts";
 Deno.serve(async (req) => {
   const early = preflight(req);
@@ -54,7 +54,8 @@ Deno.serve(async (req) => {
           pending.push(sellerId);
           continue;
         }
-        const apiKey = await decrypt(
+        const apiKey = await decryptBackendTornKey(
+        admin,
           credential.encrypted_key,
           Deno.env.get("TORN_KEY_ENCRYPTION_KEY")!,
         );

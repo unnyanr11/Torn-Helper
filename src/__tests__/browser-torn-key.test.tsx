@@ -22,7 +22,7 @@ describe('browser key copies stay separate from encrypted server credentials',()
   writeBrowserTornKey(storage,'owner-a',1,key);writeBrowserTornKey(storage,'owner-b',2,'1234567890AbCdEf');removeBrowserTornKey(storage,'owner-a');
   expect(readBrowserTornKey(storage,'owner-a')).toBeNull();expect(readBrowserTornKey(storage,'owner-b')?.tornId).toBe(2);
  });
- it('removes the old local copy after successful request-only sign-in/linking',async()=>{
+ it('removes the old local copy when browser retention is not requested',async()=>{
   writeBrowserTornKey(storage,'owner-a',1,key);
   await commitVerifiedBrowserKey({ownerId:'owner-a',tornId:1,key,persist:false},async()=>'owner-a',()=>storage);expect(readBrowserTornKey(storage,'owner-a')).toBeNull();
  });
@@ -44,6 +44,10 @@ describe('browser key copies stay separate from encrypted server credentials',()
  it('does not request any credential from the backend while saving or reading a local copy',async()=>{
   const fetch=vi.fn();vi.stubGlobal('fetch',fetch);
   try{await commitVerifiedBrowserKey({ownerId:'owner-a',tornId:1,key,persist:true},async()=>'owner-a',()=>storage);readBrowserTornKey(storage,'owner-a');renderToStaticMarkup(<BrowserTornKeyCard ownerId="owner-a"/>);expect(fetch).not.toHaveBeenCalled();}finally{vi.unstubAllGlobals();}
+ });
+ it('discloses mandatory backend retention independently of the optional browser copy',()=>{
+  const html=renderToStaticMarkup(<KeyDisclosure persist browserCopy={false} requiredBackend/>);
+  expect(html).toContain('required while the app account is active');expect(html).toContain('will not retain a browser copy');expect(html).toContain('Account deletion removes the backend key');
  });
  it('discloses both locations and keeps request-only forms separate from saved copies',()=>{
   const both=renderToStaticMarkup(<KeyDisclosure persist browserCopy/>);expect(both).toContain('saved in this browser');expect(both).toContain('backend copy is encrypted');expect(both).toContain('never downloaded');

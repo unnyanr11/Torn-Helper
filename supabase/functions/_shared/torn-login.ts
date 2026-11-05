@@ -1,3 +1,4 @@
+import { retentionPolicyError } from "./torn-key-policy.ts";
 import { tornGet } from "./torn.ts";
 import { encrypt } from "./crypto.ts";
 type Result<T> = PromiseLike<{ data: T; error: unknown }>;
@@ -102,21 +103,14 @@ export async function loginWithTorn(
   fetcher: typeof fetch = fetch,
   onStage: (stage: string) => void = () => {},
 ) {
+  const policyError=retentionPolicyError(persist);if(policyError)throw new LoginError(409,policyError);
   onStage("verify_torn");
   const identity = await verifiedTornIdentity(apiKey, fetcher);
   // Encrypt before creating anything: configuration errors cannot leave half-created accounts.
   onStage("encrypt_key");
-  let ciphertext: string | null = null;
-  if (persist) {
-    try {
-      ciphertext = await encrypt(apiKey, secret ?? "");
-    } catch {
-      throw new LoginError(
-        503,
-        "Encrypted key storage is not configured. Turn off key retention to sign in, or ask the site owner to configure it.",
-      );
-    }
-  }
+  let ciphertext: string;
+  try { ciphertext = await encrypt(apiKey, secret ?? ""); }
+  catch { throw new LoginError(503,"Encrypted key storage is not configured. Ask the site owner to configure it before signing in."); }
   onStage("lookup_identity");
   const lookup = await admin
     .from("linked_torn_accounts")
@@ -146,7 +140,7 @@ export async function loginWithTorn(
       proposed_user: proposed,
       player_name: identity.name,
       access_level: identity.access,
-      persist_key: persist,
+      persist_key: true,
       ciphertext,
     });
     if (complete.error || typeof complete.data !== "string")
@@ -183,7 +177,7 @@ export async function loginWithTorn(
       type: "magiclink" as const,
       torn_id: identity.id,
       torn_name: identity.name,
-      persistent: persist,
+      persistent: true,
     };
   } catch (error) {
     // A transport error can arrive after the mapping transaction committed. Only
@@ -230,9 +224,10 @@ export async function boundedLoginBody(req: Request) {
   )
     throw new LoginError(
       400,
-      "Enter a 16-character Torn key and choose whether to retain it.",
+      "Enter a 16-character Torn key and acknowledge required encrypted backend storage.",
     );
-  return { apiKey: body.apiKey, persist: body.persist };
+  const policyError=retentionPolicyError(body.persist);if(policyError)throw new LoginError(409,policyError);
+  return { apiKey: body.apiKey, persist: true };
 }
 export async function fingerprint(value: string, serverSecret: string) {
   if (!serverSecret) throw new Error("Rate limiter configuration missing");

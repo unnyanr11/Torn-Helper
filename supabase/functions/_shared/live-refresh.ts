@@ -1,4 +1,4 @@
-import { decrypt } from "./crypto.ts";
+import { decryptBackendTornKey } from "./torn-key-storage.ts";
 import { LoginError, verifiedTornIdentity } from "./torn-login.ts";
 import { tornGet, TornApiError } from "./torn.ts";
 
@@ -41,7 +41,7 @@ export async function collectOverview(
 }
 
 export async function resolveRefreshKey(
-  admin: { from(table: string): any },
+  admin: { from(table: string): any; rpc?:any },
   userId: string,
   supplied: unknown,
   secret: string | undefined,
@@ -81,13 +81,8 @@ export async function resolveRefreshKey(
       409,
       "Your identity is linked, but no key was retained. Enter a request-only key on Overview or store an encrypted key in Settings.",
     );
-  if (!secret)
-    throw new LoginError(
-      503,
-      "Encrypted key storage is not configured. Use a request-only key on Overview.",
-    );
   try {
-    return await decrypt(credential.data.encrypted_key, secret);
+    return await decryptBackendTornKey(admin as {rpc:any},credential.data.encrypted_key,secret);
   } catch {
     throw new LoginError(
       503,
