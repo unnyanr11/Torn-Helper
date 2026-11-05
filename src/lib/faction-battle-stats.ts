@@ -1,7 +1,8 @@
 export const BATTLE_STATS=['strength','defense','speed','dexterity'] as const;
 export type BattleStat=typeof BATTLE_STATS[number];
-export type BattleSnapshot=Record<BattleStat,string>&{observed_at:string};
-export type SharedMember={id:number;name:string;latest:BattleSnapshot|null;baseline:BattleSnapshot|null};
+export type BattleSnapshot=Record<BattleStat,string>&{observed_at:string;source?:'official_api'|'log_estimate';baseline_at?:string|null};
+export type BattleLogSync={checked_through:number;baseline_at:string;reason:string|null};
+export type SharedMember={id:number;name:string;latest:BattleSnapshot|null;baseline:BattleSnapshot|null;log_sync?:BattleLogSync|null};
 export type FactionBattleDashboard={faction_id:number;faction_name:string;verified_at:string;expires_at:string;members:SharedMember[]};
 const decimal=(value:string)=>{if(!/^\d+(\.\d+)?$/.test(value))throw new Error('Invalid battle stat.');const [whole,fraction='']=value.split('.');return {digits:BigInt(whole+fraction),scale:fraction.length};};
 export function compareBattleValues(a:string,b:string){const x=decimal(a),y=decimal(b),scale=Math.max(x.scale,y.scale);const diff=x.digits*10n**BigInt(scale-x.scale)-y.digits*10n**BigInt(scale-y.scale);return diff<0n?-1:diff>0n?1:0;}
