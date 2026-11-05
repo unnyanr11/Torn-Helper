@@ -1,9 +1,11 @@
 export default function KeyDisclosure({
   persist,
   session = false,
+  browserCopy = false,
 }: {
   persist: boolean;
   session?: boolean;
+  browserCopy?: boolean;
 }) {
   return (
     <div
@@ -41,10 +43,10 @@ export default function KeyDisclosure({
             </td>
             <td>
               {persist
-                ? "Encrypted on the server until removed; never returned to the browser."
+                ? browserCopy ? "A separate copy of your entered key is saved in this browser. The backend copy is encrypted for updates and is never downloaded or returned to the frontend. Use a trusted device." : "Encrypted on the server until removed; the server copy is never returned to the browser. A separate copy saved in Settings may exist on this device."
                 : session
-                  ? "Kept only in page memory until you leave or reload, never in persistent browser storage or the database."
-                  : "Used for this request only, then discarded. No raw key is saved in browser storage."}
+                  ? "This form keeps the request-only key in page memory until you leave or reload; it does not persist it. Copies saved separately in Settings are unchanged."
+                  : "This form uses the key for this request only and does not save it. Copies saved separately in Settings are unchanged."}
             </td>
             <td>
               Minimal or Limited access for sign-in. Limited selections are

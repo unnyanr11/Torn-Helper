@@ -25,6 +25,6 @@ describe('full official item catalogue',()=>{
  });
  it('offers an explicit full import using a request-only or encrypted saved key',()=>{
   const html=renderToStaticMarkup(<QueryClientProvider client={new QueryClient()}><ItemCatalogueLoader/></QueryClientProvider>);
-  expect(html).toContain('Load all Torn items');expect(html).toContain('Fetch all item names and IDs once');expect(html).toContain('type="password"');expect(html).toContain('Public Only');expect(html).toContain('Used for this request only');expect(html).not.toContain('href="http');
+  expect(html).toContain('Load all Torn items');expect(html).toContain('Fetch all item names and IDs once');expect(html).toContain('type="password"');expect(html).toContain('Public Only');expect(html).toContain('This form uses the key for this request only');expect(html).not.toContain('href="http');
  });
 });

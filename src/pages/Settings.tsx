@@ -1,4 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
+import BrowserTornKeyCard from "../components/BrowserTornKeyCard";
+import {commitVerifiedBrowserKey,removeBrowserTornKey,notifyBrowserKeyChange} from '../lib/browser-torn-key';
 import KeyDisclosure from "../components/KeyDisclosure";
 import { functionError } from "../lib/function-error";
 import { useEffect, useState } from "react";
@@ -13,7 +15,8 @@ export default function Settings() {
     [identity, setIdentity] = useState<any>(null),
     [paused, setPaused] = useState(false),
     [persist, setPersist] = useState(false),
-    [hasStoredKey, setHasStoredKey] = useState(false);
+    [hasStoredKey, setHasStoredKey] = useState(false),
+    [ownerId,setOwnerId]=useState<string|null>(null);
   useEffect(() => {
     void load().catch((e) =>
       setMessage(
@@ -25,7 +28,7 @@ export default function Settings() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    setSignedIn(!!user);
+    setSignedIn(!!user);setOwnerId(user?.id??null);
     if (!user) return;
     const [a, p, credential] = await Promise.all([
       supabase
@@ -66,6 +69,11 @@ export default function Settings() {
       setBusy(false);
     }
   }
+  async function activeOwner(){const session=await supabase.auth.getSession();return session.data.session?.user.id??null;}
+  async function saveBrowserCopy(account:string,tornId:number,submitted:string,retained:boolean){
+    try{await commitVerifiedBrowserKey({ownerId:account,tornId,key:submitted,persist:retained},activeOwner,()=>localStorage);notifyBrowserKeyChange(account);return retained?' Browser copy saved; backend copy is encrypted.':' Persistent copies removed.';}
+    catch{return retained?' The backend copy is encrypted, but this browser could not save its copy. Background updates can still use the backend copy.':' The backend copy was removed, but this browser could not confirm removal of its local copy. Clear this site’s browser storage.';}
+  }
   async function signIn() {
     const submitted = key;
     setKey("");
@@ -82,21 +90,30 @@ export default function Settings() {
       type: "magiclink",
     });
     if (verified.error) throw verified.error;
-    setMessage(`Signed in as ${data.torn_name} [${data.torn_id}]`);
+    const account=verified.data.user?.id??verified.data.session?.user.id;
+    if(!account)throw new Error('A verified session was not returned.');
+    const storageMessage=await saveBrowserCopy(account,Number(data.torn_id),submitted,data.persistent===true);
+    setMessage(`Signed in as ${data.torn_name} [${data.torn_id}].${storageMessage}`);
   }
   async function link() {
+    const account=await activeOwner();if(!account)throw new Error('Sign in first.');
+    const submitted=key.trim();setKey('');
     const { data, error } = await supabase.functions.invoke("link-torn-key", {
-      body: { apiKey: key, persist },
+      body: { apiKey: submitted, persist },
     });
     setKey("");
     if (error || data?.error) throw await functionError(data, error);
-    setMessage(`Linked ${data.torn_name} [${data.torn_id}]`);
+    const storageMessage=await saveBrowserCopy(account,Number(data.torn_id),submitted,data.persistent===true);
+    setMessage(`Linked ${data.torn_name} [${data.torn_id}].${storageMessage}`);
   }
   async function unlink() {
+    const account=await activeOwner();if(!account)throw new Error('Sign in first.');
     const { data, error } = await supabase.functions.invoke("remove-ai-key", {
       body: { provider: "torn" },
     });
     if (error || data?.error) throw await functionError(data, error);
+    try{removeBrowserTornKey(localStorage,account);notifyBrowserKeyChange(account);setMessage('Browser and backend key copies removed.');}
+    catch{setMessage('Backend key removed. This browser blocked local removal; clear this site’s browser storage.');}
   }
   async function pause() {
     const {
@@ -126,10 +143,12 @@ export default function Settings() {
       )
     )
       return;
+    const account=await activeOwner();
     const { data, error } = await supabase.functions.invoke("account-data", {
       body: { action: "delete" },
     });
     if (error || data?.error) throw await functionError(data, error);
+    if(account){try{removeBrowserTornKey(localStorage,account);notifyBrowserKeyChange(account);}catch{setMessage('Account deleted. Clear this site’s browser storage to remove its local key copy.');}}
     await supabase.auth.signOut();
   }
   return (
@@ -154,7 +173,7 @@ export default function Settings() {
               creates your app account automatically; later sign-ins return to
               it. No email address or app password is required.
             </p>
-            <KeyDisclosure persist={persist} />
+            <KeyDisclosure persist={persist} browserCopy={persist} />
             <label>
               Torn API key
               <input
@@ -175,14 +194,10 @@ export default function Settings() {
                 checked={persist}
                 onChange={(e) => setPersist(e.target.checked)}
               />
-              Retain my encrypted key for live refreshes and background
-              verification
+              Save a copy in this browser and an encrypted copy on the backend for updates
             </label>
             <p>
-              Without retention, the key is used for sign-in only and any
-              previously retained Torn key is removed. Overview can refresh with
-              a request-only key; background features need a retained key. Keep
-              this key private: it is your sign-in credential.
+              The browser copy comes only from the key you enter here; the backend copy is never downloaded. Use a trusted device. Without retention, sign-in removes your previous backend key and this account’s local browser copy. Background updates require the encrypted backend copy. Keep this key private: it is your sign-in credential.
             </p>
             <button
               className="nu-btn"
@@ -210,10 +225,10 @@ export default function Settings() {
             </p>
             <p>
               {hasStoredKey
-                ? "Encrypted Torn key stored for refreshes."
+                ? "Encrypted backend key stored for updates; it is never returned to the frontend."
                 : "No Torn key stored. Use a request-only key on Overview or enable encrypted storage below."}
             </p>
-            <KeyDisclosure persist={persist} />
+            <KeyDisclosure persist={persist} browserCopy={persist} />
             <label>
               Torn API key
               <input
@@ -221,7 +236,7 @@ export default function Settings() {
                 className="nu-input"
                 value={key}
                 autoComplete="off"
-                onChange={(e) => setKey(e.target.value)}
+                onChange={(e) => setKey(e.target.value.trim())}
               />
             </label>
             <label>
@@ -230,16 +245,14 @@ export default function Settings() {
                 checked={persist}
                 onChange={(e) => setPersist(e.target.checked)}
               />{" "}
-              Store encrypted key for refreshes and background verification
+              Save in this browser and encrypt on the backend for updates
             </label>
             <p>
-              Without storage, identity remains linked. Use a request-only key
-              on Overview for manual refreshes; background verification needs
-              storage.
+              Both storage locations are disclosed: this browser keeps the copy you enter, and the backend keeps an encrypted copy for updates. Turning storage off while linking removes both persistent copies. Identity remains linked.
             </p>
             <button
               className="nu-btn"
-              disabled={busy || !key}
+              disabled={busy || !/^[A-Za-z0-9]{16}$/.test(key.trim())}
               onClick={() => run(link)}
             >
               Link or replace key
@@ -249,9 +262,10 @@ export default function Settings() {
               disabled={busy}
               onClick={() => run(unlink)}
             >
-              Remove key
+              Remove browser and backend copies
             </button>
           </article>
+          {ownerId&&<BrowserTornKeyCard key={ownerId} ownerId={ownerId} disabled={busy}/>}
           <article className="card">
             <h3>Privacy controls</h3>
             <button

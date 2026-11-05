@@ -56,7 +56,7 @@ const TIPS: { keywords: string[]; answer: string }[] = [
   {
     keywords: ["api key", "link key"],
     answer:
-      "Link your Torn API key in Settings. Persistent keys are encrypted server-side and are never displayed back to the browser.",
+      "Link your Torn API key in Settings. The encrypted server copy is never returned to the browser. Settings can show a separate copy saved on this device.",
   },
 ];
 

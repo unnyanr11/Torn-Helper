@@ -12,7 +12,7 @@ export default function TornConnectionPanel({mode,onMode,keyValue,onKey,disabled
   {mode==='stored'&&status.data?.hasStoredKey===false&&<p role="status">Your identity is linked, but no key was retained. Choose a request-only key or save an encrypted key in <a href="#Settings">Settings</a>.</p>}
   {mode==='request'&&<><label>Torn API key<input ref={inputRef} className="nu-input" type="password" autoComplete="off" spellCheck={false} minLength={16} maxLength={16} value={keyValue} disabled={disabled} required onChange={e=>onKey(e.target.value.trim())}/></label>
    {onMemory&&<label><input type="checkbox" checked={memory} disabled={disabled} onChange={e=>onMemory(e.target.checked)}/> Keep this key in page memory for rechecks; leaving clears it</label>}
-   <p>{memory?'The key stays in page memory for updates until you leave.':'The key is cleared when a request starts.'} It is never saved in browser storage. Use a key belonging to your linked Torn account.</p><details><summary>Key privacy and access</summary><KeyDisclosure persist={false} session={memory}/></details></>}
+   <p>{memory?'The key stays in page memory for updates until you leave.':'The key is cleared when a request starts.'} This form does not save the request-only key in browser storage. A copy saved separately in Settings may exist on this device. Use a key belonging to your linked Torn account.</p><details><summary>Key privacy and access</summary><KeyDisclosure persist={false} session={memory}/></details></>}
   <a href="#Settings">Manage connection</a>
  </details>;
 }
