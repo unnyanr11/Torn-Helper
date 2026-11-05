@@ -1,3 +1,4 @@
+import FactionBattleStats from "../components/FactionBattleStats";
 import { recordChoices } from "../lib/entry-options";
 import DataEntry from "../components/DataEntry";
 import SelectEntry from "../components/SelectEntry";
@@ -223,6 +224,7 @@ export default function FactionOps() {
 
   return (
     <section>
+      <FactionBattleStats/>
       <h2>Faction Operations</h2>
       <p className="muted">
         Roster, chain tracking, armory, and territory management for your
@@ -231,7 +233,7 @@ export default function FactionOps() {
       {error && <p className="badge warn">{error}</p>}
 
       <article className="card nu-inset">
-        <h3>Roster ({members.length})</h3>
+        <h3>Personal roster notes ({members.length})</h3><p>These manually entered notes do not verify faction membership or grant battle-stat access.</p>
         <DataEntry options={recordChoices(members,'torn_id','name',false)} source="player" onNameChange={setMName} type="number" min="1" step="1"
           className="nu-input"
           placeholder="Torn ID"
