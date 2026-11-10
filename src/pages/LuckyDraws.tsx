@@ -10,6 +10,32 @@ import {
   type Prize,
 } from "../lib/lucky-draw";
 import "./lucky-draws.css";
+import {
+  DRAW_AUDIENCES,
+  PRIZE_SPLITS,
+  splitPrizes,
+  audienceLabel,
+  type DrawAudience,
+} from "../lib/lucky-draw-presets";
+import { invokeTornData } from "../lib/torn-data-client";
+import { functionError } from "../lib/function-error";
+import type { QueryClient } from "@tanstack/react-query";
+async function refreshEligibility(client: QueryClient, audience: DrawAudience) {
+  if (audience === "all") return;
+  const r = await invokeTornData(client, {
+    body: {
+      endpoint_id:
+        audience === "new_players" ? "v2-user-profile" : "v2-user-faction",
+      parameters: {},
+    },
+  });
+  if (r.error || r.data?.error)
+    throw await functionError(
+      r.data,
+      r.error,
+      "Unable to verify campaign eligibility.",
+    );
+}
 
 async function action(
   name: string,
@@ -142,6 +168,8 @@ export default function LuckyDraws() {
           busy={busy}
           onSave={(payload) =>
             run(async () => {
+              if (payload.audience === "faction")
+                await refreshEligibility(cache, "faction");
               const c = await action("create", null, payload);
               open(c.id);
             }, "Campaign published. Its terms are now locked.")
@@ -234,6 +262,8 @@ export function CampaignForm({
   busy: boolean;
   onSave: (payload: Record<string, unknown>) => Promise<void>;
 }) {
+  const [audience, setAudience] = useState<DrawAudience>("all");
+  const recommended = DRAW_AUDIENCES.find((a) => a.id === audience)!;
   const [title, setTitle] = useState(""),
     [description, setDescription] = useState(""),
     [item, setItem] = useState("Xanax"),
@@ -241,11 +271,7 @@ export function CampaignForm({
     [cap, setCap] = useState("1"),
     [days, setDays] = useState("7");
   const [mode, setMode] = useState<"pool" | "fixed">("pool"),
-    [prizes, setPrizes] = useState<Prize[]>([
-      { percentage: 40 },
-      { percentage: 20 },
-      { percentage: 10 },
-    ]),
+    [prizes, setPrizes] = useState<Prize[]>(() => splitPrizes("tiered")),
     [previewPool, setPreviewPool] = useState("100"),
     [review, setReview] = useState(false),
     [localError, setLocalError] = useState("");
@@ -267,6 +293,52 @@ export function CampaignForm({
     <article className="card">
       <h3>Create a lucky draw</h3>
       <form onSubmit={check} onChange={() => setReview(false)}>
+        <Field label="Who can enter?">
+          <select
+            value={audience}
+            onChange={(e) => {
+              setAudience(e.target.value as DrawAudience);
+              setReview(false);
+            }}
+          >
+            {DRAW_AUDIENCES.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <p className="muted">
+          {recommended.description} Restricted campaigns verify eligibility from
+          official Torn data before accepting an entry. Send items only after
+          checking that you qualify.
+        </p>
+        <div className="draw-preview">
+          <h4>Prize ideas for {recommended.label}</h4>
+          <p>
+            Use an idea for a fixed prize, then choose its quantity. Specific
+            weapon bonuses and armor quality should be described in your
+            campaign rules.
+          </p>
+          <div className="draw-actions">
+            {recommended.items.map((name) => (
+              <button
+                className="nu-btn"
+                type="button"
+                key={name}
+                onClick={() => {
+                  setMode("fixed");
+                  setPrizes([
+                    { item: name, quantity: name === "Points" ? 50 : 1 },
+                  ]);
+                  setReview(false);
+                }}
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="draw-form-grid">
           <Field label="Campaign title">
             <input
@@ -326,11 +398,7 @@ export function CampaignForm({
                 setMode(e.target.value as "pool" | "fixed");
                 setPrizes(
                   e.target.value === "pool"
-                    ? [
-                        { percentage: 40 },
-                        { percentage: 20 },
-                        { percentage: 10 },
-                      ]
+                    ? splitPrizes("tiered")
                     : [{ item: "Xanax", quantity: 1 }],
                 );
               }}
@@ -348,6 +416,31 @@ export function CampaignForm({
             onChange={(e) => setDescription(e.target.value)}
           />
         </Field>
+        {mode === "pool" && (
+          <div className="draw-preview">
+            <h4>75% prize pool presets</h4>
+            <div className="draw-actions">
+              {PRIZE_SPLITS.map((split) => (
+                <button
+                  className="nu-btn"
+                  type="button"
+                  key={split.id}
+                  onClick={() => {
+                    setPrizes(splitPrizes(split.id));
+                    setReview(false);
+                  }}
+                >
+                  {split.label}
+                </button>
+              ))}
+            </div>
+            <p>
+              Percentages are of all approved entry items. Both presets allocate
+              75% to prizes and leave 25% with the host, plus whole-item
+              rounding. You can edit every tier below.
+            </p>
+          </div>
+        )}
         <h4>Prizes · {prizes.length} winners</h4>
         {prizes.map((p, i) => (
           <div key={i} className="draw-prize-row">
@@ -467,6 +560,12 @@ export function CampaignForm({
               player · Open for {days} days from publication.
             </p>
             <p>
+              Audience: {audienceLabel(audience)}.{" "}
+              {audience === "faction"
+                ? "Your current verified faction will be locked at publication."
+                : ""}
+            </p>
+            <p>
               The prize rules, ticket limits and deadline lock immediately.
               Fixed prizes are the host’s responsibility. Winners and the draw
               cannot be edited or rerolled.
@@ -479,6 +578,7 @@ export function CampaignForm({
                 void onSave({
                   title,
                   description,
+                  audience,
                   entry_item: item,
                   quantity_per_ticket: Number(quantity),
                   max_tickets_per_player: Number(cap),
@@ -509,6 +609,7 @@ function CampaignDetail({
   busy: boolean;
   run: (task: () => Promise<unknown>, message: string) => Promise<void>;
 }) {
+  const queryClient = useQueryClient();
   const c = data.campaign,
     [quantity, setQuantity] = useState(String(c.quantity_per_ticket)),
     [reference, setReference] = useState(""),
@@ -534,6 +635,12 @@ function CampaignDetail({
         <span className="badge">{status}</span>
       </div>
       <p style={{ whiteSpace: "pre-wrap" }}>{c.description}</p>
+      <p>
+        <strong>{audienceLabel(c.audience)}</strong>
+        {c.audience === "faction" ? ` · Faction ID ${c.faction_id}` : ""}.
+        Eligibility is checked at submission; existing accepted entries keep
+        their eligibility snapshot.
+      </p>
       <p>
         Host:{" "}
         <a
@@ -611,6 +718,7 @@ function CampaignDetail({
           onSubmit={(e) => {
             e.preventDefault();
             void run(async () => {
+              await refreshEligibility(queryClient, c.audience ?? "all");
               await action("submit", c.id, {
                 quantity: Number(quantity),
                 transfer_reference: reference,
@@ -622,6 +730,19 @@ function CampaignDetail({
           }}
         >
           <h4>Submit your transfer</h4>
+          <button
+            type="button"
+            className="nu-btn"
+            disabled={busy}
+            onClick={() =>
+              void run(async () => {
+                await refreshEligibility(queryClient, c.audience ?? "all");
+                await action("eligibility", c.id);
+              }, "You qualify for this campaign now. You can send the stated items to the host in Torn, then submit your transfer evidence.")
+            }
+          >
+            Check eligibility before sending items
+          </button>
           <p>
             {used} of {c.max_tickets_per_player} tickets used or pending. Send
             items to the host in Torn first, then provide the reference and

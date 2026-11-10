@@ -1,6 +1,8 @@
 export type Prize = { percentage?: number; item?: string; quantity?: number };
 export type Campaign = {
   id: string;
+  audience: "all" | "new_players" | "faction";
+  faction_id: number | null;
   host_user_id: string;
   host_torn_id: number;
   host_name: string;

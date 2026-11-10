@@ -49,6 +49,7 @@ beforeAll(async () => {
   await db.exec(`create role authenticated;create role anon;create schema auth;create schema private;create schema extensions;
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
  grant usage on schema auth to authenticated,anon;grant execute on function auth.uid() to authenticated,anon;
+ create table public.torn_data_cache(user_id uuid,endpoint_id text,parameters jsonb,payload jsonb,fetched_at timestamptz);
  create table public.profiles(id uuid primary key);
  create table public.linked_torn_accounts(user_id uuid primary key,torn_id bigint unique,torn_name text,revoked_at timestamptz);
  -- Randomness shim only for isolated WASM PostgreSQL; production uses pgcrypto.
@@ -58,6 +59,12 @@ beforeAll(async () => {
   await db.exec(
     readFileSync(
       "supabase/migrations/20261110083910_lucky_draw_campaigns.sql",
+      "utf8",
+    ),
+  );
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261110091429_lucky_draw_audience_presets.sql",
       "utf8",
     ),
   );
@@ -376,5 +383,95 @@ describe("real database entry, draw and payout workflow", () => {
       } as Campaign),
     ).toBe("Awaiting draw");
     expect(campaignStatus({ drawn_at: "done" } as Campaign)).toBe("Drawn");
+  });
+});
+
+describe("audience enforcement from official cached data", () => {
+  async function proof(
+    owner: string,
+    endpoint: string,
+    payload: unknown,
+    age = "0 seconds",
+  ) {
+    await db.query(
+      "delete from torn_data_cache where user_id=$1 and endpoint_id=$2",
+      [owner, endpoint],
+    );
+    await db.query(
+      "insert into torn_data_cache values($1,$2,'{}',$3,now()-$4::interval)",
+      [owner, endpoint, JSON.stringify(payload), age],
+    );
+  }
+  it("preserves existing public campaign terms and validates audience values", async () => {
+    expect((await act(a, "details", campaign)).campaign.audience).toBe("all");
+    await expect(
+      act(host, "create", null, terms({ audience: "forged" })),
+    ).rejects.toThrow("valid audience");
+  });
+  it("accepts levels 1–15 and rejects stale, missing, forged and ineligible profiles", async () => {
+    const c = await act(
+      host,
+      "create",
+      null,
+      terms({ audience: "new_players" }),
+    );
+    await expect(act(a, "eligibility", c.id, { level: 1 })).rejects.toThrow(
+      "Refresh your Torn profile",
+    );
+    for (const level of [1, 15]) {
+      await proof(a, "v2-user-profile", { profile: { id: 2, level } });
+      expect(await act(a, "eligibility", c.id)).toEqual({ eligible: true });
+    }
+    for (const level of [0, 16]) {
+      await proof(a, "v2-user-profile", { profile: { id: 2, level } });
+      await expect(act(a, "eligibility", c.id)).rejects.toThrow(
+        "restricted to levels",
+      );
+    }
+    await proof(a, "v2-user-profile", { profile: { id: 3, level: 1 } });
+    await expect(act(a, "eligibility", c.id)).rejects.toThrow("Refresh");
+    await proof(
+      a,
+      "v2-user-profile",
+      { profile: { id: 2, level: 1 } },
+      "6 minutes",
+    );
+    await expect(act(a, "eligibility", c.id)).rejects.toThrow("Refresh");
+    await proof(a, "v2-user-profile", { profile: { id: 2, level: 15 } });
+    const s = await act(a, "submit", c.id, {
+      quantity: 1,
+      transfer_reference: "level-eligible",
+      evidence: "One Xanax sent",
+    });
+    expect(s.verified_level).toBe(15);
+    await proof(a, "v2-user-profile", { profile: { id: 2, level: 16 } });
+    await act(host, "approve", c.id, { submission_id: s.id });
+  });
+  it("locks the host faction at publication and checks entrant membership at submission", async () => {
+    await expect(
+      act(host, "create", null, terms({ audience: "faction", faction_id: 10 })),
+    ).rejects.toThrow("Refresh your Torn faction");
+    await proof(host, "v2-user-faction", { faction: { id: 10 } });
+    const c = await act(
+      host,
+      "create",
+      null,
+      terms({ audience: "faction", faction_id: 999 }),
+    );
+    expect(c.faction_id).toBe(10);
+    await proof(host, "v2-user-faction", { faction: { id: 20 } });
+    await proof(a, "v2-user-faction", { faction: { id: 20 } });
+    await expect(
+      act(a, "eligibility", c.id, { faction_id: 10 }),
+    ).rejects.toThrow("Only members");
+    await proof(a, "v2-user-faction", { faction: { id: 10 } }, "6 minutes");
+    await expect(act(a, "eligibility", c.id)).rejects.toThrow("Refresh");
+    await proof(a, "v2-user-faction", { faction: { id: 10 } });
+    const s = await act(a, "submit", c.id, {
+      quantity: 1,
+      transfer_reference: "faction-eligible",
+      evidence: "One Xanax sent",
+    });
+    expect(s.verified_faction_id).toBe(10);
   });
 });
