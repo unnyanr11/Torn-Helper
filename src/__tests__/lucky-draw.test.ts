@@ -755,3 +755,117 @@ describe("log pagination and exact cash arithmetic", () => {
     ]);
   });
 });
+
+describe("one verified transfer per entry", () => {
+  beforeAll(async () => {
+    const migration = readFileSync(
+      "supabase/migrations/20261110100226_lucky_draw_one_verified_transfer.sql",
+      "utf8",
+    );
+    await expect(db.exec(`begin;${migration}commit;`)).rejects.toThrow(
+      "Campaign data exists",
+    );
+    await db.exec("rollback");
+    // Remove only this isolated test database's earlier synthetic fixtures.
+    await db.exec(
+      "delete from private.lucky_draw_receipts;delete from private.lucky_draw_sync;delete from public.lucky_draw_winners;delete from private.lucky_draw_submissions;delete from public.lucky_draw_campaigns;",
+    );
+    await db.exec(`begin;${migration}commit;`);
+  });
+  it("requires token verification even when a client requests manual entry mode", async () => {
+    const c = await act(
+      host,
+      "create",
+      null,
+      terms({ entry_item: "Cash", entry_verification: "manual" }),
+    );
+    expect(c.entry_verification).toBe("token");
+    await expect(
+      act(a, "submit", c.id, {
+        quantity: 1,
+        transfer_reference: "unverified",
+        evidence: "manual text",
+      }),
+    ).rejects.toThrow("Only verified received transfers");
+    await expect(
+      act(host, "approve", c.id, {
+        submission_id: "00000000-0000-4000-8000-000000000099",
+      }),
+    ).rejects.toThrow("Only automatically verified token");
+    await expect(
+      act(host, "create", null, terms({ entry_item: "Points" })),
+    ).rejects.toThrow("Points cannot be used for entry");
+  });
+  it("counts large and non-multiple qualifying payments once and retains their full pool contribution", async () => {
+    const c = await act(
+      host,
+      "create",
+      null,
+      terms({
+        entry_item: "Cash",
+        quantity_per_ticket: 1000000,
+        prizes: [{ percentage: 75 }],
+      }),
+    );
+    await receivedPage(c, [
+      transfer(c, "one-large", 2, 5000000),
+      transfer(c, "one-nonmultiple", 3, 1500000),
+      transfer(c, "one-small", 4, 500000),
+    ]);
+    const r = await act(host, "details", c.id);
+    expect(r.entry_count).toBe(2);
+    expect(r.pool_quantity).toBe(6500000);
+    expect(r.receipt_data.money_received).toBe(7000000);
+    expect(r.submissions.map((s: any) => s.tickets)).toEqual([1, 1]);
+    expect(
+      r.submissions
+        .map((s: any) => s.quantity)
+        .sort((a: number, b: number) => a - b),
+    ).toEqual([1500000, 5000000]);
+    expect(
+      r.receipt_data.rows.find((s: any) => s.log_id === "one-small").reason,
+    ).toContain("below the minimum");
+    await db.query(
+      "update lucky_draw_campaigns set closes_at=now()-interval '1 second' where id=$1",
+      [c.id],
+    );
+    await db.query(
+      "update private.lucky_draw_sync set checked_through=0 where campaign_id=$1",
+      [c.id],
+    );
+    await receivedPage(c, []);
+    await act(host, "draw", c.id);
+    expect((await act(host, "details", c.id)).winners[0].quantity).toBe(
+      4875000,
+    );
+  });
+  it("counts separate verified transfers individually, respects the cap and ignores tokenless money", async () => {
+    const c = await act(
+      host,
+      "create",
+      null,
+      terms({
+        entry_item: "Cash",
+        quantity_per_ticket: 1000000,
+        max_tickets_per_player: 2,
+      }),
+    );
+    await receivedPage(c, [
+      transfer(c, "single-a", 2, 2000000),
+      transfer(c, "single-b", 2, 4000000),
+      transfer(c, "single-c", 2, 8000000),
+      { ...transfer(c, "no-token", 3, 1000000), message: "" },
+    ]);
+    let r = await act(host, "details", c.id);
+    expect(r.entry_count).toBe(2);
+    expect(r.pool_quantity).toBe(6000000);
+    expect(r.receipt_data.total).toBe(3);
+    await db.query(
+      "update private.lucky_draw_sync set checked_through=0 where campaign_id=$1",
+      [c.id],
+    );
+    await receivedPage(c, [transfer(c, "single-a", 2, 2000000)]);
+    r = await act(host, "details", c.id);
+    expect(r.entry_count).toBe(2);
+  });
+});

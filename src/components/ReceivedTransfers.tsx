@@ -138,11 +138,16 @@ export default function ReceivedTransfers({
         </strong>
         .{" "}
         {c.entry_item === "Cash"
-          ? `Send $${c.quantity_per_ticket.toLocaleString()} per entry.`
-          : `Send ${c.quantity_per_ticket} ${c.entry_item} per entry.`}{" "}
+          ? `Minimum transfer: $${c.quantity_per_ticket.toLocaleString()}.`
+          : `Minimum transfer: ${c.quantity_per_ticket} ${c.entry_item}.`}{" "}
         Include the token as a separate word in the message. Matching is
-        case-insensitive. Each eligible multiple counts as an entry, up to{" "}
+        case-insensitive. Each verified transfer counts as one entry, up to{" "}
         {c.max_tickets_per_player} per player.
+      </p>
+      <p role="alert" className="badge warn">
+        Warning: any entry without the token will be lost. Only received
+        transfers with the campaign token in the message count. Sending more
+        money or items still gives one entry per transfer.
       </p>
       {isHost && (
         <>

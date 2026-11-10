@@ -206,7 +206,7 @@ export default function LuckyDraws() {
               <span className="badge">{campaignStatus(c)}</span>
               <strong>{c.title}</strong>
               <span>
-                {c.quantity_per_ticket} × {c.entry_item} per ticket
+                {c.quantity_per_ticket} × {c.entry_item} minimum per transfer
               </span>
               <small>
                 {c.prizes.length} prizes · Closes {dateLabel(c.closes_at)}
@@ -227,8 +227,8 @@ export default function LuckyDraws() {
             <article className="card">
               <h3>Choose a campaign</h3>
               <p>
-                See the entry rules, submit transfer evidence or manage your own
-                draw.
+                See the entry rules, send a token-tagged transfer or manage your
+                own draw.
               </p>
             </article>
           )}
@@ -358,14 +358,22 @@ export function CampaignForm({
               onChange={(e) => setItem(e.target.value)}
             >
               {DRAW_ASSETS.map((name) => (
-                <option key={name} value={name}>
-                  {name === "Cash" ? "Cash (Torn dollars)" : name}
+                <option key={name} value={name} disabled={name === "Points"}>
+                  {name === "Cash"
+                    ? "Cash (Torn dollars)"
+                    : name === "Points"
+                      ? "Points (prize only)"
+                      : name}
                 </option>
               ))}
             </select>
           </Field>
           <Field
-            label={item === "Cash" ? "Cash per entry ($)" : "Items per entry"}
+            label={
+              item === "Cash"
+                ? "Minimum cash per transfer ($)"
+                : "Minimum items per transfer"
+            }
           >
             <input
               required
@@ -377,7 +385,7 @@ export function CampaignForm({
               onChange={(e) => setQuantity(e.target.value)}
             />
           </Field>
-          <Field label="Maximum tickets per player">
+          <Field label="Maximum entries per player">
             <input
               required
               type="number"
@@ -418,10 +426,10 @@ export function CampaignForm({
         </div>
         <p className="muted">
           Cash means in-game Torn dollars. Percentage prizes use the entry
-          asset; choose fixed prizes to give a different item or cash.{" "}
-          {item === "Points"
-            ? "Points transfers use manual evidence review; automatic receive-log verification currently supports cash and sendable items."
-            : "A unique message token will be generated when you publish. Senders include it in the Torn transfer message for automatic entry detection."}
+          asset; choose fixed prizes to give a different item or cash. Points
+          are available as prizes only. Entries require cash or a sendable item
+          with received-log verification. A unique token is generated at
+          publication. Transfers without that token in the message do not count.
         </p>
         <Field label="Campaign description and extra rules">
           <textarea
@@ -563,12 +571,12 @@ export function CampaignForm({
           </div>
         )}
         <p className="muted">
-          One player can win once. More tickets increase their chances. All
-          pending entries must be reviewed and there must be at least{" "}
-          {prizes.length} eligible players before the host can draw after
-          closing. Percentage prizes round down to whole items; small pools can
-          produce a zero-item prize. Rejected transfers must be resolved
-          manually by the host.
+          One player can win once. Each verified transfer gives one entry;
+          larger payments do not give extra entries. All pending entries must be
+          reviewed and there must be at least {prizes.length} eligible players
+          before the host can draw after closing. Percentage prizes round down
+          to whole items; small pools can produce a zero-item prize. Rejected
+          transfers must be resolved manually by the host.
         </p>
         {localError && <p role="alert">{localError}</p>}
         <button className="nu-btn" type="submit" disabled={busy}>
@@ -578,8 +586,8 @@ export function CampaignForm({
           <div className="draw-preview">
             <h4>Ready to publish “{title}”?</h4>
             <p>
-              Entry: {quantity} {item} per ticket · Up to {cap} tickets per
-              player · Open for {days} days from publication.
+              Entry: {quantity} {item} minimum per transfer · Up to {cap}{" "}
+              entries per player · Open for {days} days from publication.
             </p>
             <p>
               Audience: {audienceLabel(audience)}.{" "}
@@ -601,7 +609,7 @@ export function CampaignForm({
                   title,
                   description,
                   audience,
-                  entry_verification: item === "Points" ? "manual" : "token",
+                  entry_verification: "token",
                   entry_item: item,
                   quantity_per_ticket: Number(quantity),
                   max_tickets_per_player: Number(cap),
@@ -634,9 +642,6 @@ function CampaignDetail({
 }) {
   const queryClient = useQueryClient();
   const c = data.campaign,
-    [quantity, setQuantity] = useState(String(c.quantity_per_ticket)),
-    [reference, setReference] = useState(""),
-    [evidence, setEvidence] = useState(""),
     [reviewNotes, setReviewNotes] = useState<Record<string, string>>({}),
     [paymentRefs, setPaymentRefs] = useState<Record<number, string>>({}),
     [confirmDraw, setConfirmDraw] = useState(false),
@@ -644,9 +649,6 @@ function CampaignDetail({
     [refundRefs, setRefundRefs] = useState<Record<string, string>>({});
   const status = campaignStatus(c),
     preview = prizePreview(data.pool_quantity, c.prizes);
-  const used = data.submissions
-    .filter((s) => s.status !== "rejected" && s.torn_id === data.viewer_torn_id)
-    .reduce((sum, s) => sum + s.tickets, 0);
   const drawReady =
     status === "Awaiting draw" &&
     data.pending_count === 0 &&
@@ -694,10 +696,10 @@ function CampaignDetail({
       </p>
       <p>
         <strong>
-          {c.quantity_per_ticket} {c.entry_item} per ticket
+          {c.quantity_per_ticket} {c.entry_item} minimum per transfer
         </strong>{" "}
-        · Maximum {c.max_tickets_per_player} tickets per player. Send only the
-        stated item, in whole ticket quantities.
+        · Maximum {c.max_tickets_per_player} entries per player. Send only the
+        stated item, in at least the minimum amount.
       </p>
       <Field label="Share campaign link (sign-in required)">
         <input
@@ -731,9 +733,10 @@ function CampaignDetail({
           </p>
         )}
         <p>
-          Each ticket contributes equal weight. Winners are distinct players.
-          Entries are manually approved by the host, not automatically verified
-          by Torn.
+          Each verified transfer contributes one entry with equal weight.
+          Winners are distinct players. Only received transfers verified against
+          the campaign token are counted. Transfer amounts do not increase the
+          number of entries.
         </p>
       </div>
       <ReceivedTransfers campaign={c} isHost={data.is_host} sync={data.sync} />
@@ -758,81 +761,6 @@ function CampaignDetail({
           </button>
         </div>
       )}
-      {!data.is_host &&
-        c.entry_verification !== "token" &&
-        status === "Open" && (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              void run(async () => {
-                await refreshEligibility(queryClient, c.audience ?? "all");
-                await action("submit", c.id, {
-                  quantity: Number(quantity),
-                  transfer_reference: reference,
-                  evidence,
-                });
-                setReference("");
-                setEvidence("");
-              }, "Entry submitted for host review.");
-            }}
-          >
-            <h4>Submit your transfer</h4>
-            <button
-              type="button"
-              className="nu-btn"
-              disabled={busy}
-              onClick={() =>
-                void run(async () => {
-                  await refreshEligibility(queryClient, c.audience ?? "all");
-                  await action("eligibility", c.id);
-                }, "You qualify for this campaign now. You can send the stated items to the host in Torn, then submit your transfer evidence.")
-              }
-            >
-              Check eligibility before sending items
-            </button>
-            <p>
-              {used} of {c.max_tickets_per_player} tickets used or pending. Send
-              items to the host in Torn first, then provide the reference and
-              evidence.
-            </p>
-            <Field label={`Quantity of ${c.entry_item} sent`}>
-              <input
-                type="number"
-                required
-                min={c.quantity_per_ticket}
-                max={1000000}
-                step={c.quantity_per_ticket}
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-              />
-            </Field>
-            <Field label="Unique Torn transfer/log reference">
-              <input
-                required
-                minLength={3}
-                maxLength={200}
-                value={reference}
-                onChange={(e) => setReference(e.target.value)}
-              />
-            </Field>
-            <Field label="Transfer evidence (paste the event text, including item, quantity and time)">
-              <textarea
-                required
-                minLength={5}
-                maxLength={2000}
-                rows={3}
-                value={evidence}
-                onChange={(e) => setEvidence(e.target.value)}
-              />
-            </Field>
-            <button
-              className="nu-btn"
-              disabled={busy || used >= c.max_tickets_per_player}
-            >
-              Submit entry for review
-            </button>
-          </form>
-        )}
       <p>
         <strong>{data.entry_count ?? 0} total entries</strong> · Approved entry
         contributions: {c.entry_item === "Cash" ? "$" : ""}
@@ -845,7 +773,7 @@ function CampaignDetail({
         <div key={s.id} className="draw-entry">
           <strong>
             {s.player_name} [{s.torn_id}] · {s.quantity} {c.entry_item} ·{" "}
-            {s.tickets} tickets
+            {s.tickets} entries
           </strong>
           <p>
             {s.status} · {dateLabel(s.created_at)}
