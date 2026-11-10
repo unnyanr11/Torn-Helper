@@ -338,5 +338,215 @@
     "buy_price": 1875,
     "source": "User screenshot",
     "observed_on": "2026-11-10"
+  },
+  {
+    "id": 1348,
+    "name": "Aluminum Plate",
+    "type": "Material",
+    "country": "Canada",
+    "shop": "General Store",
+    "buy_price": 1200,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 263,
+    "name": "Crocus",
+    "type": "Flower",
+    "country": "Canada",
+    "shop": "General Store",
+    "buy_price": 600,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 1361,
+    "name": "Dog Treats",
+    "type": "Material",
+    "country": "Canada",
+    "shop": "General Store",
+    "buy_price": 20,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 410,
+    "name": "Fire Hydrant",
+    "type": "Other",
+    "country": "Canada",
+    "shop": "General Store",
+    "buy_price": 20000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 262,
+    "name": "Hockey Stick",
+    "type": "Other",
+    "country": "Canada",
+    "shop": "General Store",
+    "buy_price": 400,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 413,
+    "name": "Mountie Hat",
+    "type": "Clothing",
+    "country": "Canada",
+    "shop": "General Store",
+    "buy_price": 30000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 328,
+    "name": "PVC Cards",
+    "type": "Material",
+    "country": "Canada",
+    "shop": "General Store",
+    "buy_price": 12500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 261,
+    "name": "Wolverine Plushie",
+    "type": "Plushie",
+    "country": "Canada",
+    "shop": "General Store",
+    "buy_price": 20,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 402,
+    "name": "Ice Pick",
+    "type": "Melee",
+    "country": "Canada",
+    "shop": "Arms Dealer",
+    "buy_price": 20000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 252,
+    "name": "Ithaca 37",
+    "type": "Primary",
+    "country": "Canada",
+    "shop": "Arms Dealer",
+    "buy_price": 10000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 253,
+    "name": "Lorcin 380",
+    "type": "Secondary",
+    "country": "Canada",
+    "shop": "Arms Dealer",
+    "buy_price": 300,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 645,
+    "name": "Safety Boots",
+    "type": "Defensive",
+    "country": "Canada",
+    "shop": "Arms Dealer",
+    "buy_price": 77000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 1484,
+    "name": "Bear Gall",
+    "type": "Other",
+    "country": "Canada",
+    "shop": "Black Market",
+    "buy_price": 30008,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 196,
+    "name": "Cannabis",
+    "type": "Drug",
+    "country": "Canada",
+    "shop": "Black Market",
+    "buy_price": 6588,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 197,
+    "name": "Ecstasy",
+    "type": "Drug",
+    "country": "Canada",
+    "shop": "Black Market",
+    "buy_price": 33143,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 1483,
+    "name": "Insulin",
+    "type": "Other",
+    "country": "Canada",
+    "shop": "Black Market",
+    "buy_price": 2458,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 198,
+    "name": "Ketamine",
+    "type": "Drug",
+    "country": "Canada",
+    "shop": "Black Market",
+    "buy_price": 59572,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 200,
+    "name": "Opium",
+    "type": "Drug",
+    "country": "Canada",
+    "shop": "Black Market",
+    "buy_price": 25831,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 201,
+    "name": "PCP",
+    "type": "Drug",
+    "country": "Canada",
+    "shop": "Black Market",
+    "buy_price": 2591,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 1504,
+    "name": "Quartz Point",
+    "type": "Artifact",
+    "country": "Canada",
+    "shop": "Black Market",
+    "buy_price": 153463,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 206,
+    "name": "Xanax",
+    "type": "Drug",
+    "country": "Canada",
+    "shop": "Black Market",
+    "buy_price": 778607,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
   }
 ]

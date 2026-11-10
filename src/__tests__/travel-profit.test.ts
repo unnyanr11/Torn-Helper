@@ -71,10 +71,10 @@ describe('saved Mexico purchase reference',()=>{
   const items=withSavedShopPrices([]);
   expect(destinationItems(items,'Mexico')).toHaveLength(34);
   expect(destinationItems(items,'Japan')).toEqual([]);
-  expect(new Set(FOREIGN_SHOP_PRICES.map(p=>p.id)).size).toBe(34);
-  expect(FOREIGN_SHOP_PRICES.filter(p=>p.shop==='General Store')).toHaveLength(10);
-  expect(FOREIGN_SHOP_PRICES.filter(p=>p.shop==='Arms Dealer')).toHaveLength(19);
-  expect(FOREIGN_SHOP_PRICES.filter(p=>p.shop==='Black Market')).toHaveLength(5);
+  expect(new Set(FOREIGN_SHOP_PRICES.filter(p=>p.country==='Mexico').map(p=>p.id)).size).toBe(34);
+  expect(FOREIGN_SHOP_PRICES.filter(p=>p.country==='Mexico'&&p.shop==='General Store')).toHaveLength(10);
+  expect(FOREIGN_SHOP_PRICES.filter(p=>p.country==='Mexico'&&p.shop==='Arms Dealer')).toHaveLength(19);
+  expect(FOREIGN_SHOP_PRICES.filter(p=>p.country==='Mexico'&&p.shop==='Black Market')).toHaveLength(5);
   expect(shopQuote(items.find(i=>i.id===260),'Mexico')).toMatchObject({buy_price:300,source:'User screenshot'});
   expect(shopQuote(items.find(i=>i.id===399),'Mexico')?.buy_price).toBe(20000000);
   expect(shopQuote(items.find(i=>i.id===1499),'Mexico')?.buy_price).toBe(141079);
@@ -95,5 +95,25 @@ describe('saved Mexico purchase reference',()=>{
   expect(live.value.shops).toHaveLength(1);
   expect(withSavedShopPrices(merged)).toEqual(merged);
   expect(marketMinimum({}).price).toBeNull();
+ });
+});
+
+
+describe('saved Canada purchase reference',()=>{
+ it('restores the 21 Canadian screenshot prices including out-of-stock items',()=>{
+  const references=FOREIGN_SHOP_PRICES.filter(p=>p.country==='Canada');
+  expect(references).toHaveLength(21);
+  expect(references.filter(p=>p.shop==='General Store')).toHaveLength(8);
+  expect(references.filter(p=>p.shop==='Arms Dealer')).toHaveLength(4);
+  expect(references.filter(p=>p.shop==='Black Market')).toHaveLength(9);
+  const items=withSavedShopPrices([]);
+  expect(destinationItems(items,'Canada')).toHaveLength(21);
+  expect(shopQuote(items.find(i=>i.id===261),'Canada')?.buy_price).toBe(20);
+  expect(shopQuote(items.find(i=>i.id===1504),'Canada')?.buy_price).toBe(153463);
+  expect(shopQuote(items.find(i=>i.id===206),'Canada')?.buy_price).toBe(778607);
+  // Shared items retain independent country prices; rows must not overwrite by item ID.
+  expect(shopQuote(items.find(i=>i.id===200),'Canada')?.buy_price).toBe(25831);
+  expect(shopQuote(items.find(i=>i.id===200),'Mexico')?.buy_price).toBe(21731);
+  expect(new Set(FOREIGN_SHOP_PRICES.map(p=>`${p.country}:${p.shop}:${p.id}`)).size).toBe(FOREIGN_SHOP_PRICES.length);
  });
 });
