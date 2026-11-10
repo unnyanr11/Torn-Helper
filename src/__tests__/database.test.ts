@@ -109,6 +109,7 @@ beforeAll(async () => {
   await db.exec("begin;"+readFileSync("supabase/migrations/20261110100226_lucky_draw_one_verified_transfer.sql", "utf8")+"commit;");
   await db.exec("begin;"+readFileSync("supabase/migrations/20261110101259_lucky_draw_deposit_bounds_and_entry_threshold.sql", "utf8")+"commit;");
   await db.exec("begin;"+readFileSync("supabase/migrations/20261110102735_lucky_draw_automatic_sealed_results.sql", "utf8")+"commit;");
+  await db.exec("begin;"+readFileSync("supabase/migrations/20261110104618_lucky_draw_private_results_and_reveal_delay.sql", "utf8")+"commit;");
   const candidate = await db.query(
     "select table_name as table,column_name as column,data_type as type from information_schema.columns where table_schema='public'",
   );

@@ -27,6 +27,7 @@ export type Campaign = {
   cancellation_reason: string | null;
   drawn_at: string | null;
   reveal_at: string | null;
+  reveal_delay_hours: number;
   pool_quantity: number | null;
   eligible_players: number | null;
 };

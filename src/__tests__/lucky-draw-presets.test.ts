@@ -148,7 +148,8 @@ describe("sealed result presentation", () => {
         onReveal: () => {},
       }),
     );
-    expect(html).toContain("48 hours after entry closing");
+    expect(html).toContain("24");
+    expect(html).toContain("hours after entry closing");
     expect(html).toContain("Winner identities remain sealed");
     expect(html).not.toContain("Hidden winning player");
     expect(revealCountdown(new Date(48 * 3600000).toISOString(), 0)).toBe(
@@ -162,7 +163,37 @@ describe("sealed result presentation", () => {
     const html = renderToStaticMarkup(
       createElement(CampaignForm, { busy: false, onSave: async () => {} }),
     );
-    expect(html).toContain("48 hours after entry closing");
+    expect(html).toContain("24");
+    expect(html).toContain("hours after entry closing");
     expect(html).toContain("public audit trail");
+  });
+});
+
+describe("configurable release and unsealing animation", () => {
+  it("shows the 24-hour minimum and seven-day maximum in campaign creation", async () => {
+    const { renderToStaticMarkup } = await import("react-dom/server");
+    const { createElement } = await import("react");
+    const { CampaignForm } = await import("../pages/LuckyDraws");
+    const html = renderToStaticMarkup(
+      createElement(CampaignForm, { busy: false, onSave: async () => {} }),
+    );
+    expect(html).toContain("Winner reveal delay after entry closes");
+    expect(html).toContain('min="24"');
+    expect(html).toContain('max="168"');
+  });
+  it("does not put a winner name into the animation introduction", async () => {
+    const { renderToStaticMarkup } = await import("react-dom/server");
+    const { createElement } = await import("react");
+    const { default: WinnerReveal } = await import(
+      "../components/WinnerReveal"
+    );
+    const html = renderToStaticMarkup(
+      createElement(WinnerReveal, {
+        campaignId: "released",
+        children: createElement("p", null, "Released winner name"),
+      }),
+    );
+    expect(html).toContain("Unsealing the winners");
+    expect(html).not.toContain("Released winner name");
   });
 });

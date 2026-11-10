@@ -1,0 +1,209 @@
+.winner-reveal {
+  position: relative;
+  margin: 22px 0;
+}
+.reveal-ceremony {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 330px;
+  padding: 32px 20px;
+  border-radius: 22px;
+  border: 1px solid #d5ad505c;
+  background:
+    radial-gradient(ellipse at 50% 28%, #e2b75821, transparent 58%),
+    var(--surface-solid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+.reveal-halo {
+  position: absolute;
+  z-index: -1;
+  top: 35px;
+  width: 180px;
+  height: 180px;
+  border: 1px solid #e2b75866;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 18px #e2b7580b,
+    0 0 0 42px #e2b75808;
+  animation: revealHalo 3.2s ease-in-out both;
+}
+.reveal-emblem {
+  width: 86px;
+  height: 86px;
+  color: #b98926;
+  filter: drop-shadow(0 6px 18px #d6a93b55);
+  animation: revealEmblem 3.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.reveal-emblem svg {
+  width: 100%;
+  height: 100%;
+}
+.reveal-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.23em;
+  font-weight: 800;
+  margin-top: 24px;
+  color: #a77c2a;
+}
+.reveal-ceremony h3 {
+  font-size: clamp(24px, 4vw, 34px);
+  margin: 12px 0 0;
+  letter-spacing: -0.035em;
+}
+.reveal-ceremony p {
+  opacity: 0.7;
+  font-size: 14px;
+}
+.reveal-progress {
+  height: 3px;
+  width: 180px;
+  border-radius: 8px;
+  background: #e2b75822;
+  overflow: hidden;
+  margin-top: 15px;
+}
+.reveal-progress span {
+  height: 100%;
+  display: block;
+  transform-origin: left;
+  background: linear-gradient(90deg, #a693df, #e2b758, #65c5bd);
+  animation: revealProgress 3.2s ease-in-out both;
+}
+.winner-reveal-content {
+  position: relative;
+  border: 1px solid #d5ad5066;
+  border-radius: 20px;
+  padding: 22px;
+  background:
+    linear-gradient(145deg, #e2b75812, transparent 50%), var(--surface-solid);
+  animation: revealContent 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.reveal-verified {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--accent, #247c76);
+}
+.reveal-verified > span {
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+}
+.reveal-confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: 20px;
+}
+.reveal-confetti i {
+  position: absolute;
+  left: var(--x);
+  top: 0;
+  width: 7px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--color);
+  animation: revealConfetti 1.7s var(--delay) cubic-bezier(0.2, 0.6, 0.4, 1)
+    both;
+}
+.winner-reveal-content .draw-entry:first-of-type {
+  border-top: 1px solid #d5ad5044;
+  padding-top: 20px;
+}
+.winner-reveal-content .draw-entry strong {
+  font-size: 18px;
+}
+@keyframes revealHalo {
+  0% {
+    transform: scale(0.65);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    transform: scale(1.12);
+    opacity: 0.65;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+@keyframes revealEmblem {
+  0% {
+    transform: translateY(18px) scale(0.8);
+    opacity: 0;
+  }
+  20% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(-5px) scale(1.05);
+  }
+  100% {
+    transform: translateY(-8px) scale(0.95);
+    opacity: 0.4;
+  }
+}
+@keyframes revealProgress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes revealContent {
+  from {
+    transform: translateY(16px) scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes revealConfetti {
+  0% {
+    transform: translateY(-15px) rotate(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(var(--fall)) rotate(var(--rotation));
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .winner-reveal * {
+    animation: none !important;
+  }
+  .reveal-confetti {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .winner-reveal-content {
+    padding: 16px;
+  }
+  .reveal-ceremony {
+    min-height: 280px;
+  }
+}

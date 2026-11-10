@@ -23,6 +23,7 @@ import { invokeTornData } from "../lib/torn-data-client";
 import { functionError } from "../lib/function-error";
 import ReceivedTransfers from "../components/ReceivedTransfers";
 import DrawRevealWindow from "../components/DrawRevealWindow";
+import WinnerReveal from "../components/WinnerReveal";
 import type { QueryClient } from "@tanstack/react-query";
 async function refreshEligibility(client: QueryClient, audience: DrawAudience) {
   if (audience === "all") return;
@@ -278,7 +279,8 @@ export function CampaignForm({
     [days, setDays] = useState("7"),
     [depositMode, setDepositMode] = useState<"fixed" | "range">("fixed"),
     [maximumDeposit, setMaximumDeposit] = useState("5"),
-    [minimumEntries, setMinimumEntries] = useState("100");
+    [minimumEntries, setMinimumEntries] = useState("100"),
+    [revealDelay, setRevealDelay] = useState("24");
   const [mode, setMode] = useState<"pool" | "fixed">("pool"),
     [prizes, setPrizes] = useState<Prize[]>(() => splitPrizes("tiered")),
     [previewPool, setPreviewPool] = useState("100"),
@@ -300,6 +302,14 @@ export function CampaignForm({
       setLocalError(
         "The maximum deposit must be at least the minimum deposit.",
       );
+      return;
+    }
+    if (
+      !Number.isInteger(Number(revealDelay)) ||
+      Number(revealDelay) < 24 ||
+      Number(revealDelay) > 168
+    ) {
+      setLocalError("Choose a reveal delay from 24 to 168 whole hours.");
       return;
     }
     setReview(true);
@@ -464,6 +474,18 @@ export function CampaignForm({
               value={days}
               onChange={(e) => setDays(e.target.value)}
             />
+          </Field>
+          <Field label="Winner reveal delay after entry closes (hours)">
+            <input
+              type="number"
+              required
+              min="24"
+              max="168"
+              step="1"
+              value={revealDelay}
+              onChange={(e) => setRevealDelay(e.target.value)}
+            />
+            <small>Minimum 24 hours (1 day), maximum 168 hours (7 days).</small>
           </Field>
           <Field label="Prize type">
             <select
@@ -639,9 +661,9 @@ export function CampaignForm({
           minute while this campaign is active, including while this page is
           closed. The backend selects and saves random winners automatically
           after entries close and final transfer verification completes. Results
-          stay sealed until 48 hours after entry closing. Administrators may
-          correct display names with a public audit trail; the winning Torn IDs
-          and original random results cannot be changed.
+          stay sealed until {revealDelay} hours after entry closing.
+          Administrators may correct display names with a public audit trail;
+          the winning Torn IDs and original random results cannot be changed.
         </p>
         <p className="muted">
           One player can win once. Each verified transfer gives one entry;
@@ -698,6 +720,7 @@ export function CampaignForm({
                       : Number(quantity),
                   minimum_entries: Number(minimumEntries),
                   days_after_threshold: Number(days),
+                  reveal_delay_hours: Number(revealDelay),
                   max_tickets_per_player: Number(cap),
                   prize_mode: mode,
                   prizes,
@@ -1013,7 +1036,7 @@ function CampaignDetail({
         </details>
       )}
       {c.drawn_at && data.result_state === "revealed" && (
-        <div>
+        <WinnerReveal campaignId={c.id}>
           <h4>Winners · {dateLabel(c.drawn_at)}</h4>
           <p>The result is final. No rerolls.</p>
           {data.winners.map((w) => (
@@ -1090,7 +1113,7 @@ function CampaignDetail({
                 )}
             </div>
           ))}
-        </div>
+        </WinnerReveal>
       )}
     </article>
   );

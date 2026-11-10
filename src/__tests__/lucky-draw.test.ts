@@ -1196,3 +1196,160 @@ describe("automatic sealed draw and audited admin name correction", () => {
     expect(row.command).toContain("vault.decrypted_secrets");
   });
 });
+
+describe("private winner storage and server-authorized configurable release", () => {
+  beforeAll(async () => {
+    const migration = readFileSync(
+      "supabase/migrations/20261110104618_lucky_draw_private_results_and_reveal_delay.sql",
+      "utf8",
+    );
+    await expect(db.exec(`begin;${migration}commit;`)).rejects.toThrow(
+      "Campaign data exists",
+    );
+    await db.exec("rollback");
+    await db.exec(
+      "delete from private.lucky_draw_name_audit;delete from private.lucky_draw_jobs;delete from private.lucky_draw_receipts;delete from private.lucky_draw_sync;delete from public.lucky_draw_winners;delete from private.lucky_draw_submissions;delete from public.lucky_draw_campaigns;",
+    );
+    await db.exec(`begin;${migration}commit;`);
+  });
+  const config = (extra: Record<string, unknown> = {}) =>
+    terms({
+      entry_item: "Cash",
+      quantity_per_ticket: 1000000,
+      minimum_entries: 1,
+      days_after_threshold: 1,
+      deposit_mode: "fixed",
+      prizes: [{ percentage: 75 }],
+      ...extra,
+    });
+  let c: any;
+  it("validates the 24–168 hour limits on the backend, including bypassed frontend validation", async () => {
+    for (const delay of [0, 23, 169, 1000000, -1, 24.5, "24; SELECT 1"])
+      await expect(
+        act(host, "create", null, config({ reveal_delay_hours: delay })),
+      ).rejects.toThrow();
+    expect((await act(host, "create", null, config())).reveal_delay_hours).toBe(
+      24,
+    );
+  });
+  it("stores selected winners privately and releases nothing through public table/API paths", async () => {
+    c = await act(host, "create", null, config({ reveal_delay_hours: 24 }));
+    await receivedPage(c, [transfer(c, "private-24", 2)]);
+    await db.query(
+      "update lucky_draw_campaigns set closes_at=now()-interval '1 second' where id=$1",
+      [c.id],
+    );
+    expect(
+      (await asService("select public.finalize_lucky_draw($1) as data", [c.id]))
+        .rows[0].data.state,
+    ).toBe("drawn");
+    expect(
+      (
+        await db.query<any>(
+          "select to_regclass('public.lucky_draw_winners') as exposed",
+        )
+      ).rows[0].exposed,
+    ).toBeNull();
+    for (const actor of [host, a, b, d]) {
+      await expect(
+        user(actor, "select * from private.lucky_draw_winners"),
+      ).rejects.toThrow("permission denied");
+      await expect(
+        user(actor, "select * from public.lucky_draw_winners"),
+      ).rejects.toThrow("does not exist");
+      const r = await act(actor, "details", c.id, {
+        reveal_at: "1900-01-01",
+        now: "9999-01-01",
+        role: "admin",
+        reveal_delay_hours: 0,
+      });
+      expect(r.result_state).toBe("sealed");
+      expect(r.winners).toEqual([]);
+      expect(r.name_corrections).toEqual([]);
+      await expect(act(actor, "received", c.id, { rank: 1 })).rejects.toThrow(
+        "not revealed yet",
+      );
+    }
+    const r = await act(a, "details", c.id);
+    expect(Date.parse(r.reveal_at) - Date.parse(r.campaign.closes_at)).toBe(
+      24 * 3600000,
+    );
+    await expect(
+      user(
+        a,
+        "update lucky_draw_campaigns set reveal_at=now(),reveal_delay_hours=0 where id=$1",
+        [c.id],
+      ),
+    ).rejects.toThrow("permission denied");
+  });
+  it("ignores forged admin claims and treats injection-shaped action values as data", async () => {
+    await expect(act(a, "details'; SELECT 1; --", c.id)).rejects.toThrow(
+      "Unknown campaign action",
+    );
+    await expect(
+      user(a, "select public.admin_correct_lucky_draw_name($1,1,$2,$3)", [
+        c.id,
+        "Name'); SELECT 1; --",
+        "role=admin",
+      ]),
+    ).rejects.toThrow("Administrator");
+    expect(
+      (
+        await db.query<any>(
+          "select count(*)::int as n from private.lucky_draw_winners where campaign_id=$1",
+          [c.id],
+        )
+      ).rows[0].n,
+    ).toBe(1);
+    expect((await act(host, "draw", c.id)).state).toBe("already_drawn");
+  });
+  it("keeps audited backend name corrections private until release and keeps the original winning ID", async () => {
+    await user(b, "select public.admin_correct_lucky_draw_name($1,1,$2,$3)", [
+      c.id,
+      "Current display name",
+      "Verified Torn rename",
+    ]);
+    expect((await act(a, "details", c.id)).winners).toEqual([]);
+    await db.query(
+      "update lucky_draw_campaigns set closes_at=now()-interval '25 hours',reveal_at=now()-interval '1 hour' where id=$1",
+      [c.id],
+    );
+    const r = await act(a, "details", c.id);
+    expect(r.result_state).toBe("revealed");
+    expect(r.winners[0].torn_id).toBe(2);
+    expect(r.winners[0].player_name).toBe("Current display name");
+    expect(r.name_corrections).toHaveLength(1);
+    await expect(
+      user(a, "select * from private.lucky_draw_winners"),
+    ).rejects.toThrow("permission denied");
+  });
+  it("supports the seven-day maximum and blocks any early deadline rewrite", async () => {
+    const seven = await act(
+      host,
+      "create",
+      null,
+      config({ reveal_delay_hours: 168 }),
+    );
+    await receivedPage(seven, [transfer(seven, "private-168", 3)]);
+    await db.query(
+      "update lucky_draw_campaigns set closes_at=now()-interval '1 second' where id=$1",
+      [seven.id],
+    );
+    await asService("select public.finalize_lucky_draw($1)", [seven.id]);
+    const r = await act(a, "details", seven.id);
+    expect(Date.parse(r.reveal_at) - Date.parse(r.campaign.closes_at)).toBe(
+      168 * 3600000,
+    );
+    await expect(
+      db.query("update lucky_draw_campaigns set reveal_at=now() where id=$1", [
+        seven.id,
+      ]),
+    ).rejects.toThrow("configured_reveal_window");
+    await expect(
+      db.query(
+        "update lucky_draw_campaigns set reveal_delay_hours=169 where id=$1",
+        [seven.id],
+      ),
+    ).rejects.toThrow();
+  });
+});

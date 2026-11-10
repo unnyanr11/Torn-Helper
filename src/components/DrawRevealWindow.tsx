@@ -16,10 +16,11 @@ export default function DrawRevealWindow({
   const [now, setNow] = useState(Date.now),
     refresh = useRef(onReveal);
   refresh.current = onReveal;
+  const delayHours = c.reveal_delay_hours ?? 24;
   const revealAt =
     data.reveal_at ??
     (c.closes_at
-      ? new Date(Date.parse(c.closes_at) + 48 * 3600000).toISOString()
+      ? new Date(Date.parse(c.closes_at) + delayHours * 3600000).toISOString()
       : null);
   useEffect(() => {
     const tick = setInterval(() => setNow(Date.now()), 1000);
@@ -38,20 +39,20 @@ export default function DrawRevealWindow({
   }, [revealAt, data.result_state]);
   return (
     <div className="draw-preview">
-      <h4>Automatic draw and 48-hour reveal</h4>
+      <h4>Automatic draw and timed reveal</h4>
       {!c.closes_at ? (
         <p>
           The draw runs automatically after the required entry count and final
-          entry window. Winners are stored on the backend, then revealed 48
-          hours after entry closing.
+          entry window. Winners are stored on the backend, then revealed{" "}
+          {delayHours} hours after entry closing.
         </p>
       ) : (
         <>
           <p>Entry closing: {new Date(c.closes_at).toLocaleString()}.</p>
           <p>
             Results reveal:{" "}
-            <strong>{new Date(revealAt!).toLocaleString()}</strong> — 48 hours
-            after entry closing.
+            <strong>{new Date(revealAt!).toLocaleString()}</strong> —{" "}
+            {delayHours} hours after entry closing.
           </p>
           {!c.drawn_at ? (
             <p>
