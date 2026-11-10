@@ -688,5 +688,225 @@
     "buy_price": 2630,
     "source": "User screenshot",
     "observed_on": "2026-11-10"
+  },
+  {
+    "id": 282,
+    "name": "African Violet",
+    "type": "Flower",
+    "country": "South Africa",
+    "shop": "General Store",
+    "buy_price": 2000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 406,
+    "name": "Afro Comb",
+    "type": "Other",
+    "country": "South Africa",
+    "shop": "General Store",
+    "buy_price": 50000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 280,
+    "name": "Elephant Statue",
+    "type": "Other",
+    "country": "South Africa",
+    "shop": "General Store",
+    "buy_price": 500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 281,
+    "name": "Lion Plushie",
+    "type": "Plushie",
+    "country": "South Africa",
+    "shop": "General Store",
+    "buy_price": 400,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 653,
+    "name": "Combat Boots",
+    "type": "Defensive",
+    "country": "South Africa",
+    "shop": "Arms Dealer",
+    "buy_price": 2400000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 654,
+    "name": "Combat Gloves",
+    "type": "Defensive",
+    "country": "South Africa",
+    "shop": "Arms Dealer",
+    "buy_price": 2100000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 651,
+    "name": "Combat Helmet",
+    "type": "Defensive",
+    "country": "South Africa",
+    "shop": "Arms Dealer",
+    "buy_price": 3100000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 652,
+    "name": "Combat Pants",
+    "type": "Defensive",
+    "country": "South Africa",
+    "shop": "Arms Dealer",
+    "buy_price": 2950000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 332,
+    "name": "Combat Vest",
+    "type": "Defensive",
+    "country": "South Africa",
+    "shop": "Arms Dealer",
+    "buy_price": 3500000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 4,
+    "name": "Knuckle Dusters",
+    "type": "Melee",
+    "country": "South Africa",
+    "shop": "Arms Dealer",
+    "buy_price": 800,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 225,
+    "name": "Mag 7",
+    "type": "Primary",
+    "country": "South Africa",
+    "shop": "Arms Dealer",
+    "buy_price": 60000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 226,
+    "name": "Smoke Grenade",
+    "type": "Temporary",
+    "country": "South Africa",
+    "shop": "Arms Dealer",
+    "buy_price": 20000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 227,
+    "name": "Spear",
+    "type": "Melee",
+    "country": "South Africa",
+    "shop": "Arms Dealer",
+    "buy_price": 600,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 228,
+    "name": "Vektor CR-21",
+    "type": "Primary",
+    "country": "South Africa",
+    "shop": "Arms Dealer",
+    "buy_price": 7500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 196,
+    "name": "Cannabis",
+    "type": "Drug",
+    "country": "South Africa",
+    "shop": "Black Market",
+    "buy_price": 1025,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 198,
+    "name": "Ketamine",
+    "type": "Drug",
+    "country": "South Africa",
+    "shop": "Black Market",
+    "buy_price": 6390,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 200,
+    "name": "Opium",
+    "type": "Drug",
+    "country": "South Africa",
+    "shop": "Black Market",
+    "buy_price": 26313,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 1500,
+    "name": "Quartzite Point",
+    "type": "Artifact",
+    "country": "South Africa",
+    "shop": "Black Market",
+    "buy_price": 119955,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 358,
+    "name": "Raw Ivory",
+    "type": "Other",
+    "country": "South Africa",
+    "shop": "Black Market",
+    "buy_price": 1909,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 204,
+    "name": "Speed",
+    "type": "Drug",
+    "country": "South Africa",
+    "shop": "Black Market",
+    "buy_price": 5028,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 1497,
+    "name": "Uncut Diamonds",
+    "type": "Other",
+    "country": "South Africa",
+    "shop": "Black Market",
+    "buy_price": 191343,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 206,
+    "name": "Xanax",
+    "type": "Drug",
+    "country": "South Africa",
+    "shop": "Black Market",
+    "buy_price": 694270,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
   }
 ]
