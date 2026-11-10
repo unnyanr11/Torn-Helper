@@ -64,6 +64,7 @@ export const NAV_GROUPS: Record<string, string[]> = {
     "Gym",
     "Racing",
     "Community",
+    "Lucky Draws",
     "Graffiti",
     "Halloween",
     "Tornipedia",

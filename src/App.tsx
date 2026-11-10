@@ -48,6 +48,7 @@ const Stocks = lazy(() => import("./pages/Stocks"));
 const Company = lazy(() => import("./pages/Company"));
 const Properties = lazy(() => import("./pages/Properties"));
 const Racing = lazy(() => import("./pages/Racing"));
+const LuckyDraws = lazy(() => import("./pages/LuckyDraws"));
 const Community = lazy(() => import("./pages/Community"));
 const LiveFeeds = lazy(() => import("./pages/LiveFeeds"));
 const Alliances = lazy(() => import("./pages/Alliances"));
@@ -245,6 +246,7 @@ export default function App() {
             {page === "Properties" && <Properties />}
             {page === "Racing" && <Racing />}
             {page === "Community" && <Community />}
+            {page === "Lucky Draws" && <LuckyDraws />}
             {page === "Live Feeds" && <LiveFeeds />}
             {page === "Alliances" && <Alliances />}
             {page === "Watched Factions" && <WatchedFactions />}

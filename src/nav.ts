@@ -57,6 +57,7 @@ export const NAV = [
   "Properties",
   "Racing",
   "Community",
+  "Lucky Draws",
   "Live Feeds",
   "Alerts",
   "Notifications",
