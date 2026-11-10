@@ -1,3 +1,5 @@
+import savedShopPrices from '../data/foreign-shop-prices.json';
+
 /** Official route reference, checked 2026-10-22 against Torn Wiki Travel.
  * These are planning estimates, not account observations. Standard fare is per paid leg.
  * https://wiki.torn.com/wiki/Travel — no runtime third-party connections.
@@ -19,7 +21,7 @@ export const ROUTES = [
 ];
 const object=(v:unknown):Record<string,any>=>v&&typeof v==='object'&&!Array.isArray(v)?v as Record<string,any>:{};
 export const finite=(v:unknown):v is number=>typeof v==='number'&&Number.isFinite(v);
-export type ShopItem={id:number;name:string;type:string;value:{shops:{country:string;shop:string;buy_price:number|null}[]}};
+export type ShopItem={id:number;name:string;type:string;value:{shops:{country:string;shop:string;buy_price:number|null;source?:string;observed_on?:string}[]}};
 export function shopItems(payload:unknown):ShopItem[]{
   const rows=object(payload).items;
   return Array.isArray(rows)?rows.filter((r:any)=>Number.isSafeInteger(r?.id)&&r.id>0&&typeof r.name==='string'&&typeof r.type==='string'&&Array.isArray(r.value?.shops)):[];
@@ -31,6 +33,20 @@ export function shopQuote(item:ShopItem|undefined,country:string){
 }
 export function destinationItems(items:ShopItem[],country:string,category?:string){
   return items.filter(i=>shopQuote(i,country)!==null&&(!category||i.type===category)).sort((a,b)=>a.name.localeCompare(b.name));
+}
+/** Persisted screenshot reference, separate from market quotes and live stock. */
+export const FOREIGN_SHOP_PRICES = savedShopPrices;
+export function withSavedShopPrices(items:ShopItem[]):ShopItem[]{
+  const merged=new Map(items.map(item=>[item.id,{...item,value:{shops:[...item.value.shops]}}]));
+  for(const reference of FOREIGN_SHOP_PRICES){
+    const existing=merged.get(reference.id);
+    // A valid fetched country price takes precedence, even when it rose above the reference.
+    if(existing&&shopQuote(existing,reference.country))continue;
+    const item=existing??{id:reference.id,name:reference.name,type:reference.type,value:{shops:[]}};
+    item.value.shops.push({country:reference.country,shop:reference.shop,buy_price:reference.buy_price,source:reference.source,observed_on:reference.observed_on});
+    merged.set(item.id,item);
+  }
+  return [...merged.values()];
 }
 export function marketMinimum(payload:unknown):{price:number|null;count:number;cacheTime:number|null}{
   const market=object(object(payload).itemmarket);

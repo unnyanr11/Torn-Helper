@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase';
 import { functionError } from '../lib/function-error';
 import { useTornChoices } from '../hooks/useTornChoices';
 import { createTravelClient, scanItemMarket, type MarketScan } from '../lib/travel-client';
-import { destinationItems, flightEstimate, METHODS, ROUTES, shopItems, shopQuote, travelProfit, tripCost, type FlyMethod } from '../lib/travel-profit';
+import { destinationItems, flightEstimate, METHODS, ROUTES, shopItems, shopQuote, travelProfit, tripCost, withSavedShopPrices, FOREIGN_SHOP_PRICES, type FlyMethod } from '../lib/travel-profit';
 import type { TornObservation } from '../lib/personal-data';
 import TornConnectionPanel from './TornConnectionPanel';
 const endpoint=(path:string)=>CAPABILITIES.find(c=>c.path===path)!.id;
@@ -38,7 +38,7 @@ export default function TravelProfitTool(){
  const items=useMemo(()=>{
   const byId=new Map<number,ReturnType<typeof shopItems>[number]>();
   for(const row of rows)if([endpoint('/torn/items'),endpoint('/torn/{ids}/items')].includes(row.endpoint_id))for(const item of shopItems(row.payload))if(!byId.has(item.id))byId.set(item.id,item);
-  return [...byId.values()];
+  return withSavedShopPrices([...byId.values()]);
  },[cache.data]);
  const travelRow=rows.find(r=>r.endpoint_id===endpoint('/user/travel'));
  useEffect(()=>{const travel=(travelRow?.payload as any)?.travel;if(METHODS.includes(travel?.method))setMethod(travel.method);},[travelRow?.fetched_at]);
@@ -46,7 +46,8 @@ export default function TravelProfitTool(){
  const chosen=destinationItems(items,country,category).find(i=>String(i.id)===itemId);
  const current=quote?.itemId===itemId&&quote.country===country?quote:null;
  const detailItem=current?shopItems(current.detail.payload).find(i=>String(i.id)===itemId):undefined;
- const buy=shopQuote(detailItem??chosen,country);
+ const buy=shopQuote(detailItem,country)??shopQuote(chosen,country);
+ const savedPrices=FOREIGN_SHOP_PRICES.filter(p=>p.country===country);
  const flight=flightEstimate(country,method,travelRow?.payload,book);
  const businessId=items.find(i=>i.name.toLowerCase()==='business class ticket')?.id;
  const estimatedCost=tripCost(country,method,paidLegs,businessPrice);
@@ -111,7 +112,7 @@ export default function TravelProfitTool(){
    const r=await supabase.from('travel_profit_scenarios').insert({user_id:user.id,destination:country,item_name:chosen.name,buy_price:buy.buy_price,sell_price:sell,quantity,travel_cost:cost,flight_minutes:Math.ceil(displayResult.totalMinutes),profit_total:displayResult.profit,profit_per_hour:displayResult.perHour});if(r.error)throw r.error;await loadSaved();setSaveMessage('Estimate saved.');
   }catch(e){setSaveMessage(e instanceof Error?e.message:'Unable to save estimate.');}finally{setSaving(false);}
  }
- return <section className="travel-profit-tool"><h2>Travel profit calculator</h2><p>Choose a location, category and item. Prices refresh automatically after you choose an item.</p>
+ return <section className="travel-profit-tool"><h2>Travel profit calculator</h2><p>Choose a location, category and item. Market prices refresh automatically after you choose an item. Saved shop references are available without a Torn request.</p>
   <details className="card" open={!ready}><summary>Torn key and data refresh</summary><TornConnectionPanel mode={mode} onMode={setMode} keyValue={key} onKey={setKey} memory/>
   <button className="nu-btn" disabled={!ready||loading} onClick={()=>void loadData()}>{loading?'Loading items and travel…':'Load items and my travel'}</button></details>
   {cache.error&&<p role="alert">Saved item choices could not be restored. Load items to try again.</p>}
@@ -123,6 +124,7 @@ export default function TravelProfitTool(){
   <label>Travel method<select className="nu-input" value={method} onChange={e=>{setMethod(e.target.value as FlyMethod);setCostOverride('');setTimeOverride('');}}>{METHODS.map(m=><option key={m}>{m}</option>)}</select></label>
   <label>Selling fee<select className="nu-input" value={fee} onChange={e=>setFee(Number(e.target.value))}>{[0,5,10,15].map(n=><option key={n} value={n}>{n}%{n===5?' · regular item market':n===0?' · fee-free assumption':''}</option>)}</select></label></div>
   {!items.length&&<p>Load item data above to populate categories and items.</p>}{!!items.length&&!available.length&&<p>No destination shop prices were returned for this location.</p>}
+  {!!savedPrices.length&&<details><summary>Saved {country} shop prices ({savedPrices.length})</summary><p>From your screenshots shared on 10 November 2026. Reference purchase prices only; Black Market prices are recorded observations. Live stock is not saved. A valid fetched shop price takes precedence.</p><div className="table-scroll"><table><thead><tr><th>Shop</th><th>Item</th><th>Type</th><th>Purchase price</th></tr></thead><tbody>{savedPrices.map(p=><tr key={`${p.shop}-${p.id}`}><td>{p.shop}</td><td>{p.name}</td><td>{p.type}</td><td>{money(p.buy_price)}</td></tr>)}</tbody></table></div></details>}
   <p>Quantity is your planned purchase, not a fetched carrying-capacity limit. Check your actual capacity and stock in game.</p>
   <button className="nu-btn" disabled={!itemId||!ready||busy} onClick={()=>setRevision(n=>n+1)}>{busy?'Fetching prices…':'Refresh item prices'}</button>
   <details><summary>Travel costs and timing</summary><p>{travelRow?`Travel observation: ${new Date(travelRow.fetched_at??0).toLocaleString()}. Method is filled from your returned travel record.`:'Load my travel to fill your last/current flight method.'} The travel API does not return your charged fare.</p><p>Airstrip/private cash fares are estimated at zero, excluding property/stock overhead. Standard fares use the official route reference. Business ticket budgets use a fetched ticket listing price when available; a free business perk can be represented with zero paid tickets.</p>
@@ -130,6 +132,7 @@ export default function TravelProfitTool(){
   <div className="travel-fields"><label>Paid legs / tickets budgeted<select className="nu-input" value={paidLegs} onChange={e=>setPaidLegs(Number(e.target.value))}>{[0,1,2].map(n=><option key={n}>{n}</option>)}</select></label><label>Shopping / waiting time<select className="nu-input" value={waiting} onChange={e=>setWaiting(Number(e.target.value))}>{[0,5,10,15,30,60,120].map(n=><option key={n} value={n}>{n} minutes</option>)}</select></label><label>Travel-time book assumption<select className="nu-input" value={book?'yes':'no'} onChange={e=>setBook(e.target.value==='yes')}><option value="no">No book reduction</option><option value="yes">25% reduction · estimated routes only</option></select></label><label>Total trip travel cost override ($)<SelectEntry label="Travel cost override ($)" kind="money" className="nu-input" type="number" min="0" step="1" options={estimatedCost===null?[]:[{value:String(estimatedCost),label:`Estimated: ${estimatedCost.toLocaleString()}`}]} value={costOverride} onChange={e=>setCostOverride(e.target.value)} emptyText="Use calculated cost"/></label><label>Round-trip flight time override (minutes)<SelectEntry label="Round-trip time override (minutes)" kind="minutes" className="nu-input" type="number" min="0.01" step="any" options={flight.minutes===null?[]:[{value:String(flight.minutes*2),label:`Calculated: ${flight.minutes*2} minutes`}]} value={timeOverride} onChange={e=>setTimeOverride(e.target.value)} emptyText="Use calculated duration"/></label></div></details>
   </article>
   {itemId&&<article className="card"><h3>{chosen?.name??'Selected item'} · {country}</h3><p>Trip estimate · {method} · {quantity} items · {fee}% selling fee</p><dl className="data-metrics"><div><dt>Foreign shop price per item</dt><dd>{money(buy?.buy_price??null)}</dd></div><div><dt>{current?.market.complete?'Lowest scanned item-market price':'Lowest observed item-market price'}</dt><dd>{money(sell)}</dd></div><div><dt>Total travel cost · {costOverride!==''?'your override':'estimate'}</dt><dd>{money(cost)}</dd></div><div><dt>Round-trip flight time</dt><dd>{roundTrip===null?'Unknown':`${roundTrip.toLocaleString(undefined,{maximumFractionDigits:2})} minutes`}</dd></div><div><dt>Selling fees · total</dt><dd>{money(displayResult?.fee??null)}</dd></div><div><dt>Shopping / waiting</dt><dd>{waiting} minutes</dd></div><div><dt>Total time used for profit / hour</dt><dd>{displayResult?`${displayResult.totalMinutes.toLocaleString()} minutes`:'Unavailable'}</dd></div></dl>
+  {buy?.source&&<p>Shop purchase price source: {buy.source}, shared {buy.observed_on}. This saved reference is not a live price or stock check.</p>}
   {current&&<p>Shop: {buy?.shop??'Not returned'}. Item catalogue collected {new Date(current.detail.fetched_at).toLocaleString()}. Market observed {new Date(current.market.fetched_at).toLocaleString()}. Checked {current.market.count} listings across {current.market.pages} pages; {current.market.complete?'all returned pages scanned':'more pages remain'}. Market cache times: {current.market.cacheTimes.map(t=>new Date(t*1000).toLocaleString()).join(', ')||'not provided'}.</p>}
   {current?.market.cacheTimes.length!==undefined&&current.market.cacheTimes.length>1&&<p role="alert">Market cache changed during scanning. Refresh prices before using this estimate.</p>}
   {current&&!current.market.complete&&<button className="nu-btn" disabled={busy||!ready} onClick={()=>void scanMore()}>Scan more market pages</button>}

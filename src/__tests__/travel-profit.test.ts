@@ -1,7 +1,7 @@
 import { describe,it,expect,vi } from 'vitest';
 import { CAPABILITIES } from '../api/capabilities';
 import { compileTornRequest } from '../../supabase/functions/_shared/torn-data';
-import { destinationItems,flightEstimate,marketMinimum,shopItems,shopQuote,travelProfit,tripCost } from '../lib/travel-profit';
+import { FOREIGN_SHOP_PRICES,withSavedShopPrices,destinationItems,flightEstimate,marketMinimum,shopItems,shopQuote,travelProfit,tripCost } from '../lib/travel-profit';
 import { createTravelClient,scanItemMarket } from '../lib/travel-client';
 import type { TornObservation } from '../lib/personal-data';
 const item=(id:number,type:string,country:string,price:number|null)=>({id,name:`Item ${id}`,type,value:{shops:[{country,shop:'General Store',buy_price:price}]}});
@@ -62,5 +62,38 @@ describe('travel fetch orchestration',()=>{
   const c=new AbortController();await expect(scanItemMarket(1,async()=>{c.abort();return observation({});},c.signal)).rejects.toThrow('Cancelled');
   let n=0;const scan=await scanItemMarket(1,async()=>observation({itemmarket:{cache_timestamp:++n,listings:[{price:10,amount:1}]}},n===1?{offset:'100'}:null),new AbortController().signal);
   expect(scan.cacheTimes).toEqual([1,2]);
+ });
+});
+
+
+describe('saved Mexico purchase reference',()=>{
+ it('restores all 34 screenshot items without a live request or stock assumptions',()=>{
+  const items=withSavedShopPrices([]);
+  expect(destinationItems(items,'Mexico')).toHaveLength(34);
+  expect(destinationItems(items,'Japan')).toEqual([]);
+  expect(new Set(FOREIGN_SHOP_PRICES.map(p=>p.id)).size).toBe(34);
+  expect(FOREIGN_SHOP_PRICES.filter(p=>p.shop==='General Store')).toHaveLength(10);
+  expect(FOREIGN_SHOP_PRICES.filter(p=>p.shop==='Arms Dealer')).toHaveLength(19);
+  expect(FOREIGN_SHOP_PRICES.filter(p=>p.shop==='Black Market')).toHaveLength(5);
+  expect(shopQuote(items.find(i=>i.id===260),'Mexico')).toMatchObject({buy_price:300,source:'User screenshot'});
+  expect(shopQuote(items.find(i=>i.id===399),'Mexico')?.buy_price).toBe(20000000);
+  expect(shopQuote(items.find(i=>i.id===1499),'Mexico')?.buy_price).toBe(141079);
+  expect(FOREIGN_SHOP_PRICES.every(p=>!('stock' in p))).toBe(true);
+ });
+ it('prefers fetched country prices even if higher and preserves other countries without mutation',()=>{
+  const live={id:260,name:'Dahlia',type:'Flower',value:{shops:[{country:'Mexico',shop:'General Store',buy_price:350},{country:'Japan',shop:'General Store',buy_price:500}]}};
+  const merged=withSavedShopPrices([live]);
+  expect(shopQuote(merged.find(i=>i.id===260),'Mexico')).toMatchObject({buy_price:350});
+  expect(shopQuote(merged.find(i=>i.id===260),'Mexico')?.source).toBeUndefined();
+  expect(shopQuote(merged.find(i=>i.id===260),'Japan')?.buy_price).toBe(500);
+  expect(live.value.shops).toHaveLength(2);
+ });
+ it('fills missing country prices without fabricating market sale prices',()=>{
+  const live={id:260,name:'Dahlia',type:'Flower',value:{shops:[{country:'Mexico',shop:'General Store',buy_price:null}]}};
+  const merged=withSavedShopPrices([live]);
+  expect(shopQuote(merged.find(i=>i.id===260),'Mexico')?.buy_price).toBe(300);
+  expect(live.value.shops).toHaveLength(1);
+  expect(withSavedShopPrices(merged)).toEqual(merged);
+  expect(marketMinimum({}).price).toBeNull();
  });
 });

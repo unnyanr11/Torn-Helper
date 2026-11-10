@@ -1,0 +1,342 @@
+[
+  {
+    "id": 159,
+    "name": "Bolt Cutters",
+    "type": "Tool",
+    "country": "Mexico",
+    "shop": "General Store",
+    "buy_price": 20,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 426,
+    "name": "Bottle of Tequila",
+    "type": "Alcohol",
+    "country": "Mexico",
+    "shop": "General Store",
+    "buy_price": 80,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 1125,
+    "name": "Card Skimmer",
+    "type": "Tool",
+    "country": "Mexico",
+    "shop": "General Store",
+    "buy_price": 180,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 432,
+    "name": "Crazy Straw",
+    "type": "Other",
+    "country": "Mexico",
+    "shop": "General Store",
+    "buy_price": 20,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 260,
+    "name": "Dahlia",
+    "type": "Flower",
+    "country": "Mexico",
+    "shop": "General Store",
+    "buy_price": 300,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 258,
+    "name": "Jaguar Plushie",
+    "type": "Plushie",
+    "country": "Mexico",
+    "shop": "General Store",
+    "buy_price": 10000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 259,
+    "name": "Mayan Statue",
+    "type": "Other",
+    "country": "Mexico",
+    "shop": "General Store",
+    "buy_price": 500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 107,
+    "name": "Trench Coat",
+    "type": "Clothing",
+    "country": "Mexico",
+    "shop": "General Store",
+    "buy_price": 500000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 409,
+    "name": "Yucca Plant",
+    "type": "Other",
+    "country": "Mexico",
+    "shop": "General Store",
+    "buy_price": 20000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 1429,
+    "name": "Zip Ties",
+    "type": "Material",
+    "country": "Mexico",
+    "shop": "General Store",
+    "buy_price": 20,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 108,
+    "name": "9mm Uzi",
+    "type": "Primary",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 1100000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 26,
+    "name": "AK-47",
+    "type": "Primary",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 15000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 399,
+    "name": "ArmaLite M-15A4",
+    "type": "Primary",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 20000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 8,
+    "name": "Axe",
+    "type": "Melee",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 4200,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 229,
+    "name": "Claymore Mine",
+    "type": "Temporary",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 15000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 177,
+    "name": "Cobra Derringer",
+    "type": "Secondary",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 70000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 20,
+    "name": "Desert Eagle",
+    "type": "Secondary",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 45000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 178,
+    "name": "Flak Jacket",
+    "type": "Defensive",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 7500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 230,
+    "name": "Flare Gun",
+    "type": "Secondary",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 300,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 231,
+    "name": "Heckler & Koch SL8",
+    "type": "Primary",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 45000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 640,
+    "name": "Kevlar Gloves",
+    "type": "Defensive",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 400000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 110,
+    "name": "Leather Bullwhip",
+    "type": "Melee",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 1500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 31,
+    "name": "M249 SAW",
+    "type": "Primary",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 950000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 63,
+    "name": "Minigun",
+    "type": "Primary",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 3000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 111,
+    "name": "Ninja Claws",
+    "type": "Melee",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 8000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 50,
+    "name": "Outer Tactical Vest",
+    "type": "Defensive",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 1000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 11,
+    "name": "Samurai Sword",
+    "type": "Melee",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 75000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 99,
+    "name": "Springfield 1911",
+    "type": "Secondary",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 175,
+    "name": "Taser",
+    "type": "Secondary",
+    "country": "Mexico",
+    "shop": "Arms Dealer",
+    "buy_price": 5500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 1499,
+    "name": "Obsidian Point",
+    "type": "Artifact",
+    "country": "Mexico",
+    "shop": "Black Market",
+    "buy_price": 141079,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 200,
+    "name": "Opium",
+    "type": "Drug",
+    "country": "Mexico",
+    "shop": "Black Market",
+    "buy_price": 21731,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 203,
+    "name": "Shrooms",
+    "type": "Drug",
+    "country": "Mexico",
+    "shop": "Black Market",
+    "buy_price": 1876,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 204,
+    "name": "Speed",
+    "type": "Drug",
+    "country": "Mexico",
+    "shop": "Black Market",
+    "buy_price": 2447,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  },
+  {
+    "id": 205,
+    "name": "Vicodin",
+    "type": "Drug",
+    "country": "Mexico",
+    "shop": "Black Market",
+    "buy_price": 1875,
+    "source": "User screenshot",
+    "observed_on": "2026-11-10"
+  }
+]
