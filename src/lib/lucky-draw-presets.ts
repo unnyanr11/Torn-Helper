@@ -49,3 +49,9 @@ export function splitPrizes(id: (typeof PRIZE_SPLITS)[number]["id"]): Prize[] {
 }
 export const audienceLabel = (id: string) =>
   DRAW_AUDIENCES.find((a) => a.id === id)?.label ?? "All players / public";
+
+/** The same curated choices are available independently for entry and prize assets. */
+export const DRAW_ASSETS = [
+  "Cash",
+  ...new Set(DRAW_AUDIENCES.flatMap((a) => [...a.items])),
+];

@@ -46,10 +46,12 @@ function terms(extra: Record<string, unknown> = {}) {
 }
 let campaign: string;
 beforeAll(async () => {
-  await db.exec(`create role authenticated;create role anon;create schema auth;create schema private;create schema extensions;
+  await db.exec(`create role authenticated;create role anon;create role service_role bypassrls;create schema auth;create schema private;create schema extensions;
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
  grant usage on schema auth to authenticated,anon;grant execute on function auth.uid() to authenticated,anon;
  create table public.torn_data_cache(user_id uuid,endpoint_id text,parameters jsonb,payload jsonb,fetched_at timestamptz);
+ create table public.torn_item_catalogue(id integer primary key,name text);
+ insert into public.torn_item_catalogue values(206,'Xanax');
  create table public.profiles(id uuid primary key);
  create table public.linked_torn_accounts(user_id uuid primary key,torn_id bigint unique,torn_name text,revoked_at timestamptz);
  -- Randomness shim only for isolated WASM PostgreSQL; production uses pgcrypto.
@@ -65,6 +67,12 @@ beforeAll(async () => {
   await db.exec(
     readFileSync(
       "supabase/migrations/20261110091429_lucky_draw_audience_presets.sql",
+      "utf8",
+    ),
+  );
+  await db.exec(
+    readFileSync(
+      "supabase/migrations/20261110092857_lucky_draw_token_receipts.sql",
       "utf8",
     ),
   );
@@ -473,5 +481,277 @@ describe("audience enforcement from official cached data", () => {
       evidence: "One Xanax sent",
     });
     expect(s.verified_faction_id).toBe(10);
+  });
+});
+
+async function asService(sql: string, params: unknown[] = []) {
+  await db.exec("set role service_role");
+  try {
+    return await db.query<any>(sql, params);
+  } finally {
+    await db.exec("reset role");
+  }
+}
+async function receivedPage(c: any, events: any[], next: any = null) {
+  const job = (
+    await asService("select public.prepare_lucky_draw_sync($1,$2) as data", [
+      host,
+      c.id,
+    ])
+  ).rows[0].data;
+  return (
+    await asService(
+      "select public.record_lucky_draw_log_page($1,$2,$3,$4,$5) as data",
+      [
+        host,
+        c.id,
+        JSON.stringify(job.parameters),
+        next === null ? null : JSON.stringify(next),
+        JSON.stringify(events),
+      ],
+    )
+  ).rows[0].data;
+}
+function transfer(
+  c: any,
+  id: string,
+  sender = 2,
+  quantity = 1000000,
+  kind = "cash",
+  timestamp = Math.floor(Date.now() / 1000),
+) {
+  return {
+    id,
+    sender,
+    timestamp,
+    kind,
+    message: c.entry_token,
+    assets: kind === "cash" ? [{ quantity }] : [{ item_id: 206, quantity }],
+  };
+}
+describe("cash and token received-transfer entries", () => {
+  it("creates unique immutable tokens and supports cash entry / fixed cash prizes", async () => {
+    const c = await act(
+      host,
+      "create",
+      null,
+      terms({
+        entry_item: "Cash",
+        quantity_per_ticket: 5000000,
+        prize_mode: "fixed",
+        prizes: [{ item: "Cash", quantity: 1000000000 }],
+        entry_verification: "token",
+      }),
+    );
+    const other = await act(host, "create", null, terms());
+    expect(c.entry_token).toMatch(/^TH-[A-F0-9]{20}$/);
+    expect(other.entry_token).not.toBe(c.entry_token);
+    await expect(
+      act(a, "submit", c.id, {
+        quantity: 5000000,
+        transfer_reference: "fake",
+        evidence: "fake evidence",
+      }),
+    ).rejects.toThrow("only verified");
+  });
+  it("prevents client-injected receipts and non-host syncs", async () => {
+    const c = await act(
+      host,
+      "create",
+      null,
+      terms({ entry_item: "Cash", entry_verification: "token" }),
+    );
+    await expect(
+      user(a, "select public.prepare_lucky_draw_sync($1,$2)", [host, c.id]),
+    ).rejects.toThrow("permission denied");
+    await expect(
+      user(
+        a,
+        "select public.record_lucky_draw_log_page($1,$2,'{}',null,'[]')",
+        [host, c.id],
+      ),
+    ).rejects.toThrow("permission denied");
+    await expect(
+      asService("select public.prepare_lucky_draw_sync($1,$2)", [a, c.id]),
+    ).rejects.toThrow("Only the host");
+  });
+  it("counts entry multiples once, deduplicates retries and supports senders without app accounts", async () => {
+    const c = await act(
+      host,
+      "create",
+      null,
+      terms({
+        entry_item: "Cash",
+        quantity_per_ticket: 1000000,
+        entry_verification: "token",
+        max_tickets_per_player: 5,
+      }),
+    );
+    const events = [
+      transfer(c, "auto-cash", 2, 2000000),
+      transfer(c, "outside-account", 999, 3000000),
+      { ...transfer(c, "unrelated", 3), message: "unrelated" },
+    ];
+    await receivedPage(c, events);
+    let r = await act(host, "details", c.id);
+    expect(r.entry_count).toBe(5);
+    expect(r.pool_quantity).toBe(5000000);
+    expect(r.receipt_data.total).toBe(2);
+    expect(r.receipt_data.money_received).toBe(5000000);
+    expect(
+      r.submissions.find((s: any) => s.torn_id === 999).user_id,
+    ).toBeNull();
+    await db.query(
+      "update private.lucky_draw_sync set checked_through=0 where campaign_id=$1",
+      [c.id],
+    );
+    await receivedPage(c, events);
+    r = await act(host, "details", c.id);
+    expect(r.entry_count).toBe(5);
+    expect(r.receipt_data.total).toBe(2);
+    expect((await act(a, "receipts", c.id)).total).toBe(1);
+    expect((await act(b, "receipts", c.id)).total).toBe(0);
+  });
+  it("shows every token-tagged cash receipt, including invalid amount, wrong asset, late and excess payments", async () => {
+    const c = await act(
+      host,
+      "create",
+      null,
+      terms({
+        entry_item: "Cash",
+        quantity_per_ticket: 1000000,
+        entry_verification: "token",
+        max_tickets_per_player: 2,
+      }),
+    );
+    await receivedPage(c, [
+      transfer(c, "a-valid", 2, 2000000),
+      transfer(c, "over-cap", 2, 1000000),
+      transfer(c, "fractional-ticket", 3, 1500000),
+      transfer(c, "wrong-kind", 3, 1, "item"),
+      transfer(
+        c,
+        "out-window",
+        4,
+        1000000,
+        "cash",
+        Math.floor(Date.now() / 1000) + 172800,
+      ),
+    ]);
+    const r = await act(host, "details", c.id);
+    expect(r.entry_count).toBe(2);
+    expect(r.receipt_data.total).toBe(5);
+    expect(r.receipt_data.money_received).toBe(5500000);
+    expect(
+      r.receipt_data.rows.filter((s: any) => s.state === "ineligible"),
+    ).toHaveLength(4);
+  });
+  it("matches the selected item by catalogue ID and counts its received quantity", async () => {
+    const c = await act(
+      host,
+      "create",
+      null,
+      terms({ quantity_per_ticket: 2, entry_verification: "token" }),
+    );
+    await receivedPage(c, [transfer(c, "auto-item", 2, 6, "item")]);
+    const r = await act(host, "details", c.id);
+    expect(r.entry_count).toBe(3);
+    expect(r.pool_quantity).toBe(6);
+  });
+  it("keeps restricted receipts waiting until official eligibility is verified", async () => {
+    const c = await act(
+      host,
+      "create",
+      null,
+      terms({
+        audience: "new_players",
+        entry_item: "Cash",
+        quantity_per_ticket: 1000000,
+        entry_verification: "token",
+      }),
+    );
+    await db.query(
+      "delete from torn_data_cache where user_id=$1 and endpoint_id='v2-user-profile'",
+      [a],
+    );
+    await receivedPage(c, [transfer(c, "restricted-cash")]);
+    expect((await act(host, "details", c.id)).entry_count).toBe(0);
+    await db.query(
+      "insert into torn_data_cache values($1,'v2-user-profile','{}',$2,now())",
+      [a, JSON.stringify({ profile: { id: 2, level: 10 } })],
+    );
+    await act(a, "claim_received", c.id);
+    expect((await act(host, "details", c.id)).entry_count).toBe(1);
+  });
+  it("requires complete post-deadline log coverage and draws distinct unregistered senders", async () => {
+    const c = await act(
+      host,
+      "create",
+      null,
+      terms({
+        entry_item: "Cash",
+        quantity_per_ticket: 1000000,
+        entry_verification: "token",
+        prizes: [{ percentage: 75 }],
+      }),
+    );
+    await receivedPage(c, [transfer(c, "draw-external", 999, 2000000)]);
+    await db.query(
+      "update lucky_draw_campaigns set closes_at=now()-interval '1 second' where id=$1",
+      [c.id],
+    );
+    await db.query(
+      "update private.lucky_draw_sync set checked_through=0 where campaign_id=$1",
+      [c.id],
+    );
+    await expect(act(host, "draw", c.id)).rejects.toThrow("Finish syncing");
+    await receivedPage(c, []);
+    await act(host, "draw", c.id);
+    const w = (await act(host, "details", c.id)).winners[0];
+    expect(w.torn_id).toBe(999);
+    expect(w.quantity).toBe(1500000);
+  });
+});
+
+describe("log pagination and exact cash arithmetic", () => {
+  it("shows detected transfers without counting until the complete scan is imported", async () => {
+    const c = await act(
+      host,
+      "create",
+      null,
+      terms({
+        entry_item: "Cash",
+        quantity_per_ticket: 1000000,
+        entry_verification: "token",
+      }),
+    );
+    await receivedPage(c, [transfer(c, "page-first", 2, 2000000)], {
+      from: "1",
+      to: "2",
+      limit: "100",
+    });
+    let r = await act(host, "details", c.id);
+    expect(r.sync.has_more).toBe(true);
+    expect(r.entry_count).toBe(0);
+    expect(r.receipt_data.rows[0].state).toBe("detected");
+    await act(a, "claim_received", c.id);
+    expect((await act(host, "details", c.id)).entry_count).toBe(0);
+    await receivedPage(c, [transfer(c, "page-second", 3, 1000000)]);
+    r = await act(host, "details", c.id);
+    expect(r.sync.has_more).toBe(false);
+    expect(r.entry_count).toBe(3);
+  });
+  it("keeps whole-dollar prize calculations exact for large supported cash pools", () => {
+    const pool = 9007199254740991;
+    const result = prizePreview(pool, [
+      { percentage: 45 },
+      { percentage: 20 },
+      { percentage: 10 },
+    ]);
+    expect(result.quantities).toEqual([
+      Number((BigInt(pool) * 45n) / 100n),
+      Number((BigInt(pool) * 20n) / 100n),
+      Number((BigInt(pool) * 10n) / 100n),
+    ]);
   });
 });

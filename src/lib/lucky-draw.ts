@@ -1,6 +1,8 @@
 export type Prize = { percentage?: number; item?: string; quantity?: number };
 export type Campaign = {
   id: string;
+  entry_token: string;
+  entry_verification: "manual" | "token";
   audience: "all" | "new_players" | "faction";
   faction_id: number | null;
   host_user_id: string;
@@ -23,7 +25,7 @@ export type Campaign = {
 };
 export type Submission = {
   id: string;
-  user_id: string;
+  user_id: string | null;
   torn_id: number;
   player_name: string;
   quantity: number;
@@ -38,7 +40,7 @@ export type Submission = {
 };
 export type Winner = {
   rank: number;
-  user_id: string;
+  user_id: string | null;
   torn_id: number;
   player_name: string;
   prize_item: string;
@@ -48,7 +50,30 @@ export type Winner = {
   paid_at: string | null;
   received_at: string | null;
 };
+export type Receipt = {
+  log_id: string;
+  sender_torn_id: number;
+  received_at: string;
+  kind: "cash" | "item";
+  assets: { item_id?: number; quantity: number }[];
+  message: string;
+  entry_quantity: number;
+  tickets: number;
+  state: string;
+  reason: string | null;
+};
+export type ReceiptPage = {
+  offset: number;
+  total: number;
+  rows: Receipt[];
+  money_received: number;
+  counted_entries: number;
+};
 export type DrawDetails = {
+  viewer_torn_id: number;
+  receipt_data: ReceiptPage;
+  entry_count: number;
+  sync: { checked_through: number; has_more: boolean; pages: number } | null;
   campaign: Campaign;
   is_host: boolean;
   submissions: Submission[];
@@ -58,8 +83,11 @@ export type DrawDetails = {
   winners: Winner[];
 };
 export function prizePreview(pool: number, prizes: Prize[]) {
+  const wholePool = Number.isSafeInteger(pool) && pool >= 0 ? BigInt(pool) : 0n;
   const quantities = prizes.map((p) =>
-    Math.floor((pool * Math.round((p.percentage ?? 0) * 100)) / 10000),
+    Number(
+      (wholePool * BigInt(Math.round((p.percentage ?? 0) * 100))) / 10000n,
+    ),
   );
   return {
     quantities,

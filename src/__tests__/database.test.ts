@@ -105,6 +105,7 @@ beforeAll(async () => {
   await db.exec(readFileSync("supabase/migrations/20261105110222_server_only_torn_key_retention.sql","utf8"));
   await db.exec(readFileSync("supabase/migrations/20261110083910_lucky_draw_campaigns.sql","utf8"));
   await db.exec(readFileSync("supabase/migrations/20261110091429_lucky_draw_audience_presets.sql", "utf8"));
+  await db.exec(readFileSync("supabase/migrations/20261110092857_lucky_draw_token_receipts.sql", "utf8"));
   const candidate = await db.query(
     "select table_name as table,column_name as column,data_type as type from information_schema.columns where table_schema='public'",
   );

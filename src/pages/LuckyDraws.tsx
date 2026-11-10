@@ -12,6 +12,7 @@ import {
 import "./lucky-draws.css";
 import {
   DRAW_AUDIENCES,
+  DRAW_ASSETS,
   PRIZE_SPLITS,
   splitPrizes,
   audienceLabel,
@@ -19,6 +20,7 @@ import {
 } from "../lib/lucky-draw-presets";
 import { invokeTornData } from "../lib/torn-data-client";
 import { functionError } from "../lib/function-error";
+import ReceivedTransfers from "../components/ReceivedTransfers";
 import type { QueryClient } from "@tanstack/react-query";
 async function refreshEligibility(client: QueryClient, audience: DrawAudience) {
   if (audience === "all") return;
@@ -148,9 +150,9 @@ export default function LuckyDraws() {
         </button>
       </div>
       <p className="draw-disclosure">
-        Send items directly in Torn. Hosts manually check transfer evidence and
-        send prizes. Torn Helper records entries and results; it does not move
-        items or hold the pool.
+        Send items or cash directly in Torn. Campaign tokens identify received
+        transfers for automatic entry detection. Prizes are sent manually; Torn
+        Helper does not move assets or hold the pool.
       </p>
       {error && (
         <p role="alert" className="badge warn">
@@ -349,21 +351,27 @@ export function CampaignForm({
               onChange={(e) => setTitle(e.target.value)}
             />
           </Field>
-          <Field label="Entry item">
-            <input
-              list="draw-item-options"
+          <Field label="Entry item or cash">
+            <select
               required
-              maxLength={100}
               value={item}
               onChange={(e) => setItem(e.target.value)}
-            />
+            >
+              {DRAW_ASSETS.map((name) => (
+                <option key={name} value={name}>
+                  {name === "Cash" ? "Cash (Torn dollars)" : name}
+                </option>
+              ))}
+            </select>
           </Field>
-          <Field label="Items per ticket">
+          <Field
+            label={item === "Cash" ? "Cash per entry ($)" : "Items per entry"}
+          >
             <input
               required
               type="number"
               min="1"
-              max="1000000"
+              max="1000000000000"
               step="1"
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
@@ -408,6 +416,13 @@ export function CampaignForm({
             </select>
           </Field>
         </div>
+        <p className="muted">
+          Cash means in-game Torn dollars. Percentage prizes use the entry
+          asset; choose fixed prizes to give a different item or cash.{" "}
+          {item === "Points"
+            ? "Points transfers use manual evidence review; automatic receive-log verification currently supports cash and sendable items."
+            : "A unique message token will be generated when you publish. Senders include it in the Torn transfer message for automatic entry detection."}
+        </p>
         <Field label="Campaign description and extra rules">
           <textarea
             maxLength={4000}
@@ -462,20 +477,27 @@ export function CampaignForm({
             ) : (
               <>
                 <Field label="Prize item">
-                  <input
-                    list="draw-item-options"
+                  <select
                     required
-                    maxLength={100}
                     value={p.item ?? ""}
                     onChange={(e) => update(i, { item: e.target.value })}
-                  />
+                  >
+                    <option value="" disabled>
+                      Choose prize asset…
+                    </option>
+                    {DRAW_ASSETS.map((name) => (
+                      <option key={name} value={name}>
+                        {name === "Cash" ? "Cash (Torn dollars)" : name}
+                      </option>
+                    ))}
+                  </select>
                 </Field>
                 <Field label="Prize quantity">
                   <input
                     required
                     type="number"
                     min="1"
-                    max="1000000"
+                    max="1000000000000"
                     step="1"
                     value={p.quantity ?? ""}
                     onChange={(e) =>
@@ -579,6 +601,7 @@ export function CampaignForm({
                   title,
                   description,
                   audience,
+                  entry_verification: item === "Points" ? "manual" : "token",
                   entry_item: item,
                   quantity_per_ticket: Number(quantity),
                   max_tickets_per_player: Number(cap),
@@ -622,7 +645,7 @@ function CampaignDetail({
   const status = campaignStatus(c),
     preview = prizePreview(data.pool_quantity, c.prizes);
   const used = data.submissions
-    .filter((s) => s.status !== "rejected" && s.user_id === viewer)
+    .filter((s) => s.status !== "rejected" && s.torn_id === data.viewer_torn_id)
     .reduce((sum, s) => sum + s.tickets, 0);
   const drawReady =
     status === "Awaiting draw" &&
@@ -713,79 +736,109 @@ function CampaignDetail({
           by Torn.
         </p>
       </div>
-      {!data.is_host && status === "Open" && (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void run(async () => {
-              await refreshEligibility(queryClient, c.audience ?? "all");
-              await action("submit", c.id, {
-                quantity: Number(quantity),
-                transfer_reference: reference,
-                evidence,
-              });
-              setReference("");
-              setEvidence("");
-            }, "Entry submitted for host review.");
-          }}
-        >
-          <h4>Submit your transfer</h4>
+      <ReceivedTransfers campaign={c} isHost={data.is_host} sync={data.sync} />
+      {c.entry_verification === "token" && !data.is_host && (
+        <div className="draw-preview">
+          <p>
+            Send the required asset directly to the host with this campaign
+            token in the transfer message. The host’s received logs verify the
+            amount and create your entries; no manual submission is needed.
+          </p>
           <button
-            type="button"
             className="nu-btn"
             disabled={busy}
             onClick={() =>
               void run(async () => {
                 await refreshEligibility(queryClient, c.audience ?? "all");
-                await action("eligibility", c.id);
-              }, "You qualify for this campaign now. You can send the stated items to the host in Torn, then submit your transfer evidence.")
+                await action("claim_received", c.id);
+              }, "Your detected transfers were checked for eligibility.")
             }
           >
-            Check eligibility before sending items
+            Verify eligibility for my received transfers
           </button>
-          <p>
-            {used} of {c.max_tickets_per_player} tickets used or pending. Send
-            items to the host in Torn first, then provide the reference and
-            evidence.
-          </p>
-          <Field label={`Quantity of ${c.entry_item} sent`}>
-            <input
-              type="number"
-              required
-              min={c.quantity_per_ticket}
-              max={1000000}
-              step={c.quantity_per_ticket}
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-            />
-          </Field>
-          <Field label="Unique Torn transfer/log reference">
-            <input
-              required
-              minLength={3}
-              maxLength={200}
-              value={reference}
-              onChange={(e) => setReference(e.target.value)}
-            />
-          </Field>
-          <Field label="Transfer evidence (paste the event text, including item, quantity and time)">
-            <textarea
-              required
-              minLength={5}
-              maxLength={2000}
-              rows={3}
-              value={evidence}
-              onChange={(e) => setEvidence(e.target.value)}
-            />
-          </Field>
-          <button
-            className="nu-btn"
-            disabled={busy || used >= c.max_tickets_per_player}
-          >
-            Submit entry for review
-          </button>
-        </form>
+        </div>
       )}
+      {!data.is_host &&
+        c.entry_verification !== "token" &&
+        status === "Open" && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void run(async () => {
+                await refreshEligibility(queryClient, c.audience ?? "all");
+                await action("submit", c.id, {
+                  quantity: Number(quantity),
+                  transfer_reference: reference,
+                  evidence,
+                });
+                setReference("");
+                setEvidence("");
+              }, "Entry submitted for host review.");
+            }}
+          >
+            <h4>Submit your transfer</h4>
+            <button
+              type="button"
+              className="nu-btn"
+              disabled={busy}
+              onClick={() =>
+                void run(async () => {
+                  await refreshEligibility(queryClient, c.audience ?? "all");
+                  await action("eligibility", c.id);
+                }, "You qualify for this campaign now. You can send the stated items to the host in Torn, then submit your transfer evidence.")
+              }
+            >
+              Check eligibility before sending items
+            </button>
+            <p>
+              {used} of {c.max_tickets_per_player} tickets used or pending. Send
+              items to the host in Torn first, then provide the reference and
+              evidence.
+            </p>
+            <Field label={`Quantity of ${c.entry_item} sent`}>
+              <input
+                type="number"
+                required
+                min={c.quantity_per_ticket}
+                max={1000000}
+                step={c.quantity_per_ticket}
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+              />
+            </Field>
+            <Field label="Unique Torn transfer/log reference">
+              <input
+                required
+                minLength={3}
+                maxLength={200}
+                value={reference}
+                onChange={(e) => setReference(e.target.value)}
+              />
+            </Field>
+            <Field label="Transfer evidence (paste the event text, including item, quantity and time)">
+              <textarea
+                required
+                minLength={5}
+                maxLength={2000}
+                rows={3}
+                value={evidence}
+                onChange={(e) => setEvidence(e.target.value)}
+              />
+            </Field>
+            <button
+              className="nu-btn"
+              disabled={busy || used >= c.max_tickets_per_player}
+            >
+              Submit entry for review
+            </button>
+          </form>
+        )}
+      <p>
+        <strong>{data.entry_count ?? 0} total entries</strong> · Approved entry
+        contributions: {c.entry_item === "Cash" ? "$" : ""}
+        {data.pool_quantity.toLocaleString()}{" "}
+        {c.entry_item === "Cash" ? "Torn dollars" : c.entry_item}
+      </p>
       <h4>{data.is_host ? "Review entries" : "Your entries"}</h4>
       {data.submissions.length === 0 && <p>No entries to show.</p>}
       {data.submissions.map((s) => (
@@ -1005,20 +1058,22 @@ function CampaignDetail({
                   </button>
                 </form>
               )}
-              {viewer === w.user_id && w.paid_at && !w.received_at && (
-                <button
-                  className="nu-btn"
-                  disabled={busy}
-                  onClick={() =>
-                    void run(
-                      () => action("received", c.id, { rank: w.rank }),
-                      "Prize receipt confirmed.",
-                    )
-                  }
-                >
-                  Confirm I received this prize
-                </button>
-              )}
+              {data.viewer_torn_id === w.torn_id &&
+                w.paid_at &&
+                !w.received_at && (
+                  <button
+                    className="nu-btn"
+                    disabled={busy}
+                    onClick={() =>
+                      void run(
+                        () => action("received", c.id, { rank: w.rank }),
+                        "Prize receipt confirmed.",
+                      )
+                    }
+                  >
+                    Confirm I received this prize
+                  </button>
+                )}
             </div>
           ))}
         </div>
