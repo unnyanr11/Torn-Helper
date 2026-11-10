@@ -79,3 +79,15 @@ The Vercel `VITE_SUPABASE_PUBLISHABLE_KEY` remains project hosting configuration
 ### Browse all documented Torn data
 
 Open **Live Feeds → Torn Data Browser** after signing in. All 234 documented read endpoints are connected across player, faction, company, markets, properties, racing, forums, game reference and key information. Choose a category and section, fill any required IDs/options, then fetch. Use a request-only Torn key or an encrypted key from Settings; Full Access offers the widest permissions, while faction/company roles still apply. An optional checkbox reuses a key only in page memory until you leave/reload. Next-page controls and JSON downloads expose paginated results without polling every section. Cached observations can be cleared in the browser and are included in account exports.
+
+## Lucky draw campaigns
+
+Open **Explore → Lucky Draws** after signing in with Torn. The existing verified Torn sign-in creates/reuses the account; campaign hosts need no separate registration.
+
+Hosts configure the entry item, whole items per ticket, per-player ticket limit, duration (1–365 days), and 1–50 ordered prizes. Prizes can be percentages of the approved entry-item pool or fixed items supplied separately by the host. The default 40%/20%/10% example discloses the remaining 30% plus whole-item rounding. Preview quantities are illustrations, never seeded contributions.
+
+Publishing locks all rules. Entrants manually send items in Torn and submit their own transfer evidence before closing. Hosts approve/reject pending evidence; only approved quantities form the prize pool. References are unique per host across campaigns. More tickets give a player more weight, but each player can win only once. After closing, every pending entry must be reviewed and there must be at least as many distinct eligible players as prizes. The host then finalizes one server-side, cryptographically randomized weighted draw. Results cannot be rerolled or edited. Percentage prizes round down and may be zero for small pools. Payout references and winner receipt confirmations track manual transfers; no item transfer is automatic or independently verified.
+
+A host can permanently cancel an undrawn campaign, including an undersubscribed draw. Received items must be returned manually in Torn; refund references can be recorded per submission. Evidence is visible only to its entrant and host; terms, pool totals and results are visible to signed-in users. Shared links require sign-in.
+
+Apply only `supabase/migrations/20261110083910_lucky_draw_campaigns.sql` to the existing linked database before deploying this frontend. Do not replay the historical migration baseline. `src/__tests__/lucky-draw.test.ts` exercises the actual PostgreSQL transitions, access restrictions, rounding, cancellation, identity changes, finalization and payout recording. Its randomness shim exists only in the isolated WASM database; production uses `extensions.gen_random_bytes` from pgcrypto.
