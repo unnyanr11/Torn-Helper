@@ -125,3 +125,44 @@ describe("deposit and threshold presentation", () => {
     expect(campaignStatus(c)).toBe("Awaiting minimum entries");
   });
 });
+
+describe("sealed result presentation", () => {
+  it("shows a closing-based countdown without embedding a sealed winner name", async () => {
+    const { renderToStaticMarkup } = await import("react-dom/server");
+    const { createElement } = await import("react");
+    const { default: DrawRevealWindow, revealCountdown } = await import(
+      "../components/DrawRevealWindow"
+    );
+    const closed = new Date(Date.now() - 1000).toISOString(),
+      reveal = new Date(Date.parse(closed) + 48 * 3600000).toISOString();
+    const c = { closes_at: closed, drawn_at: new Date().toISOString() } as any;
+    const data = {
+      result_state: "sealed",
+      reveal_at: reveal,
+      winners: [{ player_name: "Hidden winning player" }],
+    } as any;
+    const html = renderToStaticMarkup(
+      createElement(DrawRevealWindow, {
+        campaign: c,
+        data,
+        onReveal: () => {},
+      }),
+    );
+    expect(html).toContain("48 hours after entry closing");
+    expect(html).toContain("Winner identities remain sealed");
+    expect(html).not.toContain("Hidden winning player");
+    expect(revealCountdown(new Date(48 * 3600000).toISOString(), 0)).toBe(
+      "48h 0m 0s",
+    );
+  });
+  it("discloses automatic processing and audited name corrections before publication", async () => {
+    const { renderToStaticMarkup } = await import("react-dom/server");
+    const { createElement } = await import("react");
+    const { CampaignForm } = await import("../pages/LuckyDraws");
+    const html = renderToStaticMarkup(
+      createElement(CampaignForm, { busy: false, onSave: async () => {} }),
+    );
+    expect(html).toContain("48 hours after entry closing");
+    expect(html).toContain("public audit trail");
+  });
+});

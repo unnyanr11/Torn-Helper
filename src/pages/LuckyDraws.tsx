@@ -22,6 +22,7 @@ import {
 import { invokeTornData } from "../lib/torn-data-client";
 import { functionError } from "../lib/function-error";
 import ReceivedTransfers from "../components/ReceivedTransfers";
+import DrawRevealWindow from "../components/DrawRevealWindow";
 import type { QueryClient } from "@tanstack/react-query";
 async function refreshEligibility(client: QueryClient, audience: DrawAudience) {
   if (audience === "all") return;
@@ -94,6 +95,7 @@ export default function LuckyDraws() {
   const details = useQuery<DrawDetails>({
     queryKey: ["lucky-draw", selected],
     enabled: !!selected,
+    refetchInterval: 30000,
     queryFn: () => action("details", selected),
   });
   const me = useQuery({
@@ -632,6 +634,15 @@ export function CampaignForm({
             </p>
           </div>
         )}
+        <p className="draw-preview">
+          Your retained Torn key is used for automatic received-log checks every
+          minute while this campaign is active, including while this page is
+          closed. The backend selects and saves random winners automatically
+          after entries close and final transfer verification completes. Results
+          stay sealed until 48 hours after entry closing. Administrators may
+          correct display names with a public audit trail; the winning Torn IDs
+          and original random results cannot be changed.
+        </p>
         <p className="muted">
           One player can win once. Each verified transfer gives one entry;
           larger payments do not give extra entries. All pending entries must be
@@ -716,16 +727,10 @@ function CampaignDetail({
   const c = data.campaign,
     [reviewNotes, setReviewNotes] = useState<Record<string, string>>({}),
     [paymentRefs, setPaymentRefs] = useState<Record<number, string>>({}),
-    [confirmDraw, setConfirmDraw] = useState(false),
     [cancelNote, setCancelNote] = useState(""),
     [refundRefs, setRefundRefs] = useState<Record<string, string>>({});
   const status = campaignStatus(c),
     preview = prizePreview(data.pool_quantity, c.prizes);
-  const drawReady =
-    status === "Awaiting draw" &&
-    data.pending_count === 0 &&
-    data.eligible_players >= c.prizes.length &&
-    (data.entry_count ?? 0) >= (c.minimum_entries ?? 1);
   return (
     <article className="card">
       <div className="draw-heading">
@@ -964,44 +969,16 @@ function CampaignDetail({
             )}
         </div>
       ))}
-      {data.is_host && !c.drawn_at && !c.cancelled_at && (
-        <div className="draw-preview">
-          <h4>Draw winners</h4>
-          <p>
-            {!c.closes_at
-              ? `Needs ${c.minimum_entries} verified entries before the closing countdown can start.`
-              : status === "Open"
-                ? "Wait until the entry deadline."
-                : data.pending_count
-                  ? "Review every pending entry first."
-                  : data.eligible_players < c.prizes.length
-                    ? `Needs ${c.prizes.length} distinct eligible players; currently ${data.eligible_players}.`
-                    : "The draw is ready."}
-          </p>
-          <p>
-            Drawing saves one permanent result. Payouts remain manual in Torn.
-          </p>
-          <label>
-            <input
-              type="checkbox"
-              checked={confirmDraw}
-              onChange={(e) => setConfirmDraw(e.target.checked)}
-            />{" "}
-            I have checked the entries and am ready to finalize the draw.
-          </label>
-          <button
-            className="nu-btn"
-            disabled={busy || !drawReady || !confirmDraw}
-            onClick={() =>
-              void run(
-                () => action("draw", c.id),
-                "Winners drawn and saved. Send their prizes directly in Torn.",
-              )
-            }
-          >
-            Finalize draw
-          </button>
-        </div>
+      {!c.cancelled_at && (
+        <DrawRevealWindow
+          campaign={c}
+          data={data}
+          onReveal={() =>
+            void queryClient.invalidateQueries({
+              queryKey: ["lucky-draw", c.id],
+            })
+          }
+        />
       )}
       {data.is_host && !c.drawn_at && !c.cancelled_at && (
         <details>
@@ -1035,7 +1012,7 @@ function CampaignDetail({
           </form>
         </details>
       )}
-      {c.drawn_at && (
+      {c.drawn_at && data.result_state === "revealed" && (
         <div>
           <h4>Winners · {dateLabel(c.drawn_at)}</h4>
           <p>The result is final. No rerolls.</p>
@@ -1045,6 +1022,13 @@ function CampaignDetail({
                 #{w.rank} · {w.player_name} [{w.torn_id}] · {w.quantity}{" "}
                 {w.prize_item}
               </strong>
+              {w.name_corrected_at && (
+                <p>
+                  Display name corrected by an administrator. Original name:{" "}
+                  {w.original_player_name}. Reason: {w.name_correction_reason}.
+                  The winning Torn ID is unchanged.
+                </p>
+              )}
               <p>
                 {w.received_at
                   ? "Receipt confirmed"

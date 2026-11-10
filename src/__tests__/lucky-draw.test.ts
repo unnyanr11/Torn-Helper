@@ -52,7 +52,7 @@ beforeAll(async () => {
  create table public.torn_data_cache(user_id uuid,endpoint_id text,parameters jsonb,payload jsonb,fetched_at timestamptz);
  create table public.torn_item_catalogue(id integer primary key,name text);
  insert into public.torn_item_catalogue values(206,'Xanax');
- create table public.profiles(id uuid primary key);
+ create table public.profiles(id uuid primary key,role text not null default 'user',tracking_paused boolean not null default false);
  create table public.linked_torn_accounts(user_id uuid primary key,torn_id bigint unique,torn_name text,revoked_at timestamptz);
  -- Randomness shim only for isolated WASM PostgreSQL; production uses pgcrypto.
  create function extensions.gen_random_bytes(n integer) returns bytea language sql volatile as $$select substring(decode(md5(random()::text),'hex') from 1 for n)$$;
@@ -998,5 +998,201 @@ describe("exact/range deposits and entry-triggered closing windows", () => {
     expect((await act(host, "details", c.id)).winners[0].quantity).toBe(
       75750000,
     );
+  });
+});
+
+describe("automatic sealed draw and audited admin name correction", () => {
+  beforeAll(async () => {
+    const migration = readFileSync(
+      "supabase/migrations/20261110102735_lucky_draw_automatic_sealed_results.sql",
+      "utf8",
+    );
+    await expect(db.exec(`begin;${migration}commit;`)).rejects.toThrow(
+      "Campaign data exists",
+    );
+    await db.exec("rollback");
+    await db.exec(
+      "delete from private.lucky_draw_receipts;delete from private.lucky_draw_sync;delete from public.lucky_draw_winners;delete from private.lucky_draw_submissions;delete from public.lucky_draw_campaigns;",
+    );
+    await db.exec(
+      `create schema cron;create table cron.job(jobid bigint generated always as identity,jobname text,schedule text,command text);create function cron.schedule(name text,timing text,body text) returns bigint language sql as $$insert into cron.job(jobname,schedule,command) values(name,timing,body) returning jobid$$;`,
+    );
+    await db.exec(`begin;${migration}commit;`);
+  });
+  const config = () =>
+    terms({
+      entry_item: "Cash",
+      quantity_per_ticket: 1000000,
+      deposit_mode: "fixed",
+      minimum_entries: 1,
+      days_after_threshold: 1,
+      prizes: [{ percentage: 75 }],
+    });
+  let c: any, original: any;
+  it("runs only on the backend and waits for closing plus complete transfer coverage", async () => {
+    c = await act(host, "create", null, config());
+    await receivedPage(c, [transfer(c, "sealed-entry", 2, 1000000)]);
+    expect(
+      (await asService("select public.finalize_lucky_draw($1) as data", [c.id]))
+        .rows[0].data.state,
+    ).toBe("entry_open");
+    await expect(
+      user(a, "select public.finalize_lucky_draw($1)", [c.id]),
+    ).rejects.toThrow("permission denied");
+    await db.query(
+      "update lucky_draw_campaigns set closes_at=now()-interval '1 second' where id=$1",
+      [c.id],
+    );
+    await db.query(
+      "update private.lucky_draw_sync set checked_through=0 where campaign_id=$1",
+      [c.id],
+    );
+    expect(
+      (await asService("select public.finalize_lucky_draw($1) as data", [c.id]))
+        .rows[0].data.state,
+    ).toBe("awaiting_log_sync");
+    await receivedPage(c, []);
+    expect(
+      (await asService("select public.finalize_lucky_draw($1) as data", [c.id]))
+        .rows[0].data.state,
+    ).toBe("drawn");
+    original = (
+      await db.query<any>(
+        "select * from lucky_draw_winners where campaign_id=$1",
+        [c.id],
+      )
+    ).rows[0];
+    expect(original.torn_id).toBe(2);
+    expect(original.player_name).toBe(original.original_player_name);
+  });
+  it("seals winner identities from direct table reads and the details RPC for exactly 48 hours", async () => {
+    const r = await act(host, "details", c.id);
+    expect(r.result_state).toBe("sealed");
+    expect(r.winners).toEqual([]);
+    expect(r.name_corrections).toEqual([]);
+    expect(Date.parse(r.reveal_at) - Date.parse(r.campaign.closes_at)).toBe(
+      48 * 3600000,
+    );
+    expect(
+      (
+        await user(a, "select * from lucky_draw_winners where campaign_id=$1", [
+          c.id,
+        ])
+      ).rows,
+    ).toHaveLength(0);
+    await expect(
+      act(host, "paid", c.id, { rank: 1, reference: "too-early" }),
+    ).rejects.toThrow("remain sealed");
+    await expect(
+      db.query("update lucky_draw_campaigns set reveal_at=now() where id=$1", [
+        c.id,
+      ]),
+    ).rejects.toThrow("lucky_draw_fixed_reveal_window");
+  });
+  it("is retry-safe and never rerolls the saved result", async () => {
+    expect(
+      (await asService("select public.finalize_lucky_draw($1) as data", [c.id]))
+        .rows[0].data.state,
+    ).toBe("already_drawn");
+    expect(
+      (
+        await db.query<any>(
+          "select torn_id,original_player_name from lucky_draw_winners where campaign_id=$1",
+          [c.id],
+        )
+      ).rows,
+    ).toEqual([
+      { torn_id: 2, original_player_name: original.original_player_name },
+    ]);
+  });
+  it("allows only admins to correct display names and protects the winning identity/prize", async () => {
+    await expect(
+      user(host, "select public.admin_correct_lucky_draw_name($1,1,$2,$3)", [
+        c.id,
+        "Corrected name",
+        "Actual Torn rename",
+      ]),
+    ).rejects.toThrow("Administrator");
+    await db.query("update profiles set role='admin' where id=$1", [b]);
+    await user(b, "select public.admin_correct_lucky_draw_name($1,1,$2,$3)", [
+      c.id,
+      "Corrected name",
+      "Actual Torn rename",
+    ]);
+    const w = (
+      await db.query<any>(
+        "select * from lucky_draw_winners where campaign_id=$1",
+        [c.id],
+      )
+    ).rows[0];
+    expect(w.torn_id).toBe(original.torn_id);
+    expect(w.original_player_name).toBe(original.player_name);
+    expect(w.player_name).toBe("Corrected name");
+    await expect(
+      user(a, "update lucky_draw_winners set player_name='Tampered'"),
+    ).rejects.toThrow("permission denied");
+    for (const sql of [
+      "update lucky_draw_winners set torn_id=999 where campaign_id=$1",
+      "update lucky_draw_winners set quantity=999 where campaign_id=$1",
+      "update lucky_draw_winners set original_player_name='Tampered' where campaign_id=$1",
+    ])
+      await expect(db.query(sql, [c.id])).rejects.toThrow("immutable");
+    await expect(
+      user(b, "select public.admin_correct_lucky_draw_name($1,1,$2,$3)", [
+        c.id,
+        "Another name",
+        "",
+      ]),
+    ).rejects.toThrow("reason");
+    expect((await act(a, "details", c.id)).name_corrections).toEqual([]);
+  });
+  it("reveals the saved identity and transparent correction audit after the closing-based reveal time", async () => {
+    await db.query(
+      "update lucky_draw_campaigns set closes_at=now()-interval '49 hours',reveal_at=now()-interval '1 hour' where id=$1",
+      [c.id],
+    );
+    const r = await act(a, "details", c.id);
+    expect(r.result_state).toBe("revealed");
+    expect(r.winners).toHaveLength(1);
+    expect(r.winners[0].player_name).toBe("Corrected name");
+    expect(r.winners[0].torn_id).toBe(2);
+    expect(r.name_corrections).toHaveLength(1);
+    expect(r.name_corrections[0]).toMatchObject({
+      old_name: original.player_name,
+      new_name: "Corrected name",
+      reason: "Actual Torn rename",
+    });
+    expect(
+      (
+        await user(
+          a,
+          "select torn_id from lucky_draw_winners where campaign_id=$1",
+          [c.id],
+        )
+      ).rows,
+    ).toEqual([{ torn_id: 2 }]);
+    await act(host, "paid", c.id, { rank: 1, reference: "verified-payout" });
+    await act(a, "received", c.id, { rank: 1 });
+  });
+  it("leases offline processing to the backend once and installs a minute scheduler", async () => {
+    const open = await act(host, "create", null, config());
+    const jobs = (
+      await asService("select public.claim_lucky_draw_jobs() as data")
+    ).rows[0].data;
+    expect(jobs.map((j: any) => j.campaign_id)).toContain(open.id);
+    expect(
+      (await asService("select public.claim_lucky_draw_jobs() as data")).rows[0]
+        .data,
+    ).toEqual([]);
+    await expect(
+      user(host, "select public.claim_lucky_draw_jobs()"),
+    ).rejects.toThrow("permission denied");
+    const row = (
+      await db.query<any>(
+        "select * from cron.job where jobname='process-lucky-draws'",
+      )
+    ).rows[0];
+    expect(row.schedule).toBe("* * * * *");
+    expect(row.command).toContain("vault.decrypted_secrets");
   });
 });

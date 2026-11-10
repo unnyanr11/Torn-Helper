@@ -160,10 +160,11 @@ export default function ReceivedTransfers({
       {isHost && (
         <>
           <p>
-            Only matching received-transfer records are shown here. The host key
-            must allow user/log access. All matching cash receipts are listed
-            even when they do not qualify; no item or cash transfer is
-            automated.
+            The server automatically syncs active campaigns every minute, even
+            when this page is closed. Only matching received-transfer records
+            are shown here. The host key must allow user/log access. All
+            matching cash receipts are listed even when they do not qualify; no
+            item or cash transfer is automated.
           </p>
           <div className="draw-actions">
             <button

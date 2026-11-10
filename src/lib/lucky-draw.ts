@@ -26,6 +26,7 @@ export type Campaign = {
   cancelled_at: string | null;
   cancellation_reason: string | null;
   drawn_at: string | null;
+  reveal_at: string | null;
   pool_quantity: number | null;
   eligible_players: number | null;
 };
@@ -49,6 +50,9 @@ export type Winner = {
   user_id: string | null;
   torn_id: number;
   player_name: string;
+  original_player_name: string;
+  name_corrected_at: string | null;
+  name_correction_reason: string | null;
   prize_item: string;
   quantity: number;
   percentage: number | null;
@@ -76,6 +80,15 @@ export type ReceiptPage = {
   counted_entries: number;
 };
 export type DrawDetails = {
+  result_state: "pending" | "sealed" | "revealed";
+  reveal_at: string | null;
+  name_corrections: {
+    rank: number;
+    old_name: string;
+    new_name: string;
+    reason: string;
+    at: string;
+  }[];
   viewer_torn_id: number;
   receipt_data: ReceiptPage;
   entry_count: number;
@@ -109,7 +122,11 @@ export function campaignStatus(c: Campaign, now = Date.now()) {
   return c.cancelled_at
     ? "Cancelled"
     : c.drawn_at
-      ? "Drawn"
+      ? c.reveal_at
+        ? Date.parse(c.reveal_at) <= now
+          ? "Results revealed"
+          : "Winners sealed"
+        : "Drawn"
       : !c.closes_at
         ? "Awaiting minimum entries"
         : Date.parse(c.closes_at) <= now
