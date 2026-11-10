@@ -1353,3 +1353,49 @@ describe("private winner storage and server-authorized configurable release", ()
     ).rejects.toThrow();
   });
 });
+
+
+describe("database-owner-only sealed access and corrections", () => {
+  beforeAll(async () => {
+    await db.exec(readFileSync("supabase/migrations/20261110110259_lucky_draw_owner_only_corrections.sql", "utf8"));
+  });
+  it("denies correction RPCs and private tables even to app admins and the service role", async () => {
+    for (const role of ["anon", "authenticated", "service_role"]) {
+      await db.exec(`set role ${role}`);
+      try {
+        for (const table of ["lucky_draw_winners", "lucky_draw_name_audit"]) {
+          await expect(db.query(`select * from private.${table}`)).rejects.toThrow("permission denied");
+          await expect(db.query(`update private.${table} set rank=rank`)).rejects.toThrow("permission denied");
+        }
+        for (const schema of ["public", "private"])
+          await expect(db.query(`select ${schema}.admin_correct_lucky_draw_name($1,1,'Changed','Forged admin')`, [campaign])).rejects.toThrow("permission denied");
+      } finally { await db.exec("reset role"); }
+    }
+    // b already has the protected app-admin profile from earlier tests.
+    await expect(user(b, "select public.admin_correct_lucky_draw_name($1,1,'Changed','App admin')", [campaign])).rejects.toThrow("permission denied");
+  });
+  it("authorizes the SQL owner using the SQL role instead of forgeable request claims", async () => {
+    await db.exec("select set_config('request.jwt.claim.role','service_role',false)");
+    expect((await db.query<any>("select private.can_correct_lucky_draw_name() as allowed")).rows[0].allowed).toBe(true);
+    // Exercise the definer guard even if a future migration accidentally grants RPC execution.
+    await db.exec("grant execute on function private.can_correct_lucky_draw_name() to authenticated,service_role");
+    try {
+      for (const role of ["authenticated", "service_role"]) {
+        await db.exec(`set role ${role}`);
+        try { expect((await db.query<any>("select private.can_correct_lucky_draw_name() as allowed")).rows[0].allowed).toBe(false); }
+        finally { await db.exec("reset role"); }
+      }
+    } finally { await db.exec("revoke execute on function private.can_correct_lucky_draw_name() from authenticated,service_role"); }
+  });
+  it("lets the SQL owner inspect and audit a correction while clients and workers stay sealed", async () => {
+    const winner = (await db.query<any>("select w.* from private.lucky_draw_winners w join lucky_draw_campaigns c on c.id=w.campaign_id where c.reveal_at>now() limit 1")).rows[0];
+    expect(winner).toBeTruthy();
+    await db.query("select public.admin_correct_lucky_draw_name($1,$2,'Owner corrected name','Verified owner correction')", [winner.campaign_id,winner.rank]);
+    const saved = (await db.query<any>("select * from private.lucky_draw_winners where campaign_id=$1 and rank=$2", [winner.campaign_id,winner.rank])).rows[0];
+    expect(saved.player_name).toBe("Owner corrected name");
+    expect(saved.torn_id).toBe(winner.torn_id);
+    expect(saved.original_player_name).toBe(winner.original_player_name);
+    expect((await act(b,"details",winner.campaign_id)).winners).toEqual([]);
+    expect((await asService("select public.finalize_lucky_draw($1) as data", [winner.campaign_id])).rows[0].data.state).toBe("already_drawn");
+  });
+});
