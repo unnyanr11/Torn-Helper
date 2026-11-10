@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabase";
 import { useItemCatalogue } from "../hooks/useItemCatalogue";
 import {
   campaignStatus,
+  depositLabel,
   prizePreview,
   type Campaign,
   type DrawDetails,
@@ -60,7 +61,10 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
     </label>
   );
 }
-const dateLabel = (s: string) => new Date(s).toLocaleString();
+const dateLabel = (s: string | null) =>
+  s
+    ? new Date(s).toLocaleString()
+    : "Waiting for the required verified entries";
 function selectedCampaign() {
   const value = new URLSearchParams(location.hash.split("?")[1] ?? "").get(
     "campaign",
@@ -205,9 +209,7 @@ export default function LuckyDraws() {
             >
               <span className="badge">{campaignStatus(c)}</span>
               <strong>{c.title}</strong>
-              <span>
-                {c.quantity_per_ticket} × {c.entry_item} minimum per transfer
-              </span>
+              <span>{depositLabel(c)}</span>
               <small>
                 {c.prizes.length} prizes · Closes {dateLabel(c.closes_at)}
               </small>
@@ -271,7 +273,10 @@ export function CampaignForm({
     [item, setItem] = useState("Xanax"),
     [quantity, setQuantity] = useState("1"),
     [cap, setCap] = useState("1"),
-    [days, setDays] = useState("7");
+    [days, setDays] = useState("7"),
+    [depositMode, setDepositMode] = useState<"fixed" | "range">("fixed"),
+    [maximumDeposit, setMaximumDeposit] = useState("5"),
+    [minimumEntries, setMinimumEntries] = useState("100");
   const [mode, setMode] = useState<"pool" | "fixed">("pool"),
     [prizes, setPrizes] = useState<Prize[]>(() => splitPrizes("tiered")),
     [previewPool, setPreviewPool] = useState("100"),
@@ -287,6 +292,12 @@ export function CampaignForm({
     setLocalError("");
     if (mode === "pool" && preview.percentage > 100) {
       setLocalError("Prize percentages cannot exceed 100%.");
+      return;
+    }
+    if (depositMode === "range" && Number(maximumDeposit) < Number(quantity)) {
+      setLocalError(
+        "The maximum deposit must be at least the minimum deposit.",
+      );
       return;
     }
     setReview(true);
@@ -368,11 +379,26 @@ export function CampaignForm({
               ))}
             </select>
           </Field>
+          <Field label="Deposit rule">
+            <select
+              value={depositMode}
+              onChange={(e) =>
+                setDepositMode(e.target.value as "fixed" | "range")
+              }
+            >
+              <option value="fixed">Exact fixed amount</option>
+              <option value="range">Minimum and maximum together</option>
+            </select>
+          </Field>
           <Field
             label={
-              item === "Cash"
-                ? "Minimum cash per transfer ($)"
-                : "Minimum items per transfer"
+              depositMode === "fixed"
+                ? item === "Cash"
+                  ? "Exact cash deposit ($)"
+                  : "Exact item quantity"
+                : item === "Cash"
+                  ? "Minimum deposit ($)"
+                  : "Minimum item quantity"
             }
           >
             <input
@@ -385,6 +411,25 @@ export function CampaignForm({
               onChange={(e) => setQuantity(e.target.value)}
             />
           </Field>
+          {depositMode === "range" && (
+            <Field
+              label={
+                item === "Cash"
+                  ? "Maximum deposit ($)"
+                  : "Maximum item quantity"
+              }
+            >
+              <input
+                required
+                type="number"
+                min={quantity || "1"}
+                max="1000000000000"
+                step="1"
+                value={maximumDeposit}
+                onChange={(e) => setMaximumDeposit(e.target.value)}
+              />
+            </Field>
+          )}
           <Field label="Maximum entries per player">
             <input
               required
@@ -396,7 +441,18 @@ export function CampaignForm({
               onChange={(e) => setCap(e.target.value)}
             />
           </Field>
-          <Field label="Open for this many days">
+          <Field label="Minimum verified entries for a valid campaign">
+            <input
+              required
+              type="number"
+              min="1"
+              max="1000000"
+              step="1"
+              value={minimumEntries}
+              onChange={(e) => setMinimumEntries(e.target.value)}
+            />
+          </Field>
+          <Field label="Days open after the minimum is reached">
             <input
               required
               type="number"
@@ -430,6 +486,12 @@ export function CampaignForm({
           are available as prizes only. Entries require cash or a sendable item
           with received-log verification. A unique token is generated at
           publication. Transfers without that token in the message do not count.
+        </p>
+        <p className="draw-preview">
+          The campaign requires {minimumEntries || "…"} verified entries.
+          Entries remain open until that count is reached, then stay open for{" "}
+          {days || "…"} more days. The countdown starts once, when the required
+          count is confirmed. Each eligible transfer is still one entry.
         </p>
         <Field label="Campaign description and extra rules">
           <textarea
@@ -586,8 +648,13 @@ export function CampaignForm({
           <div className="draw-preview">
             <h4>Ready to publish “{title}”?</h4>
             <p>
-              Entry: {quantity} {item} minimum per transfer · Up to {cap}{" "}
-              entries per player · Open for {days} days from publication.
+              Deposit:{" "}
+              {depositMode === "fixed"
+                ? `exactly ${quantity}`
+                : `${quantity} to ${maximumDeposit}`}{" "}
+              {item} per transfer. Up to {cap} entries per player. Requires{" "}
+              {minimumEntries} verified entries, then remains open for {days}{" "}
+              more days.
             </p>
             <p>
               Audience: {audienceLabel(audience)}.{" "}
@@ -596,9 +663,10 @@ export function CampaignForm({
                 : ""}
             </p>
             <p>
-              The prize rules, ticket limits and deadline lock immediately.
-              Fixed prizes are the host’s responsibility. Winners and the draw
-              cannot be edited or rerolled.
+              The prize rules, deposit bounds, entry requirement and
+              closing-window length lock immediately. Fixed prizes are the
+              host’s responsibility. Winners and the draw cannot be edited or
+              rerolled.
             </p>
             <button
               type="button"
@@ -612,12 +680,16 @@ export function CampaignForm({
                   entry_verification: "token",
                   entry_item: item,
                   quantity_per_ticket: Number(quantity),
+                  deposit_mode: depositMode,
+                  maximum_deposit:
+                    depositMode === "range"
+                      ? Number(maximumDeposit)
+                      : Number(quantity),
+                  minimum_entries: Number(minimumEntries),
+                  days_after_threshold: Number(days),
                   max_tickets_per_player: Number(cap),
                   prize_mode: mode,
                   prizes,
-                  closes_at: new Date(
-                    Date.now() + Number(days) * 86400000,
-                  ).toISOString(),
                 })
               }
             >
@@ -652,7 +724,8 @@ function CampaignDetail({
   const drawReady =
     status === "Awaiting draw" &&
     data.pending_count === 0 &&
-    data.eligible_players >= c.prizes.length;
+    data.eligible_players >= c.prizes.length &&
+    (data.entry_count ?? 0) >= (c.minimum_entries ?? 1);
   return (
     <article className="card">
       <div className="draw-heading">
@@ -695,12 +768,39 @@ function CampaignDetail({
         Closes {dateLabel(c.closes_at)} · Times shown in your local timezone.
       </p>
       <p>
-        <strong>
-          {c.quantity_per_ticket} {c.entry_item} minimum per transfer
-        </strong>{" "}
-        · Maximum {c.max_tickets_per_player} entries per player. Send only the
-        stated item, in at least the minimum amount.
+        <strong>{depositLabel(c)}</strong> · Maximum {c.max_tickets_per_player}{" "}
+        entries per player. Send only the stated asset within the published
+        deposit rule.
       </p>
+      {c.closing_policy === "entry_threshold" && (
+        <div className="draw-preview">
+          <h4>Campaign entry requirement</h4>
+          <p>
+            <strong>
+              {data.entry_count ?? 0} / {c.minimum_entries} verified entries
+            </strong>{" "}
+            required for a valid campaign.
+          </p>
+          <progress
+            aria-label="Verified entry requirement"
+            value={Math.min(data.entry_count ?? 0, c.minimum_entries)}
+            max={c.minimum_entries}
+          />
+          {c.threshold_reached_at ? (
+            <p>
+              Minimum reached {dateLabel(c.threshold_reached_at)}. The{" "}
+              {c.days_after_threshold}-day final entry window closes{" "}
+              {dateLabel(c.closes_at)}.
+            </p>
+          ) : (
+            <p>
+              The countdown has not started. After {c.minimum_entries} verified
+              entries are confirmed, entries stay open for{" "}
+              {c.days_after_threshold} more days.
+            </p>
+          )}
+        </div>
+      )}
       <Field label="Share campaign link (sign-in required)">
         <input
           readOnly
@@ -868,13 +968,15 @@ function CampaignDetail({
         <div className="draw-preview">
           <h4>Draw winners</h4>
           <p>
-            {status === "Open"
-              ? "Wait until the entry deadline."
-              : data.pending_count
-                ? "Review every pending entry first."
-                : data.eligible_players < c.prizes.length
-                  ? `Needs ${c.prizes.length} distinct eligible players; currently ${data.eligible_players}.`
-                  : "The draw is ready."}
+            {!c.closes_at
+              ? `Needs ${c.minimum_entries} verified entries before the closing countdown can start.`
+              : status === "Open"
+                ? "Wait until the entry deadline."
+                : data.pending_count
+                  ? "Review every pending entry first."
+                  : data.eligible_players < c.prizes.length
+                    ? `Needs ${c.prizes.length} distinct eligible players; currently ${data.eligible_players}.`
+                    : "The draw is ready."}
           </p>
           <p>
             Drawing saves one permanent result. Payouts remain manual in Torn.

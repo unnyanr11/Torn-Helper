@@ -15,7 +15,13 @@ export type Campaign = {
   max_tickets_per_player: number;
   prize_mode: "pool" | "fixed";
   prizes: Prize[];
-  closes_at: string;
+  deposit_mode: "legacy_minimum" | "fixed" | "range";
+  maximum_deposit: number | null;
+  minimum_entries: number;
+  days_after_threshold: number | null;
+  threshold_reached_at: string | null;
+  closing_policy: "fixed_date" | "entry_threshold";
+  closes_at: string | null;
   created_at: string;
   cancelled_at: string | null;
   cancellation_reason: string | null;
@@ -104,7 +110,21 @@ export function campaignStatus(c: Campaign, now = Date.now()) {
     ? "Cancelled"
     : c.drawn_at
       ? "Drawn"
-      : Date.parse(c.closes_at) <= now
-        ? "Awaiting draw"
-        : "Open";
+      : !c.closes_at
+        ? "Awaiting minimum entries"
+        : Date.parse(c.closes_at) <= now
+          ? "Awaiting draw"
+          : "Open";
+}
+
+export function depositLabel(c: Campaign) {
+  const amount = (n: number) =>
+    c.entry_item === "Cash"
+      ? `$${n.toLocaleString()}`
+      : `${n.toLocaleString()} ${c.entry_item}`;
+  if (c.deposit_mode === "fixed")
+    return `Exactly ${amount(c.quantity_per_ticket)} per transfer`;
+  if (c.deposit_mode === "range")
+    return `${amount(c.quantity_per_ticket)} to ${amount(c.maximum_deposit ?? c.quantity_per_ticket)} per transfer (inclusive)`;
+  return `At least ${amount(c.quantity_per_ticket)} per transfer`;
 }

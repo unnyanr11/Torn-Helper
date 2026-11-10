@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 import { functionError } from "../lib/function-error";
 import { useItemCatalogue } from "../hooks/useItemCatalogue";
+import { depositLabel } from "../lib/lucky-draw";
 import type { Campaign, DrawDetails, ReceiptPage } from "../lib/lucky-draw";
 export default function ReceivedTransfers({
   campaign: c,
@@ -13,6 +14,10 @@ export default function ReceivedTransfers({
   isHost: boolean;
   sync: DrawDetails["sync"];
 }) {
+  const closed =
+    !!c.drawn_at ||
+    !!c.cancelled_at ||
+    !!(c.closes_at && Date.parse(c.closes_at) <= Date.now());
   const client = useQueryClient(),
     catalogue = useItemCatalogue();
   const [offset, setOffset] = useState(0),
@@ -123,6 +128,12 @@ export default function ReceivedTransfers({
   return (
     <div className="draw-preview">
       <h4>Transfer token and received logs</h4>
+      {!isHost && closed && (
+        <p role="status" className="badge warn">
+          Entries are closed. Do not send more money or items; later transfers
+          will not count.
+        </p>
+      )}
       <label className="draw-field">
         <span>Campaign token — paste this into the Torn transfer message</span>
         <input
@@ -136,18 +147,15 @@ export default function ReceivedTransfers({
         <strong>
           {c.host_name} [{c.host_torn_id}]
         </strong>
-        .{" "}
-        {c.entry_item === "Cash"
-          ? `Minimum transfer: $${c.quantity_per_ticket.toLocaleString()}.`
-          : `Minimum transfer: ${c.quantity_per_ticket} ${c.entry_item}.`}{" "}
-        Include the token as a separate word in the message. Matching is
-        case-insensitive. Each verified transfer counts as one entry, up to{" "}
-        {c.max_tickets_per_player} per player.
+        . {depositLabel(c)}. Include the token as a separate word in the
+        message. Matching is case-insensitive. Each verified transfer counts as
+        one entry, up to {c.max_tickets_per_player} per player.
       </p>
       <p role="alert" className="badge warn">
         Warning: any entry without the token will be lost. Only received
-        transfers with the campaign token in the message count. Sending more
-        money or items still gives one entry per transfer.
+        transfers with the campaign token in the message count. Each transfer
+        within the configured deposit bounds gives one entry. Amounts outside
+        the rule do not count.
       </p>
       {isHost && (
         <>

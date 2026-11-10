@@ -869,3 +869,134 @@ describe("one verified transfer per entry", () => {
     expect(r.entry_count).toBe(2);
   });
 });
+
+describe("exact/range deposits and entry-triggered closing windows", () => {
+  beforeAll(async () => {
+    const migration = readFileSync(
+      "supabase/migrations/20261110101259_lucky_draw_deposit_bounds_and_entry_threshold.sql",
+      "utf8",
+    );
+    await expect(db.exec(`begin;${migration}commit;`)).rejects.toThrow(
+      "Campaign data exists",
+    );
+    await db.exec("rollback");
+    await db.exec(
+      "delete from private.lucky_draw_receipts;delete from private.lucky_draw_sync;delete from public.lucky_draw_winners;delete from private.lucky_draw_submissions;delete from public.lucky_draw_campaigns;",
+    );
+    await db.exec(`begin;${migration}commit;`);
+  });
+  const config = (extra: Record<string, unknown> = {}) =>
+    terms({
+      entry_item: "Cash",
+      quantity_per_ticket: 1000000,
+      deposit_mode: "fixed",
+      minimum_entries: 100,
+      days_after_threshold: 7,
+      prizes: [{ percentage: 75 }],
+      ...extra,
+    });
+  it("counts only the exact fixed deposit and records under/overpayments without entries", async () => {
+    const c = await act(host, "create", null, config());
+    expect(c.closes_at).toBeNull();
+    expect(c.maximum_deposit).toBe(1000000);
+    await receivedPage(c, [
+      transfer(c, "fixed-under", 2, 500000),
+      transfer(c, "fixed-exact", 3, 1000000),
+      transfer(c, "fixed-over", 4, 5000000),
+    ]);
+    const r = await act(host, "details", c.id);
+    expect(r.entry_count).toBe(1);
+    expect(r.pool_quantity).toBe(1000000);
+    expect(r.receipt_data.total).toBe(3);
+    expect(
+      r.receipt_data.rows.filter((s: any) => s.state === "ineligible"),
+    ).toHaveLength(2);
+    await expect(act(host, "draw", c.id)).rejects.toThrow(
+      "closing countdown has not started",
+    );
+  });
+  it("accepts both inclusive range bounds and intermediate deposits as one entry each", async () => {
+    const c = await act(
+      host,
+      "create",
+      null,
+      config({ deposit_mode: "range", maximum_deposit: 5000000 }),
+    );
+    await receivedPage(c, [
+      transfer(c, "range-min", 2, 1000000),
+      transfer(c, "range-middle", 3, 1500000),
+      transfer(c, "range-max", 4, 5000000),
+      transfer(c, "range-under", 2, 999999),
+      transfer(c, "range-over", 3, 5000001),
+    ]);
+    const r = await act(host, "details", c.id);
+    expect(r.entry_count).toBe(3);
+    expect(r.pool_quantity).toBe(7500000);
+    expect(r.submissions.map((s: any) => s.tickets)).toEqual([1, 1, 1]);
+  });
+  it("requires both valid range bounds and positive entry/day requirements", async () => {
+    for (const patch of [
+      { deposit_mode: "range" },
+      { deposit_mode: "range", maximum_deposit: 999999 },
+      { deposit_mode: "range", maximum_deposit: 0 },
+      { minimum_entries: 0 },
+      { minimum_entries: 1.5 },
+      { days_after_threshold: 0 },
+      { days_after_threshold: 366 },
+      { deposit_mode: "made-up" },
+    ])
+      await expect(act(host, "create", null, config(patch))).rejects.toThrow();
+  });
+  it("starts exactly seven more days at the 100th verified entry and never restarts the countdown", async () => {
+    const c = await act(
+      host,
+      "create",
+      null,
+      config({ max_tickets_per_player: 200 }),
+    );
+    const first = Array.from({ length: 99 }, (_, i) =>
+      transfer(c, `threshold-${String(i).padStart(3, "0")}`, 2, 1000000),
+    );
+    await receivedPage(c, first);
+    let r = await act(host, "details", c.id);
+    expect(r.entry_count).toBe(99);
+    expect(r.campaign.closes_at).toBeNull();
+    expect(r.campaign.threshold_reached_at).toBeNull();
+    await db.query(
+      "update private.lucky_draw_sync set checked_through=0 where campaign_id=$1",
+      [c.id],
+    );
+    await receivedPage(c, [transfer(c, "threshold-099", 2, 1000000)]);
+    r = await act(host, "details", c.id);
+    expect(r.entry_count).toBe(100);
+    const closing = r.campaign.closes_at,
+      started = r.campaign.threshold_reached_at;
+    expect(Date.parse(closing) - Date.parse(started)).toBe(7 * 86400000);
+    await expect(act(host, "draw", c.id)).rejects.toThrow("Wait until");
+    await db.query(
+      "update private.lucky_draw_sync set checked_through=0 where campaign_id=$1",
+      [c.id],
+    );
+    await receivedPage(c, [
+      transfer(c, "threshold-100", 3, 1000000),
+      transfer(c, "threshold-099", 2, 1000000),
+    ]);
+    r = await act(host, "details", c.id);
+    expect(r.entry_count).toBe(101);
+    expect(r.campaign.closes_at).toBe(closing);
+    expect(r.campaign.threshold_reached_at).toBe(started);
+    await db.query(
+      "update lucky_draw_campaigns set closes_at=now()-interval '1 second' where id=$1",
+      [c.id],
+    );
+    await db.query(
+      "update private.lucky_draw_sync set checked_through=0 where campaign_id=$1",
+      [c.id],
+    );
+    await receivedPage(c, []);
+    await act(host, "draw", c.id);
+    expect((await act(host, "details", c.id)).winners[0].quantity).toBe(
+      75750000,
+    );
+  });
+});

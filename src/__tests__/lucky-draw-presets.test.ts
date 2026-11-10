@@ -90,3 +90,38 @@ describe("entry token warning", () => {
     client.clear();
   });
 });
+
+describe("deposit and threshold presentation", () => {
+  it("renders exact/range choices and threshold-controlled days", async () => {
+    const { renderToStaticMarkup } = await import("react-dom/server");
+    const { createElement } = await import("react");
+    const { CampaignForm } = await import("../pages/LuckyDraws");
+    const html = renderToStaticMarkup(
+      createElement(CampaignForm, { busy: false, onSave: async () => {} }),
+    );
+    for (const label of [
+      "Exact fixed amount",
+      "Minimum and maximum together",
+      "Minimum verified entries for a valid campaign",
+      "Days open after the minimum is reached",
+    ])
+      expect(html).toContain(label);
+  });
+  it("labels exact and bounded deposits and handles a not-yet-started countdown", async () => {
+    const { depositLabel, campaignStatus } = await import("../lib/lucky-draw");
+    const c = {
+      entry_item: "Cash",
+      quantity_per_ticket: 1000000,
+      maximum_deposit: 5000000,
+      deposit_mode: "range",
+      closes_at: null,
+      drawn_at: null,
+      cancelled_at: null,
+    } as any;
+    expect(depositLabel(c)).toContain("$1,000,000 to $5,000,000");
+    expect(depositLabel({ ...c, deposit_mode: "fixed" })).toContain(
+      "Exactly $1,000,000",
+    );
+    expect(campaignStatus(c)).toBe("Awaiting minimum entries");
+  });
+});
