@@ -1228,5 +1228,185 @@
     "buy_price": 68705,
     "source": "User screenshot",
     "observed_on": "2026-11-11"
+  },
+  {
+    "id": 617,
+    "name": "Banana Orchid",
+    "type": "Flower",
+    "country": "Cayman Islands",
+    "shop": "General Store",
+    "buy_price": 4000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 624,
+    "name": "Bikini",
+    "type": "Clothing",
+    "country": "Cayman Islands",
+    "shop": "General Store",
+    "buy_price": 8000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 626,
+    "name": "Diving Gloves",
+    "type": "Clothing",
+    "country": "Cayman Islands",
+    "shop": "General Store",
+    "buy_price": 5000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 622,
+    "name": "Flippers",
+    "type": "Clothing",
+    "country": "Cayman Islands",
+    "shop": "General Store",
+    "buy_price": 10000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 620,
+    "name": "Nodding Turtle",
+    "type": "Other",
+    "country": "Cayman Islands",
+    "shop": "General Store",
+    "buy_price": 700,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 621,
+    "name": "Snorkel",
+    "type": "Clothing",
+    "country": "Cayman Islands",
+    "shop": "General Store",
+    "buy_price": 20000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 623,
+    "name": "Speedo",
+    "type": "Clothing",
+    "country": "Cayman Islands",
+    "shop": "General Store",
+    "buy_price": 6000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 619,
+    "name": "Steel Drum",
+    "type": "Other",
+    "country": "Cayman Islands",
+    "shop": "General Store",
+    "buy_price": 1500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 618,
+    "name": "Stingray Plushie",
+    "type": "Plushie",
+    "country": "Cayman Islands",
+    "shop": "General Store",
+    "buy_price": 400,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 625,
+    "name": "Wetsuit",
+    "type": "Clothing",
+    "country": "Cayman Islands",
+    "shop": "General Store",
+    "buy_price": 30000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 614,
+    "name": "Diamond Bladed Knife",
+    "type": "Melee",
+    "country": "Cayman Islands",
+    "shop": "Arms Dealer",
+    "buy_price": 950000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 613,
+    "name": "Harpoon",
+    "type": "Secondary",
+    "country": "Cayman Islands",
+    "shop": "Arms Dealer",
+    "buy_price": 300000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 615,
+    "name": "Naval Cutlass",
+    "type": "Melee",
+    "country": "Cayman Islands",
+    "shop": "Arms Dealer",
+    "buy_price": 50000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 612,
+    "name": "Tavor TAR-21",
+    "type": "Primary",
+    "country": "Cayman Islands",
+    "shop": "Arms Dealer",
+    "buy_price": 495000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 616,
+    "name": "Trout",
+    "type": "Temporary",
+    "country": "Cayman Islands",
+    "shop": "Arms Dealer",
+    "buy_price": 20,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 1482,
+    "name": "Bearer Bond",
+    "type": "Other",
+    "country": "Cayman Islands",
+    "shop": "Black Market",
+    "buy_price": 82877,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 196,
+    "name": "Cannabis",
+    "type": "Drug",
+    "country": "Cayman Islands",
+    "shop": "Black Market",
+    "buy_price": 11552,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 204,
+    "name": "Speed",
+    "type": "Drug",
+    "country": "Cayman Islands",
+    "shop": "Black Market",
+    "buy_price": 873,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
   }
 ]
