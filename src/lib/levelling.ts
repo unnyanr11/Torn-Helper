@@ -1,4 +1,4 @@
-import type { StarterTarget } from '../data/levelling-targets';
+import type { CatalogueTarget } from '../data/levelling-targets';
 import type { TornObservation } from './personal-data';
 export interface TargetObservation { id:number;name:string;level:number;state:string;life:number|null;maximumLife:number|null;lastAction:number|null;fetchedAt:string }
 export function targetObservation(id:number,data:TornObservation):TargetObservation{
@@ -15,11 +15,11 @@ export function targetAvailability(row:TargetObservation|undefined,now=Date.now(
  if(row.life!==null&&row.life<=0)return 'Check again';
  return 'Available';
 }
-export function targetInactive(row:TargetObservation|undefined,days:number,now=Date.now()){
+export function targetInactive(row:Pick<TargetObservation,'lastAction'>|undefined,days:number,now=Date.now()){
  return !!row&&row.lastAction!==null&&row.lastAction>0&&row.lastAction*1000<=now-days*86400000;
 }
 /** Check unknown/stale profiles first, oldest first; retain the chosen list order for ties. */
-export function nextTargetChecks(rows:StarterTarget[],observations:Record<number,TargetObservation>,limit=8,now=Date.now()){
+export function nextTargetChecks(rows:CatalogueTarget[],observations:Record<number,TargetObservation>,limit=8,now=Date.now()){
  return rows.filter(r=>['Not checked','Check again'].includes(targetAvailability(observations[r.id],now))).sort((a,b)=>{
   const time=(id:number)=>{const value=Date.parse(observations[id]?.fetchedAt??'');return Number.isFinite(value)?value:0;};
   return time(a.id)-time(b.id);
@@ -28,22 +28,22 @@ export function nextTargetChecks(rows:StarterTarget[],observations:Record<number
 export function mergeTargetObservations(old:Record<number,TargetObservation>,incoming:Record<number,TargetObservation>){
  const next={...old};for(const row of Object.values(incoming)){if(Number.isFinite(Date.parse(row.fetchedAt))&&(!next[row.id]||!Number.isFinite(Date.parse(next[row.id].fetchedAt))||Date.parse(row.fetchedAt)>Date.parse(next[row.id].fetchedAt)))next[row.id]=row;}return next;
 }
-export function targetActivityMatches(row:TargetObservation|undefined,filter:string,now=Date.now()){
+export function targetActivityMatches(row:Pick<TargetObservation,'lastAction'>|undefined,filter:string,now=Date.now()){
  if(filter==='any')return true;
  const time=row?.lastAction;
  if(filter==='unknown')return !time||time*1000>now;
  if(filter==='recent')return !!time&&time>0&&time*1000<=now&&!targetInactive(row,30,now);
  return ['7','30','90'].includes(filter)&&targetInactive(row,Number(filter),now);
 }
-export function filterStarterTargets(rows:StarterTarget[],observations:Record<number,TargetObservation>,maximum:number,availability:string,sort:string,now=Date.now(),inactive='any'){
+export function filterStarterTargets(rows:CatalogueTarget[],observations:Record<number,TargetObservation>,maximum:number,availability:string,sort:string,now=Date.now(),inactive='any'){
  return rows.filter(r=>{
-  const row=observations[r.id];
+  const row=observations[r.id],activity=row??(r.lastAction?{lastAction:r.lastAction}:undefined);
   // Accept old saved activity filters while keeping status and inactivity independent.
-  const statusMatches=availability==='All'||(availability==='Recently active'?targetActivityMatches(row,'recent',now):availability==='Activity unknown'?targetActivityMatches(row,'unknown',now):targetAvailability(row,now)===availability);
-  return (maximum===0||r.reportedTotal<=maximum)&&statusMatches&&targetActivityMatches(row,inactive,now);
+  const statusMatches=availability==='All'||(availability==='Recently active'?targetActivityMatches(activity,'recent',now):availability==='Activity unknown'?targetActivityMatches(activity,'unknown',now):targetAvailability(row,now)===availability);
+  return (maximum===0||(r.reportedTotal!==null&&r.reportedTotal<=maximum))&&statusMatches&&targetActivityMatches(activity,inactive,now);
  }).sort((a,b)=>{
-  if(sort==='level')return (observations[b.id]?.level??b.reportedLevel)-(observations[a.id]?.level??a.reportedLevel)||a.reportedTotal-b.reportedTotal;
+  if(sort==='level')return (observations[b.id]?.level??b.reportedLevel)-(observations[a.id]?.level??a.reportedLevel)||(a.reportedTotal??Number.MAX_SAFE_INTEGER)-(b.reportedTotal??Number.MAX_SAFE_INTEGER);
   if(sort==='name')return (observations[a.id]?.name??a.name).localeCompare(observations[b.id]?.name??b.name);
-  return a.reportedTotal-b.reportedTotal||b.reportedLevel-a.reportedLevel;
+  return (a.reportedTotal??Number.MAX_SAFE_INTEGER)-(b.reportedTotal??Number.MAX_SAFE_INTEGER)||b.reportedLevel-a.reportedLevel;
  });
 }

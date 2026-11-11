@@ -1,5 +1,7 @@
+import {supabase} from '../lib/supabase';
+import {mergeCommunityTargets,COMMUNITY_LIST,type CommunityTargetRow} from '../lib/community-levelling';
 import { useEffect,useMemo,useRef,useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery,useQueryClient } from '@tanstack/react-query';
 import { STARTER_TARGETS,LEVELLING_SNAPSHOT,BALDR_LISTS } from '../data/levelling-targets';
 import { filterStarterTargets,targetAvailability,targetObservation,nextTargetChecks,mergeTargetObservations,targetInactive,type TargetObservation } from '../lib/levelling';
 import { useTornChoices } from '../hooks/useTornChoices';
@@ -8,9 +10,16 @@ import { functionError } from '../lib/function-error';
 import { invokeTornData } from '../lib/torn-data-client';
 import { useTornConnection } from '../hooks/useTornConnection';
 import TornConnectionPanel from './TornConnectionPanel';
-const targetIds=new Set(STARTER_TARGETS.map(t=>t.id));
 export default function LevellingCatalogue(){
  const cache=useTornChoices(),client=useQueryClient(),connection=useTornConnection();
+ const community=useQuery({queryKey:['community-levelling-targets',cache.owner],enabled:!!cache.owner,staleTime:60000,queryFn:async()=>{
+  const rows:CommunityTargetRow[]=[];let after=0;
+  for(;;){const r=await supabase.from('community_levelling_targets').select('torn_id,player_name,level,last_action_at,verified_at').gt('torn_id',after).order('torn_id').limit(500);if(r.error)throw r.error;const batch=r.data as CommunityTargetRow[];rows.push(...batch);if(batch.length<500)break;after=Number(batch[batch.length-1].torn_id);}
+  return rows;
+ }});
+ const targets=useMemo(()=>mergeCommunityTargets(STARTER_TARGETS,community.data??[]),[community.data]);
+ const targetIds=useMemo(()=>new Set(targets.map(t=>t.id)),[targets]);
+ const [submission,setSubmission]=useState(''),[submitting,setSubmitting]=useState(false),[submissionMessage,setSubmissionMessage]=useState('');
  const preferences=client.getQueryData<{maximum:number;availability:string;sort:string;inactive?:string}>(['levelling-preferences']);
  const [maximum,setMaximum]=useState(preferences?.maximum??0),[availability,setAvailability]=useState(preferences?.availability==='Recently active'||preferences?.availability==='Activity unknown'?'All':preferences?.availability??'All'),[sort,setSort]=useState(preferences?.sort??'stats'),[inactive,setInactive]=useState(preferences?.inactive??(preferences?.availability==='Recently active'?'recent':preferences?.availability==='Activity unknown'?'unknown':'any'));
  useEffect(()=>{client.setQueryData(['levelling-preferences'],{maximum,availability,sort,inactive});},[maximum,availability,sort,inactive]);
@@ -30,12 +39,12 @@ export default function LevellingCatalogue(){
    try{restored[id]=targetObservation(id,{endpoint_id:row.endpoint_id,payload:row.payload,fetched_at:row.fetched_at,parameters:{id:String(id)},next_parameters:null});}catch{}
   }
   setObservations(old=>mergeTargetObservations(old,restored));
- },[cache.data]);
+ },[cache.data,targetIds]);
  const mode=chosenMode??(connection.status.data?.hasStoredKey?'stored':'request');
  const ready=!!cache.owner&&(mode!=='stored'||connection.status.data?.hasStoredKey!==false)&&(mode==='stored'||/^[A-Za-z0-9]{16}$/.test(key));
- const catalogueRows=useMemo(()=>STARTER_TARGETS.filter(t=>(group==='all'||t.lists?.includes(group))&&(!search.trim()||`${t.name} ${t.id}`.toLowerCase().includes(search.trim().toLowerCase()))),[group,search]);
+ const catalogueRows=useMemo(()=>targets.filter(t=>(group==='all'||t.lists?.includes(group))&&(!search.trim()||`${t.name} ${t.id}`.toLowerCase().includes(search.trim().toLowerCase()))),[targets,group,search]);
  const visible=filterStarterTargets(catalogueRows,observations,maximum,availability,sort,now,inactive);
- const sourceRows=catalogueRows.filter(t=>maximum===0||t.reportedTotal<=maximum);
+ const sourceRows=catalogueRows.filter(t=>maximum===0||(t.reportedTotal!==null&&t.reportedTotal<=maximum));
  const pageCount=Math.max(1,Math.ceil(visible.length/50)),currentPage=Math.min(page,pageCount),visiblePage=visible.slice((currentPage-1)*50,currentPage*50);
  const nextIds=nextTargetChecks(sourceRows,observations,8,now),availableCount=sourceRows.filter(t=>targetAvailability(observations[t.id],now)==='Available').length,unchecked=sourceRows.filter(t=>!observations[t.id]).length;
  async function refresh(ids=nextTargetChecks(sourceRows,observations,8,Date.now())){
@@ -53,9 +62,24 @@ export default function LevellingCatalogue(){
   finally{if(live.current&&control.current===controller&&!controller.signal.aborted)setBusy(false);}
  }
  function stop(){control.current?.abort();setBusy(false);setMessage('Refresh stopped. Checked profiles remain visible.');}
+ async function submitTarget(event:React.FormEvent){
+  event.preventDefault();if(submitting||!cache.owner)return;
+  const playerId=Number(submission),owner=cache.owner;
+  if(!/^\d+$/.test(submission)||!Number.isSafeInteger(playerId)||playerId<1){setSubmissionMessage('Enter a valid Torn player ID.');return;}
+  setSubmitting(true);setSubmissionMessage('');
+  try{
+   const result=await supabase.functions.invoke('submit-levelling-target',{body:{player_id:playerId,...(mode==='request'&&key?{apiKey:key}:{})}});
+   if(result.error||result.data?.error)throw await functionError(result.data,result.error);
+   const session=await supabase.auth.getSession();if(session.data.session?.user.id!==owner)return;
+   await client.invalidateQueries({queryKey:['community-levelling-targets',owner]});
+   setSubmission('');setGroup(COMMUNITY_LIST);setSearch(String(playerId));setMaximum(0);setAvailability('All');setInactive('any');setPage(1);
+   setSubmissionMessage('Player verified and added to the shared levelling list. Last action was at least 10 days ago when verified.');
+  }catch(e){setSubmissionMessage(e instanceof Error?e.message:'Unable to verify this player.');}finally{if(live.current)setSubmitting(false);}
+ }
  const detail=selected?observations[selected]:undefined;
- return <article className="card built-in-targets"><h3>Ready-made levelling lists</h3><p>{STARTER_TARGETS.length} real community-listed targets are included. Select a list below; no list creation or manual IDs are required.</p>
-  <div className="travel-fields"><label>Baldr list<select className="nu-input" value={group} disabled={busy} onChange={e=>setGroup(e.target.value)}><option value="all">All Baldr lists · {STARTER_TARGETS.length} players</option>{BALDR_LISTS.map(list=><option key={list} value={list}>{list}</option>)}</select></label>
+ return <article className="card built-in-targets"><h3>Ready-made levelling lists</h3><p>{targets.length} real community-listed targets are included. Select a list below; no list creation or manual IDs are required.</p>
+  <details className="card"><summary>Add a player voluntarily</summary><p>Enter a Torn player ID. The backend checks their official last-action timestamp and accepts only players inactive for at least 10 full days. The contribution is shared with signed-in users. No battle stats are inferred.</p><form onSubmit={submitTarget}><label>Torn player ID<input className="nu-input" inputMode="numeric" pattern="[0-9]+" required value={submission} disabled={submitting} onChange={e=>setSubmission(e.target.value.trim())}/></label><button className="nu-btn" type="submit" disabled={submitting||busy||!cache.owner}>{submitting?'Verifying last action…':'Verify and add player'}</button></form>{submissionMessage&&<p role="status">{submissionMessage}</p>}{community.error&&<p role="alert">Community submissions could not be loaded. The built-in Baldr lists remain available.</p>}</details>
+  <div className="travel-fields"><label>Baldr list<select className="nu-input" value={group} disabled={busy} onChange={e=>setGroup(e.target.value)}><option value="all">All lists · {targets.length} players</option>{[...BALDR_LISTS,COMMUNITY_LIST].map(list=><option key={list} value={list}>{list}</option>)}</select></label>
   <label>Find player<input className="nu-input" type="search" value={search} disabled={busy} onChange={e=>setSearch(e.target.value)} placeholder="Name or Torn ID"/></label>
   <label>Reported battle total<select className="nu-input" value={maximum} disabled={busy} onChange={e=>setMaximum(Number(e.target.value))}><option value="0">All reported totals</option><option value="100">Starter · reported total up to 100</option><option value="500">Progressing · reported total up to 500</option><option value="1000">Reported total up to 1,000</option></select></label>
   <label>Status filter<select className="nu-input" value={availability} onChange={e=>setAvailability(e.target.value)}>{['All','Available','Not checked','Check again','Hospital','Jail','Traveling','Abroad','Federal'].map(s=><option key={s} value={s}>{s==='Available'?'Okay · checked within 5 minutes':s}</option>)}</select></label>
@@ -70,9 +94,9 @@ export default function LevellingCatalogue(){
   </details>
   {busy&&<progress aria-label="Levelling profiles checked" max={Math.max(1,total)} value={done}/>}{message&&<p role="status">{message}</p>}{error&&<p role="alert">{error}</p>}
   <nav aria-label="Levelling target pages"><p>{visible.length} matching players · Page {currentPage} of {pageCount} · up to 50 per page</p><button className="nu-btn" disabled={currentPage<=1} onClick={()=>setPage(currentPage-1)}>Previous page</button><button className="nu-btn" disabled={currentPage>=pageCount} onClick={()=>setPage(currentPage+1)}>Next page</button></nav>
-  <div className="table-scroll"><table><thead><tr><th>Target</th><th>Level</th><th>Reported battle total</th><th>Live availability</th><th>Last action</th><th>Last checked</th><th>Actions</th></tr></thead><tbody>{visiblePage.map(target=>{const o=observations[target.id],state=targetAvailability(o,now);return <tr key={target.id}><td>{o?.name??target.name}<br/><small>#{target.id}</small></td><td>{o?.level??target.reportedLevel}<br/><small>{o?'API observed':'Community reported'}</small></td><td>{target.reportedTotal.toLocaleString()}<br/><small>Unverified / report date unknown</small></td><td>{state}{state==='Check again'&&o&&<small> · Last observed: {o.state}</small>}</td><td>{o?.lastAction?new Date(o.lastAction*1000).toLocaleString():'Unknown'}{o&&targetInactive(o,30,now)&&<small> · Inactive 30+ days</small>}</td><td>{o?new Date(o.fetchedAt).toLocaleString():'Not checked'}</td><td><a className="nu-btn" href={`https://www.torn.com/page.php?sid=attack&user2ID=${target.id}`} target="_blank" rel="noopener noreferrer" aria-label={`Attack ${o?.name??target.name} in Torn (opens in a new tab)`}>Attack</a><button className="nu-btn" disabled={busy||!ready} onClick={()=>void refresh([target.id])}>Recheck</button><button className="nu-btn" disabled={!o} onClick={()=>setSelected(selected===target.id?null:target.id)}>Details</button><button className="nu-btn" onClick={()=>void navigator.clipboard.writeText(String(target.id)).then(()=>setMessage(`Copied target ID ${target.id}.`)).catch(()=>setError('Clipboard unavailable. The ID is shown in the target row.'))}>Copy ID</button></td></tr>;})}</tbody></table></div>
+  <div className="table-scroll"><table><thead><tr><th>Target</th><th>Level</th><th>Reported battle total</th><th>Live availability</th><th>Last action</th><th>Last checked</th><th>Actions</th></tr></thead><tbody>{visiblePage.map(target=>{const o=observations[target.id],state=targetAvailability(o,now);return <tr key={target.id}><td>{o?.name??target.name}<br/><small>#{target.id}</small></td><td>{o?.level??target.reportedLevel}<br/><small>{o?'API observed':'Community reported'}</small></td><td>{target.reportedTotal===null?'Unknown':target.reportedTotal.toLocaleString()}<br/><small>{target.reportedTotal===null?'Not supplied / not inferred':'Unverified / report date unknown'}</small></td><td>{state}{state==='Check again'&&o&&<small> · Last observed: {o.state}</small>}</td><td>{(o?.lastAction??target.lastAction)?new Date((o?.lastAction??target.lastAction!)*1000).toLocaleString():'Unknown'}{target.verifiedAt&&<small> · Submission verified {new Date(target.verifiedAt).toLocaleString()}</small>}{o&&targetInactive(o,30,now)&&<small> · Inactive 30+ days</small>}</td><td>{o?new Date(o.fetchedAt).toLocaleString():'Not checked'}</td><td><a className="nu-btn" href={`https://www.torn.com/page.php?sid=attack&user2ID=${target.id}`} target="_blank" rel="noopener noreferrer" aria-label={`Attack ${o?.name??target.name} in Torn (opens in a new tab)`}>Attack</a><button className="nu-btn" disabled={busy||!ready} onClick={()=>void refresh([target.id])}>Recheck</button><button className="nu-btn" disabled={!o} onClick={()=>setSelected(selected===target.id?null:target.id)}>Details</button><button className="nu-btn" onClick={()=>void navigator.clipboard.writeText(String(target.id)).then(()=>setMessage(`Copied target ID ${target.id}.`)).catch(()=>setError('Clipboard unavailable. The ID is shown in the target row.'))}>Copy ID</button></td></tr>;})}</tbody></table></div>
   {!visible.length&&<div role="status"><p>{sourceRows.length} targets exist in this list, but none match your current status and inactivity filters. Unchecked profiles cannot match a confirmed status or inactivity requirement.</p><button className="nu-btn" onClick={()=>{setAvailability('All');setInactive('any');}}>Show all {sourceRows.length} targets</button></div>}
   {detail&&<section className="card"><h4>{detail.name} · #{detail.id}</h4><p>Level {detail.level} · {detail.state} · Life {detail.life??'unknown'} / {detail.maximumLife??'unknown'}</p><p>Last action: {detail.lastAction?new Date(detail.lastAction*1000).toLocaleString():'not returned'}. Observed {new Date(detail.fetchedAt).toLocaleString()}.</p></section>}
-  <details><summary>Source and freshness</summary><p>Catalogue: all 15 named lists in the maintained Baldr dataset loaded by OranWeb’s tc-baldrs-levelling-list project. Duplicate player IDs appear once while retaining every list membership. Snapshot retrieved {LEVELLING_SNAPSHOT}; per-target battle-report dates were not supplied. The snapshot date is not a spy date. Names and levels remain reported values until checked. Availability and inactivity may change; battle totals cannot be verified from public profiles. Attack opens the selected player’s official Torn attack page in a new tab. Source: <a href="https://github.com/oranweb/tc-baldrs-levelling-list" target="_blank" rel="noopener noreferrer">OranWeb’s repository</a> and its <a href="https://github.com/Baldr-Geek/Baldrs-List/blob/8edafd4aabdc8e01b32be1e83163a06065822659/data.json" target="_blank" rel="noopener noreferrer">maintained data source</a>. Profile refreshes use your existing authorized Torn connection; no keys are sent to either repository.</p></details>
+  <details><summary>Source and freshness</summary><p>Catalogue: all 15 named lists in the maintained Baldr dataset loaded by OranWeb’s tc-baldrs-levelling-list project. Duplicate player IDs appear once while retaining every list membership. Snapshot retrieved {LEVELLING_SNAPSHOT}; per-target battle-report dates were not supplied. The snapshot date is not a spy date. Names and levels remain reported values until checked. Availability and inactivity may change; battle totals cannot be verified from public profiles. Attack opens the selected player’s official Torn attack page in a new tab. Source: <a href="https://github.com/oranweb/tc-baldrs-levelling-list" target="_blank" rel="noopener noreferrer">OranWeb’s repository</a> and its <a href="https://github.com/Baldr-Geek/Baldrs-List/blob/8edafd4aabdc8e01b32be1e83163a06065822659/data.json" target="_blank" rel="noopener noreferrer">maintained data source</a>. Voluntary contributions pass a server-side 10-day inactivity check at submission; this is not continuous monitoring and players may become active later. Profile refreshes use your existing authorized Torn connection; no keys are sent to either repository.</p></details>
  </article>;
 }

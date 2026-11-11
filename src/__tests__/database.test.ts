@@ -111,6 +111,7 @@ beforeAll(async () => {
   await db.exec("begin;"+readFileSync("supabase/migrations/20261110102735_lucky_draw_automatic_sealed_results.sql", "utf8")+"commit;");
   await db.exec("begin;"+readFileSync("supabase/migrations/20261110104618_lucky_draw_private_results_and_reveal_delay.sql", "utf8")+"commit;");
   await db.exec(readFileSync("supabase/migrations/20261111201917_security_review_fixes.sql","utf8"));
+  await db.exec(readFileSync("supabase/migrations/20261111220325_community_levelling_submissions.sql","utf8"));
   const candidate = await db.query(
     "select table_name as table,column_name as column,data_type as type from information_schema.columns where table_schema='public'",
   );

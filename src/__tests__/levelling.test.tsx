@@ -16,7 +16,7 @@ describe('ready-made levelling catalogue',()=>{
  it('offers ready-made subsets and stable numeric sorting without requiring user setup',()=>{
   const starter=filterStarterTargets(STARTER_TARGETS,{},100,'All','stats',now);
   expect(starter.length).toBeGreaterThan(0);expect(starter.length).toBeLessThan(STARTER_TARGETS.length);
-  expect(starter.every(t=>t.reportedTotal<=100)).toBe(true);
+  expect(starter.every(t=>t.reportedTotal!==null&&t.reportedTotal<=100)).toBe(true);
   const levels=filterStarterTargets(STARTER_TARGETS,{},1000,'All','level',now).map(t=>t.reportedLevel);
   expect(levels).toEqual([...levels].sort((a,b)=>b-a));
   expect(filterStarterTargets(STARTER_TARGETS,{},1000,'Available','stats',now)).toEqual([]);
@@ -87,6 +87,6 @@ describe('complete imported Baldr dataset',()=>{
   const all=filterStarterTargets(STARTER_TARGETS,{},0,'All','stats',now);
   expect(all).toHaveLength(1028);
   expect(all.some(t=>t.reportedTotal===2120394)).toBe(true);
-  expect(filterStarterTargets(STARTER_TARGETS,{},1000,'All','stats',now).some(t=>t.reportedTotal>1000)).toBe(false);
+  expect(filterStarterTargets(STARTER_TARGETS,{},1000,'All','stats',now).some(t=>t.reportedTotal!==null&&t.reportedTotal>1000)).toBe(false);
  });
 });

@@ -8,7 +8,8 @@ import snapshot from './baldr-targets.json';
 export const LEVELLING_SNAPSHOT = '2026-11-12';
 export const BALDR_SOURCE_COMMIT = '8edafd4aabdc8e01b32be1e83163a06065822659';
 export const BALDR_LISTS = Object.keys(snapshot);
-export interface StarterTarget { id:number; name:string; reportedLevel:number; reportedTotal:number; lists?:string[] }
+export interface CatalogueTarget { id:number; name:string; reportedLevel:number; reportedTotal:number|null; lists?:string[];lastAction?:number;verifiedAt?:string }
+export interface StarterTarget extends CatalogueTarget {reportedTotal:number}
 const number=(value:string)=>Number(value.replace(/,/g,''));
 const targets=new Map<number,StarterTarget>();
 for(const [list,records] of Object.entries(snapshot))for(const record of records){
