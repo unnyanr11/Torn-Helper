@@ -908,5 +908,155 @@
     "buy_price": 694270,
     "source": "User screenshot",
     "observed_on": "2026-11-11"
+  },
+  {
+    "id": 271,
+    "name": "Ceibo Flower",
+    "type": "Flower",
+    "country": "Argentina",
+    "shop": "General Store",
+    "buy_price": 500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 407,
+    "name": "Compass",
+    "type": "Other",
+    "country": "Argentina",
+    "shop": "General Store",
+    "buy_price": 2500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 1466,
+    "name": "Lighter",
+    "type": "Tool",
+    "country": "Argentina",
+    "shop": "General Store",
+    "buy_price": 20,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 269,
+    "name": "Monkey Plushie",
+    "type": "Plushie",
+    "country": "Argentina",
+    "shop": "General Store",
+    "buy_price": 400,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 270,
+    "name": "Soccer Ball",
+    "type": "Other",
+    "country": "Argentina",
+    "shop": "General Store",
+    "buy_price": 60,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 255,
+    "name": "Flamethrower",
+    "type": "Secondary",
+    "country": "Argentina",
+    "shop": "Arms Dealer",
+    "buy_price": 3000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 333,
+    "name": "Liquid Body Armor",
+    "type": "Defensive",
+    "country": "Argentina",
+    "shop": "Arms Dealer",
+    "buy_price": 7500000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 391,
+    "name": "Macana",
+    "type": "Melee",
+    "country": "Argentina",
+    "shop": "Arms Dealer",
+    "buy_price": 100000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 256,
+    "name": "Tear Gas",
+    "type": "Temporary",
+    "country": "Argentina",
+    "shop": "Arms Dealer",
+    "buy_price": 15000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 257,
+    "name": "Throwing Knife",
+    "type": "Temporary",
+    "country": "Argentina",
+    "shop": "Arms Dealer",
+    "buy_price": 35000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 196,
+    "name": "Cannabis",
+    "type": "Drug",
+    "country": "Argentina",
+    "shop": "Black Market",
+    "buy_price": 12153,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 1503,
+    "name": "Chalcedony Point",
+    "type": "Artifact",
+    "country": "Argentina",
+    "shop": "Black Market",
+    "buy_price": 101537,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 1488,
+    "name": "Meteorite Fragment",
+    "type": "Artifact",
+    "country": "Argentina",
+    "shop": "Black Market",
+    "buy_price": 468149,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 1487,
+    "name": "Patagonian Fossil",
+    "type": "Artifact",
+    "country": "Argentina",
+    "shop": "Black Market",
+    "buy_price": 545527,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 203,
+    "name": "Shrooms",
+    "type": "Drug",
+    "country": "Argentina",
+    "shop": "Black Market",
+    "buy_price": 5349,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
   }
 ]
