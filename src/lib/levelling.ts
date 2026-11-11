@@ -40,7 +40,7 @@ export function filterStarterTargets(rows:StarterTarget[],observations:Record<nu
   const row=observations[r.id];
   // Accept old saved activity filters while keeping status and inactivity independent.
   const statusMatches=availability==='All'||(availability==='Recently active'?targetActivityMatches(row,'recent',now):availability==='Activity unknown'?targetActivityMatches(row,'unknown',now):targetAvailability(row,now)===availability);
-  return r.reportedTotal<=maximum&&statusMatches&&targetActivityMatches(row,inactive,now);
+  return (maximum===0||r.reportedTotal<=maximum)&&statusMatches&&targetActivityMatches(row,inactive,now);
  }).sort((a,b)=>{
   if(sort==='level')return (observations[b.id]?.level??b.reportedLevel)-(observations[a.id]?.level??a.reportedLevel)||a.reportedTotal-b.reportedTotal;
   if(sort==='name')return (observations[a.id]?.name??a.name).localeCompare(observations[b.id]?.name??b.name);
