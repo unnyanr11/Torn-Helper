@@ -85,7 +85,11 @@ describe("production screens start without generated account or financial data",
       const html = renderToStaticMarkup(
         createElement(QueryClientProvider, { client }, createElement(Page)),
       );
-      expect(html).not.toContain('type="email"');
+      if (html.includes("Account &amp; privacy settings")) {
+        expect(html).toContain("Confirm email address");
+        expect(html).toContain("Confirm password");
+        expect(html).toContain("Continue with Torn");
+      }
       expect(html).not.toContain("App password");
       expect(html).not.toMatch(
         /Member [ABC]|DEMO_WIDGETS|DEMO PREVIEW/,

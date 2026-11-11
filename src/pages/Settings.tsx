@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import AccountRegistration from "../components/AccountRegistration";
 import BrowserTornKeyCard from "../components/BrowserTornKeyCard";
 import {commitVerifiedBrowserKey,removeBrowserTornKey,notifyBrowserKeyChange} from '../lib/browser-torn-key';
 import KeyDisclosure from "../components/KeyDisclosure";
@@ -151,6 +152,8 @@ export default function Settings() {
         </p>
       )}
       {!signedIn ? (
+        <>
+        <AccountRegistration onSignedIn={async()=>{await load();await client.invalidateQueries({queryKey:["torn-connection"]});}}/>
         <article className="card">
           <form
             onSubmit={(e) => {
@@ -162,7 +165,7 @@ export default function Settings() {
             <p>
               Your Torn identity is your account. The first verified sign-in
               creates your app account automatically; later sign-ins return to
-              it. No email address or app password is required.
+              it. Email and password registration above is optional.
             </p>
             <KeyDisclosure persist browserCopy={rememberBrowser} requiredBackend/>
             <label>
@@ -205,6 +208,7 @@ export default function Settings() {
             </p>
           </form>
         </article>
+        </>
       ) : (
         <>
           <article className="card">

@@ -21,7 +21,7 @@ export interface LoginAdmin {
       }): Result<{ user: { id: string } | null }>;
       deleteUser(id: string): Result<unknown>;
       getUserById(id: string): Result<{
-        user: { id: string; email?: string; banned_until?: string } | null;
+        user: { id: string; email?: string; email_confirmed_at?: string; banned_until?: string } | null;
       }>;
       generateLink(attributes: { type: "magiclink"; email: string }): Result<{
         user: { id: string } | null;
@@ -157,6 +157,8 @@ export async function loginWithTorn(
     const user = await admin.auth.admin.getUserById(canonical);
     if (user.error || !user.data.user?.email)
       throw user.error ?? new Error("Account unavailable");
+    if (!user.data.user.email.endsWith('@torn-login.invalid') && !user.data.user.email_confirmed_at)
+      throw new LoginError(403, 'Confirm your registration email before signing in. Use Resend confirmation if needed.');
     const banned = (user.data.user as { banned_until?: string }).banned_until;
     if (banned && Date.parse(banned) > Date.now())
       throw new LoginError(403, "This app account is unavailable.");

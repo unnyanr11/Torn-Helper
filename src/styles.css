@@ -1597,3 +1597,13 @@ details[open] > summary {
 .home-refresh { align-self:flex-start; margin-top:auto; }
 .home-freshness { display:block; padding:5px 8px; border-radius:8px; background:var(--surface); }
 .home-freshness.needs-attention { border-left:3px solid var(--accent); }
+
+.account-registration { max-width: 860px; }
+.registration-tabs { display: flex; flex-wrap: wrap; gap: .75rem; margin-bottom: 1rem; }
+.registration-tabs [aria-pressed="true"] { outline: 2px solid var(--accent, #63c7f7); outline-offset: 2px; }
+.registration-form { display: grid; gap: 1rem; }
+.registration-form label:not(.registration-consent) { display: grid; grid-template-columns: minmax(130px, 1fr) minmax(0, 2fr); gap: 1rem; align-items: center; }
+.registration-form input:not([type="checkbox"]) { width: 100%; min-width: 0; box-sizing: border-box; }
+.registration-consent { display: flex; align-items: flex-start; gap: .6rem; }
+.registration-form > button { justify-self: start; }
+@media (max-width: 600px) { .registration-form label:not(.registration-consent) { grid-template-columns: 1fr; gap: .4rem; } }
