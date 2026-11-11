@@ -42,6 +42,7 @@ export async function registerWithTorn(admin:any, input:Registration, secret:str
   throw new LoginError(503,'Registration could not be completed. Contact the site owner before retrying.');
  }
  if(complete.data!==userId){await admin.auth.admin.deleteUser(userId);throw new LoginError(409,'This Torn player already has an account. Use Continue with Torn.');}
- const sent=await admin.auth.resend({type:'signup',email:input.email});
- return {registered:true,confirmation_sent:!sent.error,message:sent.error?'Account created. The confirmation email could not be sent. Use Resend confirmation below.':'Account created. Check your email to confirm your address, then sign in.'};
+ let delivered=false;
+ try{const sent=await admin.auth.resend({type:'signup',email:input.email});delivered=!sent.error;}catch{/* A mail transport failure must not hide the committed registration. */}
+ return {registered:true,confirmation_sent:delivered,message:!delivered?'Account created. The confirmation email could not be sent. Use Resend confirmation below.':'Account created. Check your email to confirm your address, then sign in.'};
 }

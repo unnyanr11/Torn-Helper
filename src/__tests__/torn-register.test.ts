@@ -39,6 +39,11 @@ describe('verified Torn registration',()=>{
   const admin=backend();admin.auth.resend.mockResolvedValueOnce({error:new Error('delivery')} as any);
   const result=await registerWithTorn(admin,input,secret,upstream);expect(result.confirmation_sent).toBe(false);expect(admin.auth.admin.deleteUser).not.toHaveBeenCalled();
  });
+ it('reports transport failures after account creation as pending email delivery',async()=>{
+  const admin=backend();admin.auth.resend.mockRejectedValueOnce(new Error('network'));
+  expect(await registerWithTorn(admin,input,secret,upstream)).toMatchObject({registered:true,confirmation_sent:false});
+  expect(admin.auth.admin.deleteUser).not.toHaveBeenCalled();
+ });
  it('does not auto-confirm a registered email through the Torn magic-link fallback',async()=>{
   const admin=backend(true);admin.rpc.mockResolvedValueOnce({data:'new',error:null});
   await expect(loginWithTorn(admin as any,input.apiKey,true,secret,upstream)).rejects.toThrow('Confirm your registration email');expect(admin.auth.admin.generateLink).not.toHaveBeenCalled();

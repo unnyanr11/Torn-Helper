@@ -31,7 +31,7 @@ export default function AccountRegistration({onSignedIn}:{onSignedIn:()=>Promise
   {message&&<p role="status">{message}</p>}
   <form className="registration-form" onSubmit={e=>{e.preventDefault();void perform(submit);}}>
    {mode==='register'&&<>
-    <label>Username<input className="nu-input" autoComplete="username" required minLength={3} maxLength={30} pattern="[A-Za-z0-9_-]+" value={username} onChange={e=>setUsername(e.target.value)}/></label>
+    <label>Username<input className="nu-input" autoComplete="username" required minLength={3} maxLength={30} pattern={"[A-Za-z0-9_\\-]+"} value={username} onChange={e=>setUsername(e.target.value)}/></label>
     <label>Torn ID<input className="nu-input" inputMode="numeric" required pattern="[0-9]+" maxLength={16} value={tornId} onChange={e=>setTornId(e.target.value)} aria-describedby="registration-torn-help"/></label>
     <p id="registration-torn-help">The numeric ID on your Torn profile. The key must belong to this player.</p>
     <label>Torn API key<input className="nu-input" type="password" autoComplete="off" spellCheck={false} required minLength={16} maxLength={16} value={apiKey} onChange={e=>setApiKey(e.target.value.trim())}/></label>
