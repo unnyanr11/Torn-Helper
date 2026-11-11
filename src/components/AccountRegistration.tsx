@@ -4,8 +4,8 @@ import { functionError } from '../lib/function-error';
 import KeyDisclosure from './KeyDisclosure';
 
 type Mode='register'|'email';
-export default function AccountRegistration({onSignedIn}:{onSignedIn:()=>Promise<void>}) {
- const [mode,setMode]=useState<Mode>('register'),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
+export default function AccountRegistration({onSignedIn,initialMode="register"}:{onSignedIn:()=>Promise<void>;initialMode?:Mode}) {
+ const [mode,setMode]=useState<Mode>(initialMode),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
  const [username,setUsername]=useState(''),[tornId,setTornId]=useState(''),[apiKey,setApiKey]=useState('');
  const [email,setEmail]=useState(''),[confirmEmail,setConfirmEmail]=useState(''),[password,setPassword]=useState(''),[confirmPassword,setConfirmPassword]=useState(''),[consent,setConsent]=useState(false);
  async function perform(action:()=>Promise<void>){setBusy(true);setMessage('');try{await action();}catch(e){setMessage(e instanceof Error?e.message:'Unable to complete this request.');}finally{setBusy(false);}}

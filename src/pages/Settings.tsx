@@ -7,7 +7,7 @@ import { functionError } from "../lib/function-error";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { downloadBlob } from "../lib/export";
-export default function Settings() {
+export default function Settings({entry=false}:{entry?:boolean}={}) {
   const client=useQueryClient();
   const [key, setKey] = useState(""),
     [message, setMessage] = useState(""),
@@ -145,7 +145,7 @@ export default function Settings() {
   }
   return (
     <section>
-      <h2>Account & privacy settings</h2>
+      <h2>{entry?"Log in or create an account":"Account & privacy settings"}</h2>
       {message && (
         <p role="status" className="badge">
           {message}
@@ -153,7 +153,7 @@ export default function Settings() {
       )}
       {!signedIn ? (
         <>
-        <AccountRegistration onSignedIn={async()=>{await load();await client.invalidateQueries({queryKey:["torn-connection"]});}}/>
+        <AccountRegistration initialMode={entry?"email":"register"} onSignedIn={async()=>{await load();await client.invalidateQueries({queryKey:["torn-connection"]});}}/>
         <article className="card">
           <form
             onSubmit={(e) => {

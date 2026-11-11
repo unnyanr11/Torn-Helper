@@ -1,0 +1,15 @@
+.auth-landing { min-height:100dvh; position:relative; isolation:isolate; padding:clamp(24px,5vw,64px) 20px 24px; box-sizing:border-box; background:var(--bg); color:var(--fg); }
+.auth-glow { position:absolute; inset:0; z-index:-1; pointer-events:none; background:radial-gradient(ellipse at 15% 5%,#9274ed1f,transparent 55%),radial-gradient(ellipse at 95% 80%,#42bdd416,transparent 50%); }
+.auth-brand { display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:32px; font-weight:700; font-size:22px; letter-spacing:-.02em; }
+.auth-brand small { display:block; font-size:8px; letter-spacing:.14em; color:var(--muted); margin-top:5px; }
+.auth-brand .galaxy-mark { color:var(--fg); flex-shrink:0; }
+.auth-content { max-width:820px; margin:0 auto; }
+.auth-content > section > h2 { text-align:center; font-size:clamp(24px,4vw,34px); letter-spacing:-.035em; margin:0 0 24px; }
+.auth-content .card { margin-bottom:20px; padding:clamp(20px,4vw,36px); }
+.auth-content .account-registration { max-width:none; }
+.auth-content .registration-tabs { margin-bottom:24px; }
+.auth-content .registration-tabs > button { flex:1; }
+.auth-content input:not([type="checkbox"]) { box-sizing:border-box; max-width:100%; }
+.auth-content p { line-height:1.65; }
+.auth-footer { text-align:center; font-size:12px; color:var(--muted); margin-top:32px; }
+@media (max-width:600px) { .auth-brand { margin-bottom:24px; }.auth-content .registration-tabs { gap:10px; } }

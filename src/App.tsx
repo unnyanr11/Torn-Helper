@@ -71,7 +71,8 @@ const AllianceSharing = lazy(() => import("./pages/AllianceSharing"));
 const RetentionTrends = lazy(() => import("./pages/RetentionTrends"));
 const ArmoryHistory = lazy(() => import("./pages/ArmoryHistory"));
 const LoanReminders = lazy(() => import("./pages/LoanReminders"));
-const Settings = lazy(() => import("./pages/Settings"));
+import Settings from "./pages/Settings";
+import AuthLanding from "./components/AuthLanding";
 const PlayerIntel = lazy(() => import("./pages/PlayerIntel"));
 import { canAccessPage } from "./lib/access";
 import { supabase } from "./lib/supabase";
@@ -173,6 +174,15 @@ export default function App() {
     if ("serviceWorker" in navigator)
       navigator.serviceWorker.register("/sw.js").catch(() => {});
   }, []);
+  // Mount the account page beneath the intro so it is ready as the animation ends.
+  // The workspace navigation is mounted only for a session or a published report.
+  if (!sharedToken && (!authReady || authError || !signedIn)) {
+    return <AuthLanding>
+      {!authReady ? <p role="status">Checking session…</p>
+        : authError ? <div className="card" role="alert"><h1>Unable to check your session</h1><p>{authError}</p><button className="nu-btn" onClick={()=>window.location.reload()}>Try again</button></div>
+        : <Settings entry/>}
+    </AuthLanding>;
+  }
   return (
     <SpatialShell
       key={accountId??"signed-out"}
@@ -190,12 +200,6 @@ export default function App() {
       <Suspense fallback={<p role="status">Loading workspace…</p>}>
         {sharedToken ? (
           <SharedReport token={sharedToken} />
-        ) : !authReady ? (
-          <p role="status">Checking session…</p>
-        ) : authError ? (
-          <p role="alert">{authError}</p>
-        ) : !signedIn ? (
-          <Settings />
         ) : !canAccessPage(page, signedIn, role) ? (
           <p role="alert">Your account does not have access to this page.</p>
         ) : (
