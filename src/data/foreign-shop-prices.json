@@ -1058,5 +1058,175 @@
     "buy_price": 5349,
     "source": "User screenshot",
     "observed_on": "2026-11-11"
+  },
+  {
+    "id": 430,
+    "name": "Coconut Bra",
+    "type": "Clothing",
+    "country": "Hawaii",
+    "shop": "General Store",
+    "buy_price": 750000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 421,
+    "name": "Large Suitcase",
+    "type": "Enhancer",
+    "country": "Hawaii",
+    "shop": "General Store",
+    "buy_price": 10000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 420,
+    "name": "Medium Suitcase",
+    "type": "Enhancer",
+    "country": "Hawaii",
+    "shop": "General Store",
+    "buy_price": 4000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 264,
+    "name": "Orchid",
+    "type": "Flower",
+    "country": "Hawaii",
+    "shop": "General Store",
+    "buy_price": 700,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 265,
+    "name": "Pele Charm",
+    "type": "Other",
+    "country": "Hawaii",
+    "shop": "General Store",
+    "buy_price": 2000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 419,
+    "name": "Small Suitcase",
+    "type": "Enhancer",
+    "country": "Hawaii",
+    "shop": "General Store",
+    "buy_price": 2000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 241,
+    "name": "Bushmaster Carbon 15",
+    "type": "Primary",
+    "country": "Hawaii",
+    "shop": "Arms Dealer",
+    "buy_price": 15000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 242,
+    "name": "HEG",
+    "type": "Temporary",
+    "country": "Hawaii",
+    "shop": "Arms Dealer",
+    "buy_price": 20000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 243,
+    "name": "Taurus PT92",
+    "type": "Secondary",
+    "country": "Hawaii",
+    "shop": "Arms Dealer",
+    "buy_price": 600,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 240,
+    "name": "Type 98 Anti Tank",
+    "type": "Secondary",
+    "country": "Hawaii",
+    "shop": "Arms Dealer",
+    "buy_price": 25000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 1502,
+    "name": "Basalt Point",
+    "type": "Artifact",
+    "country": "Hawaii",
+    "shop": "Black Market",
+    "buy_price": 107811,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 196,
+    "name": "Cannabis",
+    "type": "Drug",
+    "country": "Hawaii",
+    "shop": "Black Market",
+    "buy_price": 9653,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 199,
+    "name": "LSD",
+    "type": "Drug",
+    "country": "Hawaii",
+    "shop": "Black Market",
+    "buy_price": 22971,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 201,
+    "name": "PCP",
+    "type": "Drug",
+    "country": "Hawaii",
+    "shop": "Black Market",
+    "buy_price": 8022,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 1485,
+    "name": "Shark Fin",
+    "type": "Other",
+    "country": "Hawaii",
+    "shop": "Black Market",
+    "buy_price": 20348,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 204,
+    "name": "Speed",
+    "type": "Drug",
+    "country": "Hawaii",
+    "shop": "Black Market",
+    "buy_price": 6184,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
+  },
+  {
+    "id": 1486,
+    "name": "Turtle Shell",
+    "type": "Other",
+    "country": "Hawaii",
+    "shop": "Black Market",
+    "buy_price": 68705,
+    "source": "User screenshot",
+    "observed_on": "2026-11-11"
   }
 ]
