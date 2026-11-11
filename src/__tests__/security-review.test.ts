@@ -13,6 +13,7 @@ beforeAll(async()=>{
  for(const f of ['0016_alliances.sql','0021_graffiti.sql','0046_ai_war_analyzer.sql'])await db.exec(readFileSync('supabase/migrations/'+f,'utf8'));
  await db.exec('grant all on all tables in schema public to authenticated,service_role;');
  await db.exec(readFileSync('supabase/migrations/20261111201917_security_review_fixes.sql','utf8'));
+ await db.exec(readFileSync('supabase/migrations/20261111221448_torn_published_request_limits.sql','utf8'));
  await db.query('insert into profiles(id) values($1),($2),($3)',[a,b,c]);
 });
 afterAll(()=>db.close());
@@ -23,9 +24,20 @@ describe('service-only atomic budgets',()=>{
   expect((await db.query<any>("select attempts from private.torn_login_limits where scope='global'")).rows[0].attempts).toBe(31);
  });
  it('keeps rejected user requests out of the global Torn counter',async()=>{
-  for(let i=0;i<100;i++)await db.query('select private.consume_torn_data_budget($1,1)',[a]);
-  expect((await db.query<any>("select attempts from private.torn_data_budgets where scope='global'")).rows[0].attempts).toBe(60);
+  await db.exec('delete from private.torn_data_budgets');
+  for(let i=0;i<101;i++)await db.query('select private.consume_torn_data_budget($1,1)',[a]);
+  expect((await db.query<any>("select attempts from private.torn_data_budgets where scope='global'")).rows[0].attempts).toBe(100);
   expect((await db.query<any>('select private.consume_torn_data_budget($1,1) allowed',[b])).rows[0].allowed).toBe(true);
+ });
+ it('accepts exactly 5,000 shared calls and counts login calls in the same allowance',async()=>{
+  await db.exec('delete from private.torn_data_budgets;delete from private.torn_login_limits');
+  const rows=(await db.query<any>("select private.consume_torn_data_budget(('00000000-0000-4000-8000-'||lpad((n/20+1)::text,12,'0'))::uuid,5) as allowed from generate_series(0,999) n")).rows;
+  expect(rows.every(r=>r.allowed)).toBe(true);
+  expect((await db.query<any>('select private.consume_torn_data_budget($1,1) allowed',[c])).rows[0].allowed).toBe(false);
+  expect((await db.query<any>('select private.consume_torn_login_budget($1,$2) allowed',['d'.repeat(64),'e'.repeat(64)])).rows[0].allowed).toBe(false);
+  await db.exec('delete from private.torn_data_budgets;delete from private.torn_login_limits');
+  expect((await db.query<any>('select private.consume_torn_login_budget($1,$2) allowed',['d'.repeat(64),'e'.repeat(64)])).rows[0].allowed).toBe(true);
+  expect((await db.query<any>("select attempts from private.torn_data_budgets where scope='global'")).rows[0].attempts).toBe(2);
  });
  it('caps parallel upstream calls and binds cleanup tokens to their owner',async()=>{
   const tokens:string[]=[];for(let i=0;i<6;i++)tokens.push((await db.query<any>('select private.torn_request_slot($1) token',[a])).rows[0].token);

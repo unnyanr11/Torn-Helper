@@ -112,6 +112,7 @@ beforeAll(async () => {
   await db.exec("begin;"+readFileSync("supabase/migrations/20261110104618_lucky_draw_private_results_and_reveal_delay.sql", "utf8")+"commit;");
   await db.exec(readFileSync("supabase/migrations/20261111201917_security_review_fixes.sql","utf8"));
   await db.exec(readFileSync("supabase/migrations/20261111220325_community_levelling_submissions.sql","utf8"));
+  await db.exec(readFileSync("supabase/migrations/20261111221448_torn_published_request_limits.sql","utf8"));
   const candidate = await db.query(
     "select table_name as table,column_name as column,data_type as type from information_schema.columns where table_schema='public'",
   );
@@ -972,7 +973,7 @@ describe("all-section Torn observations", () => {
     ).rejects.toThrow(/permission denied/);
   });
   it("counts request-only identity checks in the per-user request budget", async () => {
-    for (let n = 0; n < 20; n++)
+    for (let n = 0; n < 33; n++)
       expect(
         (
           await asService(
