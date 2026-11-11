@@ -1,3 +1,4 @@
+import { budgetedTornFetch } from '../_shared/torn-budget.ts';
 import {
   adminClient,
   authenticate,
@@ -73,7 +74,7 @@ Deno.serve(async (req) => {
         let complete = false;
         const attacks = [];
         for (let page = 0; page < 20; page++) {
-          const payload = await tornGet(path, apiKey);
+          const payload = await tornGet(path, apiKey, budgetedTornFetch(admin,sellerId));
           attacks.push(...normalizeAttacks(payload));
           const next = payload._metadata?.links?.next;
           if (!next) {

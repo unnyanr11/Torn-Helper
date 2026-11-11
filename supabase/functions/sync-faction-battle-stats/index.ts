@@ -1,3 +1,4 @@
+import {budgetedTornFetch} from '../_shared/torn-budget.ts';
 import {adminClient,scheduled,preflight,json} from '../_shared/http.ts';
 import {resolveRefreshKey} from '../_shared/live-refresh.ts';
 import {compileTornRequest,fetchTornPage,requestHash} from '../_shared/torn-data.ts';
@@ -17,12 +18,11 @@ Deno.serve(async(req)=>{
    const result=await runBattleJob(job,{act,load:async(endpoint,parameters={},fresh=false)=>{
     const hash=await requestHash(endpoint,parameters);
     if(!fresh){const saved=await admin.from('torn_data_cache').select('fetched_at').eq('user_id',job.user_id).eq('request_hash',hash).maybeSingle();if(saved.error)throw saved.error;if(saved.data&&Date.now()-Date.parse(saved.data.fetched_at)<60000)return;}
-    const budget=await admin.rpc('consume_torn_data_budget',{owner_id:job.user_id,cost:1});if(budget.error||budget.data!==true)throw new Error('Budget unavailable');
     key??=await resolveRefreshKey(admin,job.user_id,undefined,Deno.env.get('TORN_KEY_ENCRYPTION_KEY'));
     const compiled=compileTornRequest(endpoint,parameters);
     // Reconciliation alone bypasses upstream stat caching; the stored record remains a current baseline.
     const path=fresh?compiled.path+(compiled.path.includes('?')?'&':'?')+'timestamp='+Math.floor(Date.now()/1000):compiled.path;
-    const payload=await fetchTornPage(path,key);
+    const payload=await fetchTornPage(path,key,budgetedTornFetch(admin,job.user_id));
     const r=await admin.rpc('store_torn_data',{owner_id:job.user_id,hash,endpoint,params:parameters,observation:payload});if(r.error)throw r.error;
    }});
    if(result==='updated')updated++;else if(result==='paused')paused++;else skipped++;

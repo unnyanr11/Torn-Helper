@@ -1,3 +1,4 @@
+import {budgetedTornFetch} from './torn-budget.ts';
 import { adminClient } from "./http.ts";
 import { resolveRefreshKey } from "./live-refresh.ts";
 import {
@@ -33,16 +34,6 @@ export async function syncLuckyDrawPage(
       409,
       "Resume tracking in Settings before syncing received logs.",
     );
-  const budget = await admin.rpc("consume_torn_data_budget", {
-    owner_id: owner,
-    cost: 2,
-  });
-  if (budget.error) throw budget.error;
-  if (budget.data !== true)
-    throw new LoginError(
-      429,
-      "Request limit reached. Wait a minute and retry.",
-    );
   const job = await admin.rpc("prepare_lucky_draw_sync", {
     owner_id: owner,
     draw_id: campaign,
@@ -55,12 +46,13 @@ export async function syncLuckyDrawPage(
     undefined,
     Deno.env.get("TORN_KEY_ENCRYPTION_KEY"),
   );
-  const catalogue = await tornGet("/torn/logtypes", key);
+  const catalogue = await tornGet("/torn/logtypes", key,budgetedTornFetch(admin,owner));
   const logTypes = receivedLogTypeIds(catalogue);
   const payload = await tornGet(
     "/user/log?" +
       new URLSearchParams({ ...job.data.parameters, log: logTypes }),
     key,
+    budgetedTornFetch(admin,owner),
   );
   let next;
   try {

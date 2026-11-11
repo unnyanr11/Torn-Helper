@@ -45,12 +45,12 @@ export default function KeyDisclosure({
             </td>
             <td>
               {requiredBackend
-                ? `Encrypted backend storage is required while the app account is active; the server key is never returned to the frontend. ${browserCopy?'A separate user-entered copy is also saved in this browser.':'This form will not retain a browser copy.'} Account deletion removes the backend key; key revocation is available in Torn.`
+                ? `Encrypted backend storage is required while the app account is active; the server key is never returned to the frontend. ${browserCopy?'A separate user-entered copy is also held in page memory until reload or sign-out.':'This form will not retain a browser copy.'} Account deletion removes the backend key; key revocation is available in Torn.`
                 : persist
-                ? browserCopy ? "A separate copy of your entered key is saved in this browser. The backend copy is encrypted for updates and is never downloaded or returned to the frontend. Use a trusted device." : "Encrypted on the server until removed; the server copy is never returned to the browser. A separate copy saved in Settings may exist on this device."
+                ? browserCopy ? "A separate copy of your entered key is held in page memory until reload or sign-out. The backend copy is encrypted for updates and is never downloaded or returned to the frontend. Use a trusted device." : "Encrypted on the server until removed; the server copy is never returned to the browser. A separate copy held in Settings may exist for this session."
                 : session
-                  ? "This form keeps the request-only key in page memory until you leave or reload; it does not persist it. Copies saved separately in Settings are unchanged."
-                  : "This form uses the key for this request only and does not save it. Copies saved separately in Settings are unchanged."}
+                  ? "This form keeps the request-only key in page memory until you leave or reload; it does not persist it. Session copies entered separately in Settings are unchanged."
+                  : "This form uses the key for this request only and does not save it. Session copies entered separately in Settings are unchanged."}
             </td>
             <td>
               Minimal or Limited access for sign-in. Limited selections are

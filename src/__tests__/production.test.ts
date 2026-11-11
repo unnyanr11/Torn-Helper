@@ -1,3 +1,4 @@
+import {readFileSync} from 'node:fs';
 import { describe, it, expect, vi } from "vitest";
 import { validateClientConfig } from "../lib/config";
 import { canAccessPage } from "../lib/access";
@@ -95,4 +96,21 @@ describe("production screens start without generated account or financial data",
     }
     client.clear();
   });
+});
+
+
+describe('production content security policy',()=>{
+ it('allows the actual backend while excluding inline scripts and arbitrary connections',()=>{
+  const config=JSON.parse(readFileSync('vercel.json','utf8'));
+  const headers=config.headers.find((r:any)=>r.source==='/(.*)').headers;
+  const policy=headers.find((h:any)=>h.key==='Content-Security-Policy').value;
+  expect(policy).toContain("script-src 'self';");
+  expect(policy).toContain("script-src-attr 'none'");
+  expect(policy).toContain("object-src 'none'");
+  expect(policy).toContain("frame-ancestors 'none'");
+  expect(policy).toContain('https://caxhhhtrlqfuatraamto.supabase.co');
+  expect(policy).not.toContain('unsafe-eval');
+  expect(policy).not.toMatch(/script-src[^;]*unsafe-inline/);
+  expect(policy).not.toMatch(/connect-src[^;]*\*/);
+ });
 });

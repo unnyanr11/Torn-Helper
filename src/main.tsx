@@ -1,3 +1,4 @@
+import {purgeLegacyBrowserKeys} from './lib/browser-torn-key';
 import React,{useEffect,useState,type ComponentType} from "react";
 import StartupExperience from "./components/StartupExperience";
 import { createRoot } from "react-dom/client";
@@ -5,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ErrorBoundary from "./components/ErrorBoundary";
 import "./styles.css";
 import "./cosmic.css";
+try{purgeLegacyBrowserKeys(localStorage);}catch{console.warn('Browser storage cleanup was blocked. Clear this site’s storage to remove legacy Torn key copies.');}
 const root = createRoot(document.getElementById("root")!);
 const queryClient = new QueryClient({
   defaultOptions: {

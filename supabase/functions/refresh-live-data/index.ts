@@ -1,3 +1,4 @@
+import { budgetedTornFetch } from '../_shared/torn-budget.ts';
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
 import {
   collectOverview,
@@ -50,6 +51,7 @@ Deno.serve(async (req) => {
       user.id,
       apiKey,
       Deno.env.get("TORN_KEY_ENCRYPTION_KEY"),
+      budgetedTornFetch(admin,user.id),
     );
     if (
       cache &&
@@ -63,8 +65,8 @@ Deno.serve(async (req) => {
       });
     const payload =
       feed_type === "overview"
-        ? await collectOverview(key)
-        : await tornGet(endpoints[feed_type], key);
+        ? await collectOverview(key,budgetedTornFetch(admin,user.id))
+        : await tornGet(endpoints[feed_type], key,budgetedTornFetch(admin,user.id));
     const fetched_at = new Date().toISOString();
     let history_recorded = false;
     if (feed_type === "overview") {

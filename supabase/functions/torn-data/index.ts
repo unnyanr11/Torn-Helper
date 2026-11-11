@@ -1,3 +1,4 @@
+import { budgetedTornFetch } from '../_shared/torn-budget.ts';
 import { adminClient, authenticate, json, preflight } from "../_shared/http.ts";
 import { personalStatValues } from "../_shared/history.ts";
 import { LoginError } from "../_shared/torn-login.ts";
@@ -33,21 +34,12 @@ Deno.serve(async (req) => {
         409,
         "Tracking is paused. Resume it in Settings before fetching Torn data.",
       );
-    const budget = await admin.rpc("consume_torn_data_budget", {
-      owner_id: user.id,
-      cost: body.apiKey === undefined ? 1 : 3,
-    });
-    if (budget.error) throw budget.error;
-    if (budget.data !== true)
-      throw new LoginError(
-        429,
-        "Request limit reached. Wait a minute before loading more Torn data.",
-      );
     const key = await resolveRefreshKey(
       admin,
       user.id,
       body.apiKey,
       Deno.env.get("TORN_KEY_ENCRYPTION_KEY"),
+      budgetedTornFetch(admin,user.id),
     );
     if (Object.values(compiled.parameters).some((value) => value.includes(key)))
       throw new LoginError(400, "Do not put an API key in section parameters.");
@@ -63,7 +55,7 @@ Deno.serve(async (req) => {
       cached.data && Date.now() - Date.parse(cached.data.fetched_at) < 60000;
     const payload = fresh
       ? cached.data!.payload
-      : await fetchTornPage(compiled.path, key);
+      : await fetchTornPage(compiled.path, key,budgetedTornFetch(admin,user.id));
     let fetched_at = fresh ? cached.data!.fetched_at : "";
     if (!fresh) {
       const saved = await admin.rpc("store_torn_data", {

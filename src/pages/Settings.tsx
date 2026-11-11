@@ -71,7 +71,7 @@ export default function Settings() {
   }
   async function activeOwner(){const session=await supabase.auth.getSession();return session.data.session?.user.id??null;}
   async function saveBrowserCopy(account:string,tornId:number,submitted:string,retained:boolean){
-    try{await commitVerifiedBrowserKey({ownerId:account,tornId,key:submitted,persist:retained},activeOwner,()=>localStorage);notifyBrowserKeyChange(account);return retained?' Browser copy saved; backend copy is encrypted.':' Browser copy not retained; encrypted backend storage remains enabled.';}
+    try{await commitVerifiedBrowserKey({ownerId:account,tornId,key:submitted,persist:retained},activeOwner,()=>localStorage);notifyBrowserKeyChange(account);return retained?' Temporary copy held in session memory; backend copy is encrypted.':' Session copy not retained; encrypted backend storage remains enabled.';}
     catch{return retained?' The backend copy is encrypted, but this browser could not save its copy. Background updates can still use the backend copy.':' The encrypted backend copy is retained. This browser could not confirm removal of an older local copy; clear this site’s browser storage.';}
   }
   async function signIn() {
@@ -185,10 +185,10 @@ export default function Settings() {
                 checked={rememberBrowser}
                 onChange={(e) => setRememberBrowser(e.target.checked)}
               />
-              Also save a copy in this browser (optional)
+              Keep a temporary copy in page memory (clears on reload or sign-out)
             </label>
             <p>
-              Continuing requires encrypted backend key storage while your app account is active. It is used for updates and never returned to the frontend. The optional browser copy comes only from your input; use a trusted device. You can replace the key, pause tracking, delete your account, or revoke the key in Torn.
+              Continuing requires encrypted backend key storage while your app account is active. It is used for updates and never returned to the frontend. The optional session copy comes only from your input and clears on reload or sign-out. You can replace the key, pause tracking, delete your account, or revoke the key in Torn.
             </p>
             <button
               className="nu-btn"
@@ -236,10 +236,10 @@ export default function Settings() {
                 checked={rememberBrowser}
                 onChange={(e) => setRememberBrowser(e.target.checked)}
               />{" "}
-              Also save a copy in this browser (optional)
+              Keep a temporary copy in page memory (clears on reload or sign-out)
             </label>
             <p>
-              The encrypted backend copy is required while your app account is active. This checkbox controls only the separate browser copy. There is no standalone backend-key removal action. You can replace your key, pause tracking, delete your account, or revoke the key in Torn.
+              The encrypted backend copy is required while your app account is active. This checkbox controls only the temporary copy in page memory. There is no standalone backend-key removal action. You can replace your key, pause tracking, delete your account, or revoke the key in Torn.
             </p>
             <button
               className="nu-btn"

@@ -1,3 +1,4 @@
+import {clearBrowserTornKeys} from './lib/browser-torn-key';
 import { cancelTornRequests } from "./lib/torn-request-state";
 import SpatialShell from "./components/SpatialShell";
 import TornDataShortcut from "./components/TornDataShortcut";
@@ -101,6 +102,7 @@ export default function App() {
         if (disposed || version !== refreshVersion) return;
         const nextIdentity = session?.user.id ?? null;
         if (identityRef.current !== nextIdentity) {
+          if(identityRef.current)clearBrowserTornKeys();
           cancelTornRequests(queryClient);
           queryClient.clear();
           setRole("user");
@@ -137,6 +139,7 @@ export default function App() {
         setAuthReady(false);
         setSignedIn(false);
         setRole("user");
+        clearBrowserTornKeys();
         cancelTornRequests(queryClient);
         queryClient.clear();
       }

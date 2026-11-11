@@ -1,3 +1,5 @@
+import { LoginError } from '../_shared/torn-login.ts';
+import { budgetedTornFetch } from '../_shared/torn-budget.ts';
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
 import { decryptBackendTornKey } from "../_shared/torn-key-storage.ts";
 import { tornGet } from "../_shared/torn.ts";
@@ -53,6 +55,7 @@ Deno.serve(async (req) => {
       const payload = await tornGet(
         `/user/${entry.torn_player_id}/profile`,
         apiKey,
+        budgetedTornFetch(admin,user.id),
       );
       const player = payload.profile;
       if (!player) continue;
@@ -85,7 +88,8 @@ Deno.serve(async (req) => {
       message:
         "Refreshes up to 20 oldest targets; observations younger than one minute are reused",
     });
-  } catch {
+  } catch (error) {
+    if(error instanceof LoginError)return json({error:error.message},error.status);
     return json(
       {
         error:

@@ -1,3 +1,4 @@
+import { budgetedTornFetch } from '../_shared/torn-budget.ts';
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
 import { retentionPolicyError } from "../_shared/torn-key-policy.ts";
 import { tornEncryptionSecret } from "../_shared/torn-key-storage.ts";
@@ -15,7 +16,7 @@ Deno.serve(async (req) => {
       return json({ error: "Enter a 16-character Torn key" }, 400);
     const policyError=retentionPolicyError(persist);if(policyError)return json({error:policyError},409);
     const secret=await tornEncryptionSecret(admin,Deno.env.get("TORN_KEY_ENCRYPTION_KEY"));
-    const verified = await verifiedTornIdentity(apiKey);
+    const verified = await verifiedTornIdentity(apiKey,budgetedTornFetch(admin,user.id));
     const basic = { id: verified.id, name: verified.name };
     const access = verified.access;
     const current = await admin

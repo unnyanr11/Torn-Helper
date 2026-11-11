@@ -43,9 +43,8 @@ export default function Alliances() {
     if (!newName.trim()) { setError('Enter an alliance name'); return; }
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setError('Not signed in'); return; }
-    const { data, error } = await supabase.from('alliances').insert({ name: newName.trim(), tag: newTag.trim() || null, created_by: user.id }).select().single();
+    const { data, error } = await supabase.rpc('create_alliance',{alliance_name:newName.trim(),alliance_tag:newTag.trim()||null});
     if (error) { setError(error.message); return; }
-    await supabase.from('alliance_members').insert({ alliance_id: data.id, user_id: user.id, role: 'leader' });
     setNewName(''); setNewTag('');
     load();
   }

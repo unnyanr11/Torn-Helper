@@ -1,3 +1,4 @@
+import {alertHour,quietHour,isolatedAlertRules} from '../_shared/alert-isolation.ts';
 import {
   adminClient,
   authenticate,
@@ -17,35 +18,30 @@ Deno.serve(async (req) => {
       .from("alert_rules")
       .select("*")
       .eq("enabled", true)
+      .order("last_evaluated_at",{ascending:true,nullsFirst:true})
+      .order("id")
       .limit(500);
     if (user) query = query.eq("user_id", user.id);
     const { data: rules, error } = await query;
     if (error) throw error;
     let notified = 0,
       evaluated = 0;
-    for (const rule of rules ?? []) {
+    const failed=await isolatedAlertRules(rules??[],async(rule)=>{
       const { data: profile } = await admin
         .from("profiles")
         .select("tracking_paused,timezone")
         .eq("id", rule.user_id)
         .single();
-      if (profile?.tracking_paused) continue;
-      const hour = Number(
-        new Intl.DateTimeFormat("en-GB", {
-          hour: "2-digit",
-          hour12: false,
-          timeZone: profile?.timezone ?? "UTC",
-        }).format(new Date()),
-      );
-      const a = rule.quiet_hours_start,
-        b = rule.quiet_hours_end;
+      if (profile?.tracking_paused) return;
+      const hour=alertHour(profile?.timezone);
+      const a=quietHour(rule.quiet_hours_start),b=quietHour(rule.quiet_hours_end);
       if (
         a != null &&
         b != null &&
         a !== b &&
         (a < b ? hour >= a && hour < b : hour >= a || hour < b)
       )
-        continue;
+        return;
       evaluated++;
       let message = "";
       let signature = "";
@@ -99,7 +95,7 @@ Deno.serve(async (req) => {
       if (rule.condition_type === "loan_due") {
         const day = new Date().toISOString().slice(0, 10);
         const until = new Date(
-          Date.now() + Number(rule.due_soon_days ?? 3) * 86400000,
+          Date.now() + Math.min(365,Math.max(0,Number(rule.due_soon_days)||3)) * 86400000,
         )
           .toISOString()
           .slice(0, 10);
@@ -114,7 +110,7 @@ Deno.serve(async (req) => {
           signature = day;
         }
       }
-      if (!message) continue;
+      if (!message) return;
       // Bucket repeated observations to at most one notification per rule per hour.
       const dedupe_key = `rule:${rule.id}:${signature.slice(0, 13)}`;
       const { data: inserted, error } = await admin
@@ -132,8 +128,9 @@ Deno.serve(async (req) => {
         if (result.error) throw result.error;
         notified++;
       }
-    }
+    },async(rule)=>{const marked=await admin.from("alert_rules").update({last_evaluated_at:new Date().toISOString()}).eq("id",rule.id);if(marked.error)throw marked.error;});
     return json({
+      failed,
       evaluated,
       notified,
       source:

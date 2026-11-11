@@ -1,3 +1,5 @@
+import { LoginError } from '../_shared/torn-login.ts';
+import { budgetedTornFetch } from '../_shared/torn-budget.ts';
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
 import { decryptBackendTornKey } from "../_shared/torn-key-storage.ts";
 import { tornGet } from "../_shared/torn.ts";
@@ -32,6 +34,7 @@ Deno.serve(async (req) => {
         credential.encrypted_key,
         Deno.env.get("TORN_KEY_ENCRYPTION_KEY")!,
       ),
+      budgetedTornFetch(admin,user.id),
     );
     const player = payload.profile;
     if (!player) return json({ error: "Player unavailable" }, 404);
@@ -53,7 +56,8 @@ Deno.serve(async (req) => {
       source: "official API",
       required_permission: "Public Only",
     });
-  } catch {
+  } catch (error) {
+    if(error instanceof LoginError)return json({error:error.message},error.status);
     return json(
       { error: "Player lookup unavailable; check key permissions" },
       503,
