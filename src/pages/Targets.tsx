@@ -1,3 +1,4 @@
+import {useTornKeyMode} from '../hooks/useTornKeyMode';
 import TornConnectionPanel from '../components/TornConnectionPanel';
 import { useQueryClient } from '@tanstack/react-query';
 import { invokeTornData } from '../lib/torn-data-client';
@@ -29,7 +30,7 @@ interface Entry {
 
 export default function Targets() {
   const client=useQueryClient(),pending=useRef<AbortController|null>(null);
-  const [mode,setMode]=useState('stored'),[key,setKey]=useState('');
+  const [mode,setMode]=useTornKeyMode(),[key,setKey]=useState('');
   useEffect(()=>()=>pending.current?.abort(),[]);
   const [layout, setLayout] = useState({
     version: 1,

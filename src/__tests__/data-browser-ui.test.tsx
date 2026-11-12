@@ -32,7 +32,5 @@ it("opens endpoint deep links with the required ID fields", () => {
   expect(html).toContain("Fetch selected data");
 });
 it("connects native trackers to their connected data group", () => {
-  expect(renderToStaticMarkup(<TornDataShortcut page="Stocks" />)).toContain(
-    "Overview?area=Investments",
-  );
+  expect(renderToStaticMarkup(<QueryClientProvider client={new QueryClient()}><TornDataShortcut page="Stocks" /></QueryClientProvider>)).toContain("Collected Torn data for Stocks");
 });

@@ -1,3 +1,4 @@
+import { useTornKeyMode } from '../hooks/useTornKeyMode';
 import { observationKey,type TornObservation } from "../lib/personal-data";
 import SelectEntry from "../components/SelectEntry";
 import { useEffect, useRef, useState } from "react";
@@ -53,7 +54,7 @@ export default function LiveFeeds() {
     [search, setSearch] = useState("");
   const [values, setValues] = useState<Record<string, string>>(()=>!deepLink&&remembered?remembered.values:initialValues()),
     [key, setKey] = useState(""),
-    [keyMode, setKeyMode] = useState("request"),
+    [keyMode, setKeyMode] = useTornKeyMode(),
     [memory, setMemory] = useState(false);
   const [requestedResult, setResult] = useState<Result | null>(null),
     [busy, setBusy] = useState(false),

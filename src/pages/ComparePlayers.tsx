@@ -1,3 +1,4 @@
+import { useTornKeyMode } from '../hooks/useTornKeyMode';
 import PlayerPicker from "../components/PlayerPicker";
 import DateWindowPicker from '../components/DateWindowPicker';
 import { dateBounds,type DateWindow } from '../lib/date-window';
@@ -40,7 +41,7 @@ export default function ComparePlayers() {
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   const [key, setKey] = useState(""),
-    [mode, setMode] = useState("request"),
+    [mode, setMode] = useTornKeyMode(),
     [view, setView] = useState<{ ids: string; days: string } | null>(null);
   const [slots,setSlots]=useState(2);
   const [from,setFrom]=useState(''),[to,setTo]=useState('');

@@ -1,3 +1,4 @@
+import {useTornKeyMode} from '../hooks/useTornKeyMode';
 import { functionError } from "../lib/function-error";
 import TornConnectionPanel from "./TornConnectionPanel";
 import DateWindowPicker from "./DateWindowPicker";
@@ -12,7 +13,7 @@ import { toCsv, downloadBlob } from "../lib/export";
 export default function HistoryExplorer() {
   const client = useQueryClient();
   const connection=useTornConnection();
-  const [window,setWindow]=useState(defaultWindow),[mode,setMode]=useState("stored"),[key,setKey]=useState("");
+  const [window,setWindow]=useState(defaultWindow),[mode,setMode]=useTornKeyMode(),[key,setKey]=useState("");
   let bounds:ReturnType<typeof dateBounds>={},rangeError="";try{bounds=dateBounds(window);}catch(e){rangeError=(e as Error).message;}
   const [metric, setMetric] = useState(""),
     [message, setMessage] = useState(""),

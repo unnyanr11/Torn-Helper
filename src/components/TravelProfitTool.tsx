@@ -1,3 +1,4 @@
+import { useTornKeyMode } from '../hooks/useTornKeyMode';
 import SelectEntry from "./SelectEntry";
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -18,7 +19,7 @@ export default function TravelProfitTool(){
  const cache=useTornChoices(),queryClient=useQueryClient();
  const previous=queryClient.getQueryData<{country:string;category:string;itemId:string;method:FlyMethod;quantity:number;paidLegs:number;fee:number;waiting:number;book:boolean;quote:Quote|null;costOverride:string;timeOverride:string;businessPrice:number|null;businessTime:string}>(['travel-workspace']);
  const [country,setCountry]=useState(previous?.country??'Mexico'),[category,setCategory]=useState(previous?.category??''),[itemId,setItemId]=useState(previous?.itemId??'');
- const [mode,setMode]=useState('request'),[key,setKey]=useState('');
+ const [mode,setMode]=useTornKeyMode(),[key,setKey]=useState('');
  const [method,setMethod]=useState<FlyMethod>(previous?.method??'Standard'),[quantity,setQuantity]=useState(previous?.quantity??10),[paidLegs,setPaidLegs]=useState(previous?.paidLegs??2),[fee,setFee]=useState(previous?.fee??5),[waiting,setWaiting]=useState(previous?.waiting??0),[book,setBook]=useState(previous?.book??false);
  const [costOverride,setCostOverride]=useState(previous?.costOverride??''),[timeOverride,setTimeOverride]=useState(previous?.timeOverride??'');
  const [quote,setQuote]=useState<Quote|null>(previous?.quote??null),[busy,setBusy]=useState(false),[loading,setLoading]=useState(false),[revision,setRevision]=useState(0),[error,setError]=useState(''),[saveMessage,setSaveMessage]=useState(''),[saving,setSaving]=useState(false),[saved,setSaved]=useState<Saved[]>([]);

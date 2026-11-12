@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
       .maybeSingle();
     if (cached.error) throw cached.error;
     const fresh =
-      cached.data && Date.now() - Date.parse(cached.data.fetched_at) < 60000;
+      body.refresh !== true && cached.data && Date.now() - Date.parse(cached.data.fetched_at) < 60000;
     const payload = fresh
       ? cached.data!.payload
       : await fetchTornPage(compiled.path, key,budgetedTornFetch(admin,user.id));

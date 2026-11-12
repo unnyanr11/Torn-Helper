@@ -29,6 +29,12 @@ describe('shared private observations',()=>{
   const cache=client();await invokeTornData(cache,opts());const second=await invokeTornData(cache,opts('/user/bars',{comment:' '}));
   expect(mocks.invoke).toHaveBeenCalledTimes(1);expect(second.data.cached).toBe(true);expect(second.data.fetched_at).toBe(new Date(now).toISOString());
  });
+ it('makes an explicit fresh preparation request even when this section is already cached',async()=>{
+  const cache=client();cache.setQueryData(observationsKey('owner-a'),mergeObservation({},sample()));
+  await invokeTornData(cache,{body:{...opts().body,refresh:true}});
+  expect(mocks.invoke).toHaveBeenCalledTimes(1);expect(mocks.invoke.mock.calls[0][1].body.refresh).toBe(true);
+  expect(mocks.read).not.toHaveBeenCalled();
+ });
  it('fetches expired data and never treats future timestamps as fresh',async()=>{
   const cache=client(),observation=sample('/user/bars',now-61000);cache.setQueryData(observationsKey('owner-a'),mergeObservation({},observation));
   await invokeTornData(cache,opts());expect(mocks.invoke).toHaveBeenCalledTimes(1);expect(isRecent(sample('/user/bars',now+1),60000)).toBe(false);

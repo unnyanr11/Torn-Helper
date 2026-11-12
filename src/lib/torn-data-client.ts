@@ -7,7 +7,7 @@ import { mergeObservation,observationsKey,isRecent } from './observation-cache';
 import type { DataEntry } from './connected-data';
 import { CAPABILITIES } from '../api/capabilities';
 import { ESSENTIAL_PATHS } from './home-dashboard';
-type Options={body:{endpoint_id:string;parameters:Record<string,string>;apiKey?:string};signal?:AbortSignal};
+type Options={body:{endpoint_id:string;parameters:Record<string,string>;apiKey?:string;refresh?:boolean};signal?:AbortSignal};
 const cancelled=()=>new DOMException('Cancelled','AbortError');
 const digest=async(value:string)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value))),n=>n.toString(16).padStart(2,'0')).join('');
 /** Shared by all Torn tools. Secrets exist only in the active request closure. */
@@ -16,17 +16,17 @@ export async function invokeTornData(client:QueryClient,options:Options):Promise
  const {data:{session}}=await supabase.auth.getSession();const owner=session?.user.id;
  if(options.signal?.aborted)throw cancelled();
  if(!owner)throw new Error('Sign in to refresh Torn data.');
- const {endpoint_id,apiKey}=options.body;
+ const {endpoint_id,apiKey,refresh}=options.body;
  const parameters=Object.fromEntries(Object.entries(options.body.parameters).map(([key,value])=>[key,value.trim()]).filter(([,value])=>value!==''));
- const body={endpoint_id,parameters,...(apiKey===undefined?{}:{apiKey})},id=observationKey(endpoint_id,parameters),cacheKey=observationsKey(owner);
+ const body={endpoint_id,parameters,...(refresh?{refresh:true}:{}),...(apiKey===undefined?{}:{apiKey})},id=observationKey(endpoint_id,parameters),cacheKey=observationsKey(owner);
  const entry=client.getQueryData<Record<string,DataEntry>>(cacheKey)?.[id],cached=entry?.observation;
  const essential=ESSENTIAL_PATHS.includes(CAPABILITIES.find(c=>c.id===endpoint_id)?.path??'');
- if(isRecent(cached,60000)&&(!entry?.restored||essential))return {data:{...cached,cached:true},error:null};
+ if(!refresh&&isRecent(cached,60000)&&(!entry?.restored||essential))return {data:{...cached,cached:true},error:null};
  // Fingerprint separates simultaneous requests with different permissions, without retaining a raw key in a map or query key.
  const credential=apiKey===undefined?'stored':await digest(apiKey);
  if(options.signal?.aborted)throw cancelled();
  let jobs=pending.get(client);if(!jobs){jobs=new Map();pending.set(client,jobs);}
- const jobId=JSON.stringify([owner,id,credential]);let job=jobs.get(jobId);
+ const jobId=JSON.stringify([owner,id,credential,!!refresh]);let job=jobs.get(jobId);
  if(job?.controller.signal.aborted){jobs.delete(jobId);job=undefined;}
  if(!job){
   const controller=new AbortController();
@@ -36,7 +36,7 @@ export async function invokeTornData(client:QueryClient,options:Options):Promise
    let result:Result|undefined;
    const path=CAPABILITIES.find(c=>c.id===endpoint_id)?.path;
    // Essentials cannot paginate. Recheck their private database cache inside a cross-tab lock.
-   if(path&&ESSENTIAL_PATHS.includes(path)&&!parameters.timestamp){
+   if(!refresh&&path&&ESSENTIAL_PATHS.includes(path)&&!parameters.timestamp){
     const sorted=Object.fromEntries(Object.entries(parameters).sort(([a],[b])=>a.localeCompare(b)));
     const hash=await digest(JSON.stringify([endpoint_id,sorted]));
     const saved=await supabase.from('torn_data_cache').select('payload,fetched_at').eq('user_id',owner).eq('request_hash',hash).maybeSingle();

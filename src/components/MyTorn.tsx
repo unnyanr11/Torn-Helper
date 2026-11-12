@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { invokeTornData } from '../lib/torn-data-client';
 import { useSavedObservations } from '../hooks/useSavedObservations';
+import { preparationKey } from './AccountPreparation';
+import type { PreparationResult } from '../lib/account-preparation';
 import { useTornConnection } from '../hooks/useTornConnection';
 import { observationsKey, mergeObservation, refreshAfter, nextRefreshPath, type UpdateMode } from '../lib/observation-cache';
 import { isRecent } from '../lib/observation-cache';
@@ -67,7 +69,7 @@ export default function MyTorn({accountId}:{accountId?:string}) {
   const startInitialRefresh=useRef<()=>void>(()=>{});
   startInitialRefresh.current=()=>{void collect('essentials');};
   useEffect(()=>{
-    if(!accountId||connection.owner!==accountId||!connection.status.data?.hasStoredKey||!saved.isSuccess||mode!=='stored'||initialRefresh.current===accountId)return;
+    if(!accountId||client.getQueryData(preparationKey(accountId))||connection.owner!==accountId||!connection.status.data?.hasStoredKey||!saved.isSuccess||mode!=='stored'||initialRefresh.current===accountId)return;
     const timer=setTimeout(()=>{
       if(control.current&&!control.current.signal.aborted)return;
       initialRefresh.current=accountId;
@@ -148,12 +150,14 @@ export default function MyTorn({accountId}:{accountId?:string}) {
   }
   function stop() { control.current?.abort(); control.current=null;setUpdates('off');setBusy(false); setStatus('Collection stopped. Loaded observations remain available.'); void client.invalidateQueries({ queryKey: ['personal-history'] }); }
   function refreshSection(path:string){setTarget(path);if(mode==='stored'||/^[A-Za-z0-9]{16}$/.test(key))void collect('single',path);else{setStatus('Enter your request-only key below to refresh this section.');refreshForm.current?.scrollIntoView?.({block:'center',behavior:'smooth'});keyInput.current?.focus();}}
+  const preparation=accountId?client.getQueryData<PreparationResult>(preparationKey(accountId)):undefined;
   const player = (homeEntry(entries,'/user/profile')?.observation?.payload as any)?.profile;
   const loaded = Object.values(entries).filter(e => e.observation).length, denied = Object.values(entries).filter(e => e.error).length;
   const visible = requests.filter(r => (area === 'All' || r.areas.includes(area)) && `${r.label} ${r.capability.summary}`.toLowerCase().includes(search.toLowerCase()) && (showUnloaded || entries[observationKey(r.capability.id, r.parameters)]));
   return <section className="my-torn">
     <h2>{player?.name ? `${player.name}’s dashboard` : 'My dashboard'}</h2><p>Your daily overview and a useful place to start.</p>
     <div aria-live="polite">
+      {preparation&&preparation.loaded<95&&<p role="status">Setup loaded {preparation.loaded} sections from {preparation.started} requests. {preparation.problem||'Some sections were unavailable or unfinished.'} Available data appears below; retry individual sections when needed.</p>}
       {(saved.isLoading||connection.status.isPending)&&<p role="status">Preparing your Torn dashboard…</p>}
       {status&&<p role="status">{status}</p>}
       {error&&<p role="alert">{error} <button type="button" className="nu-btn" disabled={busy} onClick={()=>void collect('essentials')}>Retry essentials</button> · <a href="#Settings">Check Torn connection</a></p>}

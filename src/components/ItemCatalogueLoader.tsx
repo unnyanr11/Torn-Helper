@@ -1,3 +1,4 @@
+import { useTornKeyMode } from '../hooks/useTornKeyMode';
 import { useEffect,useRef,useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { invokeTornData } from '../lib/torn-data-client';
@@ -7,7 +8,7 @@ import { useItemCatalogue,readSavedCatalogue,type SavedItemCatalogue } from '../
 import { parseItemCatalogue } from '../lib/item-catalogue';
 import TornConnectionPanel from './TornConnectionPanel';
 export default function ItemCatalogueLoader({disabled=false}:{disabled?:boolean}){
- const client=useQueryClient(),catalogue=useItemCatalogue(),[mode,setMode]=useState('request'),[key,setKey]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState(''),[refresh,setRefresh]=useState(false);
+ const client=useQueryClient(),catalogue=useItemCatalogue(),[mode,setMode]=useTornKeyMode(),[key,setKey]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState(''),[refresh,setRefresh]=useState(false);
  const request=useRef<AbortController|null>(null),count=catalogue.data?.item_count??0;
  useEffect(()=>()=>{request.current?.abort();},[]);
  async function load(){

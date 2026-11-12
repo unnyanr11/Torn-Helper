@@ -1,6 +1,7 @@
 import {clearBrowserTornKeys} from './lib/browser-torn-key';
 import { cancelTornRequests } from "./lib/torn-request-state";
 import SpatialShell from "./components/SpatialShell";
+import AccountPreparation from "./components/AccountPreparation";
 import TornDataShortcut from "./components/TornDataShortcut";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { NAV, Page } from "./nav";
@@ -185,6 +186,7 @@ export default function App() {
     </AuthLanding>;
   }
   return (
+    <AccountPreparation key={accountId??"shared"} owner={sharedToken?"":accountId??""}>
     <SpatialShell
       key={accountId??"signed-out"}
       accountId={accountId}
@@ -280,5 +282,6 @@ export default function App() {
         )}
       </Suspense>
     </SpatialShell>
+    </AccountPreparation>
   );
 }
