@@ -117,3 +117,23 @@ describe('saved Canada purchase reference',()=>{
   expect(new Set(FOREIGN_SHOP_PRICES.map(p=>`${p.country}:${p.shop}:${p.id}`)).size).toBe(FOREIGN_SHOP_PRICES.length);
  });
 });
+
+describe('saved China purchase reference',()=>{
+ it('restores all 22 screenshot prices with country-specific observations and no stock assumptions',()=>{
+  const rows=FOREIGN_SHOP_PRICES.filter(p=>p.country==='China');
+  expect(rows).toHaveLength(22);
+  expect(rows.filter(p=>p.shop==='General Store')).toHaveLength(6);
+  expect(rows.filter(p=>p.shop==='Arms Dealer')).toHaveLength(10);
+  expect(rows.filter(p=>p.shop==='Black Market')).toHaveLength(6);
+  expect(rows.every(p=>p.observed_on==='2026-11-12'&&!('stock' in p))).toBe(true);
+  const items=withSavedShopPrices([]);expect(destinationItems(items,'China')).toHaveLength(22);
+  expect(shopQuote(items.find(i=>i.id===274),'China')?.buy_price).toBe(400);
+  expect(shopQuote(items.find(i=>i.id===276),'China')?.buy_price).toBe(5000);
+  expect(shopQuote(items.find(i=>i.id===247),'China')?.buy_price).toBe(16000);
+  expect(shopQuote(items.find(i=>i.id===327),'China')).toMatchObject({shop:'Black Market',buy_price:20215,source:'User screenshot'});
+  expect(shopQuote(items.find(i=>i.id===1494),'China')?.buy_price).toBe(166532);
+  expect(shopQuote(items.find(i=>i.id===200),'China')?.buy_price).toBe(12028);
+  expect(shopQuote(items.find(i=>i.id===200),'Mexico')?.buy_price).toBe(21731);
+  expect(new Set(FOREIGN_SHOP_PRICES.map(p=>`${p.country}:${p.shop}:${p.id}`)).size).toBe(FOREIGN_SHOP_PRICES.length);
+ });
+});
