@@ -22,6 +22,7 @@ const CrimeTracker = lazy(() => import("./pages/CrimeTracker"));
 const FlightTracker = lazy(() => import("./pages/FlightTracker"));
 const Dibs = lazy(() => import("./pages/Dibs"));
 const TargetPools = lazy(() => import("./pages/TargetPools"));
+const PlayerGuides = lazy(() => import("./pages/PlayerGuides"));
 const Glossary = lazy(() => import("./pages/Glossary"));
 const Assistant = lazy(() => import("./pages/Assistant"));
 const Discord = lazy(() => import("./pages/Discord"));
@@ -226,6 +227,7 @@ export default function App() {
             {page === "Dibs" && <Dibs />}
             {page === "Target Pools" && <TargetPools />}
             {page === "Tornipedia" && <Glossary />}
+            {page === "Player Guides" && <PlayerGuides />}
             {page === "Assistant" && <Assistant />}
             {page === "Discord" && <Discord />}
             {page === "Notification Prefs" && <NotificationPrefs />}

@@ -18,6 +18,7 @@ export const NAV = [
   "Dibs",
   "Target Pools",
   "Tornipedia",
+  "Player Guides",
   "Assistant",
   "Discord",
   "Notification Prefs",

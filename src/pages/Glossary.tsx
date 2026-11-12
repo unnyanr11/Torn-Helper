@@ -15,6 +15,7 @@ export default function Glossary() {
   return (
     <section>
       <h2>Tornipedia</h2>
+      <p><a className="nu-btn" href="#Player%20Guides">Read step-by-step player guides →</a></p>
       <p className="muted">Searchable glossary of Torn terms and mechanics. Static reference, no external APIs.</p>
       <article className="card nu-inset">
         <SelectEntry label="Term" value={query} onChange={e=>setQuery(e.target.value)} options={GLOSSARY.filter(g=>category==='all'||g.category===category).map(g=>({value:g.term,label:g.term}))} emptyText="All terms"/>
