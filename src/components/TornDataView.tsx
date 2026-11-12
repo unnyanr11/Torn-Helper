@@ -1,7 +1,9 @@
+import {findStock,stockLabel} from '../lib/stock-catalogue';
 import { useState } from 'react';
 import { dataLabel, numericChange } from '../lib/personal-data';
 const record = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
 function formatted(value: unknown, name: string) {
+  if(['stock_id','stockId'].includes(name)&&findStock(value))return `${stockLabel(value)} [${value}]`;
   if (value === null || value === undefined) return 'Not provided';
   if (typeof value === 'boolean') return value ? 'Yes' : 'No';
   if (typeof value === 'number') {
@@ -10,17 +12,20 @@ function formatted(value: unknown, name: string) {
   }
   return String(value).replace(/<[^>]*>/g, ' ').trim() || 'Empty';
 }
-export default function TornDataView({ value, previous, name = 'Details', depth = 0 }: { value: unknown; previous?: unknown; name?: string; depth?: number }) {
+export default function TornDataView({ value, previous, name = 'Details', depth = 0, stockContext=false }: { value: unknown; previous?: unknown; name?: string; depth?: number; stockContext?:boolean }) {
   const [shown, setShown] = useState(25);
+  const isStock=stockContext||name==='stocks'||name==='stock';
   if (Array.isArray(value)) {
     if (!value.length) return <p className="data-empty">No records returned.</p>;
-    return <div className="data-records"><PriceHistory value={value}/><small>{value.length.toLocaleString()} records in this response</small>{value.slice(0, shown).map((row, index) => <details key={index} open={index < 3 && depth < 2}><summary>{record(row) ? String(row.name ?? row.title ?? row.type ?? row.id ?? `Record ${index + 1}`).replace(/<[^>]*>/g, ' ') : `Record ${index + 1}`}</summary><TornDataView value={row} name={String(index)} depth={depth + 1}/></details>)}{shown < value.length && <button className="nu-btn" onClick={() => setShown(n => n + 25)}>Show 25 more ({value.length - shown} remaining)</button>}</div>;
+    return <div className="data-records"><PriceHistory value={value}/><small>{value.length.toLocaleString()} records in this response</small>{value.slice(0, shown).map((row, index) => <details key={index} open={index < 3 && depth < 2}><summary>{record(row) ? String(row.name ?? (isStock&&findStock(row.id)?stockLabel(row.id):undefined) ?? row.title ?? row.type ?? row.id ?? `Record ${index + 1}`).replace(/<[^>]*>/g, ' ') : `Record ${index + 1}`}</summary><TornDataView value={row} name={String(index)} depth={depth + 1} stockContext={isStock}/></details>)}{shown < value.length && <button className="nu-btn" onClick={() => setShown(n => n + 25)}>Show 25 more ({value.length - shown} remaining)</button>}</div>;
   }
   if (!record(value)) {
     const delta = numericChange(value, previous);
     return <span className="data-value">{formatted(value, name)}{delta !== null && delta !== 0 && <small className="data-delta">{delta > 0 ? '+' : ''}{delta.toLocaleString()} since previous observation</small>}</span>;
   }
-  const entries = Object.entries(value).filter(([key]) => !key.startsWith('_'));
+  const reference=isStock?findStock(value.id):undefined;
+  const displayed=reference?{...value,...(!value.name?{name:reference.name}:{}),...(!value.acronym?{acronym:reference.acronym}:{})}:value;
+  const entries = Object.entries(displayed).filter(([key]) => !key.startsWith('_'));
   const simple = entries.filter(([, v]) => v === null || typeof v !== 'object');
   const nested = entries.filter(([, v]) => v !== null && typeof v === 'object');
   const old = record(previous) ? previous : {};

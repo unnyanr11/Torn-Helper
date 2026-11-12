@@ -1,3 +1,4 @@
+import {stockChoices} from './stock-catalogue';
 import { CAPABILITIES } from '../api/capabilities';
 import { catalogueChoices, type CachedChoiceRow, type Choice } from './torn-choices';
 export type EntrySource = 'player'|'playerName'|'item'|'itemName'|'stock'|'faction'|'factionName'|'companyName'|'upgrade'|'territory'|'oc'|'track';
@@ -13,7 +14,7 @@ export function observedChoices(rows:CachedChoiceRow[],source:EntrySource,catego
   const options=catalogueChoices(filtered,'/torn/items','items');
   return source==='itemName'?mergeChoices(options.map(o=>({value:o.label.replace(/ \[\d+\]$/,''),label:o.label}))):options;
  }
- if(source==='stock')return catalogueChoices(rows,'/torn/stocks','stocks');
+ if(source==='stock')return stockChoices(rows);
  if(source==='track')return catalogueChoices(rows,'/racing/tracks','tracks',true);
  const result:Choice[]=[];
  const add=(record:unknown,byName:boolean,idKey='id')=>{const r=obj(record),id=r[idKey],name=r.name;if(typeof name!=='string'||!name.trim())return;if(byName)result.push({value:name,label:name});else if((typeof id==='number'&&Number.isSafeInteger(id)&&id>0)||typeof id==='string'&&/^\d+$/.test(id))result.push({value:String(id),label:`${name} [${id}]`});};

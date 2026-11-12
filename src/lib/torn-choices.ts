@@ -1,3 +1,4 @@
+import {stockChoices} from './stock-catalogue';
 import { CAPABILITIES } from '../api/capabilities';
 export type Choice = { value:string; label:string };
 export type CachedChoiceRow = { endpoint_id:string; payload:unknown; fetched_at?:string };
@@ -12,7 +13,7 @@ export function catalogueChoices(rows:CachedChoiceRow[], path:string, key:string
 export function parameterChoices(rows:CachedChoiceRow[], path:string, parameter:string):Choice[] {
   if(parameter==='crimeId')return catalogueChoices(rows,'/torn/crimes','crimes');
   if(parameter==='trackId')return catalogueChoices(rows,'/racing/tracks','tracks');
-  if(parameter==='stockId')return catalogueChoices(rows,'/torn/stocks','stocks');
+  if(parameter==='stockId')return stockChoices(rows);
   if(parameter==='propertyTypeId')return catalogueChoices(rows,'/torn/properties','properties');
   if(parameter==='raceId')return catalogueChoices(rows,'/user/races','races');
   if(parameter==='id'||parameter==='ids'){

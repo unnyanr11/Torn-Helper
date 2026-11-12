@@ -13,7 +13,7 @@ describe('choices across all tool forms',()=>{
   const data=[row('/user/{id}/profile',{profile:{id:12,name:'Player'}}),row('/faction/members',{members:[{id:12,name:'Player'},{id:13,name:'Member'}]}),row('/torn/items',{profile:{id:99,name:'Not a player'},items:[{id:1,name:'Item',type:'Medical'}]})];
   expect(observedChoices(data,'player')).toEqual([{value:'13',label:'Member [13]'},{value:'12',label:'Player [12]'}]);
   expect(observedChoices(data,'playerName').map(o=>o.value)).toEqual(['Member','Player']);
-  expect(observedChoices([],'stock')).toEqual([]);
+  expect(observedChoices([],'stock')).toHaveLength(35);
  });
  it('filters actual item options by category and preserves item IDs separately from names',()=>{
   const data=[row('/torn/items',{items:[{id:1,name:'First',type:'Medical'},{id:2,name:'Second',type:'Flower'}]})];

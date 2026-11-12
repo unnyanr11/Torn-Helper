@@ -3,6 +3,9 @@ import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
+import {findStock,stockLabel} from '../lib/stock-catalogue';
+import {useTornChoices} from '../hooks/useTornChoices';
+
 interface Holding {
   id: string;
   stock_id: string;
@@ -11,6 +14,7 @@ interface Holding {
 }
 
 export default function Stocks() {
+  const catalogue=useTornChoices();
   const [holdings, setHoldings] = useState<Holding[]>([]);
   const [stockId, setStockId] = useState("");
   const [shares, setShares] = useState("");
@@ -32,12 +36,12 @@ export default function Stocks() {
 
   async function addHolding() {
     if (!stockId.trim() || !shares) {
-      setError("Enter stock ID and shares");
+      setError("Choose a stock and enter its shares");
       return;
     }
     const { error } = await supabase.from("stock_holdings").upsert(
       {
-        stock_id: stockId.trim(),
+        stock_id: String(findStock(stockId,catalogue.data??[])?.id??stockId.trim()),
         shares,
         avg_cost: avgCost || null,
       },
@@ -74,7 +78,7 @@ export default function Stocks() {
         <h3>Add / update holding</h3>
         <DataEntry source="stock"
           className="nu-input"
-          placeholder="Stock ID (e.g. TCP)"
+          aria-label="Stock name or ticker" placeholder="Choose stock name or ticker"
           value={stockId}
           onChange={(e) => setStockId(e.target.value)}
         />
@@ -97,7 +101,7 @@ export default function Stocks() {
       <div className="grid">
         {holdings.map((h) => (
           <article key={h.id} className="card nu-raised">
-            <h3>{h.stock_id}</h3>
+            <h3>{stockLabel(h.stock_id,catalogue.data??[])}</h3>
             <p className="value">{h.shares}</p>
             {h.avg_cost && <p className="muted">Avg cost: {h.avg_cost}</p>}
             <button className="nu-btn" onClick={() => removeHolding(h.id)}>

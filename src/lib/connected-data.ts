@@ -1,3 +1,4 @@
+import {stockLabel} from './stock-catalogue';
 import {inventorySnapshot} from './inventory-data';
 import { CAPABILITIES } from '../api/capabilities';
 import { dataLabel, observationKey, PERSONAL_REQUESTS, type PersonalRequest, type TornObservation } from './personal-data';
@@ -53,7 +54,7 @@ export function relatedRequests(row: ConnectedRequest, payload: unknown): Connec
     add(items, '/market/{id}/itemmarket', 'Inventory', 'id', 'Item listings');
     for (const item of list(items)) if (positiveId(item.id)) out.push(request('/torn/{ids}/items', 'Inventory', { ids: String(item.id) }, `Item details · ${item.name ?? item.id}`));
   }
-  if (path === '/user/stocks') add(p.stocks, '/torn/{stockId}/stocks', 'Investments', 'stockId', 'Stock chart');
+  if (path === '/user/stocks') add(list(p.stocks).map(item=>({...item,name:item.name??stockLabel(item.id)})), '/torn/{stockId}/stocks', 'Investments', 'stockId', 'Stock chart');
   if (path === '/torn/properties') for (const item of list(p.properties)) if (positiveId(item.id)) {
     out.push(request('/market/{propertyTypeId}/properties', 'Properties', { propertyTypeId: String(item.id) }, `For sale · ${item.name ?? item.id}`));
     out.push(request('/market/{propertyTypeId}/rentals', 'Properties', { propertyTypeId: String(item.id) }, `For rent · ${item.name ?? item.id}`));
