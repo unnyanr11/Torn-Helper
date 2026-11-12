@@ -1,3 +1,4 @@
+import TornKeyHelp from './TornKeyHelp';
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { functionError } from '../lib/function-error';
@@ -36,6 +37,7 @@ export default function AccountRegistration({onSignedIn,initialMode="register"}:
     <label>Torn ID<input className="nu-input" inputMode="numeric" required pattern="[0-9]+" maxLength={16} value={tornId} onChange={e=>setTornId(e.target.value)} aria-describedby="registration-torn-help"/></label>
     <p id="registration-torn-help">The numeric ID on your Torn profile. The key must belong to this player.</p>
     <SecretInput label="Torn API key" className="nu-input" autoComplete="off" spellCheck={false} required minLength={16} maxLength={16} value={apiKey} onChange={e=>setApiKey(e.target.value.trim())}/>
+    <TornKeyHelp/>
    </>}
    <label>Email address<input className="nu-input" type="email" autoComplete="email" required maxLength={254} value={email} onChange={e=>setEmail(e.target.value)}/></label>
    {mode==='register'&&<label>Confirm email address<input className="nu-input" type="email" autoComplete="off" required maxLength={254} value={confirmEmail} onChange={e=>setConfirmEmail(e.target.value)}/></label>}

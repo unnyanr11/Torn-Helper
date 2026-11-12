@@ -53,10 +53,11 @@ export default function KeyDisclosure({
                   : "This form uses the key for this request only and does not save it. Session copies entered separately in Settings are unchanged."}
             </td>
             <td>
-              Minimal or Limited access for sign-in. Limited selections are
-              required for battle stats/attacks. Custom keys must expose
-              identity/key information. Missing selections reduce available
-              features.
+              Full Access is recommended for the widest feature support,
+              including activity logs used to verify campaign entries. Minimal
+              and Limited keys support fewer features. Custom keys must expose
+              identity/key information and the selections each tool needs.
+              Public-only keys cannot sign in. All Torn API access is read-only.
             </td>
           </tr>
         </tbody>

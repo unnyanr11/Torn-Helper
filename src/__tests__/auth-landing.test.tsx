@@ -13,6 +13,10 @@ describe('account access after startup',()=>{
   expect(html).toContain('Sign in with email');
   expect(html).toContain('Create account');
   expect(html).toContain('Continue with Torn');
+  expect(html).toContain('Recommended: Full Access for the widest feature support.');
+  expect(html).toContain('cannot send money or items, attack, or change your Torn account');
+  expect(html).toContain('It can read sensitive information');
+  expect(html).toContain('pause or revoke');
   expect(html).toContain('autoComplete="current-password"');
   expect(html).not.toContain('Account &amp; privacy settings');
   expect(html).not.toContain('aria-label="Main"');

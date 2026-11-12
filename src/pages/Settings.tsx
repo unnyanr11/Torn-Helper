@@ -1,3 +1,4 @@
+import TornKeyHelp from '../components/TornKeyHelp';
 import { useQueryClient } from "@tanstack/react-query";
 import SecretInput from "../components/SecretInput";
 import AccountRegistration from "../components/AccountRegistration";
@@ -179,6 +180,7 @@ export default function Settings({entry=false}:{entry?:boolean}={}) {
                 value={key}
                 onChange={(e) => setKey(e.target.value.trim())}
               />
+            <TornKeyHelp/>
             <label>
               <input
                 type="checkbox"
@@ -198,10 +200,9 @@ export default function Settings({entry=false}:{entry?:boolean}={}) {
               {busy ? "Verifying Torn identity…" : "Continue with Torn"}
             </button>
             <p>
-              Create a dedicated key in Torn Settings → API Keys. Minimal or
-              Limited access is accepted; Full access is not required. Custom
-              keys must allow identity verification. Public-only keys cannot
-              sign in.
+              Choose Full Access for the widest feature support. Minimal, Limited
+              and suitable Custom keys can still sign in with fewer features.
+              Public-only keys cannot sign in.
             </p>
           </form>
         </article>
@@ -227,6 +228,7 @@ export default function Settings({entry=false}:{entry?:boolean}={}) {
                 autoComplete="off"
                 onChange={(e) => setKey(e.target.value.trim())}
               />
+            <TornKeyHelp/>
             <label>
               <input
                 type="checkbox"
