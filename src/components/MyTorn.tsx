@@ -153,13 +153,14 @@ export default function MyTorn({accountId}:{accountId?:string}) {
   return <section className="my-torn">
     <h2>{player?.name ? `${player.name}’s dashboard` : 'My dashboard'}</h2><p>Your daily overview and a useful place to start.</p>
     <div aria-live="polite">
-      {preparation&&preparation.loaded<95&&<p role="status">Setup loaded {preparation.loaded} sections from {preparation.started} requests. {preparation.problem||'Some sections were unavailable or unfinished.'} Available data appears below; retry individual sections when needed.</p>}
+      {preparation&&preparation.loaded<95&&<p role="status">Setup loaded {preparation.loaded} sections during startup. {preparation.problem||'Some sections were unavailable or unfinished.'} Available data appears below; retry individual sections when needed.</p>}
       {(saved.isLoading||connection.status.isPending)&&<p role="status">Preparing your Torn dashboard…</p>}
       {status&&<p role="status">{status}</p>}
       {error&&<p role="alert">{error} <button type="button" className="nu-btn" disabled={busy} onClick={()=>void collect('essentials')}>Retry essentials</button> · <a href="#Settings">Check Torn connection</a></p>}
       {!busy&&denied>0&&<p role="alert">Some Torn data could not be loaded. Check your key permissions in <a href="#Settings">Settings</a>, then retry the affected section.</p>}
       {connection.status.isSuccess&&!connection.status.data.hasStoredKey&&<p>Connect a Torn API key in <a href="#Settings">Settings</a> to load your stats, or enter a request-only key under Refresh essentials.</p>}
     </div>
+    {preparation?.issues?.length? <details className="card"><summary>Startup section details · {preparation.issues.length}</summary><ul>{preparation.issues.map(issue=><li key={issue.endpoint+issue.label}><strong>{issue.label}</strong> ({issue.kind.replace('_',' ')}): {issue.reason}</li>)}</ul><p>Full Access does not grant faction leadership or company director permissions.</p></details>:null}
     <WorkspaceWelcome focus={focus.focus} onChoose={focus.choose} storageError={focus.storageError}/>
     <TimerPanel/>
     <HomeDashboard entries={entries} energyCoverage={energyCoverage} onRefresh={refreshSection} busy={busy}/>

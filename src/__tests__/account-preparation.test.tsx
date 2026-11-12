@@ -44,6 +44,12 @@ describe('one minute preparation request plan',()=>{
   await vi.advanceTimersByTimeAsync(59999);expect(fetch).toHaveBeenCalledTimes(1);expect(done).not.toHaveBeenCalled();
   await vi.advanceTimersByTimeAsync(1);expect(done.mock.calls[0][0].problem).toContain('Request limit');
  });
+ it('keeps readable reasons for restricted, inapplicable and failed sections',async()=>{
+  let n=0;const done=vi.fn();startPreparation({fetch:async()=>{n++;return n===1?{ok:false,kind:'restricted' as const,error:'Faction permission required'}:n===2?{ok:false,kind:'not_applicable' as const,error:'No company'}:n===3?{ok:false,kind:'failed' as const,error:'Inventory rejected'}:{ok:true};},onProgress:()=>{},onComplete:done});
+  await vi.advanceTimersByTimeAsync(60000);
+  expect(done.mock.calls[0][0].issues.map((issue:any)=>issue.kind)).toEqual(['restricted','not_applicable','failed']);
+  expect(done.mock.calls[0][0].loaded).toBe(92);
+ });
  it('does not continue or complete after a logout/unmount cancellation',async()=>{
   const fetch=vi.fn(async()=>({ok:true})),done=vi.fn(),task=startPreparation({fetch,onProgress:()=>{},onComplete:done});task.cancel();await vi.advanceTimersByTimeAsync(60000);expect(fetch).toHaveBeenCalledTimes(1);expect(done).not.toHaveBeenCalled();
  });
@@ -60,6 +66,15 @@ describe('loading screen and data shared across tools',()=>{
   for(const [,options] of mocks.invoke.mock.calls){expect(options.body.refresh).toBe(!isTimerEndpoint(options.body.endpoint_id));expect(options.body).not.toHaveProperty('apiKey');}
   vi.stubGlobal('requestAnimationFrame',(callback:()=>void)=>callback());vi.stubGlobal('document',{getElementById:()=>null});
   await act(async()=>{await vi.advanceTimersByTimeAsync(1200);});expect(JSON.stringify(root!.toJSON())).toContain('Workspace content');
+ });
+ it('skips company requests when current job data confirms a regular Torn job',async()=>{
+  const cache=client(),jobRow=preparationPlan().find(row=>row.capability.path==='/user/job')!;
+  cache.setQueryData(observationsKey(owner),mergeObservation({},{endpoint_id:jobRow.capability.id,parameters:{},payload:{job:{type:'job'}},fetched_at:new Date().toISOString(),next_parameters:null}));
+  mocks.invoke.mockImplementation(async(_client,{body})=>({data:{endpoint_id:body.endpoint_id,parameters:body.parameters,payload:{},fetched_at:new Date().toISOString(),next_parameters:null},error:null}));
+  await act(async()=>{root=create(<QueryClientProvider client={cache}><AccountPreparation owner={owner}>Workspace</AccountPreparation></QueryClientProvider>);await vi.advanceTimersByTimeAsync(60000);});
+  expect(mocks.invoke.mock.calls.some(([,options])=>options.body.endpoint_id.startsWith('v2-company-'))).toBe(false);
+  const result=cache.getQueryData<any>(preparationKey(owner));
+  expect(result.issues.filter((issue:any)=>issue.kind==='not_applicable')).toHaveLength(4);
  });
  it('skips private preparation for shared reports and does not reuse another owner’s completion',()=>{
   const cache=client();cache.setQueryData(preparationKey('other-owner'),{loaded:95});

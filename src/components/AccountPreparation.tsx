@@ -5,6 +5,7 @@ import {supabase} from '../lib/supabase';
 import {invokeTornData} from '../lib/torn-data-client';
 import {functionError} from '../lib/function-error';
 import {useSavedObservations} from '../hooks/useSavedObservations';
+import {homeEntry} from '../lib/home-dashboard';
 import {emptyProgress,PREPARATION_CALLS,PREPARATION_MS,startPreparation,type PreparationResult} from '../lib/account-preparation';
 import {observationKey} from '../lib/personal-data';
 import {observationsKey} from '../lib/observation-cache';
@@ -30,13 +31,17 @@ function PrivatePreparation({owner,children}:{owner:string;children:ReactNode}){
    heading.current?.focus();
    const task=startPreparation({
     fetch:async(row,signal)=>{
+     const entries=client.getQueryData<Record<string,DataEntry>>(observationsKey(owner))??{};
+     const jobObservation=homeEntry(entries,'/user/job')?.observation;
+     const job=jobObservation&&Date.parse(jobObservation.fetched_at)<=Date.now()&&Date.now()-Date.parse(jobObservation.fetched_at)<60000?(jobObservation.payload as any)?.job:undefined;
+     if(row.capability.group==='company'&&(job===null||job?.type==='job'))return {ok:false,kind:'not_applicable' as const,error:'Not applicable: your current Torn job is not a player-owned company.'};
      const response=await invokeTornData(client,{body:{endpoint_id:row.capability.id,parameters:row.parameters,refresh:!isTimerEndpoint(row.capability.id)},signal});
      if(signal.aborted)throw new DOMException('Cancelled','AbortError');
      if(!response.error&&!response.data?.error)return {ok:true};
      const problem=(await functionError(response.data,response.error)).message;
      client.setQueryData<Record<string,DataEntry>>(observationsKey(owner),old=>{const id=observationKey(row.capability.id,row.parameters);return {...old,[id]:{...old?.[id],error:problem}};});
      const status=response.error?.context?.status;
-     return {ok:false,error:problem,fatal:[401,409,429].includes(status??0)||/no key|retained|decrypt|tracking is paused|sign.?in|rate.?limit|request limit|code (2|5|10|13)\b/i.test(problem)};
+     return {ok:false,error:problem,kind:status===403?'restricted' as const:'failed' as const,fatal:[401,409,429].includes(status??0)||/no key|retained|decrypt|tracking is paused|sign.?in|rate.?limit|request limit|code (2|5|10|13)\b/i.test(problem)};
     },
     onProgress:value=>{if(!disposed)setProgress(value);},
     onComplete:(result:PreparationResult)=>{
@@ -65,11 +70,12 @@ function PrivatePreparation({owner,children}:{owner:string;children:ReactNode}){
    <p className="preparation-message" role="status">{complete?(progress.loaded===PREPARATION_CALLS?'Your data is loaded. Let’s go.':'Your workspace is ready. Available data has been saved.'):phrase+'…'}</p>
    <div className="preparation-timer" role="timer" aria-label="Preparation time remaining">{String(Math.floor(remaining/60)).padStart(2,'0')}:{String(remaining%60).padStart(2,'0')}</div>
    <progress aria-label="One-minute preparation" value={60-remaining} max={60}/>
-   <p className="preparation-count">{progress.started} / {PREPARATION_CALLS} requests sent · {progress.loaded} loaded{progress.failed?` · ${progress.failed} unavailable`:''}{pending?` · ${pending} ${complete?'unfinished':'in flight'}`:''}</p>
+   <p className="preparation-count">{progress.started} / {PREPARATION_CALLS} sections checked · {progress.loaded} loaded{progress.issues.some(i=>i.kind==='restricted')?` · ${progress.issues.filter(i=>i.kind==='restricted').length} restricted`:''}{progress.issues.some(i=>i.kind==='not_applicable')?` · ${progress.issues.filter(i=>i.kind==='not_applicable').length} not applicable`:''}{progress.issues.some(i=>i.kind==='failed')?` · ${progress.issues.filter(i=>i.kind==='failed').length} failed`:''}{pending?` · ${pending} ${complete?'unfinished':'in flight'}`:''}</p>
    {!complete&&<p className="preparation-current">{progress.current}</p>}
    {progress.problem&&<p className="preparation-note" role="status">{progress.problem}{!complete&&' Your workspace will open when the timer finishes.'}</p>}
    {complete&&(progress.loaded<PREPARATION_CALLS)&&<p className="preparation-note">Some sections need a retry, different key permissions, or a faction/company role. You can check these inside.</p>}
    {!complete&&<p className="preparation-note">A one-minute setup for your personal tools. Data access depends on your Torn key and role.</p>}
+   {progress.issues.length>0&&<details className="preparation-note"><summary>See section details ({progress.issues.length})</summary><ul>{progress.issues.map(issue=><li key={issue.endpoint+issue.label}><strong>{issue.label}</strong>: {issue.reason}</li>)}</ul></details>}
    <button type="button" className="preparation-signout" onClick={()=>void supabase.auth.signOut()}>Sign out</button>
   </section>
  </main>;
