@@ -1628,5 +1628,155 @@
     "buy_price": 30749,
     "source": "User screenshot",
     "observed_on": "2026-11-12"
+  },
+  {
+    "id": 384,
+    "name": "Camel Plushie",
+    "type": "Plushie",
+    "country": "UAE",
+    "shop": "General Store",
+    "buy_price": 14000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 381,
+    "name": "Gold Laptop",
+    "type": "Tool",
+    "country": "UAE",
+    "shop": "General Store",
+    "buy_price": 8000000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 1264,
+    "name": "Potassium Nitrate",
+    "type": "Material",
+    "country": "UAE",
+    "shop": "General Store",
+    "buy_price": 3800,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 414,
+    "name": "Proda Sunglasses",
+    "type": "Clothing",
+    "country": "UAE",
+    "shop": "General Store",
+    "buy_price": 100000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 412,
+    "name": "Sports Shades",
+    "type": "Clothing",
+    "country": "UAE",
+    "shop": "General Store",
+    "buy_price": 10000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 386,
+    "name": "Sports Sneakers",
+    "type": "Enhancer",
+    "country": "UAE",
+    "shop": "General Store",
+    "buy_price": 14000000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 385,
+    "name": "Tribulus Omanense",
+    "type": "Flower",
+    "country": "UAE",
+    "shop": "General Store",
+    "buy_price": 6000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 382,
+    "name": "Gold Plated AK-47",
+    "type": "Primary",
+    "country": "UAE",
+    "shop": "Arms Dealer",
+    "buy_price": 25000000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 387,
+    "name": "Handbag",
+    "type": "Melee",
+    "country": "UAE",
+    "shop": "Arms Dealer",
+    "buy_price": 16000000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 388,
+    "name": "Pink Mac-10",
+    "type": "Secondary",
+    "country": "UAE",
+    "shop": "Arms Dealer",
+    "buy_price": 23000000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 1495,
+    "name": "Ambergris Lump",
+    "type": "Other",
+    "country": "UAE",
+    "shop": "Black Market",
+    "buy_price": 358740,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 1496,
+    "name": "Natural Pearls",
+    "type": "Other",
+    "country": "UAE",
+    "shop": "Black Market",
+    "buy_price": 94715,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 200,
+    "name": "Opium",
+    "type": "Drug",
+    "country": "UAE",
+    "shop": "Black Market",
+    "buy_price": 27851,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 204,
+    "name": "Speed",
+    "type": "Drug",
+    "country": "UAE",
+    "shop": "Black Market",
+    "buy_price": 569,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
+  },
+  {
+    "id": 205,
+    "name": "Vicodin",
+    "type": "Drug",
+    "country": "UAE",
+    "shop": "Black Market",
+    "buy_price": 5550,
+    "source": "User screenshot",
+    "observed_on": "2026-11-12"
   }
 ]

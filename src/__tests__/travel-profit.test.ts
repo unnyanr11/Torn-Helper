@@ -137,3 +137,26 @@ describe('saved China purchase reference',()=>{
   expect(new Set(FOREIGN_SHOP_PRICES.map(p=>`${p.country}:${p.shop}:${p.id}`)).size).toBe(FOREIGN_SHOP_PRICES.length);
  });
 });
+
+describe('saved UAE purchase reference',()=>{
+ it('retains all 15 screenshot observations including billion-dollar prices without implying stock',()=>{
+  const rows=FOREIGN_SHOP_PRICES.filter(p=>p.country==='UAE');
+  expect(rows).toHaveLength(15);
+  expect(rows.filter(p=>p.shop==='General Store')).toHaveLength(7);
+  expect(rows.filter(p=>p.shop==='Arms Dealer')).toHaveLength(3);
+  expect(rows.filter(p=>p.shop==='Black Market')).toHaveLength(5);
+  expect(rows.every(p=>p.observed_on==='2026-11-12'&&!('stock' in p))).toBe(true);
+  const items=withSavedShopPrices([]);expect(destinationItems(items,'UAE')).toHaveLength(15);
+  expect(shopQuote(items.find(i=>i.id===381),'UAE')?.buy_price).toBe(8000000000);
+  expect(shopQuote(items.find(i=>i.id===386),'UAE')?.buy_price).toBe(14000000000);
+  expect(shopQuote(items.find(i=>i.id===382),'UAE')?.buy_price).toBe(25000000000);
+  expect(shopQuote(items.find(i=>i.id===387),'UAE')?.buy_price).toBe(16000000000);
+  expect(shopQuote(items.find(i=>i.id===388),'UAE')?.buy_price).toBe(23000000000);
+  expect(shopQuote(items.find(i=>i.id===1264),'UAE')?.buy_price).toBe(3800);
+  expect(shopQuote(items.find(i=>i.id===385),'UAE')?.buy_price).toBe(6000);
+  expect(shopQuote(items.find(i=>i.id===1495),'UAE')?.buy_price).toBe(358740);
+  expect(shopQuote(items.find(i=>i.id===204),'UAE')?.buy_price).toBe(569);
+  expect(shopQuote(items.find(i=>i.id===204),'China')?.buy_price).toBe(5433);
+  expect(new Set(FOREIGN_SHOP_PRICES.map(p=>`${p.country}:${p.shop}:${p.id}`)).size).toBe(FOREIGN_SHOP_PRICES.length);
+ });
+});
