@@ -1,3 +1,4 @@
+import {isTimerEndpoint} from '../_shared/timer-events.ts';
 import { budgetedTornFetch } from '../_shared/torn-budget.ts';
 import { adminClient, authenticate, json, preflight } from "../_shared/http.ts";
 import { personalStatValues } from "../_shared/history.ts";
@@ -43,6 +44,11 @@ Deno.serve(async (req) => {
     );
     if (Object.values(compiled.parameters).some((value) => value.includes(key)))
       throw new LoginError(400, "Do not put an API key in section parameters.");
+    if(isTimerEndpoint(compiled.endpoint.id)&&body.refresh!==true&&Object.keys(compiled.parameters).every(name=>['timestamp','comment'].includes(name))){
+      const baseline=await admin.from('torn_timer_baselines').select('payload,observed_at').eq('user_id',user.id).eq('endpoint_id',compiled.endpoint.id).maybeSingle();
+      if(baseline.error)throw baseline.error;
+      if(baseline.data)return json({payload:baseline.data.payload,fetched_at:baseline.data.observed_at,cached:true,source:'saved timer baseline',endpoint_id:compiled.endpoint.id,parameters:compiled.parameters,next_parameters:null});
+    }
     const hash = await requestHash(compiled.endpoint.id, compiled.parameters);
     const cached = await admin
       .from("torn_data_cache")

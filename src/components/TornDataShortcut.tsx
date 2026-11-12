@@ -7,12 +7,13 @@ import {observationKey} from '../lib/personal-data';
 import {invokeTornData} from '../lib/torn-data-client';
 import {functionError} from '../lib/function-error';
 import TornDataView from './TornDataView';
+import TimerPanel from './TimerPanel';
 export default function TornDataShortcut({page}:{page:string}){
  const cache=useCurrentObservations(),client=useQueryClient(),[busy,setBusy]=useState(''),[error,setError]=useState('');
  const sections=pageDatasets(page);
  if(!sections.length)return null;
  return <section className="card connected-page-data" aria-label={`Collected Torn data for ${page}`}>
-  <h2>Your Torn data</h2><p>Loaded for your account during setup. Each section shows its collection time; your saved tool entries appear below.</p>
+  <TimerPanel page={page}/><h2>Your Torn data</h2><p>Loaded for your account during setup. Each section shows its collection time; your saved tool entries appear below.</p>
   {error&&<p role="alert">{error}</p>}
   {sections.map(section=>{
    const seed=CONNECTED_REQUESTS.find(row=>row.capability.id===section.id&&(page!=='Armory History'||row.parameters.cat==='armoryAction')),parameters=seed?.parameters??{};
@@ -25,7 +26,7 @@ export default function TornDataShortcut({page}:{page:string}){
    const observation=entry?.observation;
    const refresh=async()=>{
     setBusy(section.id);setError('');
-    try{const response=await invokeTornData(client,{body:{endpoint_id:section.id,parameters}});if(response.error||response.data?.error)throw await functionError(response.data,response.error);}
+    try{const response=await invokeTornData(client,{body:{endpoint_id:section.id,parameters,refresh:true}});if(response.error||response.data?.error)throw await functionError(response.data,response.error);}
     catch(failure){setError(failure instanceof Error?failure.message:'Unable to refresh this section.');}
     finally{setBusy('');}
    };

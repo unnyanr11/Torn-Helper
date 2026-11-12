@@ -108,6 +108,7 @@ export default function LiveFeeds() {
       const { data, error } = await invokeTornData(queryClient, {
         body: {
           endpoint_id: section.id,
+          refresh: true,
           parameters,
           ...(keyMode === "request" ? { apiKey: submitted } : {}),
         },

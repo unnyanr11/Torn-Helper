@@ -16,7 +16,7 @@ export type UpdateMode='off'|'economy'|'active';
 export const UPDATE_PATHS=['/user/bars','/user/cooldowns','/user/travel','/user/profile'];
 export function refreshAfter(path:string,mode:UpdateMode,payload?:unknown){
  if(mode==='off')return Infinity;
- if(path==='/user/profile')return 900000;
+ if(['/user/bars','/user/cooldowns','/user/travel','/user/profile'].includes(path))return Infinity;
  const flight=(payload as any)?.travel?.time_left;
  return mode==='active'&&(path!=='/user/travel'||typeof flight==='number'&&flight>0)?60000:300000;
 }

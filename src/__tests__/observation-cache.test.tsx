@@ -35,9 +35,13 @@ describe('shared private observations',()=>{
   expect(mocks.invoke).toHaveBeenCalledTimes(1);expect(mocks.invoke.mock.calls[0][1].body.refresh).toBe(true);
   expect(mocks.read).not.toHaveBeenCalled();
  });
+ it('reuses an old timer baseline without any upstream countdown polling',async()=>{
+  const cache=client();cache.setQueryData(observationsKey('owner-a'),mergeObservation({},sample('/user/cooldowns',now-86400000)));
+  const result=await invokeTornData(cache,opts('/user/cooldowns'));expect(mocks.invoke).not.toHaveBeenCalled();expect(result.data.cached).toBe(true);
+ });
  it('fetches expired data and never treats future timestamps as fresh',async()=>{
-  const cache=client(),observation=sample('/user/bars',now-61000);cache.setQueryData(observationsKey('owner-a'),mergeObservation({},observation));
-  await invokeTornData(cache,opts());expect(mocks.invoke).toHaveBeenCalledTimes(1);expect(isRecent(sample('/user/bars',now+1),60000)).toBe(false);
+  const cache=client(),observation=sample('/user/money',now-61000);cache.setQueryData(observationsKey('owner-a'),mergeObservation({},observation));
+  await invokeTornData(cache,opts('/user/money'));expect(mocks.invoke).toHaveBeenCalledTimes(1);expect(isRecent(sample('/user/bars',now+1),60000)).toBe(false);
  });
  it('shares simultaneous requests while keeping independent caller cancellation',async()=>{
   const cache=client(),gate=deferred<any>();mocks.invoke.mockReturnValue(gate.promise);
@@ -51,13 +55,13 @@ describe('shared private observations',()=>{
   const request=invokeTornData(cache,opts('/user/bars',{},controller.signal)),rejection=expect(request).rejects.toThrow('Cancelled');
   await vi.waitFor(()=>expect(mocks.invoke).toHaveBeenCalledTimes(1));controller.abort();await rejection;
   expect(mocks.invoke.mock.calls[0][1].signal.aborted).toBe(true);gate.resolve({data:sample(),error:null});await Promise.resolve();
-  await invokeTornData(cache,opts());expect(mocks.invoke).toHaveBeenCalledTimes(2);
+  await invokeTornData(cache,{body:{...opts().body,refresh:true}});expect(mocks.invoke).toHaveBeenCalledTimes(2);
  });
  it('does not cache errors and preserves the last successful snapshot',async()=>{
   const cache=client(),old=sample('/user/bars',now-61000);cache.setQueryData(observationsKey('owner-a'),mergeObservation({},old));
-  mocks.invoke.mockResolvedValueOnce({data:{error:'Rate limited'},error:{context:{status:429}}});const failure=await invokeTornData(cache,opts());
+  mocks.invoke.mockResolvedValueOnce({data:{error:'Rate limited'},error:{context:{status:429}}});const failure=await invokeTornData(cache,{body:{...opts().body,refresh:true}});
   expect(failure.error.context.status).toBe(429);expect(cache.getQueryData<Record<string,DataEntry>>(observationsKey('owner-a'))?.[observationKey(old.endpoint_id,{})].observation).toEqual(old);
-  await invokeTornData(cache,opts());expect(mocks.invoke).toHaveBeenCalledTimes(2);
+  await invokeTornData(cache,{body:{...opts().body,refresh:true}});expect(mocks.invoke).toHaveBeenCalledTimes(2);
  });
  it('isolates owners and rejects responses arriving after an account change',async()=>{
   const cache=client();await invokeTornData(cache,opts());mocks.owner='owner-b';await invokeTornData(cache,opts());expect(mocks.invoke).toHaveBeenCalledTimes(2);
@@ -98,14 +102,14 @@ describe('freshness and economical update policy',()=>{
  it('never schedules hidden, offline or manual-mode refreshes',()=>{
   expect(nextRefreshPath({},'active',false,true)).toBeUndefined();expect(nextRefreshPath({},'active',true,false)).toBeUndefined();expect(nextRefreshPath({},'off',true,true)).toBeUndefined();expect(nextRefreshPath({},'active',true,true)).toBe('/user/bars');
  });
- it('gives slower-changing sections longer intervals and increases travel frequency during a flight',()=>{
-  expect(refreshAfter('/user/profile','active')).toBe(900000);expect(refreshAfter('/user/bars','active')).toBe(60000);expect(refreshAfter('/user/bars','economy')).toBe(300000);expect(refreshAfter('/user/travel','active',{travel:{time_left:0}})).toBe(300000);expect(refreshAfter('/user/travel','active',{travel:{time_left:100}})).toBe(60000);
+ it('never schedules repeated timer endpoint calls after their baseline is collected',()=>{
+  for(const path of ['/user/profile','/user/bars','/user/cooldowns','/user/travel'])expect(refreshAfter(path,'active')).toBe(Infinity);
  });
  it('selects only stale sections while keeping fresh records untouched',()=>{
-  let rows={};for(const path of ['/user/bars','/user/cooldowns','/user/travel','/user/profile'])rows=mergeObservation(rows,sample(path));expect(nextRefreshPath(rows,'active',true,true)).toBeUndefined();rows=mergeObservation(rows,sample('/user/bars',now+61000));expect(nextRefreshPath(rows,'active',true,true,now+61000)).toBe('/user/cooldowns');
+  let rows={};for(const path of ['/user/bars','/user/cooldowns','/user/travel','/user/profile'])rows=mergeObservation(rows,sample(path));expect(nextRefreshPath(rows,'active',true,true)).toBeUndefined();rows=mergeObservation(rows,sample('/user/bars',now+61000));expect(nextRefreshPath(rows,'active',true,true,now+61000)).toBeUndefined();
  });
  it('shows refresh controls and stale labels without fetching on render',()=>{
-  const html=renderToStaticMarkup(<HomeDashboard entries={mergeObservation({},sample('/user/bars',now-61000))} onRefresh={()=>{}}/>);expect(html).toContain('needs refresh');expect(html).toContain('Refresh bars');expect(html).toContain('Refresh cooldowns');expect(mocks.invoke).not.toHaveBeenCalled();
+  const html=renderToStaticMarkup(<HomeDashboard entries={mergeObservation({},sample('/user/bars',now-61000))} onRefresh={()=>{}}/>);expect(html).toContain('Snapshot');expect(html).not.toContain('needs refresh');expect(html).toContain('Refresh bars');expect(html).toContain('Refresh cooldowns');expect(mocks.invoke).not.toHaveBeenCalled();
  });
  it('renders saved dashboard cards before refresh controls and offers dropdown update modes',()=>{
   vi.stubGlobal('location',{hash:'#Overview'});const cache=client();cache.setQueryData(observationsKey('owner-a'),mergeObservation({},sample()));const html=renderToStaticMarkup(<QueryClientProvider client={cache}><MyTorn accountId="owner-a"/></QueryClientProvider>);expect(html.indexOf('Your daily overview')).toBeLessThan(html.indexOf('<h3>Refresh essentials'));expect(html).toContain('40 / 100');expect(html).toContain('Automatic updates');expect(html).toContain('Only essentials that need updating');expect(mocks.invoke).not.toHaveBeenCalled();

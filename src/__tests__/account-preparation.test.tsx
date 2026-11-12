@@ -1,3 +1,4 @@
+import {isTimerEndpoint} from '../../supabase/functions/_shared/timer-events';
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest';
 import {act,create,type ReactTestRenderer} from 'react-test-renderer';
 import {QueryClient,QueryClientProvider} from '@tanstack/react-query';
@@ -56,7 +57,7 @@ describe('loading screen and data shared across tools',()=>{
   expect(root!.root.findByProps({role:'timer'}).children.join('')).toBe('01:00');expect(JSON.stringify(root!.toJSON())).not.toContain('Workspace content');
   await act(async()=>{await vi.advanceTimersByTimeAsync(59999);});expect(JSON.stringify(root!.toJSON())).not.toContain('Workspace content');
   await act(async()=>{await vi.advanceTimersByTimeAsync(1);});expect(JSON.stringify(root!.toJSON())).toContain('You’re ready now');expect(mocks.invoke).toHaveBeenCalledTimes(95);expect(cache.getQueryData(preparationKey(owner))).toMatchObject({loaded:95});
-  for(const [,options] of mocks.invoke.mock.calls){expect(options.body.refresh).toBe(true);expect(options.body).not.toHaveProperty('apiKey');}
+  for(const [,options] of mocks.invoke.mock.calls){expect(options.body.refresh).toBe(!isTimerEndpoint(options.body.endpoint_id));expect(options.body).not.toHaveProperty('apiKey');}
   vi.stubGlobal('requestAnimationFrame',(callback:()=>void)=>callback());vi.stubGlobal('document',{getElementById:()=>null});
   await act(async()=>{await vi.advanceTimersByTimeAsync(1200);});expect(JSON.stringify(root!.toJSON())).toContain('Workspace content');
  });

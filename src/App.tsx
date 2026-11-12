@@ -2,6 +2,7 @@ import {clearBrowserTornKeys} from './lib/browser-torn-key';
 import { cancelTornRequests } from "./lib/torn-request-state";
 import SpatialShell from "./components/SpatialShell";
 import AccountPreparation from "./components/AccountPreparation";
+import TimerProvider from "./components/TimerProvider";
 import TornDataShortcut from "./components/TornDataShortcut";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { NAV, Page } from "./nav";
@@ -186,6 +187,7 @@ export default function App() {
     </AuthLanding>;
   }
   return (
+    <TimerProvider key={accountId??"shared"} owner={sharedToken?"":accountId??""}>
     <AccountPreparation key={accountId??"shared"} owner={sharedToken?"":accountId??""}>
     <SpatialShell
       key={accountId??"signed-out"}
@@ -283,5 +285,6 @@ export default function App() {
       </Suspense>
     </SpatialShell>
     </AccountPreparation>
+    </TimerProvider>
   );
 }

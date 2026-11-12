@@ -66,15 +66,14 @@ Deno.serve(async (req) => {
           signature = cache.fetched_at;
         }
       }
-      if (
-        rule.condition_type === "cooldown_expired" &&
-        cache &&
-        Date.now() - Date.parse(cache.fetched_at) < 120000
-      ) {
-        const values = Object.values(cache.payload.cooldowns ?? {});
-        if (values.some((n) => n === 0)) {
-          message = `${rule.name}: a tracked cooldown is zero`;
-          signature = cache.fetched_at;
+      if (rule.condition_type === "cooldown_expired") {
+        const timers=await admin.from('torn_timer_baselines').select('deadlines,observed_at').eq('user_id',rule.user_id).eq('endpoint_id','v2-user-cooldowns').maybeSingle();
+        if(timers.error)throw timers.error;
+        const baseline=timers.data;
+        if(baseline){
+          const observed=Date.parse(baseline.observed_at)/1000;
+          const expired=Object.entries(baseline.deadlines??{}).filter(([,end])=>typeof end==='number'&&end>observed&&end<=Date.now()/1000).sort(([,a],[,b])=>Number(b)-Number(a));
+          if(expired.length){message=`${rule.name}: ${expired[0][0]} cooldown timer elapsed (estimated from the saved deadline).`;signature=`${expired[0][0]}:${expired[0][1]}`;}
         }
       }
       if (rule.condition_type === "target_available") {
@@ -112,7 +111,7 @@ Deno.serve(async (req) => {
       }
       if (!message) return;
       // Bucket repeated observations to at most one notification per rule per hour.
-      const dedupe_key = `rule:${rule.id}:${signature.slice(0, 13)}`;
+      const dedupe_key = `rule:${rule.id}:${rule.condition_type==='cooldown_expired'?signature:signature.slice(0,13)}`;
       const { data: inserted, error } = await admin
         .from("notification_events")
         .upsert(

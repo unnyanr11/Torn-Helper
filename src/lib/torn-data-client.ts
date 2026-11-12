@@ -1,3 +1,4 @@
+import {isTimerEndpoint} from '../../supabase/functions/_shared/timer-events';
 import { pendingTornRequests as pending,type TornResult as Result } from './torn-request-state';
 export { cancelTornRequests } from './torn-request-state';
 import type { QueryClient } from '@tanstack/react-query';
@@ -21,7 +22,7 @@ export async function invokeTornData(client:QueryClient,options:Options):Promise
  const body={endpoint_id,parameters,...(refresh?{refresh:true}:{}),...(apiKey===undefined?{}:{apiKey})},id=observationKey(endpoint_id,parameters),cacheKey=observationsKey(owner);
  const entry=client.getQueryData<Record<string,DataEntry>>(cacheKey)?.[id],cached=entry?.observation;
  const essential=ESSENTIAL_PATHS.includes(CAPABILITIES.find(c=>c.id===endpoint_id)?.path??'');
- if(!refresh&&isRecent(cached,60000)&&(!entry?.restored||essential))return {data:{...cached,cached:true},error:null};
+ if(!refresh&&cached&&(isTimerEndpoint(endpoint_id)&&Number.isFinite(Date.parse(cached.fetched_at))&&Date.parse(cached.fetched_at)<=Date.now()||isRecent(cached,60000)&&(!entry?.restored||essential)))return {data:{...cached,cached:true},error:null};
  // Fingerprint separates simultaneous requests with different permissions, without retaining a raw key in a map or query key.
  const credential=apiKey===undefined?'stored':await digest(apiKey);
  if(options.signal?.aborted)throw cancelled();

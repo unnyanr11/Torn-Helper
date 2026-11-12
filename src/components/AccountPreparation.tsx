@@ -1,3 +1,4 @@
+import {isTimerEndpoint} from '../../supabase/functions/_shared/timer-events';
 import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {useQueryClient} from '@tanstack/react-query';
 import {supabase} from '../lib/supabase';
@@ -29,7 +30,7 @@ function PrivatePreparation({owner,children}:{owner:string;children:ReactNode}){
    heading.current?.focus();
    const task=startPreparation({
     fetch:async(row,signal)=>{
-     const response=await invokeTornData(client,{body:{endpoint_id:row.capability.id,parameters:row.parameters,refresh:true},signal});
+     const response=await invokeTornData(client,{body:{endpoint_id:row.capability.id,parameters:row.parameters,refresh:!isTimerEndpoint(row.capability.id)},signal});
      if(signal.aborted)throw new DOMException('Cancelled','AbortError');
      if(!response.error&&!response.data?.error)return {ok:true};
      const problem=(await functionError(response.data,response.error)).message;
