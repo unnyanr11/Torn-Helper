@@ -22,9 +22,9 @@ export function validateSelection(ids:unknown,roster:WarTarget[]):number[]{
  if(ids.some(id=>!roster.some(m=>m.id===id)))throw new Error('Targets must belong to the active enemy faction.');
  return ids;
 }
-export function authorizeAssignee(actorId:number,assigneeId:number,leaderId:number,roster:WarTarget[]){
+export function authorizeAssignee(actorId:number,assigneeId:number,leaderId:number,roster:WarTarget[],delegated=false){
  if(!positiveId(assigneeId))throw new Error('Choose a faction member.');
- if(assigneeId!==actorId&&(actorId!==leaderId||!roster.some(m=>m.id===actorId)||!roster.some(m=>m.id===assigneeId)))throw new Error('Only the current faction leader can change another current member’s targets.');
+ if(assigneeId!==actorId&&((actorId!==leaderId&&!delegated)||!roster.some(m=>m.id===actorId)||!roster.some(m=>m.id===assigneeId)))throw new Error('Only the current faction leader or an appointed war handler can change another current member’s targets.');
 }
 
 export function validPriorities(value:unknown,ids:number[]):Record<string,number>{

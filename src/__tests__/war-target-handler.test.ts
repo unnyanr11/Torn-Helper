@@ -5,14 +5,14 @@ import {describe,it,expect,vi} from 'vitest';
 import * as policies from '../../supabase/functions/_shared/war-targets';
 import * as reports from '../../supabase/functions/_shared/war-reports';
 function harness(actor=1){
- const lists=new Map<string,any>();let handler!:(req:Request)=>Promise<Response>;
+ const lists=new Map<string,any>(),handlers:any[]=[];let handler!:(req:Request)=>Promise<Response>;
  const users=[{user_id:'leader',torn_id:1,revoked_at:null},{user_id:'member',torn_id:2,revoked_at:null},{user_id:'outsider',torn_id:3,revoked_at:null}];
  const writes:unknown[]=[],lookups:string[]=[];
- const rpc=vi.fn(async()=>({data:null,error:null}));
+ const rpc=vi.fn(async(name:string,args:any)=>{if(name==='commit_war_assignments'){const row=args.values_json;lists.set(args.owner_id,row);writes.push(row);return {data:row,error:null};}return {data:null,error:null};});
  const admin={rpc,from:(table:string)=>{
   const filters:((row:any)=>boolean)[]=[],state:{mutation?:any;insert?:any}={};
   const result=(single=true)=>{
-   const all=table==='linked_torn_accounts'?users:table==='profiles'?[{id:actor===1?'leader':actor===2?'member':'outsider',tracking_paused:false}]:table==='war_target_lists'?[...lists.values()]:[];
+   const all=table==='linked_torn_accounts'?users:table==='profiles'?[{id:actor===1?'leader':actor===2?'member':'outsider',tracking_paused:false}]:table==='war_target_lists'?[...lists.values()]:table==='war_handlers'?handlers:[];
    const row=all.find(r=>filters.every(f=>f(r)));
    if(state.insert){lists.set(state.insert.user_id,state.insert);writes.push(state.insert);return {data:state.insert,error:null};}
    if(state.mutation&&row){Object.assign(row,state.mutation);writes.push(state.mutation);}
@@ -35,7 +35,7 @@ function harness(actor=1){
  };
  const source=ts.transpileModule(readFileSync('supabase/functions/war-targets/index.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
  vm.runInNewContext(source,{exports:{},require:(name:string)=>deps[name],Deno:{serve:(fn:any)=>handler=fn,env:{get:()=>undefined}},Response,Request,Date,Number,Error,URLSearchParams});
- return {lists,payloads,get,writes,lookups,rpc,call:(body:any,auth=true)=>handler(new Request('https://example.test',{method:'POST',headers:auth?{authorization:'Bearer test'}:{},body:JSON.stringify(body)}))};
+ return {lists,handlers,payloads,get,writes,lookups,rpc,call:(body:any,auth=true)=>handler(new Request('https://example.test',{method:'POST',headers:auth?{authorization:'Bearer test'}:{},body:JSON.stringify(body)}))};
 }
 describe('war target gateway authorization and saved assignments',()=>{
  it('rejects unauthenticated access without fetching Torn',async()=>{const h=harness();expect((await h.call({action:'load'},false)).status).toBe(401);expect(h.get).not.toHaveBeenCalled();});
@@ -48,7 +48,7 @@ describe('war target gateway authorization and saved assignments',()=>{
   expect((await r.json()).error).toContain('Only the current faction leader');expect(h.writes).toHaveLength(0);
  });
  it('saves leader assignments to the chosen member and returns only selected attack targets',async()=>{
-  const h=harness(),r=await h.call({action:'save',assignee_id:2,target_ids:[50],war_key:'ranked:7:20',expected_revision:null});
+  const h=harness(),r=await h.call({action:'save',assignee_id:2,target_ids:[50],war_key:'ranked:7:20',expected_revision:null,assignment_reason:'Tactical assignment'});
   expect(r.status).toBe(200);expect(h.lists.get('member')).toMatchObject({faction_id:10,updated_by:1,target_ids:[50]});expect(h.lists.has('leader')).toBe(false);
  });
  it('rejects arbitrary non-enemy IDs and stale assignment revisions',async()=>{
@@ -82,4 +82,12 @@ it('rest uses only the authenticated owner and needs no upstream key or API requ
 it('returning without pending goals only ends the owner’s rest and makes no upstream request',async()=>{
  const h=harness(2);await h.call({action:'resume',owner_id:'leader'});
  expect(h.rpc).toHaveBeenCalledWith('resume_war_targets',{owner_id:'member'});expect(h.get).not.toHaveBeenCalled();
+});
+
+it('accepts a trusted current-war handler appointment for target assignments, but rejects stale appointments',async()=>{
+ const h=harness(2);h.handlers.push({faction_id:10,war_key:'ranked:7:20',torn_id:2,appointed_by:1});
+ const result=await h.call({action:'save',war_key:'ranked:7:20',assignee_id:1,target_ids:[50],assignment_reason:'Tactical matchup',expected_revision:null});
+ expect(result.status).toBe(200);expect((await result.json()).is_leader).toBe(false);expect(h.lists.get('leader').target_ids).toEqual([50]);
+ h.handlers[0].appointed_by=3;
+ expect((await h.call({action:'save',war_key:'ranked:7:20',assignee_id:1,target_ids:[50],assignment_reason:'Stale appointment'})).status).toBe(503);
 });

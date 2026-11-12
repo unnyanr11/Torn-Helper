@@ -3,6 +3,8 @@ import {describe,it,expect,vi} from 'vitest';
 import WarRoom from '../pages/WarRoom';
 const mocks=vi.hoisted(()=>({list:null as any}));
 vi.mock('../components/WarTargetProvider',()=>({useWarTargets:()=>({list:mocks.list,error:'',owner:'owner',claims:[{target_id:1,user_id:'owner',claimant_name:'Me',expires_at:new Date(Date.now()+60000).toISOString(),attacks_done:0,attacks_goal:2}],refresh:vi.fn()}),warTargetAction:vi.fn()}));
+vi.mock('../components/WarCoordination',()=>({default:()=>null}));
+vi.mock('../lib/war-governance',()=>({governanceAction:vi.fn()}));
 vi.mock('../components/WarRestControls',()=>({default:()=>null}));
 vi.mock('../components/TimerProvider',()=>({useAccountTimers:()=>({baselines:[]})}));
 describe('assigned-only War Room attack view',()=>{

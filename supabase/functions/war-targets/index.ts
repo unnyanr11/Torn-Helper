@@ -96,13 +96,16 @@ Deno.serve(async(req)=>{
   const warPayload=await get('/faction/wars');
   const wars=activeOpponents(warPayload,factionId);
   const assigneeId=['refresh','claim','resume'].includes(body.action)?actorId:body.assignee_id??actorId;
-  let leaderId=actorId,canManage=false,members:ReturnType<typeof rosterTargets>=[];
+  const scopedWarKey=body.war_key??saved?.war_key??wars[0]?.key;
+  let leaderId=actorId,canManage=false,delegated=false,members:ReturnType<typeof rosterTargets>=[];
   if(!['refresh','claim','resume'].includes(body.action)){
    const basic=(await get('/faction/basic')).basic;
    if(basic?.id!==factionId||!positiveId(basic?.leader_id))return json({error:'Faction identity verification failed.'},403);
-   leaderId=basic.leader_id;canManage=leaderId===actorId;
-   if(canManage){members=rosterTargets(await get('/faction/members'));}
-   authorizeAssignee(actorId,assigneeId,leaderId,members);
+   leaderId=basic.leader_id;
+   const appointment=checked(await admin.from('war_handlers').select('appointed_by').eq('faction_id',factionId).eq('war_key',scopedWarKey).eq('torn_id',actorId).maybeSingle()).data;
+   delegated=wars.some(w=>w.key===scopedWarKey)&&appointment?.appointed_by===leaderId;
+   canManage=leaderId===actorId||delegated;members=rosterTargets(await get('/faction/members'));
+   authorizeAssignee(actorId,assigneeId,leaderId,members,delegated);
   }
   let owner=user.id;
   if(assigneeId!==actorId){
@@ -120,8 +123,9 @@ Deno.serve(async(req)=>{
    }
    if(body.action==='refresh'&&saved)checked(await admin.from('war_target_lists').update({active:false,targets:[],verified_until:new Date().toISOString()}).eq('user_id',owner).eq('revision',saved.revision));
    if(['save','claim'].includes(body.action))return json({error:'Choose a current active faction war.'},409);
-   return json({actor_id:actorId,faction_id:factionId,can_manage:canManage,members,wars,enemies:[],list:null,war_key:null,assignment_revision:saved?.revision??null,assignee_id:assigneeId});
+   return json({actor_id:actorId,faction_id:factionId,can_manage:canManage,is_leader:leaderId===actorId,members,wars,enemies:[],list:null,war_key:null,assignment_revision:saved?.revision??null,assignee_id:assigneeId});
   }
+  if(delegated&&assigneeId!==actorId&&opponent.key!==scopedWarKey)return json({error:'War-handler appointment does not cover this war.'},403);
   const enemies=rosterTargets(await get(`/faction/${opponent.id}/members`));
   if(body.action==='resume'){
    const paused=checked(await admin.from('war_rest_claims').select('*').eq('user_id',user.id)).data??[];
@@ -145,15 +149,15 @@ Deno.serve(async(req)=>{
   if(body.action==='claim'){
    if(!Number.isInteger(body.attacks_goal??1)||(body.attacks_goal??1)<1||(body.attacks_goal??1)>100)return json({error:'Choose between 1 and 100 attacks.'},400);
    if(!saved?.active||!saved.target_ids.includes(body.target_id)||!enemies.some(t=>t.id===body.target_id))return json({error:'Choose one of your current assigned targets.'},403);
-   const result=checked(await admin.rpc('take_war_target',{owner_id:user.id,target:body.target_id,attack_goal:body.attacks_goal??1}));return json({claim:result.data});
+   const result=checked(await admin.rpc('take_war_target',{owner_id:user.id,target:body.target_id,attack_goal:body.attacks_goal??1}));if(result.data?.error)return json(result.data,409);return json({claim:result.data});
   }
   if(body.action==='save'){
    const ids=validateSelection(body.target_ids,enemies),priorities=validPriorities(body.priorities,ids);
    const expected=body.expected_revision??null;
    if(expected!==(saved?.revision??null))return json({error:'Assignments changed. Reload before saving.'},409);
    const row={user_id:owner,faction_id:factionId,war_key:opponent.key,enemy_faction_id:opponent.id,target_ids:ids,priorities,war_start:opponent.start,war_end:null,targets:enemies.filter(m=>ids.includes(m.id)),active:true,updated_by:actorId,revision:(saved?.revision??0)+1,verified_until:new Date(Date.now()+120000).toISOString(),updated_at:new Date().toISOString()};
-   const result=saved?await admin.from('war_target_lists').update(row).eq('user_id',owner).eq('revision',saved.revision).select().maybeSingle():await admin.from('war_target_lists').insert(row).select().single();
-   checked(result);if(!result.data)return json({error:'Assignments changed. Reload before saving.'},409);saved=result.data;
+   checked(await admin.rpc('verify_war_command',{owner_id:user.id,faction:factionId,war:opponent.key,identity:actorId,leader:leaderId,roster:members.map(m=>m.id),enemy:opponent.id,targets:enemies,started:opponent.start}));
+   const result=checked(await admin.rpc('commit_war_assignments',{owner_id:owner,actor_user:user.id,values_json:row,expected_revision:saved?.revision??null,reason:body.assignment_reason??''}));saved=result.data;
   }else if(saved&&saved.war_key===opponent.key&&saved.faction_id===factionId){
    const targets=enemies.filter(m=>(saved.target_ids as number[]).includes(m.id));
    checked(await admin.from('war_target_lists').update({targets,war_start:opponent.start,verified_until:new Date(Date.now()+120000).toISOString(),updated_at:new Date().toISOString(),revision:saved.revision+1}).eq('user_id',owner).eq('revision',saved.revision));
@@ -171,7 +175,7 @@ Deno.serve(async(req)=>{
     history=events.map(e=>({...e,member_id:linkedMembers.find(m=>m.user_id===e.user_id)?.torn_id,user_id:undefined}));
    }
   }
-  return json(body.action==='refresh'?{list:saved}:{actor_id:actorId,faction_id:factionId,can_manage:canManage,members,wars,enemies,board,history,war_key:opponent.key,assignment_revision:saved?.revision??null,list:saved?.war_key===opponent.key&&saved.faction_id===factionId?saved:null,assignee_id:assigneeId});
+  return json(body.action==='refresh'?{list:saved}:{actor_id:actorId,faction_id:factionId,can_manage:canManage,is_leader:leaderId===actorId,members,wars,enemies,board,history,war_key:opponent.key,assignment_revision:saved?.revision??null,list:saved?.war_key===opponent.key&&saved.faction_id===factionId?saved:null,assignee_id:assigneeId});
  }catch(error){
   if((error as any)?.code==='P0001'&&typeof (error as any).message==='string')return json({error:(error as any).message},409);
   const failure=refreshFailure(error);

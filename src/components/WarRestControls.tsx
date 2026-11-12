@@ -24,7 +24,7 @@ export default function WarRestControls(){
     const resumed=(result.resumed??[]).map((r:any)=>`${r.name}: ${r.remaining} attacks left`).join('; ');
     const blocked=(result.blocked??[]).map((r:any)=>`${r.name}: ${r.reason}`).join('; ');
     const discarded=(result.discarded??[]).map((r:any)=>`${r.name}: ${r.reason}`).join('; ');
-    setMessage([resumed?`Welcome back. Reserved ${resumed}.`:'You’re back. No previous targets were newly reserved.',blocked?`Still released: ${blocked}. You can try I’m back again when available.`:'',discarded?`Not resumed: ${discarded}.`:''].filter(Boolean).join(' '));
+    setMessage([resumed?`Welcome back. Reserved ${resumed}.`:'You’re back. No previous targets were newly reserved.',blocked?`Still released: ${blocked}. Your queue position and saved goal are kept; claim when it is your turn.`:'',discarded?`Not resumed: ${discarded}.`:''].filter(Boolean).join(' '));
    }
    refresh();await client.invalidateQueries({queryKey:key});
   }catch(e){setError(e instanceof Error?e.message:'Could not change rest status. Your saved progress is retained.');}
@@ -35,7 +35,7 @@ export default function WarRestControls(){
  return <article className="card"><h3>{list.resting?'Resting · targets released':'Taking a break?'}</h3><p>Release your claims now and keep your remaining attack goals for later. Hospital alerts and automatic war checks pause while you rest. Other faction members can claim the released targets.</p>
   <button className="nu-btn" disabled={busy||!!list.resting} onClick={()=>void change('rest')}>{busy?'Updating…':'I’m going to rest'}</button>
   <button className="nu-btn" disabled={busy||(!list.resting&&!rows.length)} onClick={()=>void change('resume')}>I’m back</button>
-  <p>Returning checks attacks from before your break and restores only free targets that are still assigned to you in the current war. It never replaces another member’s claim.</p>
+  <p>Returning checks attacks from before your break and restores a free target or joins the back of its queue, while keeping only targets still assigned to you in the current war. It never replaces another member’s claim.</p>
   {rows.length>0&&<ul aria-label="Saved attack goals">{rows.map(r=><li key={`${r.war_key}:${r.target_id}`}>{r.target_name} [{r.target_id}] · <strong>{Math.max(0,r.attacks_goal-r.attacks_done)} attacks remaining</strong> ({r.attacks_done} / {r.attacks_goal} confirmed)</li>)}</ul>}
   {message&&<p role="status">{message}</p>}{(error||saved.isError)&&<p role="alert">{error||'Could not load saved rest goals.'}</p>}
  </article>;
