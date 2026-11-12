@@ -1,3 +1,4 @@
+import StockForecast from "../components/StockForecast";
 import DataEntry from "../components/DataEntry";
 import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
@@ -73,6 +74,7 @@ export default function Stocks() {
         your stocks; the data browser also provides stock reference and benefit
         data.
       </p>
+      <StockForecast/>
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Add / update holding</h3>
