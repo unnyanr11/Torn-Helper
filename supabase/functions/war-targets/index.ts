@@ -8,13 +8,18 @@ Deno.serve(async(req)=>{
  const early=preflight(req);if(early)return early;
  const admin=adminClient(),user=await authenticate(req,admin);if(!user)return json({error:'Sign in to manage war targets.'},401);
  try{
-  const body=await req.json();if(!['load','save','refresh','alerts','preferences','claim','release','prealert','report','report_sync','claim_sync'].includes(body.action))return json({error:'Unknown war target action.'},400);
+  const body=await req.json();if(!['load','save','refresh','alerts','preferences','claim','release','prealert','report','report_sync','claim_sync','rest','resume'].includes(body.action))return json({error:'Unknown war target action.'},400);
   const linked=checked(await admin.from('linked_torn_accounts').select('torn_id,torn_name').eq('user_id',user.id).is('revoked_at',null).maybeSingle()).data;
   if(!linked)return json({error:'Link your Torn identity first.'},409);
   const actorId=Number(linked.torn_id);
   const profile=checked(await admin.from('profiles').select('tracking_paused').eq('id',user.id).single()).data;
-  if(profile.tracking_paused)return json({error:'Resume tracking in Settings to use war targets.'},409);
   let saved=checked(await admin.from('war_target_lists').select('*').eq('user_id',user.id).maybeSingle()).data;
+  if(body.action==='rest')return json(checked(await admin.rpc('rest_war_targets',{owner_id:user.id})).data);
+  if(body.action==='resume'){
+   const rows=checked(await admin.from('war_rest_claims').select('*').eq('user_id',user.id)).data??[];
+   if(!rows.length)return json(checked(await admin.rpc('resume_war_targets',{owner_id:user.id})).data);
+  }
+  if(profile.tracking_paused)return json({error:'Resume tracking in Settings to use war targets.'},409);
   if(body.action==='preferences'){
    const preferences=validAlertPreferences(body.preferences);checked(await admin.from('war_alert_preferences').upsert({user_id:user.id,...preferences}));return json({preferences});
   }
@@ -34,7 +39,7 @@ Deno.serve(async(req)=>{
    const result=checked(await admin.from('war_target_lists').update({alerts_enabled:body.enabled}).eq('user_id',user.id).select().maybeSingle()).data;
    return json({list:result});
   }
-  if(body.action==='refresh'&&(!saved||!saved.active||!saved.target_ids.length||!saved.alerts_enabled))return json({list:saved});
+  if(body.action==='refresh'&&(!saved||!saved.active||saved.resting||!saved.target_ids.length||!saved.alerts_enabled))return json({list:saved});
   // Repeated tabs/reconnects reuse the most recent saved snapshot for 30 seconds.
   if(body.action==='refresh'&&Date.parse(saved.updated_at)>Date.now()-30000)return json({list:saved});
   const key=await resolveRefreshKey(admin,user.id,undefined,Deno.env.get('TORN_KEY_ENCRYPTION_KEY'));
@@ -71,7 +76,7 @@ Deno.serve(async(req)=>{
    return json({synced:true,more:!!params});
   }
   if(body.action==='prealert'){
-   if(!saved?.active||!saved.alerts_enabled||Date.parse(saved.verified_until)<=Date.now())return json({list:saved});
+   if(!saved?.active||saved.resting||!saved.alerts_enabled||Date.parse(saved.verified_until)<=Date.now())return json({list:saved});
    const target=saved.targets.find(t=>t.id===body.target_id&&saved.target_ids.includes(t.id)&&t.state==='Hospital');
    const prefs=checked(await admin.from('war_alert_preferences').select('*').eq('user_id',user.id).maybeSingle()).data;
    const lead=prefs?.lead_seconds??20;
@@ -90,9 +95,9 @@ Deno.serve(async(req)=>{
   checked(await admin.rpc('verify_war_membership',{owner_id:user.id,faction:factionId,identity:actorId}));
   const warPayload=await get('/faction/wars');
   const wars=activeOpponents(warPayload,factionId);
-  const assigneeId=['refresh','claim'].includes(body.action)?actorId:body.assignee_id??actorId;
+  const assigneeId=['refresh','claim','resume'].includes(body.action)?actorId:body.assignee_id??actorId;
   let leaderId=actorId,canManage=false,members:ReturnType<typeof rosterTargets>=[];
-  if(!['refresh','claim'].includes(body.action)){
+  if(!['refresh','claim','resume'].includes(body.action)){
    const basic=(await get('/faction/basic')).basic;
    if(basic?.id!==factionId||!positiveId(basic?.leader_id))return json({error:'Faction identity verification failed.'},403);
    leaderId=basic.leader_id;canManage=leaderId===actorId;
@@ -106,14 +111,37 @@ Deno.serve(async(req)=>{
    owner=assignee.user_id;
    saved=checked(await admin.from('war_target_lists').select('*').eq('user_id',owner).maybeSingle()).data;
   }
-  const warKey=['refresh','claim'].includes(body.action)?saved?.war_key:body.war_key??saved?.war_key;
+  const warKey=['refresh','claim','resume'].includes(body.action)?saved?.war_key:body.war_key??saved?.war_key;
   const opponent=wars.find(w=>w.key===warKey)??(body.action==='load'&&!body.war_key?wars[0]:undefined);
   if(!opponent){
+   if(body.action==='resume'){
+    checked(await admin.from('war_target_lists').update({active:false,targets:[],verified_until:new Date().toISOString()}).eq('user_id',user.id));
+    return json(checked(await admin.rpc('resume_war_targets',{owner_id:user.id})).data);
+   }
    if(body.action==='refresh'&&saved)checked(await admin.from('war_target_lists').update({active:false,targets:[],verified_until:new Date().toISOString()}).eq('user_id',owner).eq('revision',saved.revision));
    if(['save','claim'].includes(body.action))return json({error:'Choose a current active faction war.'},409);
    return json({actor_id:actorId,faction_id:factionId,can_manage:canManage,members,wars,enemies:[],list:null,war_key:null,assignment_revision:saved?.revision??null,assignee_id:assigneeId});
   }
   const enemies=rosterTargets(await get(`/faction/${opponent.id}/members`));
+  if(body.action==='resume'){
+   const paused=checked(await admin.from('war_rest_claims').select('*').eq('user_id',user.id)).data??[];
+   // Reconcile late-arriving original-claim attacks before restoring any reservation.
+   const relevant=paused.filter(r=>r.war_key===saved?.war_key&&r.faction_id===factionId&&r.claimant_torn_id===actorId&&saved?.target_ids.includes(r.target_id)&&enemies.some(t=>t.id===r.target_id)&&r.attacks_done<r.attacks_goal);
+   if(relevant.length){
+    const ids=['rest',...relevant.map(r=>r.original_claim_id).sort()],rangeStart=Math.floor(Math.min(...relevant.map(r=>Date.parse(r.original_claimed_at)))/1000);
+    let params=checked(await admin.rpc('war_claim_scan',{owner_id:user.id,ids})).data??{from:String(Math.floor(Math.min(...relevant.map(r=>Date.parse(r.original_claimed_at)))/1000)),to:String(Math.ceil(Math.max(...relevant.map(r=>Date.parse(r.rested_at)))/1000)),limit:'100',sort:'ASC',filters:'outgoing'};
+    const records=[];
+    for(let page=0;page<2&&params;page++){
+     const payload=await get('/user/attacks?'+new URLSearchParams(params));records.push(...attackRecords(payload,actorId,rangeStart,Number(params.to)));params=attackNext(payload,params);
+    }
+    checked(await admin.rpc('record_rest_attacks',{owner_id:user.id,records}));
+    checked(await admin.rpc('war_claim_scan',{owner_id:user.id,ids,next_value:params,save_value:true}));
+    if(params)return json({pending:true,message:'More original-claim attack history remains. Press I’m back again to continue checking.'});
+   }
+   const updated=checked(await admin.from('war_target_lists').update({targets:enemies.filter(t=>saved.target_ids.includes(t.id)),verified_until:new Date(Date.now()+120000).toISOString()}).eq('user_id',user.id).eq('revision',saved.revision).select().maybeSingle()).data;
+   if(!updated)return json({error:'Assignments changed. Retry returning with the latest list.'},409);
+   return json(checked(await admin.rpc('resume_war_targets',{owner_id:user.id})).data);
+  }
   if(body.action==='claim'){
    if(!Number.isInteger(body.attacks_goal??1)||(body.attacks_goal??1)<1||(body.attacks_goal??1)>100)return json({error:'Choose between 1 and 100 attacks.'},400);
    if(!saved?.active||!saved.target_ids.includes(body.target_id)||!enemies.some(t=>t.id===body.target_id))return json({error:'Choose one of your current assigned targets.'},403);

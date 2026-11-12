@@ -74,3 +74,12 @@ it('passes the selected attack goal only for an owned assigned enemy target',asy
  expect((await h.call({action:'claim',target_id:50,attacks_goal:0})).status).toBe(400);
  expect((await h.call({action:'claim',target_id:999,attacks_goal:2})).status).toBe(403);
 });
+
+it('rest uses only the authenticated owner and needs no upstream key or API request',async()=>{
+ const h=harness(2);await h.call({action:'rest',owner_id:'leader',assignee_id:1});
+ expect(h.rpc).toHaveBeenCalledWith('rest_war_targets',{owner_id:'member'});expect(h.get).not.toHaveBeenCalled();
+});
+it('returning without pending goals only ends the owner’s rest and makes no upstream request',async()=>{
+ const h=harness(2);await h.call({action:'resume',owner_id:'leader'});
+ expect(h.rpc).toHaveBeenCalledWith('resume_war_targets',{owner_id:'member'});expect(h.get).not.toHaveBeenCalled();
+});

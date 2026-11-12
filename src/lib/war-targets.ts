@@ -1,6 +1,6 @@
 import type {WarTarget,WarOpponent} from '../../supabase/functions/_shared/war-targets';
 export type {WarTarget,WarOpponent};
-export type WarTargetList={user_id:string;faction_id:number;war_key:string;enemy_faction_id:number;target_ids:number[];targets:WarTarget[];active:boolean;alerts_enabled:boolean;updated_by:number;revision:number;verified_until:string;updated_at:string;priorities?:Record<string,number>;war_start?:number;war_end?:number|null};
+export type WarTargetList={user_id:string;faction_id:number;war_key:string;enemy_faction_id:number;target_ids:number[];targets:WarTarget[];active:boolean;alerts_enabled:boolean;updated_by:number;revision:number;verified_until:string;updated_at:string;priorities?:Record<string,number>;war_start?:number;war_end?:number|null;resting?:boolean};
 export type WarTargetContext={actor_id:number;faction_id:number;can_manage:boolean;members:WarTarget[];wars:WarOpponent[];enemies:WarTarget[];list:WarTargetList|null;assignee_id:number;war_key:string|null;assignment_revision:number|null;board?:{id:number;name:string;linked:boolean;assignment:{target_ids:number[];priorities:Record<string,number>;updated_by:number}|null}[];history?:WarEvent[]};
 export const attackUrl=(id:number)=>`https://www.torn.com/loader.php?sid=attack&user2ID=${id}`;
 export const hospitalAlertKey=(owner:string,war:string,target:WarTarget)=>`war-hospital:${owner}:${war}:${target.id}:${target.hospital_until}`;
@@ -10,7 +10,7 @@ export function alertDeadline(target:WarTarget,now=Date.now(),leadSeconds=20):nu
 }
 /** Local deadlines only. Late wakeups never announce an already-expired hospital. */
 export function scheduleHospitalAlerts(list:WarTargetList,owner:string,notify:(target:WarTarget,key:string)=>void,seen:(key:string)=>boolean,now=Date.now,options:{leadSeconds?:number;requirePrecheck?:boolean}={}){
- if(!list.active||!list.alerts_enabled||Date.parse(list.verified_until)<=now())return ()=>{};
+ if(!list.active||list.resting||!list.alerts_enabled||Date.parse(list.verified_until)<=now())return ()=>{};
  const timers=list.targets.filter(t=>list.target_ids.includes(t.id)).flatMap(target=>{
   const at=alertDeadline(target,now(),options.leadSeconds??20);if(at===null||at>=Date.parse(list.verified_until))return [];
   const key=hospitalAlertKey(owner,list.war_key,target);if(seen(key))return [];
@@ -42,3 +42,5 @@ export function warReportSummary(report:WarReport,events:WarEvent[]){
  }
  return {hits:attacks.length,respect:attacks.reduce((n,a)=>n+a.respect,0),results,windows,unhit,changes:events.filter(e=>e.kind==='assignment').length};
 }
+
+export type RestedWarClaim={user_id:string;faction_id:number;war_key:string;target_id:number;target_name:string;attacks_goal:number;attacks_done:number;rested_at:string};
