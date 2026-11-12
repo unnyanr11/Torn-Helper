@@ -153,7 +153,7 @@ export default function MyTorn({accountId}:{accountId?:string}) {
   return <section className="my-torn">
     <h2>{player?.name ? `${player.name}’s dashboard` : 'My dashboard'}</h2><p>Your daily overview and a useful place to start.</p>
     <div aria-live="polite">
-      {preparation&&preparation.loaded<PREPARATION_CALLS&&<p role="status">Setup loaded {preparation.loaded} sections during startup. {preparation.problem||'Some sections were unavailable or unfinished.'} Available data appears below; retry individual sections when needed.</p>}
+      {preparation&&preparation.loaded<PREPARATION_CALLS&&<p role="status">{preparation.problem||'Some dashboard essentials could not be loaded.'} Available data appears below; retry individual sections when needed.</p>}
       {(saved.isLoading||connection.status.isPending)&&<p role="status">Preparing your Torn dashboard…</p>}
       {status&&<p role="status">{status}</p>}
       {error&&<p role="alert">{error} <button type="button" className="nu-btn" disabled={busy} onClick={()=>void collect('essentials')}>Retry essentials</button> · <a href="#Settings">Check Torn connection</a></p>}

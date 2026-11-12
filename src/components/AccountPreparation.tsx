@@ -54,7 +54,7 @@ function PrivatePreparation({owner,children}:{owner:string;children:ReactNode}){
   return()=>{disposed=true;clearTimeout(boot);cleanup?.();};
  },[client,owner]);
  if(phase==='done')return <>{children}</>;
- const complete=phase==='ready',pending=Math.max(0,progress.started-progress.loaded-progress.failed);
+ const complete=phase==='ready';
  return <main className={`account-preparation ${complete?'is-ready':''}`} aria-labelledby="preparation-title">
   <div className="preparation-glow" aria-hidden="true"/>
   <section className="preparation-panel">
@@ -64,12 +64,11 @@ function PrivatePreparation({owner,children}:{owner:string;children:ReactNode}){
    <p className="preparation-message" role="status">{complete?(progress.loaded===PREPARATION_CALLS?'Your dashboard essentials are ready. Let’s go.':'Your workspace is ready. Available data has been saved.'):phrase+'…'}</p>
    <div className="preparation-timer" role="timer" aria-label="Preparation time remaining">{String(Math.floor(remaining/60)).padStart(2,'0')}:{String(remaining%60).padStart(2,'0')}</div>
    <progress aria-label="One-minute preparation" value={60-remaining} max={60}/>
-   <p className="preparation-count">{progress.started} / {PREPARATION_CALLS} sections checked · {progress.loaded} loaded{progress.issues.some(i=>i.kind==='restricted')?` · ${progress.issues.filter(i=>i.kind==='restricted').length} restricted`:''}{progress.issues.some(i=>i.kind==='not_applicable')?` · ${progress.issues.filter(i=>i.kind==='not_applicable').length} not applicable`:''}{progress.issues.some(i=>i.kind==='failed')?` · ${progress.issues.filter(i=>i.kind==='failed').length} failed`:''}{pending?` · ${pending} ${complete?'unfinished':'in flight'}`:''}</p>
    {!complete&&<p className="preparation-current">{progress.current}</p>}
    {progress.problem&&<p className="preparation-note" role="status">{progress.problem}{!complete&&' Your workspace will open when the timer finishes.'}</p>}
-   {complete&&(progress.loaded<PREPARATION_CALLS)&&<p className="preparation-note">Some sections need a retry, different key permissions, or a faction/company role. You can check these inside.</p>}
+   {complete&&(progress.loaded<PREPARATION_CALLS)&&<p className="preparation-note">Some essentials could not be loaded. Check the details or retry them inside your workspace.</p>}
    {!complete&&<p className="preparation-note">A one-minute setup for your personal tools. Data access depends on your Torn key and role.</p>}
-   {progress.issues.length>0&&<details className="preparation-note"><summary>See section details ({progress.issues.length})</summary><ul>{progress.issues.map(issue=><li key={issue.endpoint+issue.label}><strong>{issue.label}</strong>: {issue.reason}</li>)}</ul></details>}
+   {progress.issues.length>0&&<details className="preparation-note"><summary>See loading details</summary><ul>{progress.issues.map(issue=><li key={issue.endpoint+issue.label}><strong>{issue.label}</strong>: {issue.reason}</li>)}</ul></details>}
    <button type="button" className="preparation-signout" onClick={()=>void supabase.auth.signOut()}>Sign out</button>
   </section>
  </main>;

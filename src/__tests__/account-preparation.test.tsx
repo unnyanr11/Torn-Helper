@@ -3,7 +3,7 @@ import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest';
 import {act,create,type ReactTestRenderer} from 'react-test-renderer';
 import {QueryClient,QueryClientProvider} from '@tanstack/react-query';
 import {renderToStaticMarkup} from 'react-dom/server';
-import {preparationPlan,startPreparation,pageDatasets,PAGE_DATA,PREPARATION_CALLS} from '../lib/account-preparation';
+import {preparationPlan,startPreparation,pageDatasets,PAGE_DATA,PREPARATION_CALLS,PREPARATION_CALL_BUDGET} from '../lib/account-preparation';
 import {compileTornRequest} from '../../supabase/functions/_shared/torn-data';
 import {observationKey} from '../lib/personal-data';
 import {observationsKey,mergeObservation} from '../lib/observation-cache';
@@ -18,7 +18,7 @@ beforeEach(()=>{vi.useFakeTimers();vi.setSystemTime(1800000000000);});
 afterEach(()=>{act(()=>root?.unmount());root=undefined;vi.useRealTimers();vi.unstubAllGlobals();mocks.invoke.mockReset();});
 describe('one minute preparation request plan',()=>{
  it('contains only four unique, compilable dashboard requests',()=>{
-  const rows=preparationPlan();expect(rows).toHaveLength(PREPARATION_CALLS);
+  const rows=preparationPlan();expect(PREPARATION_CALL_BUDGET).toBe(95);expect(rows.length).toBeLessThanOrEqual(PREPARATION_CALL_BUDGET);expect(rows).toHaveLength(PREPARATION_CALLS);
   expect(new Set(rows.map(row=>observationKey(row.capability.id,row.parameters))).size).toBe(PREPARATION_CALLS);
   for(const row of rows)expect(()=>compileTornRequest(row.capability.id,row.parameters)).not.toThrow();
   expect(rows.slice(0,4).map(row=>row.capability.path)).toEqual(['/user/profile','/user/bars','/user/cooldowns','/user/travel']);
@@ -60,9 +60,9 @@ describe('loading screen and data shared across tools',()=>{
  it('shows 01:00, rotating messages, then a tick and the workspace after one minute',async()=>{
   const cache=client();mocks.invoke.mockImplementation(async(_client,{body})=>({data:{endpoint_id:body.endpoint_id,parameters:body.parameters,payload:{},fetched_at:new Date().toISOString(),next_parameters:null},error:null}));
   await act(async()=>{root=create(<QueryClientProvider client={cache}><AccountPreparation owner={owner}><div>Workspace content</div></AccountPreparation></QueryClientProvider>);await vi.advanceTimersByTimeAsync(0);});
-  expect(root!.root.findByProps({role:'timer'}).children.join('')).toBe('01:00');expect(JSON.stringify(root!.toJSON())).not.toContain('Workspace content');
+  expect(root!.root.findByProps({role:'timer'}).children.join('')).toBe('01:00');expect(JSON.stringify(root!.toJSON())).not.toMatch(/95|sections checked|in flight|[0-9]+ loaded/);expect(JSON.stringify(root!.toJSON())).not.toContain('Workspace content');
   await act(async()=>{await vi.advanceTimersByTimeAsync(59999);});expect(JSON.stringify(root!.toJSON())).not.toContain('Workspace content');
-  await act(async()=>{await vi.advanceTimersByTimeAsync(1);});expect(JSON.stringify(root!.toJSON())).toContain('You’re ready now');expect(mocks.invoke).toHaveBeenCalledTimes(PREPARATION_CALLS);expect(cache.getQueryData(preparationKey(owner))).toMatchObject({loaded:PREPARATION_CALLS});
+  await act(async()=>{await vi.advanceTimersByTimeAsync(1);});expect(JSON.stringify(root!.toJSON())).toContain('You’re ready now');expect(JSON.stringify(root!.toJSON())).not.toMatch(/95|sections checked|[0-9]+ loaded/);expect(mocks.invoke).toHaveBeenCalledTimes(PREPARATION_CALLS);expect(cache.getQueryData(preparationKey(owner))).toMatchObject({loaded:PREPARATION_CALLS});
   for(const [,options] of mocks.invoke.mock.calls){expect(options.body.refresh).toBe(false);expect(options.body).not.toHaveProperty('apiKey');}
   vi.stubGlobal('requestAnimationFrame',(callback:()=>void)=>callback());vi.stubGlobal('document',{getElementById:()=>null});
   await act(async()=>{await vi.advanceTimersByTimeAsync(1200);});expect(JSON.stringify(root!.toJSON())).toContain('Workspace content');

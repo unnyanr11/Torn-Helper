@@ -1,12 +1,12 @@
 import {CAPABILITIES} from '../api/capabilities';
 import {request,type ConnectedRequest} from './connected-data';
 import {ESSENTIAL_PATHS} from './home-dashboard';
-export const PREPARATION_MS=60000,PREPARATION_CALLS=ESSENTIAL_PATHS.length;
+export const PREPARATION_MS=60000,PREPARATION_CALL_BUDGET=95,PREPARATION_CALLS=ESSENTIAL_PATHS.length;
 /** Only the dashboard's own-player essentials load automatically. Optional tools
  * keep their explicit Load actions; no padding requests are made to fill time.
  */
 export function preparationPlan():ConnectedRequest[]{
- return ESSENTIAL_PATHS.map(path=>request(path,'Personal'));
+ return ESSENTIAL_PATHS.map(path=>request(path,'Personal')).slice(0,PREPARATION_CALL_BUDGET);
 }
 export type PreparationIssue={endpoint:string;label:string;reason:string;kind:'restricted'|'not_applicable'|'failed'};
 export type PreparationProgress={started:number;loaded:number;failed:number;active:number;current:string;problem:string;issues:PreparationIssue[]};
@@ -23,7 +23,7 @@ export function startPreparation(options:{fetch:(row:ConnectedRequest,signal:Abo
  const launch=()=>{
   if(closed||halted)return;
   if(now()-start>=PREPARATION_MS){finish();return;}
-  if(state.active>=5||next>=plan.length||now()-start<next*600)return;
+  if(state.active>=5||next>=plan.length||state.started>=PREPARATION_CALL_BUDGET||now()-start<next*600)return;
   const row=plan[next++];state={...state,started:next,active:state.active+1,current:`Loading ${row.label.toLowerCase()}`};emit();
   void options.fetch(row,controller.signal).then(result=>{
    if(closed)return;
