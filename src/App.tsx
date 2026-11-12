@@ -3,6 +3,7 @@ import { cancelTornRequests } from "./lib/torn-request-state";
 import SpatialShell from "./components/SpatialShell";
 import AccountPreparation from "./components/AccountPreparation";
 import TimerProvider from "./components/TimerProvider";
+import WarTargetProvider from "./components/WarTargetProvider";
 import TornDataShortcut from "./components/TornDataShortcut";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { NAV, Page } from "./nav";
@@ -189,6 +190,7 @@ export default function App() {
   return (
     <TimerProvider key={accountId??"shared"} owner={sharedToken?"":accountId??""}>
     <AccountPreparation key={accountId??"shared"} owner={sharedToken?"":accountId??""}>
+    <WarTargetProvider key={accountId??"shared"} owner={sharedToken?"":accountId??""}>
     <SpatialShell
       key={accountId??"signed-out"}
       accountId={accountId}
@@ -284,6 +286,7 @@ export default function App() {
         )}
       </Suspense>
     </SpatialShell>
+    </WarTargetProvider>
     </AccountPreparation>
     </TimerProvider>
   );
