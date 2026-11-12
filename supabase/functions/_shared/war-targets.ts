@@ -1,5 +1,5 @@
-export type WarOpponent={key:string;kind:string;id:number;name:string;war_id:number};
-export type WarTarget={id:number;name:string;level:number;state:string;hospital_until:number|null};
+export type WarOpponent={key:string;kind:string;id:number;name:string;war_id:number;start?:number;end?:number|null};
+export type WarTarget={id:number;name:string;level:number;state:string;hospital_until:number|null;checked_at?:number};
 export const positiveId=(value:unknown):value is number=>Number.isSafeInteger(value)&&Number(value)>0;
 /** Official /faction/wars: scheduled, ended, unrelated and malformed wars fail closed. */
 export function activeOpponents(payload:any,factionId:number,now=Date.now()):WarOpponent[]{
@@ -8,14 +8,14 @@ export function activeOpponents(payload:any,factionId:number,now=Date.now()):War
  for(const [kind,rows] of [['ranked',[payload.wars.ranked]],['raid',payload.wars.raids],['territory',payload.wars.territory]] as const){
   for(const row of rows){
    if(!row||!positiveId(row.war_id)||!Number.isSafeInteger(row.start)||row.start*1000>now||!(row.end===null||row.end===0)||!Array.isArray(row.factions)||!row.factions.some((f:any)=>f.id===factionId))continue;
-   for(const enemy of row.factions)if(positiveId(enemy.id)&&enemy.id!==factionId)result.push({key:`${kind}:${row.war_id}:${enemy.id}`,kind,id:enemy.id,name:String(enemy.name).slice(0,100),war_id:row.war_id});
+   for(const enemy of row.factions)if(positiveId(enemy.id)&&enemy.id!==factionId)result.push({key:`${kind}:${row.war_id}:${enemy.id}`,kind,id:enemy.id,name:String(enemy.name).slice(0,100),war_id:row.war_id,start:row.start,end:row.end});
   }
  }
  return result;
 }
 export function rosterTargets(payload:any):WarTarget[]{
  if(!Array.isArray(payload?.members)||payload.members.length>200)throw new Error('A complete faction roster is required.');
- return payload.members.filter((m:any)=>positiveId(m.id)).map((m:any)=>({id:m.id,name:String(m.name??m.id).slice(0,100),level:Number.isInteger(m.level)?m.level:0,state:String(m.status?.state??'Unknown').slice(0,40),hospital_until:m.status?.state==='Hospital'&&positiveId(m.status?.until)?m.status.until:null}));
+ return payload.members.filter((m:any)=>positiveId(m.id)).map((m:any)=>({id:m.id,name:String(m.name??m.id).slice(0,100),level:Number.isInteger(m.level)?m.level:0,checked_at:Date.now(),state:String(m.status?.state??'Unknown').slice(0,40),hospital_until:m.status?.state==='Hospital'&&positiveId(m.status?.until)?m.status.until:null}));
 }
 export function validateSelection(ids:unknown,roster:WarTarget[]):number[]{
  if(!Array.isArray(ids)||ids.length>100||ids.some(id=>!positiveId(id))||new Set(ids).size!==ids.length)throw new Error('Choose up to 100 unique targets.');
@@ -25,4 +25,19 @@ export function validateSelection(ids:unknown,roster:WarTarget[]):number[]{
 export function authorizeAssignee(actorId:number,assigneeId:number,leaderId:number,roster:WarTarget[]){
  if(!positiveId(assigneeId))throw new Error('Choose a faction member.');
  if(assigneeId!==actorId&&(actorId!==leaderId||!roster.some(m=>m.id===actorId)||!roster.some(m=>m.id===assigneeId)))throw new Error('Only the current faction leader can change another current member’s targets.');
+}
+
+export function validPriorities(value:unknown,ids:number[]):Record<string,number>{
+ if(value===undefined)return {};
+ if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('Choose valid target priorities.');
+ const result:Record<string,number>={};
+ for(const [key,priority] of Object.entries(value)){
+  if(!ids.includes(Number(key))||![1,2,3].includes(priority as number))throw new Error('Priorities must belong to selected targets.');
+  result[key]=priority as number;
+ }
+ return result;
+}
+export function validAlertPreferences(body:any){
+ if(!body||typeof body!=='object'||!Number.isInteger(body.lead_seconds)||body.lead_seconds<5||body.lead_seconds>120||!['off','soft','double'].includes(body.sound)||typeof body.volume!=='number'||!Number.isFinite(body.volume)||body.volume<0||body.volume>1||typeof body.desktop!=='boolean')throw new Error('Choose a warning from 5 to 120 seconds and volume from 0 to 100%.');
+ return {lead_seconds:body.lead_seconds,sound:body.sound,volume:body.volume,desktop:body.desktop};
 }
