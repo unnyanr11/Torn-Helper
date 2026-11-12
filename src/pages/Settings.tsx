@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import SecretInput from "../components/SecretInput";
 import AccountRegistration from "../components/AccountRegistration";
 import BrowserTornKeyCard from "../components/BrowserTornKeyCard";
 import {commitVerifiedBrowserKey,removeBrowserTornKey,notifyBrowserKeyChange} from '../lib/browser-torn-key';
@@ -168,11 +169,8 @@ export default function Settings({entry=false}:{entry?:boolean}={}) {
               it. Email and password registration above is optional.
             </p>
             <KeyDisclosure persist browserCopy={rememberBrowser} requiredBackend/>
-            <label>
-              Torn API key
-              <input
+            <SecretInput label="Torn API key"
                 className="nu-input"
-                type="password"
                 autoComplete="off"
                 spellCheck={false}
                 minLength={16}
@@ -181,7 +179,6 @@ export default function Settings({entry=false}:{entry?:boolean}={}) {
                 value={key}
                 onChange={(e) => setKey(e.target.value.trim())}
               />
-            </label>
             <label>
               <input
                 type="checkbox"
@@ -224,16 +221,12 @@ export default function Settings({entry=false}:{entry?:boolean}={}) {
                 : "No backend key is stored. Link a key below to enable automatic updates."}
             </p>
             <KeyDisclosure persist browserCopy={rememberBrowser} requiredBackend/>
-            <label>
-              Torn API key
-              <input
-                type="password"
+            <SecretInput label="Torn API key"
                 className="nu-input"
                 value={key}
                 autoComplete="off"
                 onChange={(e) => setKey(e.target.value.trim())}
               />
-            </label>
             <label>
               <input
                 type="checkbox"
