@@ -39,7 +39,7 @@ Returning creates a new reservation only when the target is free (including an e
 
 ## First-come claims and leadership
 
-Open targets use first-come, server-confirmed reservations. Members can keep a shortlist of up to 100, but may hold only one active reservation. New claim goals default to one; each war defaults to a cap of three attacks, configurable from 1–100 by the actual current leader. Previously saved rest progress is retained instead of silently resetting a member’s goal.
+Open targets use first-come, server-confirmed reservations. Members can keep a shortlist of up to 100, but may hold up to three active reservations. New claim goals default to one; each war defaults to a cap of three attacks, configurable from 1–100 by the actual current leader. Previously saved rest progress is retained instead of silently resetting a member’s goal.
 
 **Join waiting queue** preserves server-issued order; repeat joins never move a member forward. When a queued target becomes free, its head has a 60-second acceptance window. Unanswered turns are removed; queue entries expire after 30 minutes and are excluded if a member rests or loses the relevant shortlist. A queue-turn popup is available across workspace pages while the app is open. Queuing and polling use database state; countdowns do not poll Torn. Rest leaves the queue. Returning rejoins at the back when the target is busy or the member has another active reservation.
 
@@ -48,3 +48,5 @@ Open targets use first-come, server-confirmed reservations. Members can keep a s
 The **current faction leader** can appoint or remove linked current members as war handlers for one active war. Appointments are bound to the appointing leader’s Torn ID and become ineffective under another leader or another war. Handlers can coordinate target assignments and resolve disputes, but cannot appoint handlers, change claim caps or gain private battle-stat/attack-history access. Live Torn faction/basic/roster/war data proves authority; browser role flags and position strings do not.
 
 Leadership may mark a target **Leadership assigned** to a particular linked member or return it to open claiming. Assigning it adds the target to that member’s shortlist; the member claims it when ready. An existing reservation can be released only with an explicit override and a recorded reason. Ordinary edits to another member’s shortlist also require a reason. Decisions and mutually accepted exchanges are audited, with in-app notifications to affected members. Coordination is advisory: it cannot prevent attacks made directly in Torn.
+
+The three-claim limit is enforced for direct claims, accepted transfers and rest/return. A fourth claim is rejected or waits in its target queue. Swaps exchange a specifically selected owned target without adding a slot; the attack-goal cap is a separate per-war setting.

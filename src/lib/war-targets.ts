@@ -1,3 +1,4 @@
+export const MAX_ACTIVE_WAR_CLAIMS=3;
 import type {WarTarget,WarOpponent} from '../../supabase/functions/_shared/war-targets';
 export type {WarTarget,WarOpponent};
 export type WarTargetList={user_id:string;faction_id:number;war_key:string;enemy_faction_id:number;target_ids:number[];targets:WarTarget[];active:boolean;alerts_enabled:boolean;updated_by:number;revision:number;verified_until:string;updated_at:string;priorities?:Record<string,number>;war_start?:number;war_end?:number|null;resting?:boolean};

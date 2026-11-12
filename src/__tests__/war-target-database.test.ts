@@ -9,6 +9,7 @@ beforeAll(async()=>{
  await db.exec(readFileSync('supabase/migrations/20261112185335_war_coordination.sql','utf8'));
  await db.exec(readFileSync('supabase/migrations/20261112192716_war_rest_resume.sql','utf8'));
  await db.exec(readFileSync('supabase/migrations/20261112194559_war_fair_claims.sql','utf8'));
+ await db.exec(readFileSync('supabase/migrations/20261112201322_three_active_war_claims.sql','utf8'));
  await db.exec(`insert into public.war_claim_policies values(1,'ranked:7:2',100);grant select on public.linked_torn_accounts to service_role;insert into public.war_target_lists(user_id,faction_id,war_key,enemy_faction_id,updated_by,verified_until) values('${one}',1,'ranked:7:2',2,1,now()+interval '2 minutes'),('${two}',1,'ranked:7:2',2,1,now()+interval '2 minutes')`);
 });afterAll(()=>db.close());
 it('owners can read only their list, and browser roles cannot forge assignments or leadership',async()=>{
@@ -110,7 +111,7 @@ it('rested goals remain owner-only and browser roles cannot invoke rest or resum
 });
 
 const three='00000000-0000-4000-8000-000000000003',outside='00000000-0000-4000-8000-000000000004';
-const enemyTargets=[{id:50,name:'Target 50',state:'Okay',level:1,hospital_until:null},{id:51,name:'Target 51',state:'Okay',level:1,hospital_until:null},{id:52,name:'Target 52',state:'Okay',level:1,hospital_until:null}];
+const enemyTargets=[{id:50,name:'Target 50',state:'Okay',level:1,hospital_until:null},{id:51,name:'Target 51',state:'Okay',level:1,hospital_until:null},{id:52,name:'Target 52',state:'Okay',level:1,hospital_until:null},{id:53,name:'Target 53',state:'Okay',level:1,hospital_until:null}];
 async function commandProof(user:string,id:number,leaderId=1,faction=1,war='ranked:7:2'){
  await db.query('select public.verify_war_command($1,$2,$3,$4,$5,$6,2,$7,1)',[user,faction,war,id,leaderId,faction===1?[1,2,3]:[4],JSON.stringify(enemyTargets)]);
 }
@@ -118,16 +119,18 @@ async function gov(user:string,command:string,body:any={}){return (await db.quer
 describe('first-come queues, mutual agreements and delegated leadership',()=>{
  beforeEach(async()=>{
   await resetRestClaims();await db.exec(`delete from public.war_handlers;delete from public.war_claim_policies;delete from private.war_command_proofs;insert into public.profiles values('${three}'),('${outside}') on conflict do nothing;insert into public.linked_torn_accounts values('${three}',3,'Third',null),('${outside}',4,'Outside',null) on conflict do nothing;`);
-  for(const [user,id] of [[three,3],[outside,4]] as const){await db.query(`insert into public.war_target_lists(user_id,faction_id,war_key,enemy_faction_id,target_ids,targets,active,updated_by,verified_until) values($1,$2,'ranked:7:2',2,array[50::bigint,51::bigint,52::bigint],$3,true,$4,now()+interval '2 minutes') on conflict(user_id) do update set faction_id=excluded.faction_id,active=true,resting=false,target_ids=excluded.target_ids,targets=excluded.targets,verified_until=excluded.verified_until`,[user,id===4?2:1,JSON.stringify(enemyTargets),id]);}
-  await db.exec(`update public.war_target_lists set target_ids=array[50::bigint,51::bigint,52::bigint] where user_id in('${one}','${two}')`);
+  for(const [user,id] of [[three,3],[outside,4]] as const){await db.query(`insert into public.war_target_lists(user_id,faction_id,war_key,enemy_faction_id,target_ids,targets,active,updated_by,verified_until) values($1,$2,'ranked:7:2',2,array[50::bigint,51::bigint,52::bigint,53::bigint],$3,true,$4,now()+interval '2 minutes') on conflict(user_id) do update set faction_id=excluded.faction_id,active=true,resting=false,target_ids=excluded.target_ids,targets=excluded.targets,verified_until=excluded.verified_until`,[user,id===4?2:1,JSON.stringify(enemyTargets),id]);}
+  await db.query(`update public.war_target_lists set target_ids=array[50::bigint,51::bigint,52::bigint,53::bigint],targets=$1 where user_id in($2,$3)`,[JSON.stringify(enemyTargets),one,two]);
   for(const [user,id] of [[one,1],[two,2],[three,3]] as const)await commandProof(user,id);
   await commandProof(outside,4,4,2);
  });
- it('enforces one active claim and the three-attack default cap without resetting an owned claim',async()=>{
+ it('allows three active claims, rejects a fourth and keeps the per-claim attack cap separate',async()=>{
   await expect(db.query('select public.take_war_target($1,50,4)',[one])).rejects.toThrow('between 1 and 3');
-  await db.query('select public.take_war_target($1,50,1)',[one]);
-  await expect(db.query('select public.take_war_target($1,51,1)',[one])).rejects.toThrow('one active');
-  await expect(db.query('select public.take_war_target($1,50,3)',[one])).rejects.toThrow('one active');
+  for(const target of [50,51,52])await db.query('select public.take_war_target($1,$2,1)',[one,target]);
+  await expect(db.query('select public.take_war_target($1,53,1)',[one])).rejects.toThrow('three active');
+  await expect(db.query('select public.take_war_target($1,50,3)',[one])).rejects.toThrow('already hold');
+  await db.exec('update public.war_target_claims set expires_at=now()-interval \'1 second\' where target_id=50');
+  await db.query('select public.take_war_target($1,53,1)',[one]);expect((await db.query('select * from public.war_target_claims where expires_at>now()')).rows).toHaveLength(3);
  });
  it('preserves queue order, rejects jumping ahead, and expires an unanswered turn',async()=>{
   await db.query('select public.take_war_target($1,50,1)',[one]);await gov(two,'queue',{target_id:50});await gov(three,'queue',{target_id:50});
@@ -159,6 +162,28 @@ describe('first-come queues, mutual agreements and delegated leadership',()=>{
   const claims=(await db.query<any>('select target_id,user_id from public.war_target_claims order by target_id')).rows;expect(claims).toEqual([{target_id:50,user_id:two},{target_id:51,user_id:one}]);
   const again=await gov(one,'propose',{target_id:50,swap:true});await db.query("update public.war_transfer_requests set expires_at=now()-interval '1 second' where id=$1",[again.id]);await expect(gov(two,'respond',{request_id:again.id,accept:true})).rejects.toThrow('expired');
   expect((await db.query('select * from public.war_target_claims')).rows).toHaveLength(2);
+ });
+ it('checks the recipient cap again at transfer acceptance, then allows the third slot after a release',async()=>{
+  await db.query('select public.take_war_target($1,50,1)',[one]);for(const id of [51,52])await db.query('select public.take_war_target($1,$2,1)',[two,id]);
+  const request=await gov(two,'propose',{target_id:50});await db.query('select public.take_war_target($1,53,1)',[two]);
+  await expect(gov(one,'respond',{request_id:request.id,accept:true})).rejects.toThrow('three active');
+  expect((await db.query<any>('select user_id from public.war_target_claims where target_id=50')).rows[0].user_id).toBe(one);
+  await db.exec(`delete from public.war_target_claims where user_id='${two}' and target_id=53`);await gov(one,'respond',{request_id:request.id,accept:true});
+  expect((await db.query('select * from public.war_target_claims where user_id=$1 and expires_at>now()',[two])).rows).toHaveLength(3);
+ });
+ it('a member holding three claims selects exactly which one to swap',async()=>{
+  await db.query('select public.take_war_target($1,50,1)',[one]);for(const id of [51,52,53])await db.query('select public.take_war_target($1,$2,1)',[two,id]);
+  await expect(gov(two,'propose',{target_id:50,swap:true})).rejects.toThrow('Choose which');
+  const request=await gov(two,'propose',{target_id:50,swap:true,swap_target_id:52});await gov(one,'respond',{request_id:request.id,accept:true});
+  expect((await db.query<any>('select target_id from public.war_target_claims where user_id=$1 order by target_id',[two])).rows.map(r=>r.target_id)).toEqual([50,51,53]);
+  expect((await db.query<any>('select target_id from public.war_target_claims where user_id=$1',[one])).rows[0].target_id).toBe(52);
+ });
+ it('rest and return restore at most three reservations and queue extra saved goals',async()=>{
+  for(const id of [50,51,52])await db.query('select public.take_war_target($1,$2,1)',[one,id]);await db.query('select public.rest_war_targets($1)',[one]);
+  await db.query(`insert into public.war_rest_claims(user_id,faction_id,war_key,target_id,target_name,claimant_torn_id,original_claim_id,original_claimed_at,attacks_goal,attacks_done) values($1,1,'ranked:7:2',53,'Target 53',1,gen_random_uuid(),now()-interval '2 minutes',1,0)`,[one]);
+  const back=(await db.query<any>('select public.resume_war_targets($1) as data',[one])).rows[0].data;
+  expect(back.resumed).toHaveLength(3);expect(back.blocked).toHaveLength(1);expect((await db.query('select * from public.war_target_claims where user_id=$1 and expires_at>now()',[one])).rows).toHaveLength(3);
+  expect((await db.query('select * from public.war_wait_queue where user_id=$1',[one])).rows).toHaveLength(1);
  });
  it('only the actual current leader appoints handlers; appointments do not survive a leader or war change',async()=>{
   await gov(one,'handler',{member_id:2,enabled:true});expect((await gov(two,'snapshot')).can_manage).toBe(true);

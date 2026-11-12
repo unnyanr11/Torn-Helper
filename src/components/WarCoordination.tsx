@@ -10,7 +10,7 @@ export default function WarCoordination(){
  async function run(body:Record<string,unknown>,note:string){setBusy(true);setError('');try{const result=await governanceAction({...body,war_key:list?.war_key});if(Array.isArray(result.queue))client.setQueryData(governanceKey(owner),result);else await client.invalidateQueries({queryKey:governanceKey(owner)});refresh();setMessage(note);}catch(e){setError(e instanceof Error?e.message:'Coordination update failed.');}finally{setBusy(false);}}
  if(!owner||!list)return null;
  const myQueue=(data?.queue??[]).filter(q=>q.user_id===owner);
- return <article className="card"><h3>Fair claims and war coordination</h3><p>First come, first served for open targets. One active reservation per member. Queued members get a 60-second turn to confirm; stale turns expire. Leadership-assigned targets are marked separately.</p>
+ return <article className="card"><h3>Fair claims and war coordination</h3><p>First come, first served for open targets. Up to three active reservations per member. Queued members get a 60-second turn to confirm; stale turns expire. Leadership-assigned targets are marked separately.</p>
   <button className="nu-btn" disabled={busy} onClick={()=>void run({action:'verify'},'Current war and roles verified.')}>Refresh coordination &amp; roles</button>
   {query.isError&&<p>Verify your current war to load queues, requests and leadership controls.</p>}
   {message&&<p role="status">{message}</p>}{error&&<p role="alert">{error}</p>}

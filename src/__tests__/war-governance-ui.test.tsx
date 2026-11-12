@@ -20,5 +20,5 @@ it('acceptance is explicit and sends only the request ID and decision',async()=>
  expect(m.action).toHaveBeenCalledWith({action:'respond',request_id:'request',accept:true,war_key:'ranked:7:2'});
 });
 it('members see fairness defaults and requests without privileged controls',async()=>{
- await mount();const tree=JSON.stringify(root!.toJSON());expect(tree).toContain('One active reservation');expect(tree).not.toContain('Apply leadership decision');expect(tree).toContain('Default goal: one attack');
+ await mount();const tree=JSON.stringify(root!.toJSON());expect(tree).toContain('Up to three active reservations');expect(tree).not.toContain('Apply leadership decision');expect(tree).toContain('Default goal: one attack');
 });
