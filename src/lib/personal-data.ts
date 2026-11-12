@@ -1,3 +1,4 @@
+import {INVENTORY_CATEGORIES} from './inventory-data';
 import { CAPABILITIES } from '../api/capabilities';
 import type { Capability } from '../api/types';
 export type TornObservation = { endpoint_id: string; payload: unknown; fetched_at: string; cached?: boolean; parameters: Record<string, string>; next_parameters: Record<string, string> | null; history_recorded?: boolean; history_warning?: string };
@@ -19,6 +20,7 @@ export function dataCategory(path: string): string {
 export const PERSONAL_SECTIONS = CAPABILITIES.filter(c => c.group === 'user' && !c.path.includes('{') && !['/user', '/user/search', '/user/lookup', '/user/timestamp'].includes(c.path));
 export type PersonalRequest = { capability: Capability; parameters: Record<string, string>; label: string };
 export const PERSONAL_REQUESTS: PersonalRequest[] = PERSONAL_SECTIONS.flatMap<PersonalRequest>(capability => {
+  if (capability.path === '/user/inventory') return INVENTORY_CATEGORIES.map(cat=>({capability,parameters:{cat,limit:'250'},label:`Inventory · ${cat}`}));
   if (capability.path === '/user/list') return ['Friends', 'Enemies', 'Targets'].map(cat => ({ capability, parameters: { cat }, label: cat }));
   if (capability.parameters.some(p => p.required && ['path', 'query'].includes(p.location))) return [];
   const parameters: Record<string, string> = capability.path === '/user/personalstats' ? { cat: 'all' } : {};

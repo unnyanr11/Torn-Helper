@@ -2,14 +2,14 @@ import {CAPABILITIES} from '../api/capabilities';
 import {CONNECTED_REQUESTS,mergeRequests,request,type ConnectedRequest} from './connected-data';
 import {ESSENTIAL_PATHS} from './home-dashboard';
 export const PREPARATION_MS=60000,PREPARATION_CALLS=95;
-const priority=[...ESSENTIAL_PATHS,'/user/battlestats','/user/money','/user/networth','/user/workstats','/user/job','/user/skills','/user/inventory','/user/stocks','/user/properties','/user/gym','/user/education','/user/organizedcrime','/user/notifications','/user/personalstats',
+const priority=[...ESSENTIAL_PATHS,'/user/battlestats','/user/money','/user/networth','/user/workstats','/user/job','/user/skills','/user/inventory','/user/stocks','/user/properties','/user/gym','/user/education','/user/organizedcrime','/user/notifications','/user/personalstats','/user/attacks','/user/revives','/user/bounties','/user/events','/user/competition','/user/racingrecords',
  '/faction/basic','/faction/members','/faction/chain','/faction/crimes','/faction/rankedwars','/faction/balance','/faction/upgrades','/faction/stats','/faction/positions','/faction/territory','/faction/news',
  '/company/profile','/company/employees','/company/stock','/company/applications',
  '/torn/items','/torn/stocks','/torn/properties','/torn/companies','/torn/crimes','/torn/education','/torn/gyms','/torn/merits','/torn/honors','/torn/medals','/torn/itemammo','/torn/itemmods','/torn/bank','/torn/museum','/torn/factiontree','/market/pointsmarket','/racing/cars','/racing/tracks','/racing/carupgrades'];
 /** Fixed, unique, fully specified datasets. No random IDs or unbounded related lookups. */
 export function preparationPlan():ConnectedRequest[]{
  const candidates=mergeRequests([
-  ...priority.flatMap(path=>{const row=CONNECTED_REQUESTS.find(r=>r.capability.path===path&&(path!=='/faction/news'||r.parameters.cat==='armoryAction'));return row?[row]:[request(path,'Personal')];}),
+  ...[...priority,...Object.values(PAGE_DATA).flat()].flatMap(path=>{if(path==='/user/inventory')return CONNECTED_REQUESTS.filter(r=>r.capability.path===path);const row=CONNECTED_REQUESTS.find(r=>r.capability.path===path&&(path!=='/faction/news'||r.parameters.cat==='armoryAction'));return row?[row]:[request(path,'Personal')];}),
   ...CONNECTED_REQUESTS,
  ]).filter(row=>!row.capability.path.includes('{')&&row.capability.parameters.every(p=>!p.required||!['path','query'].includes(p.location)||!!row.parameters[p.name]));
  return candidates.slice(0,PREPARATION_CALLS);

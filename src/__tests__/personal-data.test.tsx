@@ -1,3 +1,4 @@
+import {INVENTORY_CATEGORIES} from '../lib/inventory-data';
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import TornDataView from '../components/TornDataView';
@@ -7,7 +8,7 @@ describe('complete personal dashboard collection', () => {
     expect(PERSONAL_REQUESTS.find(r => r.capability.path === '/user/personalstats')?.parameters).toEqual({ cat: 'all' });
     for (const path of ['/user/profile', '/user/bars', '/user/battlestats', '/user/workstats', '/user/money', '/user/inventory', '/user/networth', '/user/skills', '/user/log', '/user/messages']) expect(PERSONAL_REQUESTS.some(r => r.capability.path === path)).toBe(true);
     expect(PERSONAL_REQUESTS.filter(r => r.capability.path === '/user/list').map(r => r.parameters.cat)).toEqual(['Friends', 'Enemies', 'Targets']);
-    expect(PERSONAL_REQUESTS.length).toBe(PERSONAL_SECTIONS.length + 2);
+    expect(PERSONAL_REQUESTS.length).toBe(PERSONAL_SECTIONS.length + 2 + INVENTORY_CATEGORIES.length - 1);
     for (const request of PERSONAL_REQUESTS) {
       expect(request.capability.path).not.toContain('{');
       for (const parameter of request.capability.parameters.filter(p => p.required && ['path', 'query'].includes(p.location))) expect(request.parameters[parameter.name]).toBeTruthy();

@@ -1,3 +1,4 @@
+import {inventorySnapshot} from './inventory-data';
 import { CAPABILITIES } from '../api/capabilities';
 import { dataLabel, observationKey, PERSONAL_REQUESTS, type PersonalRequest, type TornObservation } from './personal-data';
 export type ConnectedRequest = PersonalRequest & { areas: string[] };
@@ -18,10 +19,10 @@ export function mergeRequests(rows: ConnectedRequest[]): ConnectedRequest[] {
 }
 const seeds = (area: string, paths: string[]) => paths.map(p => request(p, area));
 export const CONNECTED_REQUESTS = mergeRequests([
-  ...PERSONAL_REQUESTS.map(r => ({ ...r, areas: ['Personal'] })),
+  ...PERSONAL_REQUESTS.map(r => ({ ...r, areas: r.capability.path==='/user/inventory'?['Personal','Inventory']:['Personal'] })),
   ...seeds('Crimes', ['/torn/crimes', '/user/skills']),
   request('/user/personalstats', 'Crimes', { cat: 'crimes' }),
-  ...seeds('Inventory', ['/user/inventory', '/torn/items', '/torn/itemammo', '/torn/itemmods', '/torn/museum']),
+  ...seeds('Inventory', ['/torn/items', '/torn/itemammo', '/torn/itemmods', '/torn/museum']),
   ...seeds('Investments', ['/user/stocks', '/user/money', '/torn/stocks', '/torn/bank', '/market/pointsmarket']),
   ...seeds('Faction', ['/faction/basic', '/faction/members', '/faction/chain', '/faction/chains', '/faction/chainreport', '/faction/rankedwars', '/faction/crimes', '/faction/upgrades', '/faction/balance', '/faction/stats', '/faction/positions', '/faction/wars', '/faction/territory', '/faction/attacks', '/faction/crimeexp']),
   ...['weapons','armor','temporary','medical','consumables','drugs','boosters','utilities','loot'].map(cat => request('/faction/inventory', 'Faction', { cat }, `Armory · ${cat}`)),
@@ -69,7 +70,8 @@ export function relatedRequests(row: ConnectedRequest, payload: unknown): Connec
 export function browserLink(row: ConnectedRequest, parameters = row.parameters) {
   return `#Live%20Feeds?${new URLSearchParams({ section: row.capability.id, ...parameters })}`;
 }
-export const entryPayload = (entries: Record<string, DataEntry>, path: string, parameters: Record<string,string> = {}) => {
+export const entryPayload = (entries: Record<string, DataEntry>, path: string, parameters: Record<string,string> = {}):Record<string,any> => {
+  if(path==='/user/inventory'&&!Object.keys(parameters).length){const snapshot=inventorySnapshot(entries);if(snapshot.categories)return snapshot.payload;}
   const c = CAPABILITIES.find(c => c.path === path);
   return c ? object(entries[observationKey(c.id, parameters)]?.observation?.payload) : {};
 };

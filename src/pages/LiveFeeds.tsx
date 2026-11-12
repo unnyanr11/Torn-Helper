@@ -150,7 +150,7 @@ export default function LiveFeeds() {
   const parameters = section.parameters.filter((p) =>
     ["path", "query"].includes(p.location),
   );
-  const ready = keyMode === "stored" || /^[A-Za-z0-9]{16}$/.test(key);
+  const ready = (keyMode === "stored" || /^[A-Za-z0-9]{16}$/.test(key)) && (section.path!=='/user/inventory'||!!values.cat);
   return (
     <section>
       <h2>Torn Data Browser</h2>
@@ -229,7 +229,7 @@ export default function LiveFeeds() {
           {parameters.length > 0 && (
             <details open={parameters.some((p) => p.required)}>
               <summary>Section options and pagination</summary>
-              {parameters.map(parameter => <div key={parameter.name} style={{marginBottom:'0.8rem'}}><ApiParameterField parameter={parameter} value={values[parameter.name]??''} onChange={value=>setValues({...values,[parameter.name]:value})} choices={parameterChoices(savedChoices.data??[],section.path,parameter.name)}/>{parameter.description&&<small>{clean(parameter.description)}</small>}</div>)}
+              {parameters.map(parameter => <div key={parameter.name} style={{marginBottom:'0.8rem'}}><ApiParameterField parameter={section.path==='/user/inventory'&&parameter.name==='cat'?{...parameter,required:true}:parameter} value={values[parameter.name]??''} onChange={value=>setValues({...values,[parameter.name]:value})} choices={parameterChoices(savedChoices.data??[],section.path,parameter.name)}/>{parameter.description&&<small>{clean(parameter.description)}</small>}</div>)}
             </details>
           )}
           <button className="nu-btn" disabled={busy || !ready}>
