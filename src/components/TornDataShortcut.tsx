@@ -15,7 +15,7 @@ export default function TornDataShortcut({page}:{page:string}){
  const sections=pageDatasets(page);
  if(!sections.length)return null;
  return <section className="card connected-page-data" aria-label={`Collected Torn data for ${page}`}>
-  <TimerPanel page={page}/><h2>Your Torn data</h2><p>Loaded for your account during setup. Each section shows its collection time; your saved tool entries appear below.</p>
+  <TimerPanel page={page}/><h2>Your Torn data</h2><p>Only dashboard essentials load during setup. Load an optional section when you need it; saved observations are reused.</p>
   {error&&<p role="alert">{error}</p>}
   {sections.map(section=>{
    const seed=CONNECTED_REQUESTS.find(row=>row.capability.id===section.id&&(page!=='Armory History'||row.parameters.cat==='armoryAction')&&(section.path!=='/user/inventory'||row.parameters.cat===inventoryCategory)),parameters=seed?.parameters??{};
@@ -38,7 +38,7 @@ export default function TornDataShortcut({page}:{page:string}){
     {section.path==='/user/inventory'&&<><label>Inventory category<select className="nu-input" value={inventoryCategory} onChange={e=>setInventoryCategory(e.target.value)}>{INVENTORY_CATEGORIES.map(cat=><option key={cat}>{cat}</option>)}</select></label><p>{inventorySnapshot(cache.data??{}).categories} of {INVENTORY_CATEGORIES.length} categories collected. Showing the returned first page for {inventoryCategory}; use the full data browser for additional pages.</p></>}
     {observation?<><p className="observation-time">Observed {new Date(observation.fetched_at).toLocaleString()}</p><TornDataView value={observation.payload}/></>:<p>{entry?.error??'No data was returned for this section. It may require different key permissions or a faction/company role.'}</p>}
     {observation&&entry?.error&&<p role="status">{entry.error} Showing the last successful observation.</p>}
-    <button className="nu-btn" type="button" disabled={!!busy} onClick={()=>void refresh()}>{busy===section.id?'Refreshing…':'Refresh this section'}</button>{' '}
+    <button className="nu-btn" type="button" disabled={!!busy} onClick={()=>void refresh()}>{busy===section.id?'Loading…':observation?'Refresh this section':'Load this section'}</button>{' '}
     <a href={`#Live%20Feeds?${new URLSearchParams({section:section.id,...parameters})}`}>Open full data browser</a>
    </details>;
   })}

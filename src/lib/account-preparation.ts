@@ -1,24 +1,18 @@
 import {CAPABILITIES} from '../api/capabilities';
-import {CONNECTED_REQUESTS,mergeRequests,request,type ConnectedRequest} from './connected-data';
+import {request,type ConnectedRequest} from './connected-data';
 import {ESSENTIAL_PATHS} from './home-dashboard';
-export const PREPARATION_MS=60000,PREPARATION_CALLS=95;
-const priority=[...ESSENTIAL_PATHS,'/user/battlestats','/user/money','/user/networth','/user/workstats','/user/job','/user/skills','/user/inventory','/user/stocks','/user/properties','/user/gym','/user/education','/user/organizedcrime','/user/notifications','/user/personalstats','/user/attacks','/user/revives','/user/bounties','/user/events','/user/competition','/user/racingrecords',
- '/faction/basic','/faction/members','/faction/chain','/faction/crimes','/faction/rankedwars','/faction/balance','/faction/upgrades','/faction/stats','/faction/positions','/faction/territory','/faction/news',
- '/company/profile','/company/employees','/company/stock','/company/applications',
- '/torn/items','/torn/stocks','/torn/properties','/torn/companies','/torn/crimes','/torn/education','/torn/gyms','/torn/merits','/torn/honors','/torn/medals','/torn/itemammo','/torn/itemmods','/torn/bank','/torn/museum','/torn/factiontree','/market/pointsmarket','/racing/cars','/racing/tracks','/racing/carupgrades'];
-/** Fixed, unique, fully specified datasets. No random IDs or unbounded related lookups. */
+export const PREPARATION_MS=60000,PREPARATION_CALLS=ESSENTIAL_PATHS.length;
+/** Only the dashboard's own-player essentials load automatically. Optional tools
+ * keep their explicit Load actions; no padding requests are made to fill time.
+ */
 export function preparationPlan():ConnectedRequest[]{
- const candidates=mergeRequests([
-  ...[...priority,...Object.values(PAGE_DATA).flat()].flatMap(path=>{if(path==='/user/inventory')return CONNECTED_REQUESTS.filter(r=>r.capability.path===path);const row=CONNECTED_REQUESTS.find(r=>r.capability.path===path&&(path!=='/faction/news'||r.parameters.cat==='armoryAction'));return row?[row]:[request(path,'Personal')];}),
-  ...CONNECTED_REQUESTS,
- ]).filter(row=>!row.capability.path.includes('{')&&row.capability.parameters.every(p=>!p.required||!['path','query'].includes(p.location)||!!row.parameters[p.name]));
- return candidates.slice(0,PREPARATION_CALLS);
+ return ESSENTIAL_PATHS.map(path=>request(path,'Personal'));
 }
 export type PreparationIssue={endpoint:string;label:string;reason:string;kind:'restricted'|'not_applicable'|'failed'};
 export type PreparationProgress={started:number;loaded:number;failed:number;active:number;current:string;problem:string;issues:PreparationIssue[]};
 export const emptyProgress=():PreparationProgress=>({started:0,loaded:0,failed:0,active:0,current:'Preparing environment',problem:'',issues:[]});
 export type PreparationResult=PreparationProgress&{finishedAt:number};
-/** Schedule 95 calls across a fixed minute, capped below the server's six leases.
+/** Load the four essentials within the existing one-minute screen, capped below the server's six leases.
  * Deadline and auth/rate-limit failures cancel work; no retries inflate the budget.
  */
 export function startPreparation(options:{fetch:(row:ConnectedRequest,signal:AbortSignal)=>Promise<{ok:boolean;fatal?:boolean;error?:string;kind?:'restricted'|'not_applicable'|'failed'}>;onProgress:(value:PreparationProgress)=>void;onComplete:(value:PreparationResult)=>void;now?:()=>number}){
@@ -34,6 +28,7 @@ export function startPreparation(options:{fetch:(row:ConnectedRequest,signal:Abo
   void options.fetch(row,controller.signal).then(result=>{
    if(closed)return;
    state={...state,active:state.active-1,loaded:state.loaded+(result.ok?1:0),failed:state.failed+(result.ok?0:1),issues:result.ok?state.issues:[...state.issues,{endpoint:row.capability.id,label:`${row.capability.group.charAt(0).toUpperCase()+row.capability.group.slice(1)} · ${row.label}`,reason:result.error??'No data was returned.',kind:result.kind??'failed'}]};
+   if(next===plan.length&&state.active===0&&!result.fatal)state.current='Dashboard essentials prepared';
    if(result.fatal){halted=true;state.problem=result.error??'Some data could not be loaded.';controller.abort();}
    emit();
   }).catch(error=>{

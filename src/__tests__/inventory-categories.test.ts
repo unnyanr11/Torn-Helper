@@ -12,8 +12,8 @@ describe('category-specific inventory collection',()=>{
   expect(rows).toHaveLength(INVENTORY_CATEGORIES.length);expect(INVENTORY_CATEGORIES.length).toBe(25);
   for(const r of rows){expect(INVENTORY_CATEGORIES).toContain(r.parameters.cat);expect(r.parameters.limit).toBe('250');expect(()=>compileTornRequest(r.capability.id,r.parameters)).not.toThrow();expect(r.areas).toContain('Inventory');}
  });
- it('fits all inventory categories into the existing 95-section startup plan',()=>{
-  const plan=preparationPlan();expect(plan).toHaveLength(95);expect(plan.filter(r=>r.capability.path==='/user/inventory')).toHaveLength(25);
+ it('keeps all inventory categories out of the automatic startup plan',()=>{
+  const plan=preparationPlan();expect(plan).toHaveLength(4);expect(plan.filter(r=>r.capability.path==='/user/inventory')).toHaveLength(0);
  });
  it('merges category observations without counting old snapshots or later pages twice',()=>{
   let entries={};entries=mergeObservation(entries,row('Drug',[1]));entries=mergeObservation(entries,row('Medical',[2]));entries=mergeObservation(entries,row('Drug',[3],2000));entries=mergeObservation(entries,row('Drug',[9],3000,'250'));

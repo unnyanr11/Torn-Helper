@@ -2,7 +2,7 @@ import {adminClient,authenticate,scheduled,json,preflight} from '../_shared/http
 import {resolveRefreshKey} from '../_shared/live-refresh.ts';
 import {budgetedTornFetch} from '../_shared/torn-budget.ts';
 import {compileTornRequest,fetchTornPage,requestHash} from '../_shared/torn-data.ts';
-import {runTimerJob,type TimerJob} from '../_shared/timer-events.ts';
+import {AUTOMATIC_TIMER_ENDPOINTS,runTimerJob,type TimerJob} from '../_shared/timer-events.ts';
 Deno.serve(async(req)=>{
  const early=preflight(req);if(early)return early;
  try{
@@ -12,7 +12,7 @@ Deno.serve(async(req)=>{
   let processed=0;const deadline=Date.now()+45000;
   for(const task of (claimed.data??[]) as TimerJob[]){
    if(Date.now()>deadline)break;
-   const baselines=await admin.from('torn_timer_baselines').select('endpoint_id,payload,observed_at,deadlines').eq('user_id',task.user_id);
+   const baselines=await admin.from('torn_timer_baselines').select('endpoint_id,payload,observed_at,deadlines').eq('user_id',task.user_id).in('endpoint_id',[...AUTOMATIC_TIMER_ENDPOINTS]);
    if(baselines.error)throw baselines.error;
    let key:string|undefined;
    const load=async(endpoint:string,parameters:Record<string,string>)=>{

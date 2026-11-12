@@ -37,6 +37,11 @@ describe('activity-triggered timer refresh',()=>{
  it('backs off denied logs and does not repeatedly fetch every timer as a fallback',async()=>{
   const refresh=vi.fn();const result=await runTimerJob(job,{baselines:[baseline('v2-user-cooldowns')],loadLogs:async()=>{throw {code:7};},refresh,now});expect(result.retry_seconds).toBe(3600);expect(refresh).not.toHaveBeenCalled();expect(result.cursor_to).toBe(base);
  });
+ it('does not automatically refresh optional timers, including old pending work',async()=>{
+  const refresh=vi.fn(async()=>{});
+  const result=await runTimerJob({...job,pending_endpoints:['v2-faction-chain','v2-user-races','v2-user-education']},{baselines:[baseline('v2-faction-chain'),baseline('v2-user-races'),baseline('v2-user-education')],loadLogs:async()=>page([event('Chain increase'),event('Racing start'),event('Education complete')]),refresh,now});
+  expect(refresh).not.toHaveBeenCalled();expect(result.pending_endpoints).toEqual([]);
+ });
  it('validates log cursors, windows, and same-second continuation without exporting keys',()=>{
   const params={from:String(base),to:String(base+55),limit:'100'};
   expect(nextTimerLogParameters(page([]),params)).toBeNull();

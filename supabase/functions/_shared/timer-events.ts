@@ -1,4 +1,6 @@
 export const TIMER_ENDPOINTS=['v2-user-bars','v2-user-cooldowns','v2-user-travel','v2-user-education','v2-user-organizedcrime','v2-user-races','v2-user-profile','v2-faction-chain'] as const;
+export const AUTOMATIC_TIMER_ENDPOINTS=['v2-user-profile','v2-user-bars','v2-user-cooldowns','v2-user-travel'] as const;
+export const isAutomaticTimerEndpoint=(id:string)=>(AUTOMATIC_TIMER_ENDPOINTS as readonly string[]).includes(id);
 export type TimerEndpoint=typeof TIMER_ENDPOINTS[number];
 export const isTimerEndpoint=(id:string):id is TimerEndpoint=>(TIMER_ENDPOINTS as readonly string[]).includes(id);
 export type TimerBaseline={endpoint_id:string;payload:any;observed_at:string;deadlines:Record<string,number>};
@@ -44,7 +46,7 @@ export type TimerJobResult={cursor_to:number;scan_to:number|null;next_parameters
 export async function runTimerJob(job:TimerJob,deps:{baselines:TimerBaseline[];loadLogs:(params:Record<string,string>)=>Promise<any>;refresh:(endpoint:TimerEndpoint)=>Promise<void>;now?:number}):Promise<TimerJobResult>{
  const to=job.scan_to??Math.floor((deps.now??Date.now())/1000)-5;
  let params=job.next_parameters??{from:String(Math.max(0,job.cursor_to-1)),to:String(to),limit:'100'};
- const pending=new Set(job.pending_endpoints.filter(isTimerEndpoint));
+ const pending=new Set(job.pending_endpoints.filter(isTimerEndpoint).filter(isAutomaticTimerEndpoint));
  let next:Record<string,string>|null=params,complete=false;
  try{
   for(let page=0;page<2&&next;page++){
@@ -53,6 +55,7 @@ export async function runTimerJob(job:TimerJob,deps:{baselines:TimerBaseline[];l
    for(const event of payload.log){
     if(!Number.isSafeInteger(event.timestamp)||event.timestamp>to||event.timestamp<job.cursor_to-1)continue;
     for(const target of affectedTimerEndpoints(event)){
+     if(!isAutomaticTimerEndpoint(target))continue;
      const baseline=deps.baselines.find(row=>row.endpoint_id===target);
      if(baseline&&eventIsNewFor(event,baseline))pending.add(target);
     }
