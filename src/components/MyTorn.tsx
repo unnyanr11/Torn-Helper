@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { invokeTornData } from '../lib/torn-data-client';
 import { useSavedObservations } from '../hooks/useSavedObservations';
+import { useTornConnection } from '../hooks/useTornConnection';
 import { observationsKey, mergeObservation, refreshAfter, nextRefreshPath, type UpdateMode } from '../lib/observation-cache';
 import { isRecent } from '../lib/observation-cache';
 import { functionError } from '../lib/function-error';
@@ -28,6 +29,8 @@ const wait = (milliseconds: number, signal: AbortSignal) => new Promise<void>(re
 const initialArea = () => { const area = new URLSearchParams(location.hash.split('?')[1] ?? '').get('area'); return area && (area==='All'||AREAS.includes(area)) ? area : 'Personal'; };
 export default function MyTorn({accountId}:{accountId?:string}) {
   const focus=useWorkspaceFocus(accountId);
+  const connection=useTornConnection();
+  const initializedMode=useRef<string>(),initialRefresh=useRef<string>();
   const client = useQueryClient();
   const saved=useSavedObservations(accountId),entries=saved.data??{};
   const setEntries=(update:(old:Record<string,DataEntry>)=>Record<string,DataEntry>)=>client.setQueryData<Record<string,DataEntry>>(observationsKey(accountId??''),old=>update(old??{}));
@@ -36,7 +39,7 @@ export default function MyTorn({accountId}:{accountId?:string}) {
   const latest=useRef<()=>void>(()=>{});
   const [requests, setRequests] = useState(CONNECTED_REQUESTS);
   const [selected, setSelected] = useState(() => { const area = initialArea(); return area === 'All' ? AREAS : [area]; });
-  const [key, setKey] = useState(''), [mode, setMode] = useState('request');
+  const [key, setKey] = useState(''), [mode, setMode] = useState('stored');
   const [busy, setBusy] = useState(false), [status, setStatus] = useState(''), [error, setError] = useState('');
   const [done, setDone] = useState(0), [total, setTotal] = useState(0), [area, setArea] = useState(initialArea), [search, setSearch] = useState('');
   const [showUnloaded, setShowUnloaded] = useState(false);
@@ -52,6 +55,26 @@ export default function MyTorn({accountId}:{accountId?:string}) {
     setRequests(old=>mergeRequests([...old,...rows]));
   },[saved.data]);
   useEffect(()=>{const tick=()=>{if((document.visibilityState!=='visible'||navigator.onLine===false)&&automaticControl.current){automaticControl.current.abort();automaticControl.current=null;setStatus('Automatic updates paused while this tab is hidden or offline.');}else latest.current();};const timer=setInterval(tick,15000);document.addEventListener('visibilitychange',tick);window.addEventListener('online',tick);window.addEventListener('offline',tick);return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',tick);window.removeEventListener('online',tick);window.removeEventListener('offline',tick);};},[]);
+  // Wait for both private caches before choosing a key or issuing Torn requests.
+  // The deferred start survives StrictMode's setup/cleanup replay without duplicates.
+  useEffect(()=>{
+    if(!accountId||connection.owner!==accountId||!connection.status.isSuccess)return;
+    if(initializedMode.current!==accountId){
+      initializedMode.current=accountId;
+      setMode(connection.status.data.hasStoredKey?'stored':'request');
+    }
+  },[accountId,connection.owner,connection.status.isSuccess,connection.status.data]);
+  const startInitialRefresh=useRef<()=>void>(()=>{});
+  startInitialRefresh.current=()=>{void collect('essentials');};
+  useEffect(()=>{
+    if(!accountId||connection.owner!==accountId||!connection.status.data?.hasStoredKey||!saved.isSuccess||mode!=='stored'||initialRefresh.current===accountId)return;
+    const timer=setTimeout(()=>{
+      if(control.current&&!control.current.signal.aborted)return;
+      initialRefresh.current=accountId;
+      startInitialRefresh.current();
+    },0);
+    return()=>clearTimeout(timer);
+  },[accountId,connection.owner,connection.status.data?.hasStoredKey,saved.isSuccess,mode]);
   latest.current=()=>{
     if(updates==='off'||mode!=='stored'||control.current&&!control.current.signal.aborted)return;
     const path=nextRefreshPath(entries,updates,document.visibilityState==='visible',navigator.onLine!==false);
@@ -84,7 +107,10 @@ export default function MyTorn({accountId}:{accountId?:string}) {
         onDiscover: rows => setRequests(old => mergeRequests([...old, ...rows])),
         onProgress: (count, size, message) => { setDone(count); setTotal(size); setStatus(message); },
       });
-      if (!result.stopped) setStatus(kind==='single'?'Section checked. Other saved sections were reused.':kind==='essentials'?`Checked ${result.done} essential sections. Your daily overview is updated below.`:`Finished checking ${result.done} sections. Open connected data below to view results.`);
+      if (!result.stopped) {
+        const failed=queue.filter(row=>client.getQueryData<Record<string,DataEntry>>(observationsKey(accountId??''))?.[observationKey(row.capability.id,row.parameters)]?.error).length;
+        setStatus(failed?`Finished checking. ${failed} sections could not be loaded. Check the messages below and retry.`:kind==='single'?'Section checked. Other saved sections were reused.':kind==='essentials'?`Checked ${result.done} essential sections. Your daily overview is updated.`:`Finished checking ${result.done} sections. Open connected data below to view results.`);
+      }
       if (!controller.signal.aborted) await Promise.all([client.invalidateQueries({ queryKey: ['personal-history'] }), client.invalidateQueries({ queryKey: ['personal-history-start'] })]);
     } catch (failure) {
       if (!controller.signal.aborted) { if(automatic)setUpdates('off');setError(failure instanceof Error ? failure.message : 'Unable to load Torn data.'); setStatus('Collection stopped. Successful observations remain available.'); }
@@ -127,12 +153,19 @@ export default function MyTorn({accountId}:{accountId?:string}) {
   const visible = requests.filter(r => (area === 'All' || r.areas.includes(area)) && `${r.label} ${r.capability.summary}`.toLowerCase().includes(search.toLowerCase()) && (showUnloaded || entries[observationKey(r.capability.id, r.parameters)]));
   return <section className="my-torn">
     <h2>{player?.name ? `${player.name}’s dashboard` : 'My dashboard'}</h2><p>Your daily overview and a useful place to start.</p>
+    <div aria-live="polite">
+      {(saved.isLoading||connection.status.isPending)&&<p role="status">Preparing your Torn dashboard…</p>}
+      {status&&<p role="status">{status}</p>}
+      {error&&<p role="alert">{error} <button type="button" className="nu-btn" disabled={busy} onClick={()=>void collect('essentials')}>Retry essentials</button> · <a href="#Settings">Check Torn connection</a></p>}
+      {!busy&&denied>0&&<p role="alert">Some Torn data could not be loaded. Check your key permissions in <a href="#Settings">Settings</a>, then retry the affected section.</p>}
+      {connection.status.isSuccess&&!connection.status.data.hasStoredKey&&<p>Connect a Torn API key in <a href="#Settings">Settings</a> to load your stats, or enter a request-only key under Refresh essentials.</p>}
+    </div>
     <WorkspaceWelcome focus={focus.focus} onChoose={focus.choose} storageError={focus.storageError}/>
     <HomeDashboard entries={entries} energyCoverage={energyCoverage} onRefresh={refreshSection} busy={busy}/>
     {saved.isLoading&&<p role="status">Loading your saved observations…</p>}{saved.isError&&<p role="alert">Saved observations could not be restored. <button type="button" className="nu-btn" onClick={()=>void saved.refetch()}>Retry saved data</button></p>}
     <article ref={refreshForm} className="card personal-connect"><h3>Refresh essentials</h3><p>Saved data appears first. Refresh only what you need; recent essentials are reused.</p>
       <form onSubmit={event=>{event.preventDefault();void collect(target==='essentials'?'essentials':'single',target);}}>
-       <TornConnectionPanel mode={mode} onMode={value=>{setMode(value);setUpdates('off');}} keyValue={key} onKey={setKey} disabled={busy} inputRef={keyInput}/>
+       <TornConnectionPanel mode={mode} onMode={value=>{initializedMode.current=accountId;initialRefresh.current=accountId;setMode(value);setUpdates('off');}} keyValue={key} onKey={setKey} disabled={busy} inputRef={keyInput}/>
        <label>What to refresh<select className="nu-input" disabled={busy} value={target} onChange={e=>setTarget(e.target.value)}><option value="essentials">Only essentials that need updating</option><option value="/user/bars">Bars only</option><option value="/user/cooldowns">Cooldowns only</option><option value="/user/travel">Travel only</option><option value="/user/profile">Profile only</option></select></label>
        <label>Automatic updates<select className="nu-input" value={updates} disabled={mode!=='stored'} onChange={e=>{setUpdates(e.target.value as UpdateMode);if(e.target.value==='off'){automaticControl.current?.abort();setStatus('Automatic updates turned off.');}}}><option value="off">Off · refresh myself</option><option value="economy">Economy · about every 5 minutes while visible</option><option value="active">Active · bars and cooldowns about every minute</option></select></label><p>Requires an encrypted key saved in Settings. Updates pause when this page is hidden or offline, and stop after an error. Profile checks run less often; travel checks speed up during a recorded flight. Request-only keys are never retained.</p>
        <button className="nu-btn" disabled={busy||(mode==='request'&&!/^[A-Za-z0-9]{16}$/.test(key))}>{busy?'Refreshing…':target==='essentials'?'Refresh essentials':'Refresh selected section'}</button>{busy&&<button className="nu-btn" type="button" onClick={stop}>Stop refresh</button>}
