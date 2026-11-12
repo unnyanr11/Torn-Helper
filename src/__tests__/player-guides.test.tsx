@@ -36,6 +36,6 @@ describe('imported player guides',()=>{
  it('makes guides discoverable and labels old content as reference material',()=>{
   expect(NAV).toContain('Player Guides');expect(NAV_GROUPS.Explore).toContain('Player Guides');
   const html=renderToStaticMarkup(<PlayerGuides/>);
-  expect(html).toContain('not live game data');expect(html).toContain('Recorded source date');expect(html).toContain('Search guides');expect(html).toContain('10 of 10 guides');expect(html).toContain('Use Torn Helper tools');
+  expect(html).toContain('not live game data');expect(html).toContain('Research checked:');expect(html).toContain('Search guides');expect(html).toContain('10 of 10 guides');expect(html).toContain('Use Torn Helper tools');
  });
 });

@@ -1,0 +1,3040 @@
+{
+  "reviewedAt": "2026-11-12",
+  "scope": "All 127 original headings reviewed; additional walkthroughs and planning references added.",
+  "method": "Mechanics are paraphrased from linked sources. Editorial tips are recommendations and calculations, not developer promises or guaranteed outcomes. Wiki pages may be incomplete; named faction availability is not verified by a generic mechanics source.",
+  "sources": {
+    "rules": {
+      "title": "Torn game rules",
+      "url": "https://www.torn.com/rules.php",
+      "checkedAt": "2026-11-12",
+      "kind": "Official Torn documentation"
+    },
+    "api": {
+      "title": "Torn API acceptable usage",
+      "url": "https://www.torn.com/api.html",
+      "checkedAt": "2026-11-12",
+      "kind": "Official Torn documentation"
+    },
+    "sidebar": {
+      "title": "Sidebar",
+      "url": "https://wiki.torn.com/wiki/Sidebar",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "home": {
+      "title": "Home dashboard",
+      "url": "https://wiki.torn.com/wiki/Home",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "energy": {
+      "title": "Energy",
+      "url": "https://wiki.torn.com/wiki/Energy",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "nerve": {
+      "title": "Nerve",
+      "url": "https://wiki.torn.com/wiki/Nerve",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "happy": {
+      "title": "Happiness",
+      "url": "https://wiki.torn.com/wiki/Happiness",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "life": {
+      "title": "Life",
+      "url": "https://wiki.torn.com/wiki/Life",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "donator": {
+      "title": "Donator benefits",
+      "url": "https://wiki.torn.com/wiki/Donator",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "points": {
+      "title": "Points",
+      "url": "https://wiki.torn.com/wiki/Points",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "merits": {
+      "title": "Merits",
+      "url": "https://wiki.torn.com/wiki/Merits",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "level": {
+      "title": "Level and ranks",
+      "url": "https://wiki.torn.com/wiki/Level",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "attack": {
+      "title": "Attacking",
+      "url": "https://wiki.torn.com/wiki/Attacking",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "gym": {
+      "title": "Gym",
+      "url": "https://wiki.torn.com/wiki/Gym",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "property": {
+      "title": "Property and leasing",
+      "url": "https://wiki.torn.com/wiki/Property",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "education": {
+      "title": "Education",
+      "url": "https://wiki.torn.com/wiki/Education",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "jobs": {
+      "title": "Starter jobs",
+      "url": "https://wiki.torn.com/wiki/Jobs",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "company": {
+      "title": "Player-owned companies",
+      "url": "https://wiki.torn.com/wiki/Company",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "medical": {
+      "title": "Medical items",
+      "url": "https://wiki.torn.com/wiki/Medical",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "drugs": {
+      "title": "Drugs and cooldowns",
+      "url": "https://wiki.torn.com/wiki/Drugs",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "mission": {
+      "title": "Missions",
+      "url": "https://wiki.torn.com/wiki/Missions",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "city": {
+      "title": "City map",
+      "url": "https://wiki.torn.com/wiki/City",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "awareness": {
+      "title": "Awareness and city finds",
+      "url": "https://wiki.torn.com/wiki/City_find",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "jail": {
+      "title": "Jail and busting",
+      "url": "https://wiki.torn.com/wiki/Jail",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "hospital": {
+      "title": "Hospital",
+      "url": "https://wiki.torn.com/wiki/Hospital",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "casino": {
+      "title": "Casino",
+      "url": "https://wiki.torn.com/wiki/Casino",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "chain": {
+      "title": "Chains",
+      "url": "https://wiki.torn.com/wiki/Chain",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "faction": {
+      "title": "Faction membership and upgrades",
+      "url": "https://wiki.torn.com/wiki/Faction",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "oc": {
+      "title": "Organized Crimes 2.0",
+      "url": "https://wiki.torn.com/wiki/Organized_Crime_2.0",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "stocks": {
+      "title": "Stock market",
+      "url": "https://wiki.torn.com/wiki/Stock_Market",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "trade": {
+      "title": "Direct trading",
+      "url": "https://wiki.torn.com/wiki/Trade",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "mug": {
+      "title": "Mugging and protection",
+      "url": "https://wiki.torn.com/wiki/Mug",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "bank": {
+      "title": "City bank",
+      "url": "https://wiki.torn.com/wiki/Bank",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "cayman": {
+      "title": "Cayman offshore bank",
+      "url": "https://wiki.torn.com/wiki/Cayman_Islands",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "piggy": {
+      "title": "Piggy bank",
+      "url": "https://wiki.torn.com/wiki/Piggy_Bank",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "museum": {
+      "title": "Museum and sets",
+      "url": "https://wiki.torn.com/wiki/Museum",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "items": {
+      "title": "Items and equipment",
+      "url": "https://wiki.torn.com/wiki/Items",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "market": {
+      "title": "Item Market 2.0 and fees",
+      "url": "https://wiki.torn.com/wiki/Item_Market",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "chat": {
+      "title": "Chat channels and restrictions",
+      "url": "https://wiki.torn.com/wiki/Chat",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "news": {
+      "title": "Newspaper",
+      "url": "https://wiki.torn.com/wiki/Newspaper",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "calendar": {
+      "title": "Calendar and event slots",
+      "url": "https://wiki.torn.com/wiki/Calendar",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "hof": {
+      "title": "Hall of Fame",
+      "url": "https://wiki.torn.com/wiki/Hall_of_Fame",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "loot": {
+      "title": "NPC looting",
+      "url": "https://wiki.torn.com/wiki/Loot",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "travel": {
+      "title": "Travel mechanics",
+      "url": "https://wiki.torn.com/wiki/Traveling",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "travel-patch": {
+      "title": "2025–2026 travel changes",
+      "url": "https://wiki.torn.com/wiki/Travel/Patch_History",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "suitcase": {
+      "title": "Large Suitcase effect",
+      "url": "https://wiki.torn.com/wiki/Large_Suitcase",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "crimes": {
+      "title": "Crimes 2.0 overview",
+      "url": "https://wiki.torn.com/wiki/Crimes_2.0",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "easter": {
+      "title": "Easter Egg Hunt",
+      "url": "https://wiki.torn.com/wiki/Easter_Egg_Hunt",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "revive": {
+      "title": "Reviving",
+      "url": "https://wiki.torn.com/wiki/Revive",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "bounty": {
+      "title": "Bounties",
+      "url": "https://wiki.torn.com/wiki/Bounty",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "war": {
+      "title": "Ranked wars and weekly templates",
+      "url": "https://wiki.torn.com/wiki/Ranked_War",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "time": {
+      "title": "Torn City Time",
+      "url": "https://wiki.torn.com/wiki/TCT",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "referral": {
+      "title": "Recruit Citizens",
+      "url": "https://wiki.torn.com/wiki/Recruit_Citizens",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "friends": {
+      "title": "Friends list",
+      "url": "https://wiki.torn.com/wiki/Friends_List",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "enemies": {
+      "title": "Enemies list",
+      "url": "https://wiki.torn.com/wiki/Enemies_List",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "awards": {
+      "title": "Awards and migration caveats",
+      "url": "https://wiki.torn.com/wiki/Awards",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "search-cash": {
+      "title": "Search for Cash",
+      "url": "https://wiki.torn.com/wiki/Search_For_Cash",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "bootlegging": {
+      "title": "Bootlegging",
+      "url": "https://wiki.torn.com/wiki/Bootlegging",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "graffiti": {
+      "title": "Graffiti",
+      "url": "https://wiki.torn.com/wiki/Graffiti",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "shoplifting": {
+      "title": "Shoplifting",
+      "url": "https://wiki.torn.com/wiki/Shoplifting",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "pickpocket": {
+      "title": "Pickpocketing",
+      "url": "https://wiki.torn.com/wiki/Pickpocketing",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "skimming": {
+      "title": "Card Skimming",
+      "url": "https://wiki.torn.com/wiki/Card_Skimming",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "burglary": {
+      "title": "Burglary",
+      "url": "https://wiki.torn.com/wiki/Burglary",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "hustling": {
+      "title": "Hustling",
+      "url": "https://wiki.torn.com/wiki/Hustling",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "disposal": {
+      "title": "Disposal",
+      "url": "https://wiki.torn.com/wiki/Disposal",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "cracking": {
+      "title": "Cracking",
+      "url": "https://wiki.torn.com/wiki/Cracking",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "forgery": {
+      "title": "Forgery",
+      "url": "https://wiki.torn.com/wiki/Forgery",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "scamming": {
+      "title": "Scamming",
+      "url": "https://wiki.torn.com/wiki/Scamming",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "arson": {
+      "title": "Arson",
+      "url": "https://wiki.torn.com/wiki/Arson",
+      "checkedAt": "2026-11-12",
+      "kind": "Official wiki (community-edited)"
+    },
+    "npo": {
+      "title": "NPO recruitment thread",
+      "url": "https://www.torn.com/forums.php?p=threads&t=16272610",
+      "checkedAt": "2026-11-12",
+      "kind": "Player-authored Torn forum source"
+    },
+    "nso": {
+      "title": "New Sith Order recruitment thread",
+      "url": "https://www.torn.com/forums.php?p=threads&t=16318343",
+      "checkedAt": "2026-11-12",
+      "kind": "Player-authored Torn forum source"
+    },
+    "tornado": {
+      "title": "TORNado recruitment thread",
+      "url": "https://www.torn.com/forums.php?p=threads&t=16146026",
+      "checkedAt": "2026-11-12",
+      "kind": "Player-authored Torn forum source"
+    },
+    "new-factions": {
+      "title": "Community list of beginner factions",
+      "url": "https://www.torn.com/forums.php?p=threads&t=16494766",
+      "checkedAt": "2026-11-12",
+      "kind": "Player-authored Torn forum source"
+    },
+    "primer": {
+      "title": "Emforus: A Criminal Primer",
+      "url": "https://www.torn.com/forums.php?p=threads&t=16385729",
+      "checkedAt": "2026-11-12",
+      "kind": "Player-authored Torn forum source"
+    }
+  },
+  "guides": {
+    "introduction": {
+      "sections": [
+        {
+          "slug": "welcome",
+          "title": "Welcome",
+          "sourceIds": [
+            "rules"
+          ],
+          "facts": [
+            "Torn permits one account per person; ownership and account-sharing restrictions matter from the start."
+          ],
+          "tips": [
+            "Build a repeatable login routine: bars, education, job, cash and upcoming commitments.",
+            "Choose one short-term goal before spending; level 15, training and liquidity need different budgets."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "donator-status",
+          "title": "Donator Status",
+          "sourceIds": [
+            "donator"
+          ],
+          "facts": [
+            "Using a Donator Pack grants 31 donator days and 60 points; subscriptions are a different product."
+          ],
+          "tips": [
+            "Compare the current pack price against the value of the benefits you will actually use.",
+            "Buy a pack with in-game cash if affordable; do not rely on old market-price quotes."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "need-help-stuck-somewhere",
+          "title": "Need Help? stuck somewhere?",
+          "sourceIds": [
+            "rules",
+            "news"
+          ],
+          "facts": [
+            "Official rules and help channels take precedence over player-written shortcuts."
+          ],
+          "tips": [
+            "When asking for help, include your goal, level, the exact message and what you already tried.",
+            "Crop API keys, passwords, email addresses and session tokens out of screenshots."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "go-further",
+          "title": "Go further",
+          "sourceIds": [
+            "education",
+            "gym"
+          ],
+          "facts": [
+            "Education unlocks lasting perks; gym progression rewards consistent training."
+          ],
+          "tips": [
+            "Keep a small notebook of mistakes and one next action for each guide you finish.",
+            "Review your plan weekly instead of chasing every profitable-looking idea simultaneously."
+          ],
+          "status": "source-reviewed"
+        }
+      ],
+      "summary": "A practical start: protect your account, plan your resources and build a routine.",
+      "corrections": [
+        "Do not confuse subscription rewards with using a tradable Donator Pack."
+      ],
+      "checklist": [
+        "Read the game rules and secure your account.",
+        "Choose a goal and set a budget that leaves an emergency reserve.",
+        "Review bars, education and cash exposure at each normal login."
+      ],
+      "extras": [
+        {
+          "slug": "extra-account-and-api-key-hygiene",
+          "title": "Account and API-key hygiene",
+          "sourceIds": [
+            "rules",
+            "api"
+          ],
+          "facts": [
+            "Torn restricts software to authorised API data or the page a player manually loaded and is actively viewing."
+          ],
+          "tips": [
+            "Use a dedicated, least-privilege key per trusted tool so one revocation does not disable every service.",
+            "Never copy a Torn password, browser cookie or another player's credentials into a helper."
+          ],
+          "status": "source-reviewed"
+        }
+      ]
+    },
+    "basic-elements": {
+      "sections": [
+        {
+          "slug": "sidebar-top",
+          "title": "Sidebar Top",
+          "sourceIds": [
+            "sidebar"
+          ],
+          "facts": [
+            "The sidebar groups account actions, game areas and player lists."
+          ],
+          "tips": [
+            "Read status tooltips before buying a cure or assuming a feature is broken.",
+            "Put frequently used pages in your own routine rather than opening every menu on each login."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "icons",
+          "title": "Icons",
+          "sourceIds": [
+            "sidebar",
+            "drugs"
+          ],
+          "facts": [
+            "Status icons distinguish ongoing effects and cooldowns."
+          ],
+          "tips": [
+            "Check the relevant timer, not only the icon colour, before scheduling another action.",
+            "If an icon seems unfamiliar, inspect it in Torn before acting on a screenshot or cached observation."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "money",
+          "title": "Money",
+          "sourceIds": [
+            "mug"
+          ],
+          "facts": [
+            "Cash on hand is the exposure relevant to mugging; total net worth is a different measure."
+          ],
+          "tips": [
+            "Decide where proceeds will go before accepting a sale or withdrawing a balance.",
+            "Keep only your working float available and compare storage access times before committing funds."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "level",
+          "title": "Level",
+          "sourceIds": [
+            "level"
+          ],
+          "facts": [
+            "Experience is hidden; winning and leaving a higher-level opponent is a documented levelling route."
+          ],
+          "tips": [
+            "A target's visible level does not prove it is weak; check your own attack results.",
+            "Accept an available upgrade when pursuing travel access rather than accidentally level-holding."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "points",
+          "title": "Points",
+          "sourceIds": [
+            "points"
+          ],
+          "facts": [
+            "Points buy unlocks and refills; they cannot be placed in an ordinary direct trade."
+          ],
+          "tips": [
+            "List permanent unlocks and recurring refills separately in your budget.",
+            "Compare a refill's usable gain with its current point cost; avoid refilling an already-full bar."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "merits",
+          "title": "Merits",
+          "sourceIds": [
+            "merits"
+          ],
+          "facts": [
+            "Upgrade tiers become more expensive: a ten-tier merit line costs 55 merits in total."
+          ],
+          "tips": [
+            "Choose upgrades that serve your current goal; early education reductions are a planning choice, not a universal rule.",
+            "Read reset costs and available free resets before experimenting with an expensive allocation."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "energy",
+          "title": "Energy",
+          "sourceIds": [
+            "energy"
+          ],
+          "facts": [
+            "Normal regeneration is 5 energy per 15 minutes to 100; donator regeneration is 5 per 10 minutes to 150."
+          ],
+          "tips": [
+            "Schedule logins before your bar caps if practical; capped natural regeneration is lost opportunity.",
+            "Compare training, attacks and paid services by useful outcome per energy, not gross cash alone."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "nerve",
+          "title": "Nerve",
+          "sourceIds": [
+            "nerve"
+          ],
+          "facts": [
+            "Nerve regenerates by one every five minutes; bonuses can make the displayed maximum differ from natural nerve."
+          ],
+          "tips": [
+            "Track crime skill separately from bar size when deciding what to attempt.",
+            "Spend naturally regenerated nerve before buying more; measure material losses and failures too."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "happiness",
+          "title": "Happiness",
+          "sourceIds": [
+            "happy"
+          ],
+          "facts": [
+            "Above-maximum happiness resets at quarter-hour boundaries; it affects gym gains and Crimes 2.0 progression."
+          ],
+          "tips": [
+            "Prepare supplies and energy before raising happiness; leave time to complete training before the next reset.",
+            "Do not copy a costly happy-jump recipe without comparing its cost per stat gain for your own account."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "life",
+          "title": "Life",
+          "sourceIds": [
+            "life"
+          ],
+          "facts": [
+            "Life normally regenerates by 5% of maximum every five minutes; full life alone does not remove hospital time."
+          ],
+          "tips": [
+            "Check life, hospital status and medical cooldown independently.",
+            "Keep compatible medical supplies available before a planned attack session."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "chain",
+          "title": "Chain",
+          "sourceIds": [
+            "chain"
+          ],
+          "facts": [
+            "A chain starts with ten successful attacks in five minutes, then needs a successful hit before its timer expires."
+          ],
+          "tips": [
+            "Coordinate backup hitters so one failed attack does not leave the timer unattended.",
+            "Follow the faction's bonus-hit allocation instead of racing a teammate for a milestone."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "mail-events-awards",
+          "title": "Mail Events & Awards",
+          "sourceIds": [
+            "awards",
+            "sidebar"
+          ],
+          "facts": [
+            "Awards may change with crime-system migration; the wiki flags some requirements as incomplete."
+          ],
+          "tips": [
+            "Use your own current awards screen to verify an unlock before spending resources for it.",
+            "Read faction mail and transaction events before deleting messages that could explain a missing payment."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "areas",
+          "title": "Areas",
+          "sourceIds": [
+            "sidebar"
+          ],
+          "facts": [
+            "The sidebar links to the main activity areas; access can depend on your current game state."
+          ],
+          "tips": [
+            "If a page is unavailable, check travel, jail and hospital state before assuming an outage.",
+            "Learn the city quick links for common purchases rather than following strangers' shortened URLs."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "home",
+          "title": "Home",
+          "sourceIds": [
+            "home"
+          ],
+          "facts": [
+            "Torn's Home page supports rearranging and minimising information boxes."
+          ],
+          "tips": [
+            "Keep bars, education, perks and useful activity summaries near the top.",
+            "Treat helper snapshots as dated observations and confirm important changes in game."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "items-inventory",
+          "title": "Items / Inventory",
+          "sourceIds": [
+            "items"
+          ],
+          "facts": [
+            "Items include equipment, tools, materials and consumables, with different uses and trading restrictions."
+          ],
+          "tips": [
+            "Check category filters and whether an item is equipped or committed elsewhere before assuming it vanished.",
+            "Read an item's effect and current market listing before using, discarding or bulk-selling it."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "city",
+          "title": "City",
+          "sourceIds": [
+            "city",
+            "awareness"
+          ],
+          "facts": [
+            "The city map supports item finds and faction-territory information."
+          ],
+          "tips": [
+            "Separate collecting finds from shopping; assess unfamiliar items before selling them.",
+            "Repeated clicking is not a substitute for learning the relevant page or verifying an item's purpose."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "job",
+          "title": "Job",
+          "sourceIds": [
+            "jobs"
+          ],
+          "facts": [
+            "Starter jobs award daily pay, work stats and job points; explicitly passive specials can remain after leaving."
+          ],
+          "tips": [
+            "Plan promotions around work-stat requirements rather than choosing a job only for today's wage.",
+            "Compare the long-term unlock with a player company's pay, training policy and activity expectations."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "gym",
+          "title": "Gym",
+          "sourceIds": [
+            "gym"
+          ],
+          "facts": [
+            "Gyms have different training multipliers and unlock through gym experience plus membership purchases."
+          ],
+          "tips": [
+            "Check the next gym's multipliers before paying; specialise only when it fits your stat plan.",
+            "Record before-and-after stats to evaluate your own training budget rather than trusting a fixed beginner threshold."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "properties",
+          "title": "Properties",
+          "sourceIds": [
+            "property"
+          ],
+          "facts": [
+            "Rent is prepaid; tenants can incur staff upkeep, and a rented property's vault is inaccessible."
+          ],
+          "tips": [
+            "Compare rent plus staff cost per day rather than only the headline rental price.",
+            "Read upgrades and remaining lease duration before paying for housing intended for travel."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "education",
+          "title": "Education",
+          "sourceIds": [
+            "education"
+          ],
+          "facts": [
+            "Courses can have prerequisites and drug-related expulsion can force a restart."
+          ],
+          "tips": [
+            "Queue your next course choice in advance and set a reminder for completion.",
+            "Link education to a specific unlock or passive perk, and monitor addiction before an important course ends."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "crimes",
+          "title": "Crimes",
+          "sourceIds": [
+            "crimes"
+          ],
+          "facts": [
+            "Crimes 2.0 has hidden crime experience and separate, visible skill for each crime."
+          ],
+          "tips": [
+            "Use the expanded Crimes 2.0 chapter here; do not apply old Crimes 1.0 nerve ladders to the new system.",
+            "Decide whether your session targets skill, unique outcomes or cash before choosing subcrimes."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "missions",
+          "title": "Missions",
+          "sourceIds": [
+            "mission"
+          ],
+          "facts": [
+            "Contract standing changes with success, failure and declining; accepting every contract is not always beneficial."
+          ],
+          "tips": [
+            "Read every condition before accepting, including target, weapon and finishing-result requirements.",
+            "Price supplies and energy against the reward, and leave a time buffer for unavailable targets."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "newspaper",
+          "title": "Newspaper",
+          "sourceIds": [
+            "news"
+          ],
+          "facts": [
+            "The newspaper includes articles, job listings, property markets and bounties."
+          ],
+          "tips": [
+            "Check publication dates so an old announcement is not mistaken for the current event.",
+            "Use official article and announcement links when verifying a claim repeated in chat."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "jail",
+          "title": "Jail",
+          "sourceIds": [
+            "jail"
+          ],
+          "facts": [
+            "Busting success depends on several factors, and repeated attempts close together can reduce success rates."
+          ],
+          "tips": [
+            "Compare waiting, bail and asking for a bust before repeatedly spending nerve.",
+            "Use jail time productively where possible; do not deliberately fail crimes just to reach a jail gym."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "hospital",
+          "title": "Hospital",
+          "sourceIds": [
+            "hospital"
+          ],
+          "facts": [
+            "Hospital time and medical cooldown govern different restrictions; several exit methods have exceptions."
+          ],
+          "tips": [
+            "Budget the cooldown cost of each medical item instead of using the strongest item automatically.",
+            "Before paying for a revive, confirm your settings allow it and agree whether payment depends on success."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "casino",
+          "title": "Casino",
+          "sourceIds": [
+            "casino"
+          ],
+          "facts": [
+            "Casino tokens and casino-job points are different resources."
+          ],
+          "tips": [
+            "Treat casino play as optional entertainment with a hard loss budget, not a dependable income plan.",
+            "Do not raise stakes to recover losses; use in-game self-exclusion if gambling stops being enjoyable."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "hall-of-fame",
+          "title": "Hall Of Fame",
+          "sourceIds": [
+            "hof"
+          ],
+          "facts": [
+            "Some rankings show your position without exposing other players' private battle-stat identities."
+          ],
+          "tips": [
+            "Use personal progress over time rather than comparing your first week with veteran accounts.",
+            "Do not infer exact hidden stats from a rank, title or level alone."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "factions-my-faction",
+          "title": "Factions / My Faction",
+          "sourceIds": [
+            "faction"
+          ],
+          "facts": [
+            "Faction membership provides shared resources, upgrades and coordinated activities."
+          ],
+          "tips": [
+            "Compare obligations and payout policies alongside perks before accepting an invitation.",
+            "Ask when withdrawal requests are handled, especially if you intend to use the faction vault."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "to-join-or-not-to-join-a-faction",
+          "title": "To join or not to join a faction",
+          "sourceIds": [
+            "faction"
+          ],
+          "facts": [
+            "New members normally begin with a 72-hour Recruit period and limited access."
+          ],
+          "tips": [
+            "Ask which benefits are available immediately and which require full membership.",
+            "Choose an activity schedule that fits real life; an impressive perk list is not enough if attendance rules do not fit."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "organized-crimes",
+          "title": "Organized Crimes",
+          "sourceIds": [
+            "oc"
+          ],
+          "facts": [
+            "OCs 2.0 have planning and execution stages with role-specific requirements."
+          ],
+          "tips": [
+            "Ask which role suits your success chance and bring the listed equipment before committing.",
+            "Check readiness before flying or scheduling an absence; coordinate replacements early."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "recruit-citizens",
+          "title": "Recruit Citizens",
+          "sourceIds": [
+            "referral",
+            "rules"
+          ],
+          "facts": [
+            "Referral rewards are tied to genuine referred players' progression."
+          ],
+          "tips": [
+            "Invite people who want to play and help them understand the game rather than promising easy money.",
+            "Never create a second account to obtain referral rewards."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "calendar",
+          "title": "Calendar",
+          "sourceIds": [
+            "calendar"
+          ],
+          "facts": [
+            "Events may use player-selected time slots; dates in old guides are not an authoritative schedule."
+          ],
+          "tips": [
+            "Copy both start and end times from your own current calendar into a reminder.",
+            "Check whether a bonus applies at departure, consumption, claim or another event-specific action."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "community-events",
+          "title": "Community Events",
+          "sourceIds": [
+            "calendar",
+            "news"
+          ],
+          "facts": [
+            "Community competitions and seasonal systems have their own participation rules."
+          ],
+          "tips": [
+            "Read deadlines, eligibility and reward delivery conditions before sending an entry.",
+            "Keep the original announcement or entry receipt when a host promises a prize."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "lists",
+          "title": "Lists",
+          "sourceIds": [
+            "sidebar"
+          ],
+          "facts": [
+            "Friends, enemies and targets serve different organisational purposes."
+          ],
+          "tips": [
+            "Use short, consistent descriptions so the list remains searchable months later.",
+            "Review notes after a player's status or your relationship changes."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "friends-list",
+          "title": "Friends List",
+          "sourceIds": [
+            "friends"
+          ],
+          "facts": [
+            "Friends can have custom descriptions and status filters."
+          ],
+          "tips": [
+            "Save reliable traders, mentors and service providers with a note explaining the relationship.",
+            "Keep payment terms in an actual conversation; a friendly label is not a guarantee."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "enemies-list",
+          "title": "Enemies List",
+          "sourceIds": [
+            "enemies"
+          ],
+          "facts": [
+            "Enemies-list settings can block listed players from purchases across several markets."
+          ],
+          "tips": [
+            "Review purchase-block settings before using the list merely as a convenient bookmark.",
+            "Keep factual notes; avoid turning an old dispute into an accidental ongoing trade restriction."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "chats",
+          "title": "Chats",
+          "sourceIds": [
+            "chat"
+          ],
+          "facts": [
+            "Public, group and private channels have different access and conduct rules."
+          ],
+          "tips": [
+            "Choose the correct channel before posting a question, trade advert or faction instruction.",
+            "Never paste credentials into a chat, even if someone claims to be support."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "chats-settings-panel",
+          "title": "Chats Settings Panel",
+          "sourceIds": [
+            "chat"
+          ],
+          "facts": [
+            "Channel access depends partly on membership and game state."
+          ],
+          "tips": [
+            "Review notification settings and mute noisy channels during time-sensitive activity.",
+            "If a channel disappears, first check whether your faction, company or travel state changed."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "new-player-chat",
+          "title": "New Player Chat",
+          "sourceIds": [
+            "chat"
+          ],
+          "facts": [
+            "Access ends at level 13 or after 336 hours of accumulated play time."
+          ],
+          "tips": [
+            "Use the protected channel to ask basic questions while eligible.",
+            "After access ends, use suitable help forums or faction mentors rather than trying to regain it through another account."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "global",
+          "title": "Global",
+          "sourceIds": [
+            "chat"
+          ],
+          "facts": [
+            "Global is for social discussion; trade advertising is not permitted there."
+          ],
+          "tips": [
+            "Move sales offers to the appropriate trade channel or forum.",
+            "Avoid repeating a message when nobody replies; provide better context instead."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "trade-chat",
+          "title": "Trade Chat",
+          "sourceIds": [
+            "chat"
+          ],
+          "facts": [
+            "Trade chat is for adverts; the documented limits are one message per 60 seconds and 125 characters."
+          ],
+          "tips": [
+            "Fit item, price basis and contact terms into a concise advert.",
+            "Check your current channel rules before posting, rather than following old advice to spam advertisements."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "faction",
+          "title": "Faction",
+          "sourceIds": [
+            "chat"
+          ],
+          "facts": [
+            "Faction chat is tied to membership."
+          ],
+          "tips": [
+            "Confirm war orders and targets with the current organiser rather than an old pinned conversation.",
+            "Keep important payout or supply agreements in a durable written message too."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "company",
+          "title": "Company",
+          "sourceIds": [
+            "chat"
+          ],
+          "facts": [
+            "Company chat provides a shared channel for that company's members."
+          ],
+          "tips": [
+            "Use it to coordinate trains, stock needs or absences with the director.",
+            "Do not assume an informal chat promise overrides the published company policy."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "hospital-jail-travel",
+          "title": "Hospital / Jail / Travel",
+          "sourceIds": [
+            "chat"
+          ],
+          "facts": [
+            "These channels appear and disappear with the relevant game state."
+          ],
+          "tips": [
+            "Explain your location and need clearly when requesting a service.",
+            "Verify the provider's Torn ID and price before sending cash or items."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "misc",
+          "title": "Misc",
+          "sourceIds": [
+            "time"
+          ],
+          "facts": [
+            "Torn Time follows UTC rather than a daylight-saving local timezone."
+          ],
+          "tips": [
+            "Write deadlines with a timezone and date instead of saying only tonight.",
+            "Keep a small emergency float and relevant supplies before long or scheduled activities."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "time---tct",
+          "title": "Time - TCT",
+          "sourceIds": [
+            "time"
+          ],
+          "facts": [
+            "TCT is UTC year-round; India Standard Time is UTC plus 5 hours 30 minutes."
+          ],
+          "tips": [
+            "For example, 12:00 TCT is 17:30 IST; account for date changes around midnight.",
+            "Use an actual timezone-aware calendar for international teammates rather than memorising every offset."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "npc-looting",
+          "title": "NPC Looting",
+          "sourceIds": [
+            "loot"
+          ],
+          "facts": [
+            "NPC loot uses a contribution-based lottery; joining a fight does not guarantee an item."
+          ],
+          "tips": [
+            "Check the NPC's current loot level and a coordinated attack plan before spending energy.",
+            "A beginner should compare the cost of participation with reliable training or levelling progress."
+          ],
+          "status": "source-reviewed"
+        }
+      ],
+      "summary": "A complete interface tour with current resource mechanics and advice for every original section.",
+      "corrections": [
+        "Happy helps Crimes 2.0 skill/experience gains; this is not the same as improving success chance.",
+        "Old city-find and chat assumptions should be checked against the current systems."
+      ],
+      "checklist": [
+        "Check timers before buying a cure or booster.",
+        "Keep education and training aligned with one useful unlock.",
+        "Use live in-game information when helper data is old or incomplete."
+      ],
+      "extras": [
+        {
+          "slug": "extra-a-resource-check-before-expensive-actions",
+          "title": "A resource check before expensive actions",
+          "sourceIds": [
+            "energy",
+            "nerve",
+            "happy"
+          ],
+          "facts": [
+            "Energy, nerve, happy and their cooldowns do not all refill or reset in the same way."
+          ],
+          "tips": [
+            "Before consuming anything expensive, check current amount, cap, next timer and the action you will immediately take.",
+            "Do not mistake an estimated countdown for a verified live value after acting elsewhere in Torn."
+          ],
+          "status": "source-reviewed"
+        }
+      ]
+    },
+    "level15": {
+      "sections": [
+        {
+          "slug": "the-magic-number",
+          "title": "The Magic Number",
+          "sourceIds": [
+            "travel",
+            "level"
+          ],
+          "facts": [
+            "Level 15 unlocks overseas travel; visible level and combat strength are not interchangeable."
+          ],
+          "tips": [
+            "Pursue reliable wins rather than the highest-level name on a list.",
+            "After unlocking travel, reassess training and income instead of assuming permanent attack-only play is optimal."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "levelling-targets",
+          "title": "Levelling Targets",
+          "sourceIds": [
+            "level",
+            "attack"
+          ],
+          "facts": [
+            "Leaving after a win yields more level experience than mugging or hospitalising the same target."
+          ],
+          "tips": [
+            "Use your actual attack history to build a small list of repeatable wins.",
+            "Check current status before spending energy; inactivity and historical stats do not guarantee an easy fight."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "initial-preparation",
+          "title": "Initial Preparation",
+          "sourceIds": [
+            "items",
+            "attack"
+          ],
+          "facts": [
+            "Equipment includes melee, firearms, temporary items and armour; damage and accuracy matter alongside item names."
+          ],
+          "tips": [
+            "Equip what you bought and check ammunition if using a firearm.",
+            "Borrow faction gear or compare inexpensive upgrades before spending most of your cash on prestige equipment."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "the-housing-situation",
+          "title": "The Housing Situation",
+          "sourceIds": [
+            "property"
+          ],
+          "facts": [
+            "A lease fixes its agreed terms; staff still create upkeep costs."
+          ],
+          "tips": [
+            "Choose housing you can afford throughout the levelling period rather than just on day one.",
+            "Keep enough for supplies and a later travel setup instead of exhausting your float on rent."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "getting-your-happy-up",
+          "title": "Getting your happy up",
+          "sourceIds": [
+            "happy",
+            "drugs"
+          ],
+          "facts": [
+            "Ecstasy doubles current happiness but has overdose risk; surplus happiness has a quarter-hour reset."
+          ],
+          "tips": [
+            "Prepare the full sequence before using expensive happiness items.",
+            "Use a cheaper training session if an overdose or missed timer would derail your budget."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "the-lists-of-levelling-targets",
+          "title": "The Lists of Levelling Targets",
+          "sourceIds": [
+            "level"
+          ],
+          "facts": [
+            "Target catalogues are references, not guarantees of unchanged stats or availability."
+          ],
+          "tips": [
+            "Use Torn Helper's Baldr and Community filters, then confirm a target through recent observations and results.",
+            "Avoid assuming a ten-day-inactive submission is permanently inactive; its verification date matters."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "attacking-the-levelling-targets",
+          "title": "Attacking the Levelling Targets",
+          "sourceIds": [
+            "attack"
+          ],
+          "facts": [
+            "A normal attack costs 25 energy and has a 25-turn, five-minute limit."
+          ],
+          "tips": [
+            "Stop repeatedly attacking a target that you cannot defeat; diagnose accuracy, damage, life and equipment first.",
+            "For levelling, choose Leave deliberately after the win rather than reflexively selecting a cash option."
+          ],
+          "status": "source-reviewed"
+        }
+      ],
+      "summary": "Reach travel access through affordable preparation and reliable wins, not a fixed stat or cash target.",
+      "corrections": [
+        "The archived equipment prices and 500-stat suggestion are examples, not current prices or a guaranteed combat threshold."
+      ],
+      "checklist": [
+        "Equip affordable gear and arrange medical supplies.",
+        "Test a suitable target and record the result.",
+        "Use Leave for level experience and take available level upgrades while pursuing level 15."
+      ],
+      "extras": [
+        {
+          "slug": "extra-when-a-target-stops-being-profitable",
+          "title": "When a target stops being profitable",
+          "sourceIds": [
+            "level",
+            "attack"
+          ],
+          "facts": [
+            "Battle outcome depends on more than displayed level; no fixed beginner stat total guarantees a win."
+          ],
+          "tips": [
+            "After repeated failures, compare turns, accuracy, damage and medical cost, then train or pick another target.",
+            "Do not keep spending energy simply because a target appeared on a respected list."
+          ],
+          "status": "source-reviewed"
+        }
+      ]
+    },
+    "after15": {
+      "sections": [
+        {
+          "slug": "prerequisites",
+          "title": "Prerequisites",
+          "sourceIds": [
+            "travel-patch"
+          ],
+          "facts": [
+            "Travel inventory and baggage rules changed in June 2026."
+          ],
+          "tips": [
+            "Check your actual travel screen for capacity, usable supplies and restrictions before your first flight.",
+            "Compare the cost of your entire round trip with the expected net sale proceeds."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "renting-island",
+          "title": "Renting Island",
+          "sourceIds": [
+            "property"
+          ],
+          "facts": [
+            "Rented vault access is unavailable even if the property listing includes a vault upgrade."
+          ],
+          "tips": [
+            "Verify an airstrip is included and budget ongoing staff upkeep separately from rent.",
+            "Do not buy an island solely to unlock a benefit you could access more cheaply through a suitable lease."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "hiring-a-pilot",
+          "title": "Hiring a Pilot",
+          "sourceIds": [
+            "travel",
+            "property"
+          ],
+          "facts": [
+            "An airstrip and pilot give access to the corresponding travel method; an airstrip alone is not enough."
+          ],
+          "tips": [
+            "Check staff are actually hired and the intended flight option is active before departing.",
+            "Record recurring pilot and property costs when comparing routes."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "why-you-should-only-run-flowersplushies-at-start",
+          "title": "Why you should only run flowers/plushies at start",
+          "sourceIds": [
+            "museum",
+            "travel-patch"
+          ],
+          "facts": [
+            "Flowers and plushies have museum-set demand; newer contraband has different pricing and risk."
+          ],
+          "tips": [
+            "Treat flowers and plushies as a simple starting strategy, not a rule that no other item can be profitable.",
+            "Test demand and net margin on a small shipment before committing your full working capital."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "flowerplushie-running",
+          "title": "Flower/Plushie Running",
+          "sourceIds": [
+            "travel",
+            "market"
+          ],
+          "facts": [
+            "Default baggage is 10; the airstrip/WLT/business base is 15, before applicable bonuses."
+          ],
+          "tips": [
+            "Use displayed capacity, round-trip time, current purchase price and after-fee resale proceeds.",
+            "Plan a fallback item and a maximum waiting time if the intended shop is empty."
+          ],
+          "status": "source-reviewed"
+        }
+      ],
+      "summary": "Travel with the current baggage rules and calculate net income for your own schedule.",
+      "corrections": [
+        "The 2026 revision increased standard capacity and reduced suitcase bonuses; the archived +4 large-suitcase advice is outdated.",
+        "Black-market pricing is variable; a saved screenshot is not a current quote."
+      ],
+      "checklist": [
+        "Verify the active travel method, capacity and recurring housing cost.",
+        "Check destination stock and a fallback purchase before flying.",
+        "Compare net profit per round-trip hour and sell without leaving unnecessary cash exposed."
+      ],
+      "extras": [
+        {
+          "slug": "extra-foreign-shop-pricing-and-inventory",
+          "title": "Foreign shop pricing and inventory",
+          "sourceIds": [
+            "travel-patch"
+          ],
+          "facts": [
+            "Contraband Importation introduced separate General Store, Arms Dealer and Black Market shops; drugs and contraband have variable prices."
+          ],
+          "tips": [
+            "Treat saved foreign prices as observations, and verify the shop price before buying.",
+            "Leave room for the items you intend to bring and check the travel inventory rather than relying on an old capacity screenshot."
+          ],
+          "status": "source-reviewed"
+        }
+      ],
+      "tables": [
+        {
+          "title": "Current baggage reference",
+          "sourceIds": [
+            "travel",
+            "suitcase"
+          ],
+          "columns": [
+            "Component",
+            "Documented allowance",
+            "Planning note"
+          ],
+          "rows": [
+            [
+              "Standard travel base",
+              "10 items",
+              "Check your actual flight screen."
+            ],
+            [
+              "Airstrip plus pilot / WLT / Business Class base",
+              "15 items",
+              "These alternative bases do not add together."
+            ],
+            [
+              "Small / medium / large suitcase",
+              "+1 / +2 / +3",
+              "Only the largest applicable suitcase counts."
+            ],
+            [
+              "Faction Excursion",
+              "Up to +10",
+              "Use your own active faction perks."
+            ],
+            [
+              "Category-specific company bonuses",
+              "Depends on company and item",
+              "Do not assume a flower bonus applies to all goods."
+            ]
+          ]
+        }
+      ]
+    },
+    "factions-new-players": {
+      "sections": [
+        {
+          "slug": "npo---valour",
+          "title": "NPO - Valour",
+          "sourceIds": [
+            "npo"
+          ],
+          "facts": [
+            "Its recruitment thread describes Valour as an entry-level branch, but current acceptance and perks must be confirmed."
+          ],
+          "tips": [
+            "Ask which requirements have exceptions for players below level 15.",
+            "Read the current first post and contact admissions before planning around a quoted perk."
+          ],
+          "status": "availability-unverified"
+        },
+        {
+          "slug": "wtf-family",
+          "title": "WTF Family",
+          "sourceIds": [
+            "faction"
+          ],
+          "facts": [
+            "The imported family description is historical; a family name does not verify the policies of each branch."
+          ],
+          "tips": [
+            "Ask which actual faction ID fits your goals and skill level.",
+            "Compare each branch's war schedule, bank access and membership conditions separately."
+          ],
+          "status": "availability-unverified"
+        },
+        {
+          "slug": "wtf",
+          "title": "WTF",
+          "sourceIds": [
+            "faction"
+          ],
+          "facts": [
+            "Current recruitment availability and perks were not independently verified for this historical entry."
+          ],
+          "tips": [
+            "Confirm the faction ID through a current recruiter or profile.",
+            "Request current expectations and payout terms instead of relying on the archived description."
+          ],
+          "status": "availability-unverified"
+        },
+        {
+          "slug": "wtf-medical",
+          "title": "WTF Medical",
+          "sourceIds": [
+            "revive"
+          ],
+          "facts": [
+            "The old guide describes a medical branch; present revive benefits and recruitment status are unverified."
+          ],
+          "tips": [
+            "Ask the current energy cost of reviving and whether Brain Surgeon is required before joining.",
+            "Check contracts, training support and whether failed revive attempts are paid."
+          ],
+          "status": "availability-unverified"
+        },
+        {
+          "slug": "wtf-healers",
+          "title": "WTF Healers",
+          "sourceIds": [
+            "revive"
+          ],
+          "facts": [
+            "The historical healer listing is not a current offer of membership or a verified perk guarantee."
+          ],
+          "tips": [
+            "Compare revive-training support with the requirements of your current job progression.",
+            "Ask about activity obligations and how contract revenue is distributed."
+          ],
+          "status": "availability-unverified"
+        },
+        {
+          "slug": "toxic-spawn",
+          "title": "Toxic Spawn",
+          "sourceIds": [
+            "new-factions"
+          ],
+          "facts": [
+            "A community beginner-faction list references Toxic Spawn; this does not verify a present vacancy."
+          ],
+          "tips": [
+            "Check the current profile, recruiter and requirements before applying.",
+            "Ask how beginners progress to another branch and whether any costs or obligations apply."
+          ],
+          "status": "availability-unverified"
+        },
+        {
+          "slug": "new-sith-order",
+          "title": "New Sith Order",
+          "sourceIds": [
+            "nso"
+          ],
+          "facts": [
+            "The recruitment thread distinguishes a war-focused family branch; historic beginner suitability is not assured."
+          ],
+          "tips": [
+            "Ask which branch currently accepts your battle stats and schedule.",
+            "Confirm whether the listed war requirements and supplies policy fit your budget."
+          ],
+          "status": "availability-unverified"
+        },
+        {
+          "slug": "tornado",
+          "title": "TORNado",
+          "sourceIds": [
+            "tornado"
+          ],
+          "facts": [
+            "A faction recruitment thread exists, but an old thread title cannot establish current vacancies or perks."
+          ],
+          "tips": [
+            "Inspect the current first post and date of the recruiter's latest response.",
+            "Request written terms for training, supplies and withdrawals before depositing significant funds."
+          ],
+          "status": "availability-unverified"
+        },
+        {
+          "slug": "we-are-rising",
+          "title": "We Are Rising",
+          "sourceIds": [
+            "faction"
+          ],
+          "facts": [
+            "No sufficiently current recruitment offer was verified for this archived name and ID."
+          ],
+          "tips": [
+            "Use the numeric faction ID in the original source to avoid confusing a rename or similarly named group.",
+            "Confirm leadership, membership rules and current recruitment status directly in Torn."
+          ],
+          "status": "availability-unverified"
+        },
+        {
+          "slug": "nngo-deja-2",
+          "title": "NNGO Deja 2",
+          "sourceIds": [
+            "faction"
+          ],
+          "facts": [
+            "Current recruitment and benefits were not verified for this historical directory entry."
+          ],
+          "tips": [
+            "Check whether the faction has been renamed, reorganised or moved to a different role.",
+            "Compare current active perks and participation requirements before treating it as a beginner option."
+          ],
+          "status": "availability-unverified"
+        }
+      ],
+      "summary": "Evaluate a faction by current fit and terms rather than a historical name or benefit list.",
+      "corrections": [
+        "Named entries are historical leads. Present recruitment, ownership, requirements and perks are not guaranteed."
+      ],
+      "checklist": [
+        "Compare active upgrades and participation expectations.",
+        "Read the current recruitment thread and confirm the exact faction ID.",
+        "Agree supply, payout and vault-withdrawal policies before committing."
+      ],
+      "extras": [
+        {
+          "slug": "extra-current-faction-selection-checklist",
+          "title": "Current faction selection checklist",
+          "sourceIds": [
+            "faction",
+            "war"
+          ],
+          "facts": [
+            "Faction resources, upgrades and membership terms differ; a historical directory is not a live offer."
+          ],
+          "tips": [
+            "Ask for active training/travel perks, war frequency, supply policy, payout deductions and withdrawal availability.",
+            "Prefer a clear, sustainable fit over a recruitment promise you cannot independently verify."
+          ],
+          "status": "source-reviewed"
+        }
+      ]
+    },
+    "money-storage": {
+      "sections": [
+        {
+          "slug": "mugging",
+          "title": "Mugging",
+          "sourceIds": [
+            "mug"
+          ],
+          "facts": [
+            "Mugging takes a variable proportion of exposed cash and can be modified by perks."
+          ],
+          "tips": [
+            "Plan the cash-storage action before a predictable incoming payment.",
+            "Do not treat a high net worth, hospital plan or small previous mug as proof that your next payment is safe."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "mug-protection",
+          "title": "Mug Protection",
+          "sourceIds": [
+            "mug"
+          ],
+          "facts": [
+            "Post-mug protected cash decays over 12 hours; moving protected funds can reduce that protection."
+          ],
+          "tips": [
+            "Do not repeatedly move funds under the assumption that the original protected amount will remain intact.",
+            "Treat protection as a loss-limiting mechanic, not a reason to leave future sale proceeds exposed."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "cash-storage",
+          "title": "Cash Storage",
+          "sourceIds": [
+            "bank",
+            "stocks"
+          ],
+          "facts": [
+            "Storage choices differ in access, lockup, volatility and counterparty risk."
+          ],
+          "tips": [
+            "Split emergency spending money from investments and money needed on a known date.",
+            "Write down your exit route before depositing, buying an asset or starting a trade."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "piggy-bank",
+          "title": "Piggy Bank",
+          "sourceIds": [
+            "piggy"
+          ],
+          "facts": [
+            "The beginner piggy bank is a one-time opportunity; withdrawing destroys it and puts the balance in hand."
+          ],
+          "tips": [
+            "Check George's mission store early rather than assuming you can buy one later.",
+            "Arrange the next storage destination before breaking it."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "ghost-trades",
+          "title": "Ghost Trades",
+          "sourceIds": [
+            "trade"
+          ],
+          "facts": [
+            "An unfinished trade can be cancelled; completed acceptance transfers its contents."
+          ],
+          "tips": [
+            "Do not confuse temporary trade holding with interest-bearing or unlimited-duration banking.",
+            "Use a trusted counterparty and an explicit agreement that the holding trade must not be completed."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "how-to-set-a-ghost-trade",
+          "title": "How to set a ghost trade?",
+          "sourceIds": [
+            "trade"
+          ],
+          "facts": [
+            "The initiating player has the final acceptance step in direct trading."
+          ],
+          "tips": [
+            "Confirm the recipient ID and purpose, then leave the trade unfinished and monitor its state.",
+            "Keep a separate reminder to review the holding arrangement; do not leave critical cash dependent on an abandoned conversation."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "city-bank",
+          "title": "City Bank",
+          "sourceIds": [
+            "bank"
+          ],
+          "facts": [
+            "Time deposits offer several durations with changing APR; matured funds can remain in the bank until withdrawn."
+          ],
+          "tips": [
+            "Compare the current term return and when you need the money, not merely the largest interest figure.",
+            "Keep a reserve outside a locked deposit so an urgent expense does not force a worse borrowing decision."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "cayman-island",
+          "title": "Cayman Island",
+          "sourceIds": [
+            "cayman"
+          ],
+          "facts": [
+            "Offshore interest uses the month's lowest qualifying balance, and access requires being abroad."
+          ],
+          "tips": [
+            "Include travel and time costs when comparing it with other storage choices.",
+            "Do not assume a late-month deposit earns a full month's interest."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "stocks",
+          "title": "Stocks",
+          "sourceIds": [
+            "stocks"
+          ],
+          "facts": [
+            "Stock sales have a 0.1% fee and trading is restricted in hospital, jail and transit."
+          ],
+          "tips": [
+            "Stocks are not a risk-free cash vault: price changes and inability to access them can matter more than the fee.",
+            "Avoid needing an immediate sale to pay for a war, rental or other deadline."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "points",
+          "title": "Points",
+          "sourceIds": [
+            "points"
+          ],
+          "facts": [
+            "Points are a separate currency and must normally be exchanged through their own market."
+          ],
+          "tips": [
+            "Compare the buy/sell spread before using points as temporary value storage.",
+            "Keep planned refill points separate from a speculative resale position."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "items",
+          "title": "Items",
+          "sourceIds": [
+            "items",
+            "market"
+          ],
+          "facts": [
+            "Different items have different markets, restrictions and liquidity."
+          ],
+          "tips": [
+            "Store value only in items you understand well enough to price and sell.",
+            "Calculate the cash you could actually receive after selling costs instead of using an estimated inventory value."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "property-vaults",
+          "title": "Property Vaults",
+          "sourceIds": [
+            "property"
+          ],
+          "facts": [
+            "A tenant cannot access a rented property's vault."
+          ],
+          "tips": [
+            "Check ownership, shared access and current capacity before treating a vault as available storage.",
+            "Do not pay extra rent for vault access you will not receive."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "faction-vault",
+          "title": "Faction Vault",
+          "sourceIds": [
+            "faction"
+          ],
+          "facts": [
+            "Faction resources are controlled by members with the relevant permissions."
+          ],
+          "tips": [
+            "Ask who can authorise a withdrawal and what happens while officers are offline.",
+            "Keep a personal record of deposits and avoid entrusting money you cannot afford to wait for."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "company-vaults",
+          "title": "Company Vaults",
+          "sourceIds": [
+            "company"
+          ],
+          "facts": [
+            "A company vault is part of a player-run business, not your personal bank."
+          ],
+          "tips": [
+            "Keep operating cash separate from personal money in your records.",
+            "Consider director access, sale terms and business liabilities before using a company as storage."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "winning-the-lottery-slots-big-money-quick-storage",
+          "title": "Winning the lottery / Slots / Big Money Quick Storage",
+          "sourceIds": [
+            "bank",
+            "casino"
+          ],
+          "facts": [
+            "Some large receipts use cashier's checks while other payouts can create immediate wallet exposure."
+          ],
+          "tips": [
+            "Before claiming, identify the exact payout mechanism and prepare a storage destination.",
+            "Avoid announcing a windfall publicly until you have dealt with the practical cash exposure."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "slots-win",
+          "title": "Slots Win",
+          "sourceIds": [
+            "casino"
+          ],
+          "facts": [
+            "Casino activity can create large gains or losses; it is not a reliable savings method."
+          ],
+          "tips": [
+            "After an unusual win, stop and protect the proceeds instead of increasing the stake.",
+            "Do not assume a slots payout follows the same claim process as a lottery cheque."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "lottery-win",
+          "title": "Lottery Win",
+          "sourceIds": [
+            "bank"
+          ],
+          "facts": [
+            "Lottery winnings are cashier's checks that automatically credit after 24 hours if not collected."
+          ],
+          "tips": [
+            "Set a reminder before the automatic-credit deadline and decide where the money will go.",
+            "Verify the bank record itself rather than following an unexpected message claiming you won."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "investing-your-winnings",
+          "title": "Investing your winnings",
+          "sourceIds": [
+            "bank",
+            "stocks"
+          ],
+          "facts": [
+            "Bank rates vary and stock prices can fall; a quoted return is not a guarantee."
+          ],
+          "tips": [
+            "Separate training, housing and emergency budgets before investing the remainder.",
+            "Avoid buying several benefit blocks at once without comparing their marginal yield and loss of liquidity."
+          ],
+          "status": "source-reviewed"
+        }
+      ],
+      "summary": "Compare wallet exposure, access time, lockup, volatility and trust for every storage method.",
+      "corrections": [
+        "A rented property does not provide vault access.",
+        "Stocks can lose value and are unavailable in some game states; they are not an instant guaranteed vault.",
+        "Mug protection can change when protected cash is moved."
+      ],
+      "checklist": [
+        "Plan the destination before a large receipt.",
+        "Keep a separate operating float for foreseeable expenses.",
+        "Set reminders for deposits, temporary holdings and automatic cheque credit."
+      ],
+      "extras": [
+        {
+          "slug": "extra-a-plan-for-a-predictable-cash-receipt",
+          "title": "A plan for a predictable cash receipt",
+          "sourceIds": [
+            "mug",
+            "bank"
+          ],
+          "facts": [
+            "Different payout mechanisms can put money in hand immediately or after a claim deadline."
+          ],
+          "tips": [
+            "Decide the claim time, destination and required access in advance; perform the storage step before unrelated browsing.",
+            "Keep the action manual and confirm the resulting balance in game rather than trusting a helper notification."
+          ],
+          "status": "source-reviewed"
+        }
+      ]
+    },
+    "money-making": {
+      "sections": [
+        {
+          "slug": "for-newbies",
+          "title": "For Newbies",
+          "sourceIds": [
+            "energy",
+            "market"
+          ],
+          "facts": [
+            "Early earning methods consume different combinations of time, energy and capital."
+          ],
+          "tips": [
+            "Choose a method that funds your next useful unlock without consuming every resource needed for growth.",
+            "Track net proceeds and time spent for a week before deciding a method is worth scaling."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "selling-lossesslutting",
+          "title": "Selling Losses/Slutting",
+          "sourceIds": [
+            "attack"
+          ],
+          "facts": [
+            "Paid losses use attack energy that could otherwise support levelling or gym training."
+          ],
+          "tips": [
+            "Agree quantity, weapon conditions, proof and payment timing before the first hit.",
+            "Compare the net pay after recovery costs with the progress you are giving up; do a small trial with an unfamiliar buyer."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "city-shops",
+          "title": "City Shops",
+          "sourceIds": [
+            "market",
+            "items"
+          ],
+          "facts": [
+            "Shop purchase cost and player resale value are separate prices."
+          ],
+          "tips": [
+            "Check today's stock and demand before buying; an old beer or candy margin is not a current quote.",
+            "Include sales fees and any unsold inventory when calculating whether the daily run helped."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "odd-jobs",
+          "title": "Odd Jobs",
+          "sourceIds": [
+            "trade",
+            "rules"
+          ],
+          "facts": [
+            "Player services rely on a specific agreement rather than a built-in salary guarantee."
+          ],
+          "tips": [
+            "Define a small deliverable, payment amount, deadline and acceptance standard.",
+            "Keep work inside Torn's rules and avoid services involving account access or real-money exchanges."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "advertising",
+          "title": "Advertising",
+          "sourceIds": [
+            "chat"
+          ],
+          "facts": [
+            "Trade and Global have different permitted uses; old spam-based advice is unsuitable."
+          ],
+          "tips": [
+            "Use the correct channel and measure genuine replies or completed sales, not message volume.",
+            "Agree the placement and duration before paying for another player's advertising service."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "company-employee-finding",
+          "title": "Company Employee Finding",
+          "sourceIds": [
+            "company"
+          ],
+          "facts": [
+            "Companies need staff suited to their positions and operating model."
+          ],
+          "tips": [
+            "Ask the director for work-stat, activity and retention requirements before searching.",
+            "Agree what counts as a successful referral and when the fee becomes payable; do not promise a job on the director's behalf."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "community-events",
+          "title": "Community Events",
+          "sourceIds": [
+            "calendar"
+          ],
+          "facts": [
+            "Event eligibility and rewards depend on each organiser's published conditions."
+          ],
+          "tips": [
+            "Enter only when the likely reward or enjoyment justifies the entry cost.",
+            "Save proof of submission and check whether the organiser has a clear payout process."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "fun-forum-discord-servers",
+          "title": "Fun & Forum / Discord Servers",
+          "sourceIds": [
+            "rules"
+          ],
+          "facts": [
+            "Off-site communities do not replace Torn's game rules or account-security controls."
+          ],
+          "tips": [
+            "Verify invitations through a known profile or official thread rather than a random direct message.",
+            "Do not pay an upfront verification fee or disclose keys to claim an unexpected prize."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "city-map",
+          "title": "City Map",
+          "sourceIds": [
+            "awareness"
+          ],
+          "facts": [
+            "City finds can spawn after daily activity; more clicking does not produce more spawns."
+          ],
+          "tips": [
+            "Collect finds during a short routine and value unusual items before selling.",
+            "Do not build an income budget around rare windfalls."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "gfx-design",
+          "title": "GFX Design",
+          "sourceIds": [
+            "rules"
+          ],
+          "facts": [
+            "Creative work for Torn assets still needs to respect the game's trading rules."
+          ],
+          "tips": [
+            "Agree size, format, revisions, delivery and usage rights before starting a commission.",
+            "Use a small paid milestone for custom work and retain previews or receipts to document completion."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "responsible-gambling",
+          "title": "Responsible gambling",
+          "sourceIds": [
+            "casino"
+          ],
+          "facts": [
+            "Gambling outcomes are uncertain; token availability does not create a positive-return income method."
+          ],
+          "tips": [
+            "Exclude gambling winnings from the budget needed for rent, training and supplies.",
+            "Set an affordable entertainment limit and do not use progression money to chase a loss."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "companies",
+          "title": "Companies",
+          "sourceIds": [
+            "company"
+          ],
+          "facts": [
+            "Directors manage staff, stock and advertising; gross revenue is not net business profit."
+          ],
+          "tips": [
+            "Request operating records and liabilities before buying a company.",
+            "Stress-test a bad week of wages, advertising and inventory costs before committing your capital."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "city-bank",
+          "title": "City Bank",
+          "sourceIds": [
+            "bank"
+          ],
+          "facts": [
+            "The normal investment ceiling is $2 billion; a qualifying Oil Rig benefit can raise it."
+          ],
+          "tips": [
+            "Use the current bank offer to compare your next investment, keeping known expenses liquid.",
+            "Do not pool or borrow money merely because an old guide shows an attractive historic rate."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "intermediate",
+          "title": "Intermediate",
+          "sourceIds": [
+            "revive",
+            "war"
+          ],
+          "facts": [
+            "Service and faction income depend on skill, opportunities, terms and actual participation."
+          ],
+          "tips": [
+            "Select a repeatable method that fits your schedule rather than adopting every veteran activity.",
+            "Measure net earnings alongside energy consumption and time availability."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "reviving",
+          "title": "Reviving",
+          "sourceIds": [
+            "revive"
+          ],
+          "facts": [
+            "Reviving unlocks through Brain Surgeon; attempts consume energy even when they fail."
+          ],
+          "tips": [
+            "Agree success-based or attempt-based payment before a contract starts.",
+            "Use the displayed success chance and your energy cost to estimate expected pay per energy."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "flowerplushie-running",
+          "title": "Flower/Plushie Running",
+          "sourceIds": [
+            "travel",
+            "market"
+          ],
+          "facts": [
+            "Foreign stock availability and local resale demand can change between departures."
+          ],
+          "tips": [
+            "Rank routes by net profit per round-trip hour, including waiting and selling time.",
+            "Try more than one buyer and keep a fallback route instead of relying on yesterday's highest margin."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "stocks-benefit-blocks",
+          "title": "Stocks Benefit Blocks",
+          "sourceIds": [
+            "stocks"
+          ],
+          "facts": [
+            "Passive benefits have a holding period; active dividends need claiming before another cycle progresses."
+          ],
+          "tips": [
+            "Set collection reminders and check the marginal cost of the next increment.",
+            "Value an item dividend at a realistic after-fee sale price, not a headline market estimate."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "bounties",
+          "title": "Bounties",
+          "sourceIds": [
+            "bounty"
+          ],
+          "facts": [
+            "Claiming a bounty requires a qualifying hospitalisation; a high bounty does not imply an easy target."
+          ],
+          "tips": [
+            "Check target strength and availability before committing recovery items and energy.",
+            "Compare likely net reward with repeated-failure risk and the opportunity cost of training."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "ranked-warring",
+          "title": "Ranked Warring",
+          "sourceIds": [
+            "war"
+          ],
+          "facts": [
+            "Weekly ranked-war templates were introduced in November 2026; enlistment shows the applicable rules."
+          ],
+          "tips": [
+            "Read this week's template before planning hits or relying on an old score target.",
+            "Agree your faction's payout formula and expense deductions before the war, then retain the report."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "building-flowerplushie-sets",
+          "title": "Building Flower/Plushie Sets",
+          "sourceIds": [
+            "museum"
+          ],
+          "facts": [
+            "The History bachelor unlocks museum exchanges; complete flower or plushie sets exchange for points."
+          ],
+          "tips": [
+            "Price the entire set, including its least convenient item, against the current value of the points received.",
+            "Include selling costs, available cash and time spent assembling sets rather than assuming every set is profitable."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "eventscompetitions",
+          "title": "Events/Competitions",
+          "sourceIds": [
+            "calendar"
+          ],
+          "facts": [
+            "Special bonuses have event-specific start and end conditions."
+          ],
+          "tips": [
+            "Check your own event slot before buying supplies or scheduling a large action.",
+            "Budget for the ordinary outcome; a rare event prize should remain upside rather than expected income."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "mugging",
+          "title": "Mugging",
+          "sourceIds": [
+            "mug"
+          ],
+          "facts": [
+            "Mug results are variable and affected by protection and perks."
+          ],
+          "tips": [
+            "Do not infer a guaranteed target balance from a visible sale or an old net-worth figure.",
+            "Consider retaliation, failed attacks and training opportunity cost when deciding whether an attempt is worthwhile."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "advanced",
+          "title": "Advanced",
+          "sourceIds": [
+            "stocks",
+            "company"
+          ],
+          "facts": [
+            "Trading and businesses introduce more capital and liquidity risk than a simple service sale."
+          ],
+          "tips": [
+            "Keep a written ledger of cost basis, fees, stock levels and cash tied up.",
+            "Scale only after you can explain where profit comes from and what would make the plan fail."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "trading",
+          "title": "Trading",
+          "sourceIds": [
+            "market",
+            "trade"
+          ],
+          "facts": [
+            "Item-market sales carry fees; direct trades and bazaars have different processes and exposure."
+          ],
+          "tips": [
+            "Calculate margin after fees, price movement, slow stock and the value of your own time.",
+            "Make a small test purchase before expanding into an unfamiliar item category."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "stocks",
+          "title": "Stocks",
+          "sourceIds": [
+            "stocks"
+          ],
+          "facts": [
+            "Share-price gains are distinct from dividend benefits and neither guarantees profit."
+          ],
+          "tips": [
+            "Track realised proceeds after the selling fee and keep capital for near-term obligations out of a speculative position.",
+            "Do not present a guessed price pattern as a predictable trading signal."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "mercenaries",
+          "title": "Mercenaries",
+          "sourceIds": [
+            "war",
+            "attack"
+          ],
+          "facts": [
+            "Outside combat services depend on game restrictions and a buyer's agreed qualifying conditions."
+          ],
+          "tips": [
+            "Specify eligible targets, finish result, evidence, payment and exclusions before accepting work.",
+            "Use reports to reconcile completed work; do not assume every visible hit qualifies under a faction's contract."
+          ],
+          "status": "source-reviewed"
+        }
+      ],
+      "summary": "Choose earnings by net return, time, resource use and downside risk.",
+      "corrections": [
+        "Old sale-price and hourly-income examples are not live earning guarantees.",
+        "The ordinary item-market sales fee is 5%; a route or trade must account for its actual selling channel.",
+        "Ranked-war templates now make checking the current enlistment rules important."
+      ],
+      "checklist": [
+        "Choose one repeatable earning method and record the full costs.",
+        "Keep progression energy and near-term cash needs in your plan.",
+        "Scale only when completed results support the expected margin."
+      ],
+      "extras": [
+        {
+          "slug": "extra-marginal-return-versus-total-return",
+          "title": "Marginal return versus total return",
+          "sourceIds": [
+            "stocks",
+            "bank"
+          ],
+          "facts": [
+            "An additional investment can have a different cost and yield from the first one."
+          ],
+          "tips": [
+            "Compare the next block or upgrade on its own additional cost rather than averaging it with a cheaper earlier purchase.",
+            "Keep realistic sale prices and an adverse scenario in the worksheet before committing money."
+          ],
+          "status": "source-reviewed"
+        }
+      ],
+      "tables": [
+        {
+          "title": "Net return worksheet (editorial calculation)",
+          "sourceIds": [
+            "market"
+          ],
+          "columns": [
+            "Measure",
+            "Calculation",
+            "What to include"
+          ],
+          "rows": [
+            [
+              "Net unit margin",
+              "Sale proceeds after fees − purchase cost",
+              "Use the fee of the actual selling channel."
+            ],
+            [
+              "Trip profit",
+              "Quantity × unit margin − other trip costs",
+              "Include paid travel and allocated recurring costs."
+            ],
+            [
+              "Profit per hour",
+              "Trip profit ÷ total hours",
+              "Include both flights, waiting and selling time."
+            ],
+            [
+              "Illustrative example, not a price quote",
+              "$2,000 sale × 0.95 − $1,000 cost = $900 per item",
+              "At 10 items: $9,000 before other costs."
+            ],
+            [
+              "Service return",
+              "Expected net pay ÷ total energy spent",
+              "Include unsuccessful attempts and unpaid work."
+            ]
+          ]
+        }
+      ]
+    },
+    "crimes2": {
+      "sections": [
+        {
+          "slug": "a-criminal-primer",
+          "title": "A Criminal Primer",
+          "sourceIds": [
+            "primer",
+            "crimes"
+          ],
+          "facts": [
+            "The player-authored Criminal Primer includes an October 2026 Arson update; it remains community guidance."
+          ],
+          "tips": [
+            "Use the crime-specific notes below and compare them with the current interface and linked wiki.",
+            "Separate documented mechanics from community estimates of optimal profitability or progression."
+          ],
+          "status": "source-reviewed"
+        }
+      ],
+      "extras": [
+        {
+          "slug": "crime-search-for-cash",
+          "title": "Search for Cash",
+          "sourceIds": [
+            "search-cash"
+          ],
+          "facts": [
+            "All six searches cost two nerve. Beach and cemetery require unlock items; the fountain needs skill 75."
+          ],
+          "tips": [
+            "Trash, subway and junkyard have different environmental conditions; use the current on-screen cues rather than a fixed best crime rule.",
+            "Treat unique-outcome hunting as a separate goal from short-term cash and check any required item before repeating attempts."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "crime-bootlegging",
+          "title": "Bootlegging",
+          "sourceIds": [
+            "bootlegging"
+          ],
+          "facts": [
+            "Copying, selling and an online store are separate activities. The store needs skill 50, the named web-design course and a computer."
+          ],
+          "tips": [
+            "Count blank-DVD costs and the time needed to sell copied stock; copying alone does not realise cash profit.",
+            "Check production and remaining stock before spending more nerve on an already overfilled genre."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "crime-graffiti",
+          "title": "Graffiti",
+          "sourceIds": [
+            "graffiti"
+          ],
+          "facts": [
+            "Area reputation changes independently and decays; the Paint Mask is its enhancer. Some areas require a crew unlock."
+          ],
+          "tips": [
+            "Build an area deliberately rather than spreading early attempts everywhere.",
+            "Watch remaining paint and distinguish reputation goals from cash goals."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "crime-shoplifting",
+          "title": "Shoplifting",
+          "sourceIds": [
+            "shoplifting"
+          ],
+          "facts": [
+            "Each shop has its own notoriety and security state. Notoriety falls over time; four nerve is used per attempt."
+          ],
+          "tips": [
+            "Rotate or pause when local notoriety is costly, using the actual shop indicators.",
+            "Do not treat disabled cameras or a high skill level as a guarantee; budget for lost supplies and failures."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "crime-pickpocketing",
+          "title": "Pickpocketing",
+          "sourceIds": [
+            "pickpocket"
+          ],
+          "facts": [
+            "Targets vary by type, body and current distraction; availability does not mean suitability for your skill."
+          ],
+          "tips": [
+            "Choose manageable targets and watch their expiry timers instead of rushing every new row.",
+            "Track failures by target type so your next session uses your own evidence rather than a universal promise of safety."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "crime-card-skimming",
+          "title": "Card Skimming",
+          "sourceIds": [
+            "skimming"
+          ],
+          "facts": [
+            "Installation uses a card skimmer and spy camera; details become usable on recovery, and devices can be lost."
+          ],
+          "tips": [
+            "Treat longer placement as a return-versus-loss-risk decision, not an automatic improvement.",
+            "Keep a placement log and include replacement equipment in your cash-per-nerve estimate."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "crime-burglary",
+          "title": "Burglary",
+          "sourceIds": [
+            "burglary"
+          ],
+          "facts": [
+            "Scout, case and burglarize are distinct actions. Casing confidence fades; a target's recommended item unlocks its unique reward."
+          ],
+          "tips": [
+            "Plan enough nerve to finish a chosen target rather than accumulating more locations than you will use.",
+            "Check the recommendation and current confidence before the final step; focused scouting has a higher nerve cost than ordinary scouting."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "crime-hustling",
+          "title": "Hustling",
+          "sourceIds": [
+            "hustling"
+          ],
+          "facts": [
+            "Audience interest, suspicion and each game's technique affect play. Shill and pickpocket helpers unlock at higher skill."
+          ],
+          "tips": [
+            "Develop a game deliberately and watch the audience rather than repeatedly choosing the win action.",
+            "Include intentional losses and helper collection costs when comparing actual session profit."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "crime-disposal",
+          "title": "Disposal",
+          "sourceIds": [
+            "disposal"
+          ],
+          "facts": [
+            "Jobs arrive daily and can only be attempted once. Method choice and required consumables vary by job."
+          ],
+          "tips": [
+            "Read the job and compare the available methods before choosing; the most expensive method is not automatically best.",
+            "Check supplies first and preserve a record of method and outcome to improve future decisions."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "crime-cracking",
+          "title": "Cracking",
+          "sourceIds": [
+            "cracking"
+          ],
+          "facts": [
+            "This in-game minigame requires Introduction to Computing and a computer. Wrong character guesses can lock further guesses."
+          ],
+          "tips": [
+            "Treat this solely as a Torn minigame; no real accounts or external passwords are involved.",
+            "Compare rig-upgrade costs with the jobs available to your skill and avoid wasting guesses without a reason."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "crime-forgery",
+          "title": "Forgery",
+          "sourceIds": [
+            "forgery"
+          ],
+          "facts": [
+            "Projects have multiple five-nerve steps, mixed reusable and consumed tools, and possible progress loss."
+          ],
+          "tips": [
+            "Calculate all material costs for a finished item before starting a batch.",
+            "Stagger timed steps to match your normal logins instead of leaving many unfinished projects tying up supplies."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "crime-scamming",
+          "title": "Scamming",
+          "sourceIds": [
+            "scamming"
+          ],
+          "facts": [
+            "The fictional crime uses an in-game address pool, responses and a reward-zone minigame."
+          ],
+          "tips": [
+            "Only use the built-in Torn activity; never collect real email addresses or message real people for this guide.",
+            "Read the current cursor and zones, and budget the whole conversation rather than valuing only its final payout."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "crime-arson",
+          "title": "Arson",
+          "sourceIds": [
+            "arson"
+          ],
+          "facts": [
+            "The in-game scenario uses different fire behaviour, client requirements and unlockable tools; Collect has its own final step."
+          ],
+          "tips": [
+            "Keep this entirely within Torn's game interface and follow each fictional job's requirements.",
+            "Check what a consumable costs and whether the final condition is met before spending nerve on more actions."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "extra-crime-progression-without-false-guarantees",
+          "title": "Crime progression without false guarantees",
+          "sourceIds": [
+            "crimes",
+            "happy"
+          ],
+          "facts": [
+            "Success, failure and critical failure affect progression differently; higher happiness helps progression rather than known success chance."
+          ],
+          "tips": [
+            "Track profit, skill progression and unique outcomes separately. A cash strategy may not be the fastest skill strategy.",
+            "Use current subcrime indicators and keep a reserve for material losses; never label a method zero-risk without evidence."
+          ],
+          "status": "source-reviewed"
+        }
+      ],
+      "summary": "Go beyond the old link-only page: progression basics plus thirteen crime-specific walkthrough notes.",
+      "corrections": [
+        "Do not use the archived claim that the system has only twelve crimes as a current count.",
+        "Crime experience, individual crime skill, progression bonuses and hidden success formulas are different concepts."
+      ],
+      "checklist": [
+        "Choose cash, progression or uniques as the purpose of the session.",
+        "Check current skill, required tools, consumables and conditions.",
+        "Record net proceeds and failures rather than assuming a higher nerve cost means better returns."
+      ]
+    },
+    "how-to-set-trade": {
+      "sections": [
+        {
+          "slug": "step-1-visit-the-traders-profile",
+          "title": "Step 1: Visit the traders profile",
+          "sourceIds": [
+            "trade"
+          ],
+          "facts": [
+            "A direct trade can start from a player's profile or the inventory Trades interface."
+          ],
+          "tips": [
+            "Verify the numeric ID rather than relying only on a similar-looking name or avatar.",
+            "For a new counterparty, agree price and quantity in a written message first."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "step-2-click-on-the-trade-icon",
+          "title": "Step 2: Click on the trade icon",
+          "sourceIds": [
+            "trade"
+          ],
+          "facts": [
+            "The initiating party controls final completion after the other party accepts."
+          ],
+          "tips": [
+            "Confirm you opened the intended trade instead of a send-money or send-item action.",
+            "Keep the agreed quote visible while reviewing the new transaction."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "step-3-fill-description-on-new-trade-panel",
+          "title": "Step 3: Fill Description on new trade panel",
+          "sourceIds": [
+            "trade"
+          ],
+          "facts": [
+            "A description labels the trade; it does not replace checking its actual contents."
+          ],
+          "tips": [
+            "Use a specific description with item, quantity and agreed price basis.",
+            "Avoid vague labels that make two simultaneous trades hard to distinguish."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "step-4-use-the-plus-buttons-to-add-itemsmoney",
+          "title": "Step 4: Use the Plus Buttons to add Items/Money",
+          "sourceIds": [
+            "trade"
+          ],
+          "facts": [
+            "Money and ordinary items are tradeable; points and shares are not normal direct-trade contents."
+          ],
+          "tips": [
+            "Review both quantity and item variant before adding everything in your inventory.",
+            "Check the cash total using your own arithmetic rather than a screenshot sent by the other person."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "step-5-wait-for-the-trader-to-add-money",
+          "title": "Step 5: Wait for the trader to add money",
+          "sourceIds": [
+            "trade"
+          ],
+          "facts": [
+            "The other party's acceptance locks the proposed contents against further changes."
+          ],
+          "tips": [
+            "Treat an actual locked trade state as evidence; a chat message saying added is not enough.",
+            "Stop if the expected cash or item is missing, even when someone pressures you to hurry."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "step-6-trader-has-accepted-now-its-your-turn",
+          "title": "Step 6: Trader has accepted, now its your turn",
+          "sourceIds": [
+            "trade"
+          ],
+          "facts": [
+            "Final acceptance includes a reconfirmation delay; cancellation remains possible before completion."
+          ],
+          "tips": [
+            "Re-read both sides, the recipient and the exact amount during the final check.",
+            "Know where received cash will go before accepting a large sale."
+          ],
+          "status": "source-reviewed"
+        }
+      ],
+      "summary": "A six-step transaction checklist with identity, contents and final-acceptance checks.",
+      "corrections": [
+        "A description or chat promise does not prove payment has been added.",
+        "Points and shares cannot be placed into an ordinary direct trade."
+      ],
+      "checklist": [
+        "Agree a quote and verify the counterparty ID.",
+        "Review both sides of the actual locked trade.",
+        "Use the final confirmation to re-check the exact contents and plan for any cash received."
+      ],
+      "extras": [
+        {
+          "slug": "extra-if-a-transaction-changes-or-feels-wrong",
+          "title": "If a transaction changes or feels wrong",
+          "sourceIds": [
+            "trade"
+          ],
+          "facts": [
+            "A direct trade can be cancelled before final completion."
+          ],
+          "tips": [
+            "Stop and re-check the actual contents when the quote, item variant or recipient changes.",
+            "Do not complete under pressure; restart a clean transaction if the agreement is no longer clear."
+          ],
+          "status": "source-reviewed"
+        }
+      ]
+    },
+    "easter": {
+      "sections": [
+        {
+          "slug": "how-often-should-i-run-through-pages",
+          "title": "How Often should I run through pages",
+          "sourceIds": [
+            "easter"
+          ],
+          "facts": [
+            "Egg spawns are activity-independent; unfound eggs persist and can roll over into the next event."
+          ],
+          "tips": [
+            "Browse manually at sensible intervals instead of hammering refresh to try to generate more eggs.",
+            "Use your calendar for the current event window; this guide does not mean a hunt is active today."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "how-do-i-use-scripts-on-mobile-devices",
+          "title": "How do I use scripts on Mobile Devices",
+          "sourceIds": [
+            "rules"
+          ],
+          "facts": [
+            "Scripts must follow Torn's current scripting rules; software must not auto-request hidden game pages or click rewards."
+          ],
+          "tips": [
+            "Review a script's source and permissions, and use only tooling that fits the current rules and your browser.",
+            "Do not install an unfamiliar extension merely because a historic guide recommends it."
+          ],
+          "status": "source-reviewed"
+        },
+        {
+          "slug": "eggs-usage-guide",
+          "title": "Eggs Usage Guide",
+          "sourceIds": [
+            "easter"
+          ],
+          "facts": [
+            "Collected eggs are non-tradeable inventory items; using one adds six hours of booster cooldown."
+          ],
+          "tips": [
+            "Time an egg for a clear goal and check cooldown room before consuming it.",
+            "Percentage-based rewards may be more useful later; compare waiting with the benefit you can use now."
+          ],
+          "status": "source-reviewed"
+        }
+      ],
+      "summary": "Use the current hunt mechanics and item effects instead of pre-2023 farming advice.",
+      "corrections": [
+        "Refreshing does not increase the activity-independent spawn rate.",
+        "Collected eggs are inventory items, not immediate rewards that must be used when found.",
+        "This is a seasonal reference, not a statement that Easter is active today."
+      ],
+      "checklist": [
+        "Check the current calendar and your event slot.",
+        "Browse manually using permitted tools only.",
+        "Choose egg timing based on your own stats, resources and booster cooldown."
+      ],
+      "extras": [
+        {
+          "slug": "extra-booster-planning-around-an-egg",
+          "title": "Booster planning around an egg",
+          "sourceIds": [
+            "easter",
+            "happy"
+          ],
+          "facts": [
+            "An egg uses six hours of booster cooldown; surplus happy still has its normal timing constraint."
+          ],
+          "tips": [
+            "Reserve enough cooldown room and prepare the activity that will use the reward before consuming the egg.",
+            "Do not spend resources chasing a claimed rare spawn schedule or an unverified guaranteed colour."
+          ],
+          "status": "source-reviewed"
+        }
+      ],
+      "tables": [
+        {
+          "title": "Documented egg effects (not a current event announcement)",
+          "sourceIds": [
+            "easter"
+          ],
+          "columns": [
+            "Egg",
+            "Effect",
+            "Timing question"
+          ],
+          "rows": [
+            [
+              "Green",
+              "+500 energy",
+              "Can you use the energy effectively?"
+            ],
+            [
+              "Red",
+              "+250 nerve",
+              "Do your chosen crimes and supplies support it?"
+            ],
+            [
+              "Yellow",
+              "+10,000 happy",
+              "Will you train before the next happy reset?"
+            ],
+            [
+              "Blue",
+              "Current life becomes 3× maximum",
+              "Is a planned combat window worth using it?"
+            ],
+            [
+              "White",
+              "Halves current drug addiction",
+              "Is enough addiction present to justify using it?"
+            ],
+            [
+              "Purple",
+              "+25% of current mission-credit balance",
+              "Would a larger balance make waiting worthwhile?"
+            ],
+            [
+              "Brown",
+              "+1% to all working stats",
+              "Compare using now with delaying for larger stats."
+            ],
+            [
+              "Gold",
+              "+1% to all battle stats",
+              "Percentage gains can have more value later."
+            ],
+            [
+              "Black",
+              "Provides money",
+              "Check current item details before use."
+            ]
+          ]
+        }
+      ]
+    }
+  }
+}

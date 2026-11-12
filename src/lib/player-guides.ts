@@ -1,3 +1,4 @@
+import {GUIDE_RESEARCH} from './guide-research';
 import library from '../data/player-guides.json';
 import type { Page } from '../nav';
 export const PLAYER_GUIDES=library.guides;
@@ -20,7 +21,7 @@ export function guideLocation(hash:string){
 }
 export function findGuides(query:string,category='all'){
  const words=query.trim().toLowerCase().split(/\s+/).filter(Boolean);
- return PLAYER_GUIDES.filter(g=>(category==='all'||g.category===category)&&words.every(word=>`${g.title} ${g.description} ${g.body}`.toLowerCase().includes(word)));
+ return PLAYER_GUIDES.filter(g=>(category==='all'||g.category===category)&&words.every(word=>`${g.title} ${g.description} ${g.body} ${JSON.stringify(GUIDE_RESEARCH.guides[g.id]??{})}`.toLowerCase().includes(word)));
 }
 export function guideUrl(value:string,guide:PlayerGuide,image=false):string{
  if(!value||value.length>4096||/[\u0000-\u001f\u007f]/.test(value))return '';
