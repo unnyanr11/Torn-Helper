@@ -461,8 +461,8 @@
             "Torn permits one account per person; ownership and account-sharing restrictions matter from the start."
           ],
           "tips": [
-            "Build a repeatable login routine: bars, education, job, cash and upcoming commitments.",
-            "Choose one short-term goal before spending; level 15, training and liquidity need different budgets."
+            "Give each login a quick checklist: bars, education, job, cash, then whatever chaos Torn has planned for you.",
+            "Pick one goal before opening your wallet. Level 15, bigger stats and a healthy cash reserve all want a slice of it."
           ],
           "status": "source-reviewed"
         },
@@ -476,8 +476,8 @@
             "Using a Donator Pack grants 31 donator days and 60 points; subscriptions are a different product."
           ],
           "tips": [
-            "Compare the current pack price against the value of the benefits you will actually use.",
-            "Buy a pack with in-game cash if affordable; do not rely on old market-price quotes."
+            "Check today's pack price against the benefits you'll actually use. A shiny package isn't automatically a bargain.",
+            "If the in-game price fits your budget, that's an option too. Yesterday's price quote belongs in yesterday."
           ],
           "status": "source-reviewed"
         },
@@ -492,8 +492,8 @@
             "Official rules and help channels take precedence over player-written shortcuts."
           ],
           "tips": [
-            "When asking for help, include your goal, level, the exact message and what you already tried.",
-            "Crop API keys, passwords, email addresses and session tokens out of screenshots."
+            "Tell people your goal, level, exact error and what you've tried. Help me help you beats it broke by a mile.",
+            "Crop out keys, passwords, email addresses and session tokens before sharing screenshots. Those are not show-and-tell material."
           ],
           "status": "source-reviewed"
         },
@@ -508,20 +508,20 @@
             "Education unlocks lasting perks; gym progression rewards consistent training."
           ],
           "tips": [
-            "Keep a small notebook of mistakes and one next action for each guide you finish.",
-            "Review your plan weekly instead of chasing every profitable-looking idea simultaneously."
+            "Keep a tiny mistake log and one next step per guide. Future you deserves better than another expensive rerun.",
+            "Give your plan a weekly check-up. You don't need six side hustles and a spreadsheet-induced headache on day two."
           ],
           "status": "source-reviewed"
         }
       ],
-      "summary": "A practical start: protect your account, plan your resources and build a routine.",
+      "summary": "Welcome to Torn. Let's protect the account, tame the bars and give your wallet a fighting chance.",
       "corrections": [
         "Do not confuse subscription rewards with using a tradable Donator Pack."
       ],
       "checklist": [
-        "Read the game rules and secure your account.",
-        "Choose a goal and set a budget that leaves an emergency reserve.",
-        "Review bars, education and cash exposure at each normal login."
+        "Read the rules and secure the account. Boring now beats painful later.",
+        "Pick one goal and a budget that leaves an emergency cushion.",
+        "On a normal login, check bars, education and whether your cash is sitting somewhere sensible."
       ],
       "extras": [
         {
@@ -535,8 +535,8 @@
             "Torn restricts software to authorised API data or the page a player manually loaded and is actively viewing."
           ],
           "tips": [
-            "Use a dedicated, least-privilege key per trusted tool so one revocation does not disable every service.",
-            "Never copy a Torn password, browser cookie or another player's credentials into a helper."
+            "Give each trusted tool its own key with only the access it needs. One broken connection shouldn't take the whole circus down.",
+            "Never paste your Torn password, browser cookies or someone else's credentials into a helper. A helper doesn't need your house keys."
           ],
           "status": "source-reviewed"
         }
@@ -554,8 +554,8 @@
             "The sidebar groups account actions, game areas and player lists."
           ],
           "tips": [
-            "Read status tooltips before buying a cure or assuming a feature is broken.",
-            "Put frequently used pages in your own routine rather than opening every menu on each login."
+            "Hover over the status before buying a cure. Diagnose first, throw money at it second.",
+            "Build a short route through your usual pages. Clicking every menu isn't a secret progression strategy."
           ],
           "status": "source-reviewed"
         },
@@ -570,8 +570,8 @@
             "Status icons distinguish ongoing effects and cooldowns."
           ],
           "tips": [
-            "Check the relevant timer, not only the icon colour, before scheduling another action.",
-            "If an icon seems unfamiliar, inspect it in Torn before acting on a screenshot or cached observation."
+            "Read the timer, not just the pretty icon. A cooldown doesn't end because you looked at it intensely.",
+            "If an icon looks mysterious, inspect it in Torn before acting on an old screenshot. Tiny pictures can cause surprisingly large bills."
           ],
           "status": "source-reviewed"
         },
@@ -585,8 +585,8 @@
             "Cash on hand is the exposure relevant to mugging; total net worth is a different measure."
           ],
           "tips": [
-            "Decide where proceeds will go before accepting a sale or withdrawing a balance.",
-            "Keep only your working float available and compare storage access times before committing funds."
+            "Know where the money is going before a sale lands. Your wallet is not a long-term storage facility with excellent security.",
+            "Keep a working float, then check how quickly you can access the rest. Rich on paper and broke at checkout is an awkward combo."
           ],
           "status": "source-reviewed"
         },
@@ -600,8 +600,8 @@
             "Experience is hidden; winning and leaving a higher-level opponent is a documented levelling route."
           ],
           "tips": [
-            "A target's visible level does not prove it is weak; check your own attack results.",
-            "Accept an available upgrade when pursuing travel access rather than accidentally level-holding."
+            "A big level number doesn't mean an easy fight. Your attack results are a better judge than your optimism.",
+            "If level 15 is the mission, take the upgrade when it's available. Don't accidentally become a committed level-holder."
           ],
           "status": "source-reviewed"
         },
@@ -615,8 +615,8 @@
             "Points buy unlocks and refills; they cannot be placed in an ordinary direct trade."
           ],
           "tips": [
-            "List permanent unlocks and recurring refills separately in your budget.",
-            "Compare a refill's usable gain with its current point cost; avoid refilling an already-full bar."
+            "Split permanent unlocks from regular refills in your budget. Future you would like to afford both.",
+            "Check how much a refill will actually give you before buying it. Paying to top up an already-full bar is impressively unhelpful."
           ],
           "status": "source-reviewed"
         },
@@ -630,8 +630,8 @@
             "Upgrade tiers become more expensive: a ten-tier merit line costs 55 merits in total."
           ],
           "tips": [
-            "Choose upgrades that serve your current goal; early education reductions are a planning choice, not a universal rule.",
-            "Read reset costs and available free resets before experimenting with an expensive allocation."
+            "Spend merits for the game you're playing now. Education reductions can be useful early on; they aren't a compulsory personality trait.",
+            "Check reset prices and free resets before experimenting. A casual click can become a very uncool invoice."
           ],
           "status": "source-reviewed"
         },
@@ -645,8 +645,8 @@
             "Normal regeneration is 5 energy per 15 minutes to 100; donator regeneration is 5 per 10 minutes to 150."
           ],
           "tips": [
-            "Schedule logins before your bar caps if practical; capped natural regeneration is lost opportunity.",
-            "Compare training, attacks and paid services by useful outcome per energy, not gross cash alone."
+            "Try to log in before your bar caps when life allows it. Full bars don't earn overtime.",
+            "Compare useful progress per energy: training, attacks or paid work. The biggest cash number isn't always the best deal."
           ],
           "status": "source-reviewed"
         },
@@ -660,8 +660,8 @@
             "Nerve regenerates by one every five minutes; bonuses can make the displayed maximum differ from natural nerve."
           ],
           "tips": [
-            "Track crime skill separately from bar size when deciding what to attempt.",
-            "Spend naturally regenerated nerve before buying more; measure material losses and failures too."
+            "Watch crime skill separately from your nerve bar. They're related to crime, not identical twins.",
+            "Use natural nerve before buying more, and count materials and failed attempts. Gross income loves leaving those bits out."
           ],
           "status": "source-reviewed"
         },
@@ -675,8 +675,8 @@
             "Above-maximum happiness resets at quarter-hour boundaries; it affects gym gains and Crimes 2.0 progression."
           ],
           "tips": [
-            "Prepare supplies and energy before raising happiness; leave time to complete training before the next reset.",
-            "Do not copy a costly happy-jump recipe without comparing its cost per stat gain for your own account."
+            "Have the energy and supplies ready before boosting happy. Shopping during the countdown is a bold way to waste money.",
+            "Price a happy jump for your own stats first. Someone else's expensive ritual isn't automatically your best gym plan."
           ],
           "status": "source-reviewed"
         },
@@ -690,8 +690,8 @@
             "Life normally regenerates by 5% of maximum every five minutes; full life alone does not remove hospital time."
           ],
           "tips": [
-            "Check life, hospital status and medical cooldown independently.",
-            "Keep compatible medical supplies available before a planned attack session."
+            "Check life, hospital status and medical cooldown separately. The game has several ways to say not yet.",
+            "Sort compatible meds before an attack session. Emergency shopping is rarely your most elegant financial moment."
           ],
           "status": "source-reviewed"
         },
@@ -705,8 +705,8 @@
             "A chain starts with ten successful attacks in five minutes, then needs a successful hit before its timer expires."
           ],
           "tips": [
-            "Coordinate backup hitters so one failed attack does not leave the timer unattended.",
-            "Follow the faction's bonus-hit allocation instead of racing a teammate for a milestone."
+            "Have backup hitters ready. One failed fight shouldn't turn the chain chat into a fire drill.",
+            "Follow the bonus-hit plan. Racing your own teammate for a milestone is teamwork's slightly embarrassing cousin."
           ],
           "status": "source-reviewed"
         },
@@ -721,8 +721,8 @@
             "Awards may change with crime-system migration; the wiki flags some requirements as incomplete."
           ],
           "tips": [
-            "Use your own current awards screen to verify an unlock before spending resources for it.",
-            "Read faction mail and transaction events before deleting messages that could explain a missing payment."
+            "Check your current awards screen before funding a merit hunt. An old wiki requirement can send you on a very expensive detour.",
+            "Read faction mail and payment events before clearing them. The answer to where did my money go might already be sitting there."
           ],
           "status": "source-reviewed"
         },
@@ -736,8 +736,8 @@
             "The sidebar links to the main activity areas; access can depend on your current game state."
           ],
           "tips": [
-            "If a page is unavailable, check travel, jail and hospital state before assuming an outage.",
-            "Learn the city quick links for common purchases rather than following strangers' shortened URLs."
+            "If a page won't cooperate, check travel, jail and hospital status first. Sometimes you're not bugged; you're just unavailable.",
+            "Learn the useful city links. A stranger's mystery short URL is not a navigation upgrade."
           ],
           "status": "source-reviewed"
         },
@@ -751,8 +751,8 @@
             "Torn's Home page supports rearranging and minimising information boxes."
           ],
           "tips": [
-            "Keep bars, education, perks and useful activity summaries near the top.",
-            "Treat helper snapshots as dated observations and confirm important changes in game."
+            "Put bars, education, perks and the stuff you actually use near the top. Your dashboard doesn't need to be a junk drawer.",
+            "Check important changes in game. A dated helper snapshot is a photograph, not a live CCTV feed."
           ],
           "status": "source-reviewed"
         },
@@ -766,8 +766,8 @@
             "Items include equipment, tools, materials and consumables, with different uses and trading restrictions."
           ],
           "tips": [
-            "Check category filters and whether an item is equipped or committed elsewhere before assuming it vanished.",
-            "Read an item's effect and current market listing before using, discarding or bulk-selling it."
+            "Check filters, equipment and anything committed elsewhere before declaring an item missing. Inventory hide-and-seek happens.",
+            "Read the effect and current price before using, binning or bulk-selling something unfamiliar. Mystery buttons can be pricey."
           ],
           "status": "source-reviewed"
         },
@@ -782,8 +782,8 @@
             "The city map supports item finds and faction-territory information."
           ],
           "tips": [
-            "Separate collecting finds from shopping; assess unfamiliar items before selling them.",
-            "Repeated clicking is not a substitute for learning the relevant page or verifying an item's purpose."
+            "Collect your finds, then check what the unusual ones are worth. Found on the floor doesn't mean worth floor prices.",
+            "Learn the page you need instead of clicking like a caffeinated woodpecker. More clicks aren't a universal money printer."
           ],
           "status": "source-reviewed"
         },
@@ -797,8 +797,8 @@
             "Starter jobs award daily pay, work stats and job points; explicitly passive specials can remain after leaving."
           ],
           "tips": [
-            "Plan promotions around work-stat requirements rather than choosing a job only for today's wage.",
-            "Compare the long-term unlock with a player company's pay, training policy and activity expectations."
+            "Plan promotions around the required work stats. Today's tiny pay cheque isn't the whole story.",
+            "Compare lasting unlocks with company pay, trains and attendance rules. Pick the package, not just the loudest recruitment pitch."
           ],
           "status": "source-reviewed"
         },
@@ -812,8 +812,8 @@
             "Gyms have different training multipliers and unlock through gym experience plus membership purchases."
           ],
           "tips": [
-            "Check the next gym's multipliers before paying; specialise only when it fits your stat plan.",
-            "Record before-and-after stats to evaluate your own training budget rather than trusting a fixed beginner threshold."
+            "Peek at the next gym's multipliers before paying. A new membership should do more than decorate your profile.",
+            "Record your actual gains. Your own before-and-after numbers beat a stranger's one-size-fits-everybody stat target."
           ],
           "status": "source-reviewed"
         },
@@ -827,8 +827,8 @@
             "Rent is prepaid; tenants can incur staff upkeep, and a rented property's vault is inaccessible."
           ],
           "tips": [
-            "Compare rent plus staff cost per day rather than only the headline rental price.",
-            "Read upgrades and remaining lease duration before paying for housing intended for travel."
+            "Add staff costs to the rent. Fancy housing is less fun when the employees discover invoicing.",
+            "Check the upgrades and lease length before paying for a travel setup. A lovely view won't hire the pilot for you."
           ],
           "status": "source-reviewed"
         },
@@ -842,8 +842,8 @@
             "Courses can have prerequisites and drug-related expulsion can force a restart."
           ],
           "tips": [
-            "Queue your next course choice in advance and set a reminder for completion.",
-            "Link education to a specific unlock or passive perk, and monitor addiction before an important course ends."
+            "Pick your next course before the current one ends and set a reminder. The admissions office doesn't chase you.",
+            "Know which perk or unlock you're working towards, and keep an eye on addiction. Restarting a course is not bonus studying."
           ],
           "status": "source-reviewed"
         },
@@ -857,8 +857,8 @@
             "Crimes 2.0 has hidden crime experience and separate, visible skill for each crime."
           ],
           "tips": [
-            "Use the expanded Crimes 2.0 chapter here; do not apply old Crimes 1.0 nerve ladders to the new system.",
-            "Decide whether your session targets skill, unique outcomes or cash before choosing subcrimes."
+            "Use the Crimes 2.0 notes here, not an old Crimes 1.0 nerve ladder. Wrong rulebook, wrong party.",
+            "Choose cash, skill or unique outcomes as your goal. Trying to optimise everything at once usually just optimises confusion."
           ],
           "status": "source-reviewed"
         },
@@ -872,8 +872,8 @@
             "Contract standing changes with success, failure and declining; accepting every contract is not always beneficial."
           ],
           "tips": [
-            "Read every condition before accepting, including target, weapon and finishing-result requirements.",
-            "Price supplies and energy against the reward, and leave a time buffer for unavailable targets."
+            "Read every condition before accepting: target, weapon and finish all matter. Duke is not grading your enthusiasm.",
+            "Price the supplies and energy, then leave time for an unavailable target. A deadline doesn't care that you were nearly ready."
           ],
           "status": "source-reviewed"
         },
@@ -887,8 +887,8 @@
             "The newspaper includes articles, job listings, property markets and bounties."
           ],
           "tips": [
-            "Check publication dates so an old announcement is not mistaken for the current event.",
-            "Use official article and announcement links when verifying a claim repeated in chat."
+            "Check the publication date. An ancient announcement wearing a fresh browser tab is still ancient.",
+            "Follow the actual article or announcement when chat repeats a claim. Torn's rumour department works very hard."
           ],
           "status": "source-reviewed"
         },
@@ -902,8 +902,8 @@
             "Busting success depends on several factors, and repeated attempts close together can reduce success rates."
           ],
           "tips": [
-            "Compare waiting, bail and asking for a bust before repeatedly spending nerve.",
-            "Use jail time productively where possible; do not deliberately fail crimes just to reach a jail gym."
+            "Compare waiting, bail and asking for a bust before burning more nerve. Panic-clicking isn't a legal defence.",
+            "Use the time where you can, but don't deliberately fail crimes for gym access. That's a creative route to a worse day."
           ],
           "status": "source-reviewed"
         },
@@ -917,8 +917,8 @@
             "Hospital time and medical cooldown govern different restrictions; several exit methods have exceptions."
           ],
           "tips": [
-            "Budget the cooldown cost of each medical item instead of using the strongest item automatically.",
-            "Before paying for a revive, confirm your settings allow it and agree whether payment depends on success."
+            "Check the cooldown cost before grabbing the strongest med. Bigger is not always smarter.",
+            "Before paying for a revive, check your settings and agree whether payment needs success. Avoid bonus arguments after the hospital visit."
           ],
           "status": "source-reviewed"
         },
@@ -932,8 +932,8 @@
             "Casino tokens and casino-job points are different resources."
           ],
           "tips": [
-            "Treat casino play as optional entertainment with a hard loss budget, not a dependable income plan.",
-            "Do not raise stakes to recover losses; use in-game self-exclusion if gambling stops being enjoyable."
+            "Keep casino play inside a firm entertainment budget. Rent and training money should have other plans.",
+            "Don't raise stakes to recover losses. If it stops being enjoyable, take a break or use in-game self-exclusion."
           ],
           "status": "source-reviewed"
         },
@@ -947,8 +947,8 @@
             "Some rankings show your position without exposing other players' private battle-stat identities."
           ],
           "tips": [
-            "Use personal progress over time rather than comparing your first week with veteran accounts.",
-            "Do not infer exact hidden stats from a rank, title or level alone."
+            "Watch your own progress over time. Comparing your first week with a veteran is a very efficient way to feel unnecessarily terrible.",
+            "Don't guess exact private stats from a rank, title or level. A leaderboard is not an X-ray machine."
           ],
           "status": "source-reviewed"
         },
@@ -962,8 +962,8 @@
             "Faction membership provides shared resources, upgrades and coordinated activities."
           ],
           "tips": [
-            "Compare obligations and payout policies alongside perks before accepting an invitation.",
-            "Ask when withdrawal requests are handled, especially if you intend to use the faction vault."
+            "Compare duties and payout rules alongside perks. Great benefits can come with a surprisingly energetic calendar.",
+            "Ask when vault withdrawals are handled before parking your money there. Officers need sleep too."
           ],
           "status": "source-reviewed"
         },
@@ -977,8 +977,8 @@
             "New members normally begin with a 72-hour Recruit period and limited access."
           ],
           "tips": [
-            "Ask which benefits are available immediately and which require full membership.",
-            "Choose an activity schedule that fits real life; an impressive perk list is not enough if attendance rules do not fit."
+            "Ask what works immediately and what waits for full membership. The welcome mat and the benefits desk aren't always the same thing.",
+            "Pick attendance rules that fit real life. Your actual job probably won't accept faction chain as an absence note."
           ],
           "status": "source-reviewed"
         },
@@ -992,8 +992,8 @@
             "OCs 2.0 have planning and execution stages with role-specific requirements."
           ],
           "tips": [
-            "Ask which role suits your success chance and bring the listed equipment before committing.",
-            "Check readiness before flying or scheduling an absence; coordinate replacements early."
+            "Ask which role fits your chance and bring the required equipment. Arriving empty-handed is a memorable introduction.",
+            "Check readiness before flying or disappearing for a weekend. Sort replacements before the group starts asking where you went."
           ],
           "status": "source-reviewed"
         },
@@ -1008,8 +1008,8 @@
             "Referral rewards are tied to genuine referred players' progression."
           ],
           "tips": [
-            "Invite people who want to play and help them understand the game rather than promising easy money.",
-            "Never create a second account to obtain referral rewards."
+            "Invite people who actually want to play and help them get started. A friend is more useful than an abandoned referral number.",
+            "Never make another account for referral rewards. One account per person is a rule, not a puzzle."
           ],
           "status": "source-reviewed"
         },
@@ -1023,8 +1023,8 @@
             "Events may use player-selected time slots; dates in old guides are not an authoritative schedule."
           ],
           "tips": [
-            "Copy both start and end times from your own current calendar into a reminder.",
-            "Check whether a bonus applies at departure, consumption, claim or another event-specific action."
+            "Save both dates and times from your own calendar. Starts Friday is not a complete battle plan.",
+            "Check what triggers the bonus: departure, use, claim or something else. Timing is where the small print earns its keep."
           ],
           "status": "source-reviewed"
         },
@@ -1039,8 +1039,8 @@
             "Community competitions and seasonal systems have their own participation rules."
           ],
           "tips": [
-            "Read deadlines, eligibility and reward delivery conditions before sending an entry.",
-            "Keep the original announcement or entry receipt when a host promises a prize."
+            "Read eligibility, deadlines and delivery terms before sending anything. Entering first and reading later is the spicy option.",
+            "Keep the announcement and your receipt. A promised prize is easier to discuss when everyone can see the same agreement."
           ],
           "status": "source-reviewed"
         },
@@ -1054,8 +1054,8 @@
             "Friends, enemies and targets serve different organisational purposes."
           ],
           "tips": [
-            "Use short, consistent descriptions so the list remains searchable months later.",
-            "Review notes after a player's status or your relationship changes."
+            "Use short, consistent notes. Future you should recognise a player without solving a miniature detective case.",
+            "Update the note when things change. Easy target from six months ago might now be a rather unpleasant surprise."
           ],
           "status": "source-reviewed"
         },
@@ -1069,8 +1069,8 @@
             "Friends can have custom descriptions and status filters."
           ],
           "tips": [
-            "Save reliable traders, mentors and service providers with a note explaining the relationship.",
-            "Keep payment terms in an actual conversation; a friendly label is not a guarantee."
+            "Save good traders, mentors and service providers with a useful note. Nice person is pleasant but not very searchable.",
+            "Keep payment terms in a real conversation. A friend label isn't an insurance policy."
           ],
           "status": "source-reviewed"
         },
@@ -1084,8 +1084,8 @@
             "Enemies-list settings can block listed players from purchases across several markets."
           ],
           "tips": [
-            "Review purchase-block settings before using the list merely as a convenient bookmark.",
-            "Keep factual notes; avoid turning an old dispute into an accidental ongoing trade restriction."
+            "Check purchase-block settings before using this as a bookmark list. Accidentally banning your own customers is an unusual sales tactic.",
+            "Keep the notes factual and current. An old argument doesn't need to become a permanent checkout problem."
           ],
           "status": "source-reviewed"
         },
@@ -1099,8 +1099,8 @@
             "Public, group and private channels have different access and conduct rules."
           ],
           "tips": [
-            "Choose the correct channel before posting a question, trade advert or faction instruction.",
-            "Never paste credentials into a chat, even if someone claims to be support."
+            "Pick the right channel for the message. The whole city doesn't need your shopping list.",
+            "Keep credentials out of every chat, even if someone claims to be support. Especially then."
           ],
           "status": "source-reviewed"
         },
@@ -1114,8 +1114,8 @@
             "Channel access depends partly on membership and game state."
           ],
           "tips": [
-            "Review notification settings and mute noisy channels during time-sensitive activity.",
-            "If a channel disappears, first check whether your faction, company or travel state changed."
+            "Tame notifications before a time-sensitive activity. Your phone doesn't need to impersonate a slot machine.",
+            "If a channel vanishes, check membership and game state first. It may be a status change, not a conspiracy."
           ],
           "status": "source-reviewed"
         },
@@ -1129,8 +1129,8 @@
             "Access ends at level 13 or after 336 hours of accumulated play time."
           ],
           "tips": [
-            "Use the protected channel to ask basic questions while eligible.",
-            "After access ends, use suitable help forums or faction mentors rather than trying to regain it through another account."
+            "Ask the basic questions while you've got access. Everyone started somewhere, usually with several misunderstandings.",
+            "Once access ends, find a help forum or faction mentor. Don't make another account to sneak back into class."
           ],
           "status": "source-reviewed"
         },
@@ -1144,8 +1144,8 @@
             "Global is for social discussion; trade advertising is not permitted there."
           ],
           "tips": [
-            "Move sales offers to the appropriate trade channel or forum.",
-            "Avoid repeating a message when nobody replies; provide better context instead."
+            "Put sales adverts in the proper trade space. Global is not your personal billboard.",
+            "If nobody replies, improve the context instead of repeating yourself. Volume is not a substitute for clarity."
           ],
           "status": "source-reviewed"
         },
@@ -1159,8 +1159,8 @@
             "Trade chat is for adverts; the documented limits are one message per 60 seconds and 125 characters."
           ],
           "tips": [
-            "Fit item, price basis and contact terms into a concise advert.",
-            "Check your current channel rules before posting, rather than following old advice to spam advertisements."
+            "Make the advert useful: item, price basis and how to contact you. You're selling supplies, not writing a suspense novel.",
+            "Check today's channel rules before posting. Old advice to spam adverts has aged about as well as warm milk."
           ],
           "status": "source-reviewed"
         },
@@ -1174,8 +1174,8 @@
             "Faction chat is tied to membership."
           ],
           "tips": [
-            "Confirm war orders and targets with the current organiser rather than an old pinned conversation.",
-            "Keep important payout or supply agreements in a durable written message too."
+            "Check current orders with the organiser. A pinned message from the previous war may have retired without telling you.",
+            "Keep important supply and payout terms somewhere durable too. A busy chat scroll is a terrible filing cabinet."
           ],
           "status": "source-reviewed"
         },
@@ -1189,8 +1189,8 @@
             "Company chat provides a shared channel for that company's members."
           ],
           "tips": [
-            "Use it to coordinate trains, stock needs or absences with the director.",
-            "Do not assume an informal chat promise overrides the published company policy."
+            "Use the channel to coordinate trains, supplies and absences. Directors also appreciate fewer surprise plot twists.",
+            "Confirm informal promises against the company's actual policy. A chat shrug is not a clear contract."
           ],
           "status": "source-reviewed"
         },
@@ -1204,8 +1204,8 @@
             "These channels appear and disappear with the relevant game state."
           ],
           "tips": [
-            "Explain your location and need clearly when requesting a service.",
-            "Verify the provider's Torn ID and price before sending cash or items."
+            "Say where you are and what you need when asking for help. Please revive me is missing a few useful details.",
+            "Check the provider's Torn ID and agree the price before paying. Names and avatars can look suspiciously similar."
           ],
           "status": "source-reviewed"
         },
@@ -1219,8 +1219,8 @@
             "Torn Time follows UTC rather than a daylight-saving local timezone."
           ],
           "tips": [
-            "Write deadlines with a timezone and date instead of saying only tonight.",
-            "Keep a small emergency float and relevant supplies before long or scheduled activities."
+            "Give deadlines a date and timezone. Tonight becomes a philosophical problem when your teammates live everywhere.",
+            "Keep an emergency float and useful supplies before a long activity. Prepared is cheaper than desperate."
           ],
           "status": "source-reviewed"
         },
@@ -1234,8 +1234,8 @@
             "TCT is UTC year-round; India Standard Time is UTC plus 5 hours 30 minutes."
           ],
           "tips": [
-            "For example, 12:00 TCT is 17:30 IST; account for date changes around midnight.",
-            "Use an actual timezone-aware calendar for international teammates rather than memorising every offset."
+            "For a handy example, 12:00 TCT is 17:30 IST. Near midnight, check which day you've landed on too.",
+            "Use a timezone-aware calendar for the team. Mental time arithmetic gets less charming during a countdown."
           ],
           "status": "source-reviewed"
         },
@@ -1249,21 +1249,21 @@
             "NPC loot uses a contribution-based lottery; joining a fight does not guarantee an item."
           ],
           "tips": [
-            "Check the NPC's current loot level and a coordinated attack plan before spending energy.",
-            "A beginner should compare the cost of participation with reliable training or levelling progress."
+            "Check loot level and the attack plan before spending energy. Turning up is not the same as securing a prize.",
+            "Compare the cost with training or levelling first. An exciting lottery is still a lottery."
           ],
           "status": "source-reviewed"
         }
       ],
-      "summary": "A complete interface tour with current resource mechanics and advice for every original section.",
+      "summary": "All those buttons, bars and tiny icons explained. No advanced degree in staring at the sidebar required.",
       "corrections": [
         "Happy helps Crimes 2.0 skill/experience gains; this is not the same as improving success chance.",
         "Old city-find and chat assumptions should be checked against the current systems."
       ],
       "checklist": [
-        "Check timers before buying a cure or booster.",
-        "Keep education and training aligned with one useful unlock.",
-        "Use live in-game information when helper data is old or incomplete."
+        "Check the timer before buying a cure or booster.",
+        "Keep training and education pointed at something you actually want to unlock.",
+        "If helper data looks old, confirm it in Torn before making an expensive decision."
       ],
       "extras": [
         {
@@ -1278,8 +1278,8 @@
             "Energy, nerve, happy and their cooldowns do not all refill or reset in the same way."
           ],
           "tips": [
-            "Before consuming anything expensive, check current amount, cap, next timer and the action you will immediately take.",
-            "Do not mistake an estimated countdown for a verified live value after acting elsewhere in Torn."
+            "Check amount, cap, timer and your next action before using expensive supplies. Make the plan before pressing the shiny button.",
+            "After acting elsewhere in Torn, confirm important values in game. Your helper cannot read your mind or your other tab."
           ],
           "status": "source-reviewed"
         }
@@ -1298,8 +1298,8 @@
             "Level 15 unlocks overseas travel; visible level and combat strength are not interchangeable."
           ],
           "tips": [
-            "Pursue reliable wins rather than the highest-level name on a list.",
-            "After unlocking travel, reassess training and income instead of assuming permanent attack-only play is optimal."
+            "Chase reliable wins, not the biggest level number on the list. Confidence doesn't come with free medical supplies.",
+            "At 15, rethink training and income. You unlocked travel, not a lifelong contract to punch the same people."
           ],
           "status": "source-reviewed"
         },
@@ -1314,8 +1314,8 @@
             "Leaving after a win yields more level experience than mugging or hospitalising the same target."
           ],
           "tips": [
-            "Use your actual attack history to build a small list of repeatable wins.",
-            "Check current status before spending energy; inactivity and historical stats do not guarantee an easy fight."
+            "Build a little shortlist from fights you can actually win. Your own results deserve a vote.",
+            "Check the target's current status before spending energy. Old stats and inactivity aren't a warranty."
           ],
           "status": "source-reviewed"
         },
@@ -1330,8 +1330,8 @@
             "Equipment includes melee, firearms, temporary items and armour; damage and accuracy matter alongside item names."
           ],
           "tips": [
-            "Equip what you bought and check ammunition if using a firearm.",
-            "Borrow faction gear or compare inexpensive upgrades before spending most of your cash on prestige equipment."
+            "Equip what you bought and check ammo if you're using a gun. Your inventory isn't fighting on your behalf.",
+            "Borrow faction gear or price a modest upgrade before buying something glamorous. Looking expensive is not a battle stat."
           ],
           "status": "source-reviewed"
         },
@@ -1345,8 +1345,8 @@
             "A lease fixes its agreed terms; staff still create upkeep costs."
           ],
           "tips": [
-            "Choose housing you can afford throughout the levelling period rather than just on day one.",
-            "Keep enough for supplies and a later travel setup instead of exhausting your float on rent."
+            "Choose rent you can afford for the whole stay. Day-one luxury followed by supply poverty is a questionable lifestyle.",
+            "Leave money for meds and your eventual travel setup. The property doesn't need your entire life savings as a welcome gift."
           ],
           "status": "source-reviewed"
         },
@@ -1361,8 +1361,8 @@
             "Ecstasy doubles current happiness but has overdose risk; surplus happiness has a quarter-hour reset."
           ],
           "tips": [
-            "Prepare the full sequence before using expensive happiness items.",
-            "Use a cheaper training session if an overdose or missed timer would derail your budget."
+            "Have the full sequence ready before using pricey happy boosters. Browsing the market while the timer runs is a high-budget thriller.",
+            "Go cheaper if an overdose or missed reset would wreck the plan. Training should not require a financial recovery arc."
           ],
           "status": "source-reviewed"
         },
@@ -1376,8 +1376,8 @@
             "Target catalogues are references, not guarantees of unchanged stats or availability."
           ],
           "tips": [
-            "Use Torn Helper's Baldr and Community filters, then confirm a target through recent observations and results.",
-            "Avoid assuming a ten-day-inactive submission is permanently inactive; its verification date matters."
+            "Use the Baldr and Community filters, then check recent observations and your own results. A good list is a starting point, not a promise.",
+            "Look at the verification date. Ten days inactive once doesn't mean retired forever."
           ],
           "status": "source-reviewed"
         },
@@ -1391,20 +1391,20 @@
             "A normal attack costs 25 energy and has a 25-turn, five-minute limit."
           ],
           "tips": [
-            "Stop repeatedly attacking a target that you cannot defeat; diagnose accuracy, damage, life and equipment first.",
-            "For levelling, choose Leave deliberately after the win rather than reflexively selecting a cash option."
+            "If the target keeps winning, stop donating energy to the cause. Check accuracy, damage, life and gear, then train or switch targets.",
+            "For levelling, deliberately pick Leave after the win. The cash option is tempting, but that's a different mission."
           ],
           "status": "source-reviewed"
         }
       ],
-      "summary": "Reach travel access through affordable preparation and reliable wins, not a fixed stat or cash target.",
+      "summary": "Your route to travel access: affordable prep, fights you can win and fewer unnecessary hospital tours.",
       "corrections": [
         "The archived equipment prices and 500-stat suggestion are examples, not current prices or a guaranteed combat threshold."
       ],
       "checklist": [
-        "Equip affordable gear and arrange medical supplies.",
-        "Test a suitable target and record the result.",
-        "Use Leave for level experience and take available level upgrades while pursuing level 15."
+        "Equip sensible gear and sort your medical supplies.",
+        "Try a suitable target and note what happened.",
+        "Choose Leave for experience and take the available upgrades while chasing level 15."
       ],
       "extras": [
         {
@@ -1418,8 +1418,8 @@
             "Battle outcome depends on more than displayed level; no fixed beginner stat total guarantees a win."
           ],
           "tips": [
-            "After repeated failures, compare turns, accuracy, damage and medical cost, then train or pick another target.",
-            "Do not keep spending energy simply because a target appeared on a respected list."
+            "After repeat failures, inspect turns, damage, accuracy and recovery costs. More determination isn't a substitute for a better matchup.",
+            "A respected list can still contain a bad target for you today. Close the tab with dignity and find another one."
           ],
           "status": "source-reviewed"
         }
@@ -1437,8 +1437,8 @@
             "Travel inventory and baggage rules changed in June 2026."
           ],
           "tips": [
-            "Check your actual travel screen for capacity, usable supplies and restrictions before your first flight.",
-            "Compare the cost of your entire round trip with the expected net sale proceeds."
+            "Check method, capacity, supplies and restrictions on the actual travel screen. Your passport doesn't include immunity to old advice.",
+            "Price the whole round trip before departing. Abroad is a poor place to discover that the margin never existed."
           ],
           "status": "source-reviewed"
         },
@@ -1452,8 +1452,8 @@
             "Rented vault access is unavailable even if the property listing includes a vault upgrade."
           ],
           "tips": [
-            "Verify an airstrip is included and budget ongoing staff upkeep separately from rent.",
-            "Do not buy an island solely to unlock a benefit you could access more cheaply through a suitable lease."
+            "Confirm the airstrip and budget staff upkeep separately. The pilot doesn't accept spectacular ocean views as payment.",
+            "Compare a suitable lease before buying an island for one benefit. Start with the maths, then admire the swimming pool."
           ],
           "status": "source-reviewed"
         },
@@ -1468,8 +1468,8 @@
             "An airstrip and pilot give access to the corresponding travel method; an airstrip alone is not enough."
           ],
           "tips": [
-            "Check staff are actually hired and the intended flight option is active before departing.",
-            "Record recurring pilot and property costs when comparing routes."
+            "Make sure the pilot is hired and the intended travel method is selected. Owning a runway doesn't make you an airline.",
+            "Include the recurring staff and property bill in your route maths. Those costs didn't disappear just because they're less exciting."
           ],
           "status": "source-reviewed"
         },
@@ -1484,8 +1484,8 @@
             "Flowers and plushies have museum-set demand; newer contraband has different pricing and risk."
           ],
           "tips": [
-            "Treat flowers and plushies as a simple starting strategy, not a rule that no other item can be profitable.",
-            "Test demand and net margin on a small shipment before committing your full working capital."
+            "Treat flowers and plushies as an easy place to start, not a sacred oath against every other item.",
+            "Test demand and after-cost margin with a small load. Your first shipment doesn't need to be a dramatic financial statement."
           ],
           "status": "source-reviewed"
         },
@@ -1500,21 +1500,21 @@
             "Default baggage is 10; the airstrip/WLT/business base is 15, before applicable bonuses."
           ],
           "tips": [
-            "Use displayed capacity, round-trip time, current purchase price and after-fee resale proceeds.",
-            "Plan a fallback item and a maximum waiting time if the intended shop is empty."
+            "Use real capacity, both flights, today's buy price and after-fee resale proceeds. The calculator prefers numbers to vibes.",
+            "Pick a fallback item and a maximum wait. An empty shop is not obliged to respect your timetable."
           ],
           "status": "source-reviewed"
         }
       ],
-      "summary": "Travel with the current baggage rules and calculate net income for your own schedule.",
+      "summary": "Passport ready? Let's make the trip worthwhile instead of importing a suitcase full of questionable decisions.",
       "corrections": [
         "The 2026 revision increased standard capacity and reduced suitcase bonuses; the archived +4 large-suitcase advice is outdated.",
         "Black-market pricing is variable; a saved screenshot is not a current quote."
       ],
       "checklist": [
-        "Verify the active travel method, capacity and recurring housing cost.",
-        "Check destination stock and a fallback purchase before flying.",
-        "Compare net profit per round-trip hour and sell without leaving unnecessary cash exposed."
+        "Check travel method, capacity and the ongoing housing bill.",
+        "Check stock and pick a backup item before heading out.",
+        "Compare net cash per round-trip hour, then deal with the sale proceeds promptly."
       ],
       "extras": [
         {
@@ -1527,8 +1527,8 @@
             "Contraband Importation introduced separate General Store, Arms Dealer and Black Market shops; drugs and contraband have variable prices."
           ],
           "tips": [
-            "Treat saved foreign prices as observations, and verify the shop price before buying.",
-            "Leave room for the items you intend to bring and check the travel inventory rather than relying on an old capacity screenshot."
+            "Saved shop prices are observations, not a pinky promise. Check the price again before buying.",
+            "Check the travel inventory and leave the space your plan needs. An old capacity screenshot cannot carry the extra item for you."
           ],
           "status": "source-reviewed"
         }
@@ -1587,8 +1587,8 @@
             "Its recruitment thread describes Valour as an entry-level branch, but current acceptance and perks must be confirmed."
           ],
           "tips": [
-            "Ask which requirements have exceptions for players below level 15.",
-            "Read the current first post and contact admissions before planning around a quoted perk."
+            "Ask which requirements have exceptions below level 15. A recruitment table is the start of the conversation, not the bouncer's final verdict.",
+            "Read the current first post and ask admissions before planning around a perk. Old screenshots don't issue membership cards."
           ],
           "status": "availability-unverified"
         },
@@ -1602,8 +1602,8 @@
             "The imported family description is historical; a family name does not verify the policies of each branch."
           ],
           "tips": [
-            "Ask which actual faction ID fits your goals and skill level.",
-            "Compare each branch's war schedule, bank access and membership conditions separately."
+            "Ask which exact faction ID fits your goals. A family name can cover several very different daily routines.",
+            "Compare war schedules, vault access and membership rules branch by branch. Same surname, different house rules."
           ],
           "status": "availability-unverified"
         },
@@ -1617,8 +1617,8 @@
             "Current recruitment availability and perks were not independently verified for this historical entry."
           ],
           "tips": [
-            "Confirm the faction ID through a current recruiter or profile.",
-            "Request current expectations and payout terms instead of relying on the archived description."
+            "Confirm the faction ID with a current profile or recruiter. Similar names are a poor substitute for checking.",
+            "Get today's expectations and payout terms. An archived welcome speech cannot promise you this week's perks."
           ],
           "status": "availability-unverified"
         },
@@ -1632,8 +1632,8 @@
             "The old guide describes a medical branch; present revive benefits and recruitment status are unverified."
           ],
           "tips": [
-            "Ask the current energy cost of reviving and whether Brain Surgeon is required before joining.",
-            "Check contracts, training support and whether failed revive attempts are paid."
+            "Ask the current revive-energy cost and whether you need Brain Surgeon before joining. Check the job description before collecting the imaginary white coat.",
+            "Check contracts, training support and payment for failed attempts. A failed revive shouldn't also come with surprise accounting."
           ],
           "status": "availability-unverified"
         },
@@ -1647,8 +1647,8 @@
             "The historical healer listing is not a current offer of membership or a verified perk guarantee."
           ],
           "tips": [
-            "Compare revive-training support with the requirements of your current job progression.",
-            "Ask about activity obligations and how contract revenue is distributed."
+            "Compare their revive-training support with your own job progress. A promising role still needs a realistic route into it.",
+            "Ask about attendance and contract payouts. Generous needs a definition before you spend the energy."
           ],
           "status": "availability-unverified"
         },
@@ -1662,8 +1662,8 @@
             "A community beginner-faction list references Toxic Spawn; this does not verify a present vacancy."
           ],
           "tips": [
-            "Check the current profile, recruiter and requirements before applying.",
-            "Ask how beginners progress to another branch and whether any costs or obligations apply."
+            "Check the current profile, recruiter and requirements. An old beginner list is a lead, not a reserved seat.",
+            "Ask how moving to another branch works and what it costs or requires. Read the stairs before climbing the ladder."
           ],
           "status": "availability-unverified"
         },
@@ -1677,8 +1677,8 @@
             "The recruitment thread distinguishes a war-focused family branch; historic beginner suitability is not assured."
           ],
           "tips": [
-            "Ask which branch currently accepts your battle stats and schedule.",
-            "Confirm whether the listed war requirements and supplies policy fit your budget."
+            "Ask which branch suits your stats and schedule. The Force is useful, but so is reading the recruitment requirements.",
+            "Check war duties and supply policies against your budget. A dramatic faction name shouldn't be the entire business case."
           ],
           "status": "availability-unverified"
         },
@@ -1692,8 +1692,8 @@
             "A faction recruitment thread exists, but an old thread title cannot establish current vacancies or perks."
           ],
           "tips": [
-            "Inspect the current first post and date of the recruiter's latest response.",
-            "Request written terms for training, supplies and withdrawals before depositing significant funds."
+            "Check the first post and the recruiter's latest reply date. An old OPEN title may have taken a very long lunch.",
+            "Get current training, supply and withdrawal terms before depositing much money. Forecast first, faction-themed weather jokes later."
           ],
           "status": "availability-unverified"
         },
@@ -1707,8 +1707,8 @@
             "No sufficiently current recruitment offer was verified for this archived name and ID."
           ],
           "tips": [
-            "Use the numeric faction ID in the original source to avoid confusing a rename or similarly named group.",
-            "Confirm leadership, membership rules and current recruitment status directly in Torn."
+            "Use the numeric ID from the source so a rename or lookalike doesn't send you to the wrong doorstep.",
+            "Confirm today's leadership and recruitment rules in Torn. The old directory can't speak for whoever runs things now."
           ],
           "status": "availability-unverified"
         },
@@ -1722,20 +1722,20 @@
             "Current recruitment and benefits were not verified for this historical directory entry."
           ],
           "tips": [
-            "Check whether the faction has been renamed, reorganised or moved to a different role.",
-            "Compare current active perks and participation requirements before treating it as a beginner option."
+            "Check for a rename, reorganisation or a changed purpose. Factions can have character development too.",
+            "Compare current perks and duties before calling it a beginner option. Historic friendliness is not a live vacancy."
           ],
           "status": "availability-unverified"
         }
       ],
-      "summary": "Evaluate a faction by current fit and terms rather than a historical name or benefit list.",
+      "summary": "Find your people, not just a nice banner and an exciting list of possibly ancient perks.",
       "corrections": [
         "Named entries are historical leads. Present recruitment, ownership, requirements and perks are not guaranteed."
       ],
       "checklist": [
-        "Compare active upgrades and participation expectations.",
-        "Read the current recruitment thread and confirm the exact faction ID.",
-        "Agree supply, payout and vault-withdrawal policies before committing."
+        "Compare active perks with the duties you'll actually be expected to do.",
+        "Read current recruitment info and confirm the faction ID.",
+        "Get supplies, payouts and vault withdrawals explained before you commit."
       ],
       "extras": [
         {
@@ -1749,8 +1749,8 @@
             "Faction resources, upgrades and membership terms differ; a historical directory is not a live offer."
           ],
           "tips": [
-            "Ask for active training/travel perks, war frequency, supply policy, payout deductions and withdrawal availability.",
-            "Prefer a clear, sustainable fit over a recruitment promise you cannot independently verify."
+            "Ask about active perks, war frequency, supplies, payout deductions and withdrawals. Get the practical answers before falling in love with the banner.",
+            "Pick a faction you can actually keep up with. An unsustainable perk package is just a fancy source of stress."
           ],
           "status": "source-reviewed"
         }
@@ -1768,8 +1768,8 @@
             "Mugging takes a variable proportion of exposed cash and can be modified by perks."
           ],
           "tips": [
-            "Plan the cash-storage action before a predictable incoming payment.",
-            "Do not treat a high net worth, hospital plan or small previous mug as proof that your next payment is safe."
+            "Know where the payment is going before it lands. A wallet full of sale proceeds can become someone else's exciting afternoon.",
+            "Don't assume a hospital plan, high net worth or a tiny earlier mug makes the next receipt safe. Different money, different situation."
           ],
           "status": "source-reviewed"
         },
@@ -1783,8 +1783,8 @@
             "Post-mug protected cash decays over 12 hours; moving protected funds can reduce that protection."
           ],
           "tips": [
-            "Do not repeatedly move funds under the assumption that the original protected amount will remain intact.",
-            "Treat protection as a loss-limiting mechanic, not a reason to leave future sale proceeds exposed."
+            "Don't shuffle protected cash around assuming the original protection survives intact. Moving money has consequences beyond tidying the numbers.",
+            "Treat protection as damage limitation, not a VIP invitation to leave the next payment sitting out."
           ],
           "status": "source-reviewed"
         },
@@ -1799,8 +1799,8 @@
             "Storage choices differ in access, lockup, volatility and counterparty risk."
           ],
           "tips": [
-            "Split emergency spending money from investments and money needed on a known date.",
-            "Write down your exit route before depositing, buying an asset or starting a trade."
+            "Split emergency spending from investments and deadline money. Not every dollar needs the same bedtime and wake-up call.",
+            "Know how you'll get funds back before depositing or buying anything. Future you might need cash, not an exciting explanation."
           ],
           "status": "source-reviewed"
         },
@@ -1814,8 +1814,8 @@
             "The beginner piggy bank is a one-time opportunity; withdrawing destroys it and puts the balance in hand."
           ],
           "tips": [
-            "Check George's mission store early rather than assuming you can buy one later.",
-            "Arrange the next storage destination before breaking it."
+            "Check George's store early. The pig is a limited opportunity, not a permanent branch of your local bank.",
+            "Choose the next destination before smashing it. The pig disappears; the wallet exposure makes a fresh entrance."
           ],
           "status": "source-reviewed"
         },
@@ -1829,8 +1829,8 @@
             "An unfinished trade can be cancelled; completed acceptance transfers its contents."
           ],
           "tips": [
-            "Do not confuse temporary trade holding with interest-bearing or unlimited-duration banking.",
-            "Use a trusted counterparty and an explicit agreement that the holding trade must not be completed."
+            "Don't mistake temporary holding for an interest account or a forever vault. The ghost bit doesn't make it magical.",
+            "Use someone you trust and agree clearly that the holding trade must stay unfinished. Accidental completion is a very literal disappearing act."
           ],
           "status": "source-reviewed"
         },
@@ -1844,8 +1844,8 @@
             "The initiating player has the final acceptance step in direct trading."
           ],
           "tips": [
-            "Confirm the recipient ID and purpose, then leave the trade unfinished and monitor its state.",
-            "Keep a separate reminder to review the holding arrangement; do not leave critical cash dependent on an abandoned conversation."
+            "Check the recipient ID and purpose, leave the trade unfinished and watch its state. Small details, annoyingly large consequences.",
+            "Set a reminder to review it. Your emergency funds shouldn't depend on a conversation everyone forgot about."
           ],
           "status": "source-reviewed"
         },
@@ -1859,8 +1859,8 @@
             "Time deposits offer several durations with changing APR; matured funds can remain in the bank until withdrawn."
           ],
           "tips": [
-            "Compare the current term return and when you need the money, not merely the largest interest figure.",
-            "Keep a reserve outside a locked deposit so an urgent expense does not force a worse borrowing decision."
+            "Compare today's return with the date you'll need the money. The biggest interest number isn't automatically the most useful offer.",
+            "Keep a reserve outside the locked deposit. The bank does not unlock early because you suddenly remembered an expense."
           ],
           "status": "source-reviewed"
         },
@@ -1874,8 +1874,8 @@
             "Offshore interest uses the month's lowest qualifying balance, and access requires being abroad."
           ],
           "tips": [
-            "Include travel and time costs when comparing it with other storage choices.",
-            "Do not assume a late-month deposit earns a full month's interest."
+            "Count the travel and time cost as well as the interest. Offshore does not automatically mean clever.",
+            "Don't expect a late-month deposit to earn a whole month's interest. The calendar has noticed when you arrived."
           ],
           "status": "source-reviewed"
         },
@@ -1889,8 +1889,8 @@
             "Stock sales have a 0.1% fee and trading is restricted in hospital, jail and transit."
           ],
           "tips": [
-            "Stocks are not a risk-free cash vault: price changes and inability to access them can matter more than the fee.",
-            "Avoid needing an immediate sale to pay for a war, rental or other deadline."
+            "Stocks can fall and may be inaccessible when you need them. That's a rather important footnote for a supposed cash vault.",
+            "Don't make an urgent bill depend on an instant stock sale. Your hospital timer and the market may have other ideas."
           ],
           "status": "source-reviewed"
         },
@@ -1904,8 +1904,8 @@
             "Points are a separate currency and must normally be exchanged through their own market."
           ],
           "tips": [
-            "Compare the buy/sell spread before using points as temporary value storage.",
-            "Keep planned refill points separate from a speculative resale position."
+            "Check the buy/sell spread before parking money in points. A round trip through the market can have a toll booth.",
+            "Keep refill points apart from resale stock. Otherwise your training budget may wander off wearing an investment label."
           ],
           "status": "source-reviewed"
         },
@@ -1920,8 +1920,8 @@
             "Different items have different markets, restrictions and liquidity."
           ],
           "tips": [
-            "Store value only in items you understand well enough to price and sell.",
-            "Calculate the cash you could actually receive after selling costs instead of using an estimated inventory value."
+            "Only store value in items you know how to price and sell. A cupboard full of mystery purchases is not diversification.",
+            "Estimate what you can actually receive after costs. Your inventory's impressive estimated value doesn't pay the next bill by itself."
           ],
           "status": "source-reviewed"
         },
@@ -1935,8 +1935,8 @@
             "A tenant cannot access a rented property's vault."
           ],
           "tips": [
-            "Check ownership, shared access and current capacity before treating a vault as available storage.",
-            "Do not pay extra rent for vault access you will not receive."
+            "Check ownership, access and capacity before making plans. A vault on a rental listing can look wonderfully useful right up until you try to open it.",
+            "Don't pay extra rent for vault access you won't get. That's a very decorative expense."
           ],
           "status": "source-reviewed"
         },
@@ -1950,8 +1950,8 @@
             "Faction resources are controlled by members with the relevant permissions."
           ],
           "tips": [
-            "Ask who can authorise a withdrawal and what happens while officers are offline.",
-            "Keep a personal record of deposits and avoid entrusting money you cannot afford to wait for."
+            "Ask who handles withdrawals and when they're around. Online eventually is less helpful than an actual policy.",
+            "Keep your own deposit record and don't stash money you may urgently need. Waiting for an officer is not an instant-access account."
           ],
           "status": "source-reviewed"
         },
@@ -1965,8 +1965,8 @@
             "A company vault is part of a player-run business, not your personal bank."
           ],
           "tips": [
-            "Keep operating cash separate from personal money in your records.",
-            "Consider director access, sale terms and business liabilities before using a company as storage."
+            "Keep business and personal cash separate in your notes. One big number can hide several very different obligations.",
+            "Think about director access, sale terms and liabilities before using the company as storage. It's a business, not a giant piggy bank."
           ],
           "status": "source-reviewed"
         },
@@ -1981,8 +1981,8 @@
             "Some large receipts use cashier's checks while other payouts can create immediate wallet exposure."
           ],
           "tips": [
-            "Before claiming, identify the exact payout mechanism and prepare a storage destination.",
-            "Avoid announcing a windfall publicly until you have dealt with the practical cash exposure."
+            "Check exactly how the payout arrives before claiming. Big money deserves a plan longer than ooh, shiny.",
+            "Handle the cash exposure before announcing the win. The city has an enthusiastic audience for that sort of news."
           ],
           "status": "source-reviewed"
         },
@@ -1996,8 +1996,8 @@
             "Casino activity can create large gains or losses; it is not a reliable savings method."
           ],
           "tips": [
-            "After an unusual win, stop and protect the proceeds instead of increasing the stake.",
-            "Do not assume a slots payout follows the same claim process as a lottery cheque."
+            "After a strange and wonderful win, pause and protect it. The next spin does not owe you a sequel.",
+            "Don't assume slots use the same claim process as a lottery cheque. Check the actual payout rather than the family resemblance."
           ],
           "status": "source-reviewed"
         },
@@ -2011,8 +2011,8 @@
             "Lottery winnings are cashier's checks that automatically credit after 24 hours if not collected."
           ],
           "tips": [
-            "Set a reminder before the automatic-credit deadline and decide where the money will go.",
-            "Verify the bank record itself rather than following an unexpected message claiming you won."
+            "Set a reminder before automatic credit and plan the destination. A deadline can move the cash even when you've gone to bed.",
+            "Check the bank record yourself. An unexpected you won message isn't proof of anything except an unexpected message."
           ],
           "status": "source-reviewed"
         },
@@ -2027,22 +2027,22 @@
             "Bank rates vary and stock prices can fall; a quoted return is not a guarantee."
           ],
           "tips": [
-            "Separate training, housing and emergency budgets before investing the remainder.",
-            "Avoid buying several benefit blocks at once without comparing their marginal yield and loss of liquidity."
+            "Set aside training, housing and emergency money first. Let your future self keep a few functioning plans.",
+            "Compare the next benefit block's own cost and yield before buying several. A shopping spree doesn't become analysis because the items pay dividends."
           ],
           "status": "source-reviewed"
         }
       ],
-      "summary": "Compare wallet exposure, access time, lockup, volatility and trust for every storage method.",
+      "summary": "Give your cash a sensible home. Your wallet would love fewer surprise visitors.",
       "corrections": [
         "A rented property does not provide vault access.",
         "Stocks can lose value and are unavailable in some game states; they are not an instant guaranteed vault.",
         "Mug protection can change when protected cash is moved."
       ],
       "checklist": [
-        "Plan the destination before a large receipt.",
-        "Keep a separate operating float for foreseeable expenses.",
-        "Set reminders for deposits, temporary holdings and automatic cheque credit."
+        "Choose the storage destination before a big payment lands.",
+        "Keep an operating float for expenses you can already see coming.",
+        "Set reminders for deposits, temporary holdings and automatic cheque credits."
       ],
       "extras": [
         {
@@ -2056,8 +2056,8 @@
             "Different payout mechanisms can put money in hand immediately or after a claim deadline."
           ],
           "tips": [
-            "Decide the claim time, destination and required access in advance; perform the storage step before unrelated browsing.",
-            "Keep the action manual and confirm the resulting balance in game rather than trusting a helper notification."
+            "Pick the claim time, destination and access route before the money arrives. Storage first, casual browsing afterwards.",
+            "Make the move manually and check the balance in Torn. A helper notification is not the final bank statement."
           ],
           "status": "source-reviewed"
         }
@@ -2076,8 +2076,8 @@
             "Early earning methods consume different combinations of time, energy and capital."
           ],
           "tips": [
-            "Choose a method that funds your next useful unlock without consuming every resource needed for growth.",
-            "Track net proceeds and time spent for a week before deciding a method is worth scaling."
+            "Choose an earner that funds your next unlock without eating all your growth resources. The hustle should help the account, not hold it hostage.",
+            "Log net cash and time for a week. Your results are allowed to disagree with a very confident forum post."
           ],
           "status": "source-reviewed"
         },
@@ -2091,8 +2091,8 @@
             "Paid losses use attack energy that could otherwise support levelling or gym training."
           ],
           "tips": [
-            "Agree quantity, weapon conditions, proof and payment timing before the first hit.",
-            "Compare the net pay after recovery costs with the progress you are giving up; do a small trial with an unfamiliar buyer."
+            "Agree quantity, weapons, proof and payment timing before the first attack. Losing the fight is the service; losing the agreement is optional.",
+            "Subtract recovery costs and compare the lost progression. Try a small batch with a new buyer before committing your whole energy bar."
           ],
           "status": "source-reviewed"
         },
@@ -2107,8 +2107,8 @@
             "Shop purchase cost and player resale value are separate prices."
           ],
           "tips": [
-            "Check today's stock and demand before buying; an old beer or candy margin is not a current quote.",
-            "Include sales fees and any unsold inventory when calculating whether the daily run helped."
+            "Check stock and today's demand before buying. Historic beer margins don't travel forward in time with the guide.",
+            "Count fees and unsold items. Bought cheaply and actually made money are two different milestones."
           ],
           "status": "source-reviewed"
         },
@@ -2123,8 +2123,8 @@
             "Player services rely on a specific agreement rather than a built-in salary guarantee."
           ],
           "tips": [
-            "Define a small deliverable, payment amount, deadline and acceptance standard.",
-            "Keep work inside Torn's rules and avoid services involving account access or real-money exchanges."
+            "Agree one clear deliverable, price, deadline and acceptance standard. Something useful for a fair amount is how disputes get a running start.",
+            "Stay within Torn's rules: no account access and no real-money exchanges. A side hustle doesn't need a ban as a bonus feature."
           ],
           "status": "source-reviewed"
         },
@@ -2138,8 +2138,8 @@
             "Trade and Global have different permitted uses; old spam-based advice is unsuitable."
           ],
           "tips": [
-            "Use the correct channel and measure genuine replies or completed sales, not message volume.",
-            "Agree the placement and duration before paying for another player's advertising service."
+            "Use the right channel and track genuine replies or sales. Counting messages mostly tells you how busy your fingers were.",
+            "Agree placement and duration before paying someone to advertise. Exposure is not a sufficiently detailed invoice."
           ],
           "status": "source-reviewed"
         },
@@ -2153,8 +2153,8 @@
             "Companies need staff suited to their positions and operating model."
           ],
           "tips": [
-            "Ask the director for work-stat, activity and retention requirements before searching.",
-            "Agree what counts as a successful referral and when the fee becomes payable; do not promise a job on the director's behalf."
+            "Get the director's stat, activity and retention requirements first. Recruiting the wrong fit is an impressively busy way to achieve nothing.",
+            "Agree what earns the fee and when. You're finding candidates, not appointing yourself the director's hiring department."
           ],
           "status": "source-reviewed"
         },
@@ -2168,8 +2168,8 @@
             "Event eligibility and rewards depend on each organiser's published conditions."
           ],
           "tips": [
-            "Enter only when the likely reward or enjoyment justifies the entry cost.",
-            "Save proof of submission and check whether the organiser has a clear payout process."
+            "Enter when the likely fun or reward justifies the cost. A colourful prize list is allowed to remain someone else's adventure.",
+            "Save the entry proof and check the payout process. Winners shouldn't need to win a second contest to collect."
           ],
           "status": "source-reviewed"
         },
@@ -2183,8 +2183,8 @@
             "Off-site communities do not replace Torn's game rules or account-security controls."
           ],
           "tips": [
-            "Verify invitations through a known profile or official thread rather than a random direct message.",
-            "Do not pay an upfront verification fee or disclose keys to claim an unexpected prize."
+            "Verify invitations through a known profile or thread. Random direct messages have an excellent imagination.",
+            "Don't pay a verification fee or hand over keys for a surprise prize. Free stuff shouldn't need your account's plumbing."
           ],
           "status": "source-reviewed"
         },
@@ -2198,8 +2198,8 @@
             "City finds can spawn after daily activity; more clicking does not produce more spawns."
           ],
           "tips": [
-            "Collect finds during a short routine and value unusual items before selling.",
-            "Do not build an income budget around rare windfalls."
+            "Collect finds in a short routine and price unusual items before selling. Your accidental treasure deserves a quick check.",
+            "Don't budget around rare windfalls. Found a fortune is a pleasant event, not a dependable salary."
           ],
           "status": "source-reviewed"
         },
@@ -2213,8 +2213,8 @@
             "Creative work for Torn assets still needs to respect the game's trading rules."
           ],
           "tips": [
-            "Agree size, format, revisions, delivery and usage rights before starting a commission.",
-            "Use a small paid milestone for custom work and retain previews or receipts to document completion."
+            "Agree dimensions, format, revisions, delivery and usage rights first. Make it pop is not a complete creative brief.",
+            "Use a small paid milestone and keep previews or receipts. Unlimited revisions is a dangerous phrase in any universe."
           ],
           "status": "source-reviewed"
         },
@@ -2228,8 +2228,8 @@
             "Gambling outcomes are uncertain; token availability does not create a positive-return income method."
           ],
           "tips": [
-            "Exclude gambling winnings from the budget needed for rent, training and supplies.",
-            "Set an affordable entertainment limit and do not use progression money to chase a loss."
+            "Keep gambling winnings out of the money needed for rent, training and supplies. Those bills need a steadier plan.",
+            "Set an affordable entertainment limit. If you're chasing a loss, stop rather than feeding progression money into the attempt."
           ],
           "status": "source-reviewed"
         },
@@ -2243,8 +2243,8 @@
             "Directors manage staff, stock and advertising; gross revenue is not net business profit."
           ],
           "tips": [
-            "Request operating records and liabilities before buying a company.",
-            "Stress-test a bad week of wages, advertising and inventory costs before committing your capital."
+            "Ask for operating records and liabilities before buying. A good-looking company page is not an audit.",
+            "Price a bad week of wages, ads and inventory. If that scenario wrecks the budget, the business is already giving you useful feedback."
           ],
           "status": "source-reviewed"
         },
@@ -2258,8 +2258,8 @@
             "The normal investment ceiling is $2 billion; a qualifying Oil Rig benefit can raise it."
           ],
           "tips": [
-            "Use the current bank offer to compare your next investment, keeping known expenses liquid.",
-            "Do not pool or borrow money merely because an old guide shows an attractive historic rate."
+            "Use the current offer and keep known expenses liquid. Your next investment should match your actual calendar.",
+            "Don't pool or borrow money because an old rate looked amazing. A historic bargain cannot cover a current obligation."
           ],
           "status": "source-reviewed"
         },
@@ -2274,8 +2274,8 @@
             "Service and faction income depend on skill, opportunities, terms and actual participation."
           ],
           "tips": [
-            "Select a repeatable method that fits your schedule rather than adopting every veteran activity.",
-            "Measure net earnings alongside energy consumption and time availability."
+            "Pick a repeatable method that fits your schedule. Being a part-time version of every veteran at once sounds exhausting.",
+            "Track net income alongside energy and availability. An excellent earner you can't actually do is mostly a nice story."
           ],
           "status": "source-reviewed"
         },
@@ -2289,8 +2289,8 @@
             "Reviving unlocks through Brain Surgeon; attempts consume energy even when they fail."
           ],
           "tips": [
-            "Agree success-based or attempt-based payment before a contract starts.",
-            "Use the displayed success chance and your energy cost to estimate expected pay per energy."
+            "Agree whether pay is per attempt or per success before starting. Better to settle the definition while everyone is still calm.",
+            "Use displayed chance and energy cost to estimate expected pay per energy. A cheerful quoted rate isn't the whole calculation."
           ],
           "status": "source-reviewed"
         },
@@ -2305,8 +2305,8 @@
             "Foreign stock availability and local resale demand can change between departures."
           ],
           "tips": [
-            "Rank routes by net profit per round-trip hour, including waiting and selling time.",
-            "Try more than one buyer and keep a fallback route instead of relying on yesterday's highest margin."
+            "Rank routes after costs and count both flights, waiting and selling time. Profit per hour likes the complete clock.",
+            "Compare buyers and keep a backup route. Yesterday's winner doesn't have a permanent seat at the top of the spreadsheet."
           ],
           "status": "source-reviewed"
         },
@@ -2320,8 +2320,8 @@
             "Passive benefits have a holding period; active dividends need claiming before another cycle progresses."
           ],
           "tips": [
-            "Set collection reminders and check the marginal cost of the next increment.",
-            "Value an item dividend at a realistic after-fee sale price, not a headline market estimate."
+            "Set collection reminders and price the next increment separately. Passive income can still require you to press a button.",
+            "Value item rewards at a realistic after-fee sale price. Imaginary full-price buyers are wonderfully generous and rarely available."
           ],
           "status": "source-reviewed"
         },
@@ -2335,8 +2335,8 @@
             "Claiming a bounty requires a qualifying hospitalisation; a high bounty does not imply an easy target."
           ],
           "tips": [
-            "Check target strength and availability before committing recovery items and energy.",
-            "Compare likely net reward with repeated-failure risk and the opportunity cost of training."
+            "Check strength and status before spending energy or recovery items. The reward number isn't an assessment of your chances.",
+            "Compare expected net pay with failed attempts and missed training. A bounty can pay someone well without that someone being you."
           ],
           "status": "source-reviewed"
         },
@@ -2350,8 +2350,8 @@
             "Weekly ranked-war templates were introduced in November 2026; enlistment shows the applicable rules."
           ],
           "tips": [
-            "Read this week's template before planning hits or relying on an old score target.",
-            "Agree your faction's payout formula and expense deductions before the war, then retain the report."
+            "Read this week's template before planning. Last week's score target may have left the building.",
+            "Agree payout rules and deductions before the war, then keep the report. Post-war arithmetic is more peaceful with fewer surprises."
           ],
           "status": "source-reviewed"
         },
@@ -2365,8 +2365,8 @@
             "The History bachelor unlocks museum exchanges; complete flower or plushie sets exchange for points."
           ],
           "tips": [
-            "Price the entire set, including its least convenient item, against the current value of the points received.",
-            "Include selling costs, available cash and time spent assembling sets rather than assuming every set is profitable."
+            "Price the complete set, including the awkward item, against current point proceeds. One missing plushie can have expensive opinions.",
+            "Include fees, tied-up cash and assembly time. Completing a set is satisfying; making a profit is a separate achievement."
           ],
           "status": "source-reviewed"
         },
@@ -2380,8 +2380,8 @@
             "Special bonuses have event-specific start and end conditions."
           ],
           "tips": [
-            "Check your own event slot before buying supplies or scheduling a large action.",
-            "Budget for the ordinary outcome; a rare event prize should remain upside rather than expected income."
+            "Check your own event slot before shopping or scheduling big actions. Other people's calendars don't get to set yours.",
+            "Budget for the ordinary result. A rare prize is a lovely bonus, not next week's guaranteed rent."
           ],
           "status": "source-reviewed"
         },
@@ -2395,8 +2395,8 @@
             "Mug results are variable and affected by protection and perks."
           ],
           "tips": [
-            "Do not infer a guaranteed target balance from a visible sale or an old net-worth figure.",
-            "Consider retaliation, failed attacks and training opportunity cost when deciding whether an attempt is worthwhile."
+            "Don't treat a visible sale or old net-worth number as a guaranteed wallet balance. The money may already have better accommodation.",
+            "Count failed attacks, retaliation and lost training time. The gross mug is only the headline, not the whole article."
           ],
           "status": "source-reviewed"
         },
@@ -2411,8 +2411,8 @@
             "Trading and businesses introduce more capital and liquidity risk than a simple service sale."
           ],
           "tips": [
-            "Keep a written ledger of cost basis, fees, stock levels and cash tied up.",
-            "Scale only after you can explain where profit comes from and what would make the plan fail."
+            "Keep a ledger of cost basis, fees, inventory and tied-up cash. Your memory is not a regulated accounting system.",
+            "Scale once you can explain both the profit and the failure case. Trust me, it works is not a stress test."
           ],
           "status": "source-reviewed"
         },
@@ -2427,8 +2427,8 @@
             "Item-market sales carry fees; direct trades and bazaars have different processes and exposure."
           ],
           "tips": [
-            "Calculate margin after fees, price movement, slow stock and the value of your own time.",
-            "Make a small test purchase before expanding into an unfamiliar item category."
+            "Subtract fees, slow stock, price movement and your own time. The spread isn't all yours just because it looks tempting.",
+            "Test an unfamiliar item with a small purchase first. Tuition is cheaper when the lesson is not bought in bulk."
           ],
           "status": "source-reviewed"
         },
@@ -2442,8 +2442,8 @@
             "Share-price gains are distinct from dividend benefits and neither guarantees profit."
           ],
           "tips": [
-            "Track realised proceeds after the selling fee and keep capital for near-term obligations out of a speculative position.",
-            "Do not present a guessed price pattern as a predictable trading signal."
+            "Track realised proceeds after the sale fee and keep near-term bill money out of speculation. Paper gains are very bad at paying invoices.",
+            "Don't call a guessed pattern a reliable signal. A chart can make a convincing face without predicting anything."
           ],
           "status": "source-reviewed"
         },
@@ -2458,22 +2458,22 @@
             "Outside combat services depend on game restrictions and a buyer's agreed qualifying conditions."
           ],
           "tips": [
-            "Specify eligible targets, finish result, evidence, payment and exclusions before accepting work.",
-            "Use reports to reconcile completed work; do not assume every visible hit qualifies under a faction's contract."
+            "Define eligible targets, finish result, proof, pay and exclusions before taking the work. Paid to fight shouldn't become unpaid to argue.",
+            "Reconcile against reports. A visible hit doesn't automatically satisfy whatever the buyer agreed to count."
           ],
           "status": "source-reviewed"
         }
       ],
-      "summary": "Choose earnings by net return, time, resource use and downside risk.",
+      "summary": "Making money is good. Making money after counting the costs is even better.",
       "corrections": [
         "Old sale-price and hourly-income examples are not live earning guarantees.",
         "The ordinary item-market sales fee is 5%; a route or trade must account for its actual selling channel.",
         "Ranked-war templates now make checking the current enlistment rules important."
       ],
       "checklist": [
-        "Choose one repeatable earning method and record the full costs.",
-        "Keep progression energy and near-term cash needs in your plan.",
-        "Scale only when completed results support the expected margin."
+        "Pick a repeatable earner and count every relevant cost.",
+        "Leave room for training, progression and near-term bills.",
+        "Scale after completed results support the margin, not just because the idea sounds excellent."
       ],
       "extras": [
         {
@@ -2487,8 +2487,8 @@
             "An additional investment can have a different cost and yield from the first one."
           ],
           "tips": [
-            "Compare the next block or upgrade on its own additional cost rather than averaging it with a cheaper earlier purchase.",
-            "Keep realistic sale prices and an adverse scenario in the worksheet before committing money."
+            "Compare the next upgrade on its extra cost alone. Your cheap first purchase shouldn't be doing all the PR for the expensive next one.",
+            "Use realistic sale prices and a bad-case scenario. The spreadsheet needs at least one row where things don't go perfectly."
           ],
           "status": "source-reviewed"
         }
@@ -2547,8 +2547,8 @@
             "The player-authored Criminal Primer includes an October 2026 Arson update; it remains community guidance."
           ],
           "tips": [
-            "Use the crime-specific notes below and compare them with the current interface and linked wiki.",
-            "Separate documented mechanics from community estimates of optimal profitability or progression."
+            "Use the crime-specific notes here alongside the current interface and linked wiki. Bring the right rulebook to the right minigame.",
+            "Keep documented mechanics separate from players' best-method estimates. Very confident is not a probability calculation."
           ],
           "status": "source-reviewed"
         }
@@ -2564,8 +2564,8 @@
             "All six searches cost two nerve. Beach and cemetery require unlock items; the fountain needs skill 75."
           ],
           "tips": [
-            "Trash, subway and junkyard have different environmental conditions; use the current on-screen cues rather than a fixed best crime rule.",
-            "Treat unique-outcome hunting as a separate goal from short-term cash and check any required item before repeating attempts."
+            "Check each location's current conditions. There isn't one forever-best search button hiding behind the interface.",
+            "Decide whether you're chasing cash or uniques, then check unlock items. Aimless clicking is a hobby, not a plan."
           ],
           "status": "source-reviewed"
         },
@@ -2579,8 +2579,8 @@
             "Copying, selling and an online store are separate activities. The store needs skill 50, the named web-design course and a computer."
           ],
           "tips": [
-            "Count blank-DVD costs and the time needed to sell copied stock; copying alone does not realise cash profit.",
-            "Check production and remaining stock before spending more nerve on an already overfilled genre."
+            "Count blank DVDs and selling time. A giant pile of copied stock isn't profit until it actually sells.",
+            "Check production and existing stock before copying more. Your pretend DVD empire probably doesn't need another unsold mountain."
           ],
           "status": "source-reviewed"
         },
@@ -2594,8 +2594,8 @@
             "Area reputation changes independently and decays; the Paint Mask is its enhancer. Some areas require a crew unlock."
           ],
           "tips": [
-            "Build an area deliberately rather than spreading early attempts everywhere.",
-            "Watch remaining paint and distinguish reputation goals from cash goals."
+            "Build reputation somewhere deliberately instead of scattering every early attempt across town. Even fictional vandalism benefits from a plan.",
+            "Watch paint supplies and decide whether you're here for rep or cash. The wall has room; your nerve budget may not."
           ],
           "status": "source-reviewed"
         },
@@ -2609,8 +2609,8 @@
             "Each shop has its own notoriety and security state. Notoriety falls over time; four nerve is used per attempt."
           ],
           "tips": [
-            "Rotate or pause when local notoriety is costly, using the actual shop indicators.",
-            "Do not treat disabled cameras or a high skill level as a guarantee; budget for lost supplies and failures."
+            "Watch local notoriety and rotate or pause when it makes sense. The shop can remember you even when you'd prefer it didn't.",
+            "Disabled cameras aren't a guarantee. Leave room in the budget for failures and lost supplies instead of trusting your inner action hero."
           ],
           "status": "source-reviewed"
         },
@@ -2624,8 +2624,8 @@
             "Targets vary by type, body and current distraction; availability does not mean suitability for your skill."
           ],
           "tips": [
-            "Choose manageable targets and watch their expiry timers instead of rushing every new row.",
-            "Track failures by target type so your next session uses your own evidence rather than a universal promise of safety."
+            "Choose manageable targets and watch expiry timers. Every new row isn't a personal invitation.",
+            "Log failures by target type. Your own results are a better coach than a stranger promising totally safe money."
           ],
           "status": "source-reviewed"
         },
@@ -2639,8 +2639,8 @@
             "Installation uses a card skimmer and spy camera; details become usable on recovery, and devices can be lost."
           ],
           "tips": [
-            "Treat longer placement as a return-versus-loss-risk decision, not an automatic improvement.",
-            "Keep a placement log and include replacement equipment in your cash-per-nerve estimate."
+            "Longer placement means a return-versus-loss-risk choice. More time is not automatically more clever.",
+            "Keep a placement log and count replacement gear. A vanished device has a very direct opinion about your profit margin."
           ],
           "status": "source-reviewed"
         },
@@ -2654,8 +2654,8 @@
             "Scout, case and burglarize are distinct actions. Casing confidence fades; a target's recommended item unlocks its unique reward."
           ],
           "tips": [
-            "Plan enough nerve to finish a chosen target rather than accumulating more locations than you will use.",
-            "Check the recommendation and current confidence before the final step; focused scouting has a higher nerve cost than ordinary scouting."
+            "Leave enough nerve to finish the target you chose. Collecting locations you'll never use is basically property-window shopping.",
+            "Check the recommended item and current confidence before the final step. Focused scouting costs more, so make the choice on purpose."
           ],
           "status": "source-reviewed"
         },
@@ -2669,8 +2669,8 @@
             "Audience interest, suspicion and each game's technique affect play. Shill and pickpocket helpers unlock at higher skill."
           ],
           "tips": [
-            "Develop a game deliberately and watch the audience rather than repeatedly choosing the win action.",
-            "Include intentional losses and helper collection costs when comparing actual session profit."
+            "Build a game deliberately and watch the audience. Hammering Win isn't the entire art of fictional confidence tricks.",
+            "Include intentional losses and helper collections in the maths. Your session summary shouldn't develop selective amnesia."
           ],
           "status": "source-reviewed"
         },
@@ -2684,8 +2684,8 @@
             "Jobs arrive daily and can only be attempted once. Method choice and required consumables vary by job."
           ],
           "tips": [
-            "Read the job and compare the available methods before choosing; the most expensive method is not automatically best.",
-            "Check supplies first and preserve a record of method and outcome to improve future decisions."
+            "Read the job and compare methods. The expensive button is not automatically the smart button.",
+            "Check supplies and note what worked. Your next job deserves better than another round of enthusiastic guessing."
           ],
           "status": "source-reviewed"
         },
@@ -2699,8 +2699,8 @@
             "This in-game minigame requires Introduction to Computing and a computer. Wrong character guesses can lock further guesses."
           ],
           "tips": [
-            "Treat this solely as a Torn minigame; no real accounts or external passwords are involved.",
-            "Compare rig-upgrade costs with the jobs available to your skill and avoid wasting guesses without a reason."
+            "Keep this entirely inside Torn's minigame. Real accounts and other people's passwords are not part of the assignment.",
+            "Price rig upgrades against jobs your skill can use. Don't burn guesses just because the empty character box looks inviting."
           ],
           "status": "source-reviewed"
         },
@@ -2714,8 +2714,8 @@
             "Projects have multiple five-nerve steps, mixed reusable and consumed tools, and possible progress loss."
           ],
           "tips": [
-            "Calculate all material costs for a finished item before starting a batch.",
-            "Stagger timed steps to match your normal logins instead of leaving many unfinished projects tying up supplies."
+            "Price the full finished item before starting a batch. Half a project and a cupboard of supplies aren't a completed payday.",
+            "Stagger timed steps around normal logins. A hundred unfinished projects is an ambitious way to organise a queue."
           ],
           "status": "source-reviewed"
         },
@@ -2729,8 +2729,8 @@
             "The fictional crime uses an in-game address pool, responses and a reward-zone minigame."
           ],
           "tips": [
-            "Only use the built-in Torn activity; never collect real email addresses or message real people for this guide.",
-            "Read the current cursor and zones, and budget the whole conversation rather than valuing only its final payout."
+            "Use only the fictional Torn activity. Never gather real email addresses or message real people for this guide.",
+            "Watch the cursor and zones, and budget the whole conversation. The final payout screenshot conveniently forgets all the earlier nerve."
           ],
           "status": "source-reviewed"
         },
@@ -2744,8 +2744,8 @@
             "The in-game scenario uses different fire behaviour, client requirements and unlockable tools; Collect has its own final step."
           ],
           "tips": [
-            "Keep this entirely within Torn's game interface and follow each fictional job's requirements.",
-            "Check what a consumable costs and whether the final condition is met before spending nerve on more actions."
+            "Keep this strictly in Torn's game interface and read the fictional job requirements. The real world is not DLC.",
+            "Check consumable costs and final conditions before doing more actions. A dramatic animation doesn't mean the job is ready to collect."
           ],
           "status": "source-reviewed"
         },
@@ -2760,21 +2760,21 @@
             "Success, failure and critical failure affect progression differently; higher happiness helps progression rather than known success chance."
           ],
           "tips": [
-            "Track profit, skill progression and unique outcomes separately. A cash strategy may not be the fastest skill strategy.",
-            "Use current subcrime indicators and keep a reserve for material losses; never label a method zero-risk without evidence."
+            "Track cash, skill and uniques separately. The best cash route and the fastest progression route needn't be best friends.",
+            "Use current indicators and budget for losses. Zero risk needs evidence, not just extra capital letters."
           ],
           "status": "source-reviewed"
         }
       ],
-      "summary": "Go beyond the old link-only page: progression basics plus thirteen crime-specific walkthrough notes.",
+      "summary": "Torn's crime menu has more moving parts than click button, receive fortune. Here's the useful version.",
       "corrections": [
         "Do not use the archived claim that the system has only twelve crimes as a current count.",
         "Crime experience, individual crime skill, progression bonuses and hidden success formulas are different concepts."
       ],
       "checklist": [
-        "Choose cash, progression or uniques as the purpose of the session.",
-        "Check current skill, required tools, consumables and conditions.",
-        "Record net proceeds and failures rather than assuming a higher nerve cost means better returns."
+        "Choose your target: cash, progression or unique outcomes.",
+        "Check skill, tools, consumables and current conditions.",
+        "Log net proceeds and failures. A bigger nerve price tag doesn't automatically mean a better deal."
       ]
     },
     "how-to-set-trade": {
@@ -2789,8 +2789,8 @@
             "A direct trade can start from a player's profile or the inventory Trades interface."
           ],
           "tips": [
-            "Verify the numeric ID rather than relying only on a similar-looking name or avatar.",
-            "For a new counterparty, agree price and quantity in a written message first."
+            "Check the numeric ID. A familiar-looking avatar is not an identity document.",
+            "Agree price and quantity in writing with a new trader. Avoid starting the deal with a collaborative guessing game."
           ],
           "status": "source-reviewed"
         },
@@ -2804,8 +2804,8 @@
             "The initiating party controls final completion after the other party accepts."
           ],
           "tips": [
-            "Confirm you opened the intended trade instead of a send-money or send-item action.",
-            "Keep the agreed quote visible while reviewing the new transaction."
+            "Make sure you're opening a trade, not sending items or money. Those buttons lead to very different afternoons.",
+            "Keep the agreed quote visible while reviewing. Your memory doesn't need to carry the whole transaction."
           ],
           "status": "source-reviewed"
         },
@@ -2819,8 +2819,8 @@
             "A description labels the trade; it does not replace checking its actual contents."
           ],
           "tips": [
-            "Use a specific description with item, quantity and agreed price basis.",
-            "Avoid vague labels that make two simultaneous trades hard to distinguish."
+            "Use item, quantity and price basis in the description. Mystery trade is a title for a bad story, not a useful label.",
+            "Make simultaneous trades easy to tell apart. Two identical vague descriptions are asking your future self to improvise."
           ],
           "status": "source-reviewed"
         },
@@ -2834,8 +2834,8 @@
             "Money and ordinary items are tradeable; points and shares are not normal direct-trade contents."
           ],
           "tips": [
-            "Review both quantity and item variant before adding everything in your inventory.",
-            "Check the cash total using your own arithmetic rather than a screenshot sent by the other person."
+            "Check the quantity and exact variant before adding the whole stack. Similar names can have impressively different prices.",
+            "Do your own arithmetic on the cash total. Someone else's screenshot doesn't get the final vote."
           ],
           "status": "source-reviewed"
         },
@@ -2849,8 +2849,8 @@
             "The other party's acceptance locks the proposed contents against further changes."
           ],
           "tips": [
-            "Treat an actual locked trade state as evidence; a chat message saying added is not enough.",
-            "Stop if the expected cash or item is missing, even when someone pressures you to hurry."
+            "Look for the actual locked trade state. Added in chat is a sentence, not a payment record.",
+            "If the expected cash or item isn't there, stop. Urgency is not a replacement currency."
           ],
           "status": "source-reviewed"
         },
@@ -2864,21 +2864,21 @@
             "Final acceptance includes a reconfirmation delay; cancellation remains possible before completion."
           ],
           "tips": [
-            "Re-read both sides, the recipient and the exact amount during the final check.",
-            "Know where received cash will go before accepting a large sale."
+            "Use the last check for both sides, recipient and exact amount. This is a good time to be gloriously boring.",
+            "Know where a large cash receipt will go before accepting. Celebrate after the money has suitable accommodation."
           ],
           "status": "source-reviewed"
         }
       ],
-      "summary": "A six-step transaction checklist with identity, contents and final-acceptance checks.",
+      "summary": "Six steps to a sensible trade. Let's keep the drama out of the final confirmation.",
       "corrections": [
         "A description or chat promise does not prove payment has been added.",
         "Points and shares cannot be placed into an ordinary direct trade."
       ],
       "checklist": [
-        "Agree a quote and verify the counterparty ID.",
-        "Review both sides of the actual locked trade.",
-        "Use the final confirmation to re-check the exact contents and plan for any cash received."
+        "Agree the quote and check who you're actually trading with.",
+        "Review the contents of the real locked trade.",
+        "Check the exact amount one last time and plan where any incoming cash goes."
       ],
       "extras": [
         {
@@ -2891,8 +2891,8 @@
             "A direct trade can be cancelled before final completion."
           ],
           "tips": [
-            "Stop and re-check the actual contents when the quote, item variant or recipient changes.",
-            "Do not complete under pressure; restart a clean transaction if the agreement is no longer clear."
+            "If price, item or recipient changes, stop and inspect the actual trade again. The original agreement didn't automatically approve a plot twist.",
+            "Don't complete under pressure. A clean restart is cheaper than an impressively fast mistake."
           ],
           "status": "source-reviewed"
         }
@@ -2910,8 +2910,8 @@
             "Egg spawns are activity-independent; unfound eggs persist and can roll over into the next event."
           ],
           "tips": [
-            "Browse manually at sensible intervals instead of hammering refresh to try to generate more eggs.",
-            "Use your calendar for the current event window; this guide does not mean a hunt is active today."
+            "Browse manually at sensible intervals. Refreshing like a frantic chicken doesn't make the egg supply more generous.",
+            "Check the current calendar window. An Easter guide being available in November is not a surprise event announcement."
           ],
           "status": "source-reviewed"
         },
@@ -2925,8 +2925,8 @@
             "Scripts must follow Torn's current scripting rules; software must not auto-request hidden game pages or click rewards."
           ],
           "tips": [
-            "Review a script's source and permissions, and use only tooling that fits the current rules and your browser.",
-            "Do not install an unfamiliar extension merely because a historic guide recommends it."
+            "Read the source and permissions before installing a script, and check it fits today's Torn rules. Popular is not a permission setting.",
+            "An old recommendation isn't a security review. Skip unfamiliar extensions that ask for more access than makes sense."
           ],
           "status": "source-reviewed"
         },
@@ -2940,22 +2940,22 @@
             "Collected eggs are non-tradeable inventory items; using one adds six hours of booster cooldown."
           ],
           "tips": [
-            "Time an egg for a clear goal and check cooldown room before consuming it.",
-            "Percentage-based rewards may be more useful later; compare waiting with the benefit you can use now."
+            "Have a goal and enough cooldown room before eating the egg. This is resource planning, with chocolate.",
+            "Percentage rewards may help more later. Compare what you can use now with what waiting might gain, rather than eating the shiny thing on sight."
           ],
           "status": "source-reviewed"
         }
       ],
-      "summary": "Use the current hunt mechanics and item effects instead of pre-2023 farming advice.",
+      "summary": "Find eggs, enjoy chocolate-flavoured resource planning and leave the refresh-button workout behind.",
       "corrections": [
         "Refreshing does not increase the activity-independent spawn rate.",
         "Collected eggs are inventory items, not immediate rewards that must be used when found.",
         "This is a seasonal reference, not a statement that Easter is active today."
       ],
       "checklist": [
-        "Check the current calendar and your event slot.",
-        "Browse manually using permitted tools only.",
-        "Choose egg timing based on your own stats, resources and booster cooldown."
+        "Check the calendar and your own event slot.",
+        "Browse manually and stick to permitted tools.",
+        "Use eggs when their rewards and cooldown cost fit your plan."
       ],
       "extras": [
         {
@@ -2969,8 +2969,8 @@
             "An egg uses six hours of booster cooldown; surplus happy still has its normal timing constraint."
           ],
           "tips": [
-            "Reserve enough cooldown room and prepare the activity that will use the reward before consuming the egg.",
-            "Do not spend resources chasing a claimed rare spawn schedule or an unverified guaranteed colour."
+            "Leave cooldown space and prepare the activity first. The reward works better with a plan than with an immediate shopping trip.",
+            "Don't spend resources chasing guaranteed colours or secret spawn schedules. Eggs are mysterious enough without buying somebody's conspiracy theory."
           ],
           "status": "source-reviewed"
         }
