@@ -1778,5 +1778,275 @@
     "buy_price": 5550,
     "source": "User screenshot",
     "observed_on": "2026-11-12"
+  },
+  {
+    "id": 1333,
+    "name": "Bonded Latex",
+    "type": "Material",
+    "country": "Japan",
+    "shop": "General Store",
+    "buy_price": 220000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 294,
+    "name": "Bottle of Sake",
+    "type": "Alcohol",
+    "country": "Japan",
+    "shop": "General Store",
+    "buy_price": 40,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 277,
+    "name": "Cherry Blossom",
+    "type": "Flower",
+    "country": "Japan",
+    "shop": "General Store",
+    "buy_price": 500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 429,
+    "name": "Chopsticks",
+    "type": "Other",
+    "country": "Japan",
+    "shop": "General Store",
+    "buy_price": 20,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 437,
+    "name": "Glow Stick",
+    "type": "Material",
+    "country": "Japan",
+    "shop": "General Store",
+    "buy_price": 20,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 1249,
+    "name": "Hydrochloric Acid",
+    "type": "Material",
+    "country": "Japan",
+    "shop": "General Store",
+    "buy_price": 24500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 278,
+    "name": "Kabuki Mask",
+    "type": "Clothing",
+    "country": "Japan",
+    "shop": "General Store",
+    "buy_price": 10000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 279,
+    "name": "Maneki Neko",
+    "type": "Other",
+    "country": "Japan",
+    "shop": "General Store",
+    "buy_price": 50000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 433,
+    "name": "Sensu",
+    "type": "Other",
+    "country": "Japan",
+    "shop": "General Store",
+    "buy_price": 500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 427,
+    "name": "Sumo Doll",
+    "type": "Other",
+    "country": "Japan",
+    "shop": "General Store",
+    "buy_price": 300,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 434,
+    "name": "Yakitori Lantern",
+    "type": "Other",
+    "country": "Japan",
+    "shop": "General Store",
+    "buy_price": 4500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 233,
+    "name": "BT MP9",
+    "type": "Secondary",
+    "country": "Japan",
+    "shop": "Arms Dealer",
+    "buy_price": 55000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 234,
+    "name": "Chain Whip",
+    "type": "Melee",
+    "country": "Japan",
+    "shop": "Arms Dealer",
+    "buy_price": 2500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 334,
+    "name": "Flexible Body Armor",
+    "type": "Defensive",
+    "country": "Japan",
+    "shop": "Arms Dealer",
+    "buy_price": 15000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 236,
+    "name": "Kama",
+    "type": "Melee",
+    "country": "Japan",
+    "shop": "Arms Dealer",
+    "buy_price": 50000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 237,
+    "name": "Kodachi",
+    "type": "Melee",
+    "country": "Japan",
+    "shop": "Arms Dealer",
+    "buy_price": 95000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 395,
+    "name": "Metal Nunchaku",
+    "type": "Melee",
+    "country": "Japan",
+    "shop": "Arms Dealer",
+    "buy_price": 400000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 239,
+    "name": "Ninja Star",
+    "type": "Temporary",
+    "country": "Japan",
+    "shop": "Arms Dealer",
+    "buy_price": 500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 238,
+    "name": "Sai",
+    "type": "Melee",
+    "country": "Japan",
+    "shop": "Arms Dealer",
+    "buy_price": 1000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 235,
+    "name": "Wooden Nunchaku",
+    "type": "Melee",
+    "country": "Japan",
+    "shop": "Arms Dealer",
+    "buy_price": 5000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 196,
+    "name": "Cannabis",
+    "type": "Drug",
+    "country": "Japan",
+    "shop": "Black Market",
+    "buy_price": 10332,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 1492,
+    "name": "Counterfeit Manga",
+    "type": "Other",
+    "country": "Japan",
+    "shop": "Black Market",
+    "buy_price": 25536,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 197,
+    "name": "Ecstasy",
+    "type": "Drug",
+    "country": "Japan",
+    "shop": "Black Market",
+    "buy_price": 39218,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 204,
+    "name": "Speed",
+    "type": "Drug",
+    "country": "Japan",
+    "shop": "Black Market",
+    "buy_price": 6904,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 205,
+    "name": "Vicodin",
+    "type": "Drug",
+    "country": "Japan",
+    "shop": "Black Market",
+    "buy_price": 6019,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 1493,
+    "name": "Whale Meat",
+    "type": "Other",
+    "country": "Japan",
+    "shop": "Black Market",
+    "buy_price": 2120,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 206,
+    "name": "Xanax",
+    "type": "Drug",
+    "country": "Japan",
+    "shop": "Black Market",
+    "buy_price": 648790,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
   }
 ]

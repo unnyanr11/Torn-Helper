@@ -70,7 +70,7 @@ describe('saved Mexico purchase reference',()=>{
  it('restores all 34 screenshot items without a live request or stock assumptions',()=>{
   const items=withSavedShopPrices([]);
   expect(destinationItems(items,'Mexico')).toHaveLength(34);
-  expect(destinationItems(items,'Japan')).toEqual([]);
+  expect(destinationItems(items,'United Kingdom')).toEqual([]);
   expect(new Set(FOREIGN_SHOP_PRICES.filter(p=>p.country==='Mexico').map(p=>p.id)).size).toBe(34);
   expect(FOREIGN_SHOP_PRICES.filter(p=>p.country==='Mexico'&&p.shop==='General Store')).toHaveLength(10);
   expect(FOREIGN_SHOP_PRICES.filter(p=>p.country==='Mexico'&&p.shop==='Arms Dealer')).toHaveLength(19);
@@ -157,6 +157,29 @@ describe('saved UAE purchase reference',()=>{
   expect(shopQuote(items.find(i=>i.id===1495),'UAE')?.buy_price).toBe(358740);
   expect(shopQuote(items.find(i=>i.id===204),'UAE')?.buy_price).toBe(569);
   expect(shopQuote(items.find(i=>i.id===204),'China')?.buy_price).toBe(5433);
+  expect(new Set(FOREIGN_SHOP_PRICES.map(p=>`${p.country}:${p.shop}:${p.id}`)).size).toBe(FOREIGN_SHOP_PRICES.length);
+ });
+});
+
+describe('saved Japan purchase reference',()=>{
+ it('offers all screenshot prices as fallbacks without claiming live stock',()=>{
+  const rows=FOREIGN_SHOP_PRICES.filter(p=>p.country==='Japan');
+  expect(rows).toHaveLength(27);
+  expect(rows.filter(p=>p.shop==='General Store')).toHaveLength(11);
+  expect(rows.filter(p=>p.shop==='Arms Dealer')).toHaveLength(9);
+  expect(rows.filter(p=>p.shop==='Black Market')).toHaveLength(7);
+  expect(rows.every(p=>p.observed_on==='2026-11-14'&&p.source==='User screenshot'&&!('stock' in p))).toBe(true);
+  const items=withSavedShopPrices([]);
+  expect(destinationItems(items,'Japan')).toHaveLength(27);
+  expect(shopQuote(items.find(i=>i.id===1333),'Japan')?.buy_price).toBe(220000);
+  expect(shopQuote(items.find(i=>i.id===334),'Japan')?.buy_price).toBe(15000000);
+  expect(shopQuote(items.find(i=>i.id===277),'Japan')?.buy_price).toBe(500);
+  expect(shopQuote(items.find(i=>i.id===1249),'Japan')?.buy_price).toBe(24500);
+  expect(shopQuote(items.find(i=>i.id===1492),'Japan')?.buy_price).toBe(25536);
+  expect(shopQuote(items.find(i=>i.id===1493),'Japan')?.buy_price).toBe(2120);
+  expect(shopQuote(items.find(i=>i.id===206),'Japan')?.buy_price).toBe(648790);
+  expect(shopQuote(items.find(i=>i.id===205),'Japan')?.buy_price).toBe(6019);
+  expect(shopQuote(items.find(i=>i.id===205),'UAE')?.buy_price).toBe(5550);
   expect(new Set(FOREIGN_SHOP_PRICES.map(p=>`${p.country}:${p.shop}:${p.id}`)).size).toBe(FOREIGN_SHOP_PRICES.length);
  });
 });
