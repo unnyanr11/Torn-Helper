@@ -2048,5 +2048,255 @@
     "buy_price": 648790,
     "source": "User screenshot",
     "observed_on": "2026-11-14"
+  },
+  {
+    "id": 431,
+    "name": "Dart Board",
+    "type": "Other",
+    "country": "United Kingdom",
+    "shop": "General Store",
+    "buy_price": 700,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 267,
+    "name": "Heather",
+    "type": "Flower",
+    "country": "United Kingdom",
+    "shop": "General Store",
+    "buy_price": 5000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 1246,
+    "name": "Inkwell",
+    "type": "Material",
+    "country": "United Kingdom",
+    "shop": "General Store",
+    "buy_price": 380,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 411,
+    "name": "Model Space Ship",
+    "type": "Other",
+    "country": "United Kingdom",
+    "shop": "General Store",
+    "buy_price": 17000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 266,
+    "name": "Nessie Plushie",
+    "type": "Plushie",
+    "country": "United Kingdom",
+    "shop": "General Store",
+    "buy_price": 200,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 416,
+    "name": "Paper Weight",
+    "type": "Other",
+    "country": "United Kingdom",
+    "shop": "General Store",
+    "buy_price": 1500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 268,
+    "name": "Red Fox Plushie",
+    "type": "Plushie",
+    "country": "United Kingdom",
+    "shop": "General Store",
+    "buy_price": 1000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 408,
+    "name": "Sextant",
+    "type": "Other",
+    "country": "United Kingdom",
+    "shop": "General Store",
+    "buy_price": 25000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 415,
+    "name": "Ship in a Bottle",
+    "type": "Other",
+    "country": "United Kingdom",
+    "shop": "General Store",
+    "buy_price": 40000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 418,
+    "name": "Tailor's Dummy",
+    "type": "Other",
+    "country": "United Kingdom",
+    "shop": "General Store",
+    "buy_price": 10000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 217,
+    "name": "Claymore Sword",
+    "type": "Melee",
+    "country": "United Kingdom",
+    "shop": "Arms Dealer",
+    "buy_price": 100000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 438,
+    "name": "Cricket Bat",
+    "type": "Melee",
+    "country": "United Kingdom",
+    "shop": "Arms Dealer",
+    "buy_price": 15000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 218,
+    "name": "Crossbow",
+    "type": "Secondary",
+    "country": "United Kingdom",
+    "shop": "Arms Dealer",
+    "buy_price": 900,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 219,
+    "name": "Enfield SA-80",
+    "type": "Primary",
+    "country": "United Kingdom",
+    "shop": "Arms Dealer",
+    "buy_price": 250000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 397,
+    "name": "Flail",
+    "type": "Melee",
+    "country": "United Kingdom",
+    "shop": "Arms Dealer",
+    "buy_price": 8000000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 439,
+    "name": "Frying Pan",
+    "type": "Melee",
+    "country": "United Kingdom",
+    "shop": "Arms Dealer",
+    "buy_price": 400,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 220,
+    "name": "Grenade",
+    "type": "Temporary",
+    "country": "United Kingdom",
+    "shop": "Arms Dealer",
+    "buy_price": 10000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 221,
+    "name": "Stick Grenade",
+    "type": "Temporary",
+    "country": "United Kingdom",
+    "shop": "Arms Dealer",
+    "buy_price": 8000,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 641,
+    "name": "WWII Helmet",
+    "type": "Defensive",
+    "country": "United Kingdom",
+    "shop": "Arms Dealer",
+    "buy_price": 89500,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 196,
+    "name": "Cannabis",
+    "type": "Drug",
+    "country": "United Kingdom",
+    "shop": "Black Market",
+    "buy_price": 10828,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 1501,
+    "name": "Chert Point",
+    "type": "Artifact",
+    "country": "United Kingdom",
+    "shop": "Black Market",
+    "buy_price": 131215,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 197,
+    "name": "Ecstasy",
+    "type": "Drug",
+    "country": "United Kingdom",
+    "shop": "Black Market",
+    "buy_price": 43766,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 198,
+    "name": "Ketamine",
+    "type": "Drug",
+    "country": "United Kingdom",
+    "shop": "Black Market",
+    "buy_price": 54402,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 200,
+    "name": "Opium",
+    "type": "Drug",
+    "country": "United Kingdom",
+    "shop": "Black Market",
+    "buy_price": 24020,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
+  },
+  {
+    "id": 206,
+    "name": "Xanax",
+    "type": "Drug",
+    "country": "United Kingdom",
+    "shop": "Black Market",
+    "buy_price": 787008,
+    "source": "User screenshot",
+    "observed_on": "2026-11-14"
   }
 ]
