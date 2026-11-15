@@ -1,3 +1,4 @@
+import { readJsonObject } from "../_shared/request-body.ts";
 import {adminClient,authenticate,json,preflight,checked} from '../_shared/http.ts';
 import {resolveRefreshKey,refreshFailure} from '../_shared/live-refresh.ts';
 import {budgetedTornFetch} from '../_shared/torn-budget.ts';
@@ -8,7 +9,9 @@ Deno.serve(async(req)=>{
  const early=preflight(req);if(early)return early;
  const admin=adminClient(),user=await authenticate(req,admin);if(!user)return json({error:'Sign in to manage war targets.'},401);
  try{
-  const body=await req.json();if(!['load','save','refresh','alerts','preferences','claim','release','prealert','report','report_sync','claim_sync','rest','resume'].includes(body.action))return json({error:'Unknown war target action.'},400);
+  const requestBody = await readJsonObject(req, json);
+  if (requestBody instanceof Response) return requestBody;
+  const body=requestBody;if(!['load','save','refresh','alerts','preferences','claim','release','prealert','report','report_sync','claim_sync','rest','resume'].includes(body.action))return json({error:'Unknown war target action.'},400);
   const linked=checked(await admin.from('linked_torn_accounts').select('torn_id,torn_name').eq('user_id',user.id).is('revoked_at',null).maybeSingle()).data;
   if(!linked)return json({error:'Link your Torn identity first.'},409);
   const actorId=Number(linked.torn_id);

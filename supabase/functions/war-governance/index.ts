@@ -1,3 +1,4 @@
+import { readJsonObject } from "../_shared/request-body.ts";
 import {adminClient,authenticate,json,preflight,checked} from '../_shared/http.ts';
 import {resolveRefreshKey,refreshFailure} from '../_shared/live-refresh.ts';
 import {budgetedTornFetch} from '../_shared/torn-budget.ts';
@@ -7,7 +8,9 @@ Deno.serve(async req=>{
  const early=preflight(req);if(early)return early;
  const admin=adminClient(),user=await authenticate(req,admin);if(!user)return json({error:'Sign in to coordinate war targets.'},401);
  try{
-  const raw=await req.json(),body=Object.fromEntries(['action','war_key','target_id','attacks_goal','member_id','max_attacks','enabled','mode','override','reason','request_id','swap','swap_target_id','accept'].filter(k=>raw[k]!==undefined).map(k=>[k,raw[k]])),actions=['verify','poll','queue','leave_queue','propose','respond','handler','policy','rule'];
+  const requestBody = await readJsonObject(req, json);
+  if (requestBody instanceof Response) return requestBody;
+  const raw=requestBody,body=Object.fromEntries(['action','war_key','target_id','attacks_goal','member_id','max_attacks','enabled','mode','override','reason','request_id','swap','swap_target_id','accept'].filter(k=>raw[k]!==undefined).map(k=>[k,raw[k]])),actions=['verify','poll','queue','leave_queue','propose','respond','handler','policy','rule'];
   if(!actions.includes(body.action))return json({error:'Unknown coordination action.'},400);
   if(body.action==='respond'&&typeof body.accept!=='boolean')return json({error:'Choose accept or decline.'},400);
   if(body.action==='handler'&&typeof body.enabled!=='boolean')return json({error:'Choose appoint or remove.'},400);

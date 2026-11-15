@@ -1,3 +1,4 @@
+import { readJsonObject } from "../_shared/request-body.ts";
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
 Deno.serve(async (req) => {
   const early = preflight(req);
@@ -6,7 +7,9 @@ Deno.serve(async (req) => {
     const admin = adminClient();
     const user = await authenticate(req, admin);
     if (!user) return json({ error: "Unauthorized" }, 401);
-    const { war_id } = await req.json();
+    const requestBody = await readJsonObject(req, json);
+    if (requestBody instanceof Response) return requestBody;
+    const { war_id } = requestBody;
     const { data: war } = await admin
       .from("wars")
       .select("*")

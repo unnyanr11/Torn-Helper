@@ -1,3 +1,4 @@
+import { readJsonObject } from "../_shared/request-body.ts";
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
 import { encrypt } from "../_shared/crypto.ts";
 Deno.serve(async (req) => {
@@ -7,7 +8,9 @@ Deno.serve(async (req) => {
     const admin = adminClient();
     const user = await authenticate(req, admin);
     if (!user) return json({ error: "Unauthorized" }, 401);
-    const { provider, api_key } = await req.json();
+    const requestBody = await readJsonObject(req, json);
+    if (requestBody instanceof Response) return requestBody;
+    const { provider, api_key } = requestBody;
     if (
       !["openai", "gemini"].includes(provider) ||
       typeof api_key !== "string" ||

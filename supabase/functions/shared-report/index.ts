@@ -1,10 +1,13 @@
+import { readJsonObject } from "../_shared/request-body.ts";
 import { adminClient, preflight, json } from "../_shared/http.ts";
 import { shareIsActive, redactReport } from "../_shared/reports.ts";
 Deno.serve(async (req) => {
   const early = preflight(req);
   if (early) return early;
   try {
-    const { token } = await req.json();
+    const requestBody = await readJsonObject(req, json);
+    if (requestBody instanceof Response) return requestBody;
+    const { token } = requestBody;
     if (typeof token !== "string" || !/^[a-f0-9]{32}$/.test(token))
       return json({ error: "Report not found" }, 404);
     const admin = adminClient();
