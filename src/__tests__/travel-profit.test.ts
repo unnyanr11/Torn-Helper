@@ -207,3 +207,11 @@ describe('saved United Kingdom purchase reference',()=>{
   expect(new Set(FOREIGN_SHOP_PRICES.map(p=>`${p.country}:${p.shop}:${p.id}`)).size).toBe(FOREIGN_SHOP_PRICES.length);
  });
 });
+
+describe('owner-approved shop references',()=>{
+ it('uses approved corrections as fallbacks but preserves valid fetched prices',()=>{
+  const corrected=FOREIGN_SHOP_PRICES.map(p=>p.id===159&&p.country==='Mexico'?{...p,buy_price:35,source:'Owner-verified screenshot',observed_on:'2026-11-15'}:p);
+  expect(shopQuote(withSavedShopPrices([],corrected).find(i=>i.id===159),'Mexico')).toMatchObject({buy_price:35,source:'Owner-verified screenshot'});
+  expect(shopQuote(withSavedShopPrices([item(159,'Tool','Mexico',45)],corrected).find(i=>i.id===159),'Mexico')?.buy_price).toBe(45);
+ });
+});

@@ -1,3 +1,4 @@
+import AdminAccountCard from '../components/AdminAccountCard';
 import TornKeyHelp from '../components/TornKeyHelp';
 import { useQueryClient } from "@tanstack/react-query";
 import SecretInput from "../components/SecretInput";
@@ -148,6 +149,7 @@ export default function Settings({entry=false}:{entry?:boolean}={}) {
   return (
     <section>
       <h2>{entry?"Log in or create an account":"Account & privacy settings"}</h2>
+      {signedIn&&<AdminAccountCard/>}
       {message && (
         <p role="status" className="badge">
           {message}

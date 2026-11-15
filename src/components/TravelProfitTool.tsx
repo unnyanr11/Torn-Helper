@@ -1,4 +1,6 @@
 import { useTornKeyMode } from '../hooks/useTornKeyMode';
+import PriceUpdateRequests from './PriceUpdateRequests';
+import { useForeignShopPrices } from '../hooks/useForeignShopPrices';
 import SelectEntry from "./SelectEntry";
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -8,7 +10,7 @@ import { supabase } from '../lib/supabase';
 import { functionError } from '../lib/function-error';
 import { useTornChoices } from '../hooks/useTornChoices';
 import { createTravelClient, scanItemMarket, type MarketScan } from '../lib/travel-client';
-import { destinationItems, flightEstimate, METHODS, ROUTES, shopItems, shopQuote, travelProfit, tripCost, withSavedShopPrices, FOREIGN_SHOP_PRICES, type FlyMethod } from '../lib/travel-profit';
+import { destinationItems, flightEstimate, METHODS, ROUTES, shopItems, shopQuote, travelProfit, tripCost, withSavedShopPrices, type FlyMethod } from '../lib/travel-profit';
 import type { TornObservation } from '../lib/personal-data';
 import TornConnectionPanel from './TornConnectionPanel';
 const endpoint=(path:string)=>CAPABILITIES.find(c=>c.path===path)!.id;
@@ -16,7 +18,7 @@ const money=(n:number|null)=>n===null?'Unavailable':`$${n.toLocaleString(undefin
 type Quote={itemId:string;country:string;detail:TornObservation;market:MarketScan};
 type Saved={id:string;destination:string;item_name:string;profit_total:number;profit_per_hour:number;flight_minutes:number};
 export default function TravelProfitTool(){
- const cache=useTornChoices(),queryClient=useQueryClient();
+ const cache=useTornChoices(),queryClient=useQueryClient(),references=useForeignShopPrices();
  const previous=queryClient.getQueryData<{country:string;category:string;itemId:string;method:FlyMethod;quantity:number;paidLegs:number;fee:number;waiting:number;book:boolean;quote:Quote|null;costOverride:string;timeOverride:string;businessPrice:number|null;businessTime:string}>(['travel-workspace']);
  const [country,setCountry]=useState(previous?.country??'Mexico'),[category,setCategory]=useState(previous?.category??''),[itemId,setItemId]=useState(previous?.itemId??'');
  const [mode,setMode]=useTornKeyMode(),[key,setKey]=useState('');
@@ -39,8 +41,8 @@ export default function TravelProfitTool(){
  const items=useMemo(()=>{
   const byId=new Map<number,ReturnType<typeof shopItems>[number]>();
   for(const row of rows)if([endpoint('/torn/items'),endpoint('/torn/{ids}/items')].includes(row.endpoint_id))for(const item of shopItems(row.payload))if(!byId.has(item.id))byId.set(item.id,item);
-  return withSavedShopPrices([...byId.values()]);
- },[cache.data]);
+  return withSavedShopPrices([...byId.values()],references.prices);
+ },[cache.data,references.data]);
  const travelRow=rows.find(r=>r.endpoint_id===endpoint('/user/travel'));
  useEffect(()=>{const travel=(travelRow?.payload as any)?.travel;if(METHODS.includes(travel?.method))setMethod(travel.method);},[travelRow?.fetched_at]);
  const available=destinationItems(items,country),categories=[...new Set(available.map(i=>i.type))].sort();
@@ -48,7 +50,7 @@ export default function TravelProfitTool(){
  const current=quote?.itemId===itemId&&quote.country===country?quote:null;
  const detailItem=current?shopItems(current.detail.payload).find(i=>String(i.id)===itemId):undefined;
  const buy=shopQuote(detailItem,country)??shopQuote(chosen,country);
- const savedPrices=FOREIGN_SHOP_PRICES.filter(p=>p.country===country);
+ const savedPrices=references.prices.filter(p=>p.country===country);
  const flight=flightEstimate(country,method,travelRow?.payload,book);
  const businessId=items.find(i=>i.name.toLowerCase()==='business class ticket')?.id;
  const estimatedCost=tripCost(country,method,paidLegs,businessPrice);
@@ -114,8 +116,10 @@ export default function TravelProfitTool(){
   }catch(e){setSaveMessage(e instanceof Error?e.message:'Unable to save estimate.');}finally{setSaving(false);}
  }
  return <section className="travel-profit-tool"><h2>Travel profit calculator</h2><p>Choose a location, category and item. Market prices refresh automatically after you choose an item. Saved shop references are available without a Torn request.</p>
+  <PriceUpdateRequests key={`${country}:${itemId}`} country={country} itemId={Number(itemId)||undefined}/>
   <details className="card" open={!ready}><summary>Torn key and data refresh</summary><TornConnectionPanel mode={mode} onMode={setMode} keyValue={key} onKey={setKey} memory/>
   <button className="nu-btn" disabled={!ready||loading} onClick={()=>void loadData()}>{loading?'Loading items and travel…':'Load items and my travel'}</button></details>
+  {references.isError&&<p role="alert">Owner-verified price updates could not load. Showing the last available references; refresh to retry.</p>}
   {cache.error&&<p role="alert">Saved item choices could not be restored. Load items to try again.</p>}
   {error&&<p role="alert">{error}</p>}
   <article className="card"><div className="travel-fields"><label>Location<select className="nu-input" value={country} onChange={e=>{setCountry(e.target.value);setCategory('');setItemId('');setCostOverride('');setTimeOverride('');}}>{ROUTES.map(r=><option key={r.country}>{r.country}</option>)}</select></label>
@@ -125,7 +129,7 @@ export default function TravelProfitTool(){
   <label>Travel method<select className="nu-input" value={method} onChange={e=>{setMethod(e.target.value as FlyMethod);setCostOverride('');setTimeOverride('');}}>{METHODS.map(m=><option key={m}>{m}</option>)}</select></label>
   <label>Selling fee<select className="nu-input" value={fee} onChange={e=>setFee(Number(e.target.value))}>{[0,5,10,15].map(n=><option key={n} value={n}>{n}%{n===5?' · regular item market':n===0?' · fee-free assumption':''}</option>)}</select></label></div>
   {!items.length&&<p>Load item data above to populate categories and items.</p>}{!!items.length&&!available.length&&<p>No destination shop prices were returned for this location.</p>}
-  {!!savedPrices.length&&<details><summary>Saved {country} shop prices ({savedPrices.length})</summary><p>From your screenshots shared on {[...new Set(savedPrices.map(p=>p.observed_on))].join(', ')}. Reference purchase prices only; Black Market prices are recorded observations. Live stock is not saved. A valid fetched shop price takes precedence.</p><div className="table-scroll"><table><thead><tr><th>Shop</th><th>Item</th><th>Type</th><th>Purchase price</th></tr></thead><tbody>{savedPrices.map(p=><tr key={`${p.shop}-${p.id}`}><td>{p.shop}</td><td>{p.name}</td><td>{p.type}</td><td>{money(p.buy_price)}</td></tr>)}</tbody></table></div></details>}
+  {!!savedPrices.length&&<details><summary>Saved {country} shop prices ({savedPrices.length})</summary><p>Screenshot references observed on {[...new Set(savedPrices.map(p=>p.observed_on))].join(', ')}. Reference purchase prices only; Black Market prices are recorded observations. Live stock is not saved. A valid fetched shop price takes precedence.</p><div className="table-scroll"><table><thead><tr><th>Shop</th><th>Item</th><th>Type</th><th>Purchase price</th><th>Observed</th><th>Source</th></tr></thead><tbody>{savedPrices.map(p=><tr key={`${p.shop}-${p.id}`}><td>{p.shop}</td><td>{p.name}</td><td>{p.type}</td><td>{money(p.buy_price)}</td><td>{p.observed_on}</td><td>{p.source}</td></tr>)}</tbody></table></div></details>}
   <p>Quantity is your planned purchase, not a fetched carrying-capacity limit. Check your actual capacity and stock in game.</p>
   <button className="nu-btn" disabled={!itemId||!ready||busy} onClick={()=>setRevision(n=>n+1)}>{busy?'Fetching prices…':'Refresh item prices'}</button>
   <details><summary>Travel costs and timing</summary><p>{travelRow?`Travel observation: ${new Date(travelRow.fetched_at??0).toLocaleString()}. Method is filled from your returned travel record.`:'Load my travel to fill your last/current flight method.'} The travel API does not return your charged fare.</p><p>Airstrip/private cash fares are estimated at zero, excluding property/stock overhead. Standard fares use the official route reference. Business ticket budgets use a fetched ticket listing price when available; a free business perk can be represented with zero paid tickets.</p>

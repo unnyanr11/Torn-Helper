@@ -36,9 +36,10 @@ export function destinationItems(items:ShopItem[],country:string,category?:strin
 }
 /** Persisted screenshot reference, separate from market quotes and live stock. */
 export const FOREIGN_SHOP_PRICES = savedShopPrices;
-export function withSavedShopPrices(items:ShopItem[]):ShopItem[]{
+export type SavedShopPrice = typeof FOREIGN_SHOP_PRICES[number];
+export function withSavedShopPrices(items:ShopItem[], references:readonly SavedShopPrice[]=FOREIGN_SHOP_PRICES):ShopItem[]{
   const merged=new Map(items.map(item=>[item.id,{...item,value:{shops:[...item.value.shops]}}]));
-  for(const reference of FOREIGN_SHOP_PRICES){
+  for(const reference of references){
     const existing=merged.get(reference.id);
     // A valid fetched country price takes precedence, even when it rose above the reference.
     if(existing&&shopQuote(existing,reference.country))continue;

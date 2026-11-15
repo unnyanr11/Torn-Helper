@@ -1,0 +1,4 @@
+.price-updates form { display: grid; gap: .75rem; }
+.price-updates form > button { justify-self: start; }
+.price-review { border-top: 1px solid var(--border); margin-top: 1.5rem; padding-top: 1rem; }
+.price-evidence { display: block; width: 100%; max-width: 1000px; height: auto; margin: 1rem 0; }
