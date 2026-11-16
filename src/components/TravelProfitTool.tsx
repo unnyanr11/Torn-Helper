@@ -1,3 +1,5 @@
+import {useForeignStock} from '../hooks/useForeignStock';
+import {travelCapacity} from '../lib/travel-capacity';
 import DataFreshness from './DataFreshness';
 import RequestProblem from './RequestProblem';
 import { useTornKeyMode } from '../hooks/useTornKeyMode';
@@ -20,6 +22,7 @@ const money=(n:number|null)=>n===null?'Unavailable':`$${n.toLocaleString(undefin
 type Quote={itemId:string;country:string;detail:TornObservation;market:MarketScan};
 type Saved={id:string;destination:string;item_name:string;profit_total:number;profit_per_hour:number;flight_minutes:number};
 export default function TravelProfitTool(){
+ const stock=useForeignStock();
  const cache=useTornChoices(),queryClient=useQueryClient(),references=useForeignShopPrices();
  const previous=queryClient.getQueryData<{country:string;category:string;itemId:string;method:FlyMethod;quantity:number;paidLegs:number;fee:number;waiting:number;book:boolean;quote:Quote|null;costOverride:string;timeOverride:string;businessPrice:number|null;businessTime:string}>(['travel-workspace']);
  const [country,setCountry]=useState(previous?.country??'Mexico'),[category,setCategory]=useState(previous?.category??''),[itemId,setItemId]=useState(previous?.itemId??'');
@@ -28,7 +31,7 @@ export default function TravelProfitTool(){
  const [costOverride,setCostOverride]=useState(previous?.costOverride??''),[timeOverride,setTimeOverride]=useState(previous?.timeOverride??'');
  const [quote,setQuote]=useState<Quote|null>(previous?.quote??null),[busy,setBusy]=useState(false),[loading,setLoading]=useState(false),[revision,setRevision]=useState(0),[error,setError]=useState(''),[saveMessage,setSaveMessage]=useState(''),[saving,setSaving]=useState(false),[saved,setSaved]=useState<Saved[]>([]);
 
- const [capacity,setCapacity]=useState(100);
+ const [manualCapacity,setManualCapacity]=useState<number|null>(null),[tourism,setTourism]=useState(false);
  const [businessPrice,setBusinessPrice]=useState<number|null>(previous?.businessPrice??null),[businessTime,setBusinessTime]=useState(previous?.businessTime??'');
  useEffect(()=>{queryClient.setQueryData(['travel-workspace'],{country,category,itemId,method,quantity,paidLegs,fee,waiting,book,quote,costOverride,timeOverride,businessPrice,businessTime});},[country,category,itemId,method,quantity,paidLegs,fee,waiting,book,quote,costOverride,timeOverride,businessPrice,businessTime]);
  const businessController=useRef<AbortController|null>(null);
@@ -50,9 +53,16 @@ export default function TravelProfitTool(){
  useEffect(()=>{const travel=(travelRow?.payload as any)?.travel;if(METHODS.includes(travel?.method))setMethod(travel.method);},[travelRow?.fetched_at]);
  const available=destinationItems(items,country),categories=[...new Set(available.map(i=>i.type))].sort();
  const chosen=destinationItems(items,country,category).find(i=>String(i.id)===itemId);
+ const perksRow=rows.find(r=>r.endpoint_id===endpoint('/user/perks'));
+ const detectedCapacity=travelCapacity(perksRow?.payload,method,chosen?.type??category,tourism);
+ const capacity=manualCapacity??detectedCapacity?.capacity??(method==='Standard'?10:15);
+ useEffect(()=>{setQuantity(q=>Math.min(q,capacity));},[capacity]);
+ const report=(destination:string)=>stock.data?.rows.find(r=>r.country===destination&&String(r.id)===itemId);
+ const selectedStock=report(country);
+ const stockFresh=selectedStock&&Date.now()-Date.parse(selectedStock.observed_at)<300000;
  const current=quote?.itemId===itemId&&quote.country===country?quote:null;
  const detailItem=current?shopItems(current.detail.payload).find(i=>String(i.id)===itemId):undefined;
- const buy=shopQuote(detailItem,country)??shopQuote(chosen,country);
+ const buy=stockFresh?{buy_price:selectedStock.cost,shop:'Community stock report',source:stock.data!.source,observed_on:selectedStock.observed_at}:shopQuote(detailItem,country)??shopQuote(chosen,country);
  const savedPrices=references.prices.filter(p=>p.country===country);
  const flight=flightEstimate(country,method,travelRow?.payload,book);
  const businessId=items.find(i=>i.name.toLowerCase()==='business class ticket')?.id;
@@ -61,14 +71,15 @@ export default function TravelProfitTool(){
  const roundTrip=timeOverride.trim()!==''?Number(timeOverride):flight.minutes===null?null:flight.minutes*2;
  const sell=current&&current.market.cacheTimes.length<=1?current.market.price:null;
  const result=travelProfit({buy:buy?.buy_price??null,sell,quantity:Math.min(quantity,capacity),cost,roundTripMinutes:roundTrip,waitMinutes:waiting,feePercent:fee});
- const displayResult=!busy?result:null;
+ const insufficientStock=stockFresh&&selectedStock.quantity<quantity;
+ const displayResult=!busy&&!insufficientStock?result:null;
 
  async function loadSaved(){const r=await supabase.from('travel_profit_scenarios').select('id,destination,item_name,profit_total,profit_per_hour,flight_minutes').order('created_at',{ascending:false}).limit(25);if(r.error)throw r.error;setSaved(r.data??[]);}
  useEffect(()=>{let alive=true;void supabase.from('travel_profit_scenarios').select('id,destination,item_name,profit_total,profit_per_hour,flight_minutes').order('created_at',{ascending:false}).limit(25).then(r=>{if(alive){if(r.error)setSaveMessage(r.error.message);else setSaved(r.data??[]);}});return()=>{alive=false;pending.current?.abort();loadingController.current?.abort();businessController.current?.abort();};},[]);
  async function loadData(){
   loadingController.current?.abort();const control=new AbortController();loadingController.current=control;setLoading(true);setError('');
   const failures:string[]=[];
-  for(const path of ['/torn/items','/user/travel']){
+  for(const path of ['/torn/items','/user/travel','/user/perks']){
    try{
     const r=await fetchSection(path,path==='/torn/items'?{cat:'All'}:{},apiKey,control.signal);if(control.signal.aborted)return;
     if(path==='/user/travel'){
@@ -128,19 +139,32 @@ export default function TravelProfitTool(){
   <article className="card"><div className="travel-fields"><label>Location<select className="nu-input" value={country} onChange={e=>{setCountry(e.target.value);setCategory('');setItemId('');setCostOverride('');setTimeOverride('');}}>{ROUTES.map(r=><option key={r.country}>{r.country}</option>)}</select></label>
   <label>Item category<select className="nu-input" value={category} disabled={!categories.length} onChange={e=>{setCategory(e.target.value);setItemId('');}}><option value="">Choose a category…</option>{categories.map(c=><option key={c}>{c}</option>)}</select></label>
   <SelectEntry label="Item" searchable allowCustom={false} value={itemId} disabled={!category} onChange={e=>setItemId(e.target.value)} emptyText="Choose an item…" options={category?destinationItems(items,country,category).map(i=>({value:String(i.id),label:`${i.name} [${i.id}]`})):[]}/>
-  <label>Your carrying capacity<input className="nu-input" type="number" min="1" max="100" value={capacity} onChange={e=>{const n=Number(e.target.value);if(Number.isInteger(n)&&n>=1&&n<=100){setCapacity(n);setQuantity(q=>Math.min(q,n));}}}/></label><label>Quantity to bring<select className="nu-input" value={quantity} onChange={e=>setQuantity(Number(e.target.value))}>{Array.from({length:capacity},(_,i)=><option key={i+1}>{i+1}</option>)}</select></label>
+  <label>Your carrying capacity<input className="nu-input" type="number" min="1" max="100" value={capacity} onChange={e=>{const n=Number(e.target.value);if(Number.isInteger(n)&&n>=1&&n<=100){setManualCapacity(n);setQuantity(q=>Math.min(q,n));}}}/></label><label>Quantity to bring<select className="nu-input" value={quantity} onChange={e=>setQuantity(Number(e.target.value))}>{Array.from({length:capacity},(_,i)=><option key={i+1}>{i+1}</option>)}</select></label>
   <label>Travel method<select className="nu-input" value={method} onChange={e=>{setMethod(e.target.value as FlyMethod);setCostOverride('');setTimeOverride('');}}>{METHODS.map(m=><option key={m}>{m}</option>)}</select></label>
   <label>Selling fee<select className="nu-input" value={fee} onChange={e=>setFee(Number(e.target.value))}>{[0,5,10,15].map(n=><option key={n} value={n}>{n}%{n===5?' · regular item market':n===0?' · fee-free assumption':''}</option>)}</select></label></div>
   {!items.length&&<p>Load item data above to populate categories and items.</p>}{!!items.length&&!available.length&&<p>No destination shop prices were returned for this location.</p>}
   {!!savedPrices.length&&<details><summary>Saved {country} shop prices ({savedPrices.length})</summary><p>Screenshot references observed on {[...new Set(savedPrices.map(p=>p.observed_on))].join(', ')}. Reference purchase prices only; Black Market prices are recorded observations. Live stock is not saved. A valid fetched shop price takes precedence.</p><div className="table-scroll"><table><thead><tr><th>Shop</th><th>Item</th><th>Type</th><th>Purchase price</th><th>Observed</th><th>Source</th></tr></thead><tbody>{savedPrices.map(p=><tr key={`${p.shop}-${p.id}`}><td>{p.shop}</td><td>{p.name}</td><td>{p.type}</td><td>{money(p.buy_price)}</td><td>{p.observed_on}</td><td>{p.source}</td></tr>)}</tbody></table></div></details>}
-  <p>Enter your carrying capacity from Torn. Purchases are limited to that amount in this calculator. Shop stock is unverified; check availability before flying.</p>
+  <p>Capacity: {manualCapacity!==null?'your override':detectedCapacity?'calculated from saved Torn perks':'travel-method base estimate'}. Packed items also use slots; allow room for anything you take abroad.</p>
+  <button className="nu-btn" onClick={()=>setManualCapacity(null)}>Use calculated capacity</button>
+  <label><input type="checkbox" checked={tourism} onChange={e=>setTourism(e.target.checked)}/> Tourism Day is active for my account</label>
+  <p>Enable the event bonus only during your personal Tourism Day window. Category-specific flower and plushie bonuses apply to the selected item.</p>
+  {perksRow&&<DataFreshness at={perksRow.fetched_at} source="Torn perks · capacity estimate"/>}
+  <article className="card"><h3>Foreign stock reports</h3>
+   <button className="nu-btn" disabled={stock.isFetching} onClick={()=>void stock.refetch()}>Refresh foreign stock</button>
+   {stock.isPending&&<p role="status">Loading community stock reports…</p>}
+   {stock.isError&&<RequestProblem message="Foreign stock reports could not be refreshed." onRetry={()=>void stock.refetch()} busy={stock.isFetching}/>}
+   {stock.data?.warning&&<p role="status">{stock.data.warning}</p>}
+   {selectedStock?<><p>{selectedStock.quantity.toLocaleString()} reported in stock · {`$${selectedStock.cost.toLocaleString()}`} per item{!stockFresh?' · report is over five minutes old':''}</p><DataFreshness at={selectedStock.observed_at} source={stock.data!.source} busy={stock.isFetching}/></>:<p>No stock report for this selection.</p>}
+   <p>Community observations can change before you arrive. Missing stock is unknown.</p>{insufficientStock&&<p role="alert">The recent report has fewer items than your planned purchase. Reduce the quantity before calculating profit.</p>}
+   {stock.data?.source.includes('torn-tracker')?<p>Stock data from <a href="https://torn-tracker.com/guide/website/open-data/" target="_blank" rel="noopener noreferrer">Torn Tracker</a> · CC BY 4.0. Reports are filtered for this comparison.</p>:<p>Stock reports supplied by YATA.</p>}
+  </article>
   <button className="nu-btn" disabled={!itemId||!ready||busy} onClick={()=>setRevision(n=>n+1)}>{busy?'Fetching prices…':'Refresh item prices'}</button>
   <details><summary>Travel costs and timing</summary><p>{travelRow?`Travel observation: ${new Date(travelRow.fetched_at??0).toLocaleString()}. Method is filled from your returned travel record.`:'Load my travel to fill your last/current flight method.'} The travel API does not return your charged fare.</p><p>Airstrip/private cash fares are estimated at zero, excluding property/stock overhead. Standard fares use the official route reference. Business ticket budgets use a fetched ticket listing price when available; a free business perk can be represented with zero paid tickets.</p>
   {businessTime&&<p>Business-ticket market estimate observed {new Date(businessTime).toLocaleString()}: {money(businessPrice)} each. This values tickets consumed; it is not a charged airfare.</p>}
   <div className="travel-fields"><label>Paid legs / tickets budgeted<select className="nu-input" value={paidLegs} onChange={e=>setPaidLegs(Number(e.target.value))}>{[0,1,2].map(n=><option key={n}>{n}</option>)}</select></label><label>Shopping / waiting time<select className="nu-input" value={waiting} onChange={e=>setWaiting(Number(e.target.value))}>{[0,5,10,15,30,60,120].map(n=><option key={n} value={n}>{n} minutes</option>)}</select></label><label>Travel-time book assumption<select className="nu-input" value={book?'yes':'no'} onChange={e=>setBook(e.target.value==='yes')}><option value="no">No book reduction</option><option value="yes">25% reduction · estimated routes only</option></select></label><label>Total trip travel cost override ($)<SelectEntry label="Travel cost override ($)" kind="money" className="nu-input" type="number" min="0" step="1" options={estimatedCost===null?[]:[{value:String(estimatedCost),label:`Estimated: ${estimatedCost.toLocaleString()}`}]} value={costOverride} onChange={e=>setCostOverride(e.target.value)} emptyText="Use calculated cost"/></label><label>Round-trip flight time override (minutes)<SelectEntry label="Round-trip time override (minutes)" kind="minutes" className="nu-input" type="number" min="0.01" step="any" options={flight.minutes===null?[]:[{value:String(flight.minutes*2),label:`Calculated: ${flight.minutes*2} minutes`}]} value={timeOverride} onChange={e=>setTimeOverride(e.target.value)} emptyText="Use calculated duration"/></label></div></details>
   </article>
   {itemId&&<article className="card"><h3>{chosen?.name??'Selected item'} · {country}</h3><p>Trip estimate · {method} · {quantity} items · {fee}% selling fee</p><dl className="data-metrics"><div><dt>Foreign shop price per item</dt><dd>{money(buy?.buy_price??null)}</dd></div><div><dt>{current?.market.complete?'Lowest scanned item-market price':'Lowest observed item-market price'}</dt><dd>{money(sell)}</dd></div><div><dt>Total travel cost · {costOverride!==''?'your override':'estimate'}</dt><dd>{money(cost)}</dd></div><div><dt>Round-trip flight time</dt><dd>{roundTrip===null?'Unknown':`${roundTrip.toLocaleString(undefined,{maximumFractionDigits:2})} minutes`}</dd></div><div><dt>Selling fees · total</dt><dd>{money(displayResult?.fee??null)}</dd></div><div><dt>Shopping / waiting</dt><dd>{waiting} minutes</dd></div><div><dt>Total time used for profit / hour</dt><dd>{displayResult?`${displayResult.totalMinutes.toLocaleString()} minutes`:'Unavailable'}</dd></div></dl>
-  {buy?.source&&<p>Shop purchase price source: {buy.source}, shared {buy.observed_on}. This saved reference is not a live price or stock check.</p>}
+  {buy?.source&&<p>Shop purchase price source: {buy.source}, shared {buy.observed_on}. Compare the source time with the latest stock report before flying.</p>}
   {current&&<p>Shop: {buy?.shop??'Not returned'}. Item catalogue collected {new Date(current.detail.fetched_at).toLocaleString()}. Market observed {new Date(current.market.fetched_at).toLocaleString()}. Checked {current.market.count} listings across {current.market.pages} pages; {current.market.complete?'all returned pages scanned':'more pages remain'}. Market cache times: {current.market.cacheTimes.map(t=>new Date(t*1000).toLocaleString()).join(', ')||'not provided'}.</p>}
   {current?.market.cacheTimes.length!==undefined&&current.market.cacheTimes.length>1&&<p role="alert">Market cache changed during scanning. Refresh prices before using this estimate.</p>}
   {current&&!current.market.complete&&<button className="nu-btn" disabled={busy||!ready} onClick={()=>void scanMore()}>Scan more market pages</button>}
@@ -149,13 +173,15 @@ export default function TravelProfitTool(){
   </article>}
   {chosen&&<article className="card"><h3>Compare destinations for {chosen.name}</h3>
    <p>Uses your {quantity}-item purchase, {method} travel, {fee}% selling fee and {waiting} minutes waiting. Each route uses its estimated cost and round-trip time. Overrides apply only to the selected trip above.</p>
-   <div className="table-scroll"><table><caption>Destination estimates using the same observed resale price. Foreign stock is unverified.</caption><thead><tr><th>Country</th><th>Buy price</th><th>Price observed / source</th><th>Stock</th><th>Round trip</th><th>Trip profit</th><th>Profit / minute</th><th>Choose</th></tr></thead><tbody>
+   <div className="table-scroll"><table><caption>Destination estimates using the same observed resale price. Foreign stock comes from timestamped community reports.</caption><thead><tr><th>Country</th><th>Buy price</th><th>Price observed / source</th><th>Stock</th><th>Round trip</th><th>Trip profit</th><th>Profit / minute</th><th>Choose</th></tr></thead><tbody>
     {ROUTES.map(route=>{
-     const purchase=shopQuote(chosen,route.country);
+     const observed=report(route.country);
+     const recent=observed&&Date.now()-Date.parse(observed.observed_at)<300000;
+     const purchase=recent?{buy_price:observed.cost,observed_on:observed.observed_at,source:stock.data!.source}:shopQuote(chosen,route.country);
      if(!purchase)return null;
      const duration=flightEstimate(route.country,method,travelRow?.payload,book).minutes;
-     const estimate=travelProfit({buy:purchase.buy_price,sell,quantity,cost:tripCost(route.country,method,paidLegs,businessPrice),roundTripMinutes:duration===null?null:duration*2,waitMinutes:waiting,feePercent:fee});
-     return <tr key={route.country}><th scope="row">{route.country}</th><td>{money(purchase.buy_price)}</td><td>{purchase.observed_on??(current?new Date(current.detail.fetched_at).toLocaleString():'Collection time unavailable')} · {purchase.source??'Torn item catalogue'}</td><td>Unverified</td><td>{duration===null?'Unknown':duration*2+' min'}</td><td>{money(estimate?.profit??null)}</td><td>{money(estimate?estimate.perHour/60:null)}</td><td><button className="nu-btn" onClick={()=>{setCountry(route.country);setCategory('');setCostOverride('');setTimeOverride('');}}>Plan {route.country}</button></td></tr>;
+     const estimate=recent&&observed.quantity<quantity?null:travelProfit({buy:purchase.buy_price,sell,quantity,cost:tripCost(route.country,method,paidLegs,businessPrice),roundTripMinutes:duration===null?null:duration*2,waitMinutes:waiting,feePercent:fee});
+     return <tr key={route.country}><th scope="row">{route.country}</th><td>{money(purchase.buy_price)}</td><td>{purchase.observed_on??(current?new Date(current.detail.fetched_at).toLocaleString():'Collection time unavailable')} · {purchase.source??'Torn item catalogue'}</td><td>{observed?<>{observed.quantity.toLocaleString()} · {recent?'recent report':'older report'}<br/>{new Date(observed.observed_at).toLocaleString()}</>:'Unknown'}</td><td>{duration===null?'Unknown':duration*2+' min'}</td><td>{money(estimate?.profit??null)}</td><td>{money(estimate?estimate.perHour/60:null)}</td><td><button className="nu-btn" onClick={()=>{setCountry(route.country);setCategory('');setCostOverride('');setTimeOverride('');}}>Plan {route.country}</button></td></tr>;
     })}
    </tbody></table></div>
    {!sell&&<p>Refresh item prices to calculate profit across destinations.</p>}
