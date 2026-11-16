@@ -102,3 +102,124 @@
 .player-actions > summary { cursor:pointer; font-weight:600; }
 .player-intel .data-metrics dd { overflow-wrap:anywhere; }
 @media(max-width:800px) { .player-picker { grid-template-columns:1fr; }.appearance-options { width:200px; }.connection-panel { padding:12px; } }
+
+/* Keep workspace content within its available column at every display size. */
+.workspace-stage,
+.workspace-stage :where(.card, fieldset, .grid > *, .personal-summary > *, .home-grid > *) {
+  min-width: 0;
+}
+.workspace-stage :where(h2, h3, p, a, label, summary),
+.auth-content :where(p, label) {
+  overflow-wrap: anywhere;
+}
+.workspace-stage :where(input, select, textarea) {
+  max-width: 100%;
+}
+.workspace-stage :where(img, video, canvas, svg) {
+  max-width: 100%;
+}
+.simple-layout .sidebar {
+  height: 100dvh;
+}
+.simple-layout .nav-scroll {
+  min-height: 0;
+  overscroll-behavior: contain;
+}
+.simple-layout .home-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
+}
+.war-readiness-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
+}
+@media (max-width: 1024px) {
+  .simple-layout.cosmic-layout {
+    display: block;
+  }
+  .simple-layout.cosmic-layout .content {
+    padding: 76px max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  }
+  .simple-layout.cosmic-layout .menu-btn {
+    display: block;
+    position: fixed;
+    top: max(12px, env(safe-area-inset-top));
+    left: max(16px, env(safe-area-inset-left));
+    z-index: 60;
+  }
+  .simple-layout.cosmic-layout .sidebar {
+    position: fixed;
+    inset: 60px auto 0 0;
+    width: min(300px, calc(100vw - 48px));
+    height: calc(100dvh - 60px);
+    max-height: none;
+    min-height: 0;
+    z-index: 50;
+    transform: translateX(-100%);
+    visibility: hidden;
+    background: var(--surface-solid);
+  }
+  .simple-layout.cosmic-layout .sidebar.open {
+    visibility: visible;
+    transform: none;
+  }
+  .navigation-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    background: #02081780;
+    border: 0;
+  }
+  .simple-layout.cosmic-layout .topbar {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .simple-layout.cosmic-layout .topbar > div:first-child {
+    flex: 1 1 180px;
+    min-width: 0;
+  }
+}
+@media (max-width: 600px) {
+  .simple-layout.cosmic-layout .card,
+  .auth-content .card {
+    padding: 16px;
+  }
+  .simple-layout .personal-summary,
+  .home-cooldowns {
+    grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr));
+  }
+  .workspace-stage :where(form, .personal-section > header, .personal-heading) {
+    flex-wrap: wrap;
+  }
+  .workspace-stage :where(input, select, textarea),
+  .auth-content :where(input, select, textarea) {
+    font-size: 16px;
+  }
+  .simple-layout .nu-btn,
+  .auth-content .nu-btn,
+  .favourite-tool,
+  .tool-category > summary {
+    min-height: 44px;
+  }
+  .simple-layout .nu-input,
+  .auth-content .nu-input {
+    min-height: 44px;
+  }
+  .simple-layout .topbar h1 {
+    font-size: clamp(20px, 6vw, 24px);
+  }
+  .appearance-options {
+    max-width: calc(100vw - 32px);
+  }
+  .war-test-popup {
+    right: 16px;
+    max-width: calc(100vw - 32px);
+  }
+  .workspace-stage table {
+    overscroll-behavior-x: contain;
+  }
+}
+@media (pointer: coarse) {
+  .simple-layout .nav-item {
+    min-height: 44px;
+  }
+}
