@@ -90,10 +90,11 @@ scheduler token. It waits 12 seconds for publication, then reads Tornsy's public
 watchlist once for all 35 known tickers. No user's key, identity, or holdings are
 sent to Tornsy. Source: <https://tornsy.com/api> (checked 2026-11-16). Tornsy is an
 independent provider collecting Torn prices, not a direct Torn API response.
-The market index is excluded. A second bounded request loads up to 2,000 real
-historical minutes for one stock per run. Warmup takes roughly 35 successful
-runs; afterwards one stock is reconciled per run to recover provider-recorded
-gaps. This stays at two upstream requests per scheduled minute, not 35.
+The market index is excluded. During weekly warmup, up to six bounded history requests load seven days for
+one stock per run, with at most three in flight and 2,000 rows per request.
+Warmup takes roughly 35 successful scheduled runs. Afterwards one recent
+history page is reconciled per run. Including the watchlist, this is at most
+seven upstream requests during warmup and two normally; no player key is used.
 
 Each point retains its source timestamp, price, share count when supplied,
 source and collection time. Duplicates never overwrite the first observation.
@@ -107,18 +108,22 @@ inserts, updates and deletes are denied. Only service-authorized collector RPCs
 can record observations. The archive is pruned to a rolling 30 days. At 35 stocks
 this is about 50,400 rows per complete day. No Google account or public spreadsheet
 is created. The website exposes the latest 120 table rows for the selected stock
-and a CSV export of its latest 2,000 loaded observations, compatible with Excel
+and a CSV export of up to 10,080 observations from the last seven days, compatible with Excel
 and Google Sheets. The full rolling archive is accessible to the database owner.
 CSV exports should be saved separately for longer retention.
 
 ### Minute model validation
 
-The model uses the latest consecutive segment of up to 2,000 recorded minute
-observations. At least 240 observations are required for one-minute forecasts;
-longer horizons require additional history. Features include 1–60 minute returns,
+The model uses all recorded observations in the rolling last seven days, up to
+10,080 minute prices. At least 240 observations are required for one-minute
+forecasts; longer horizons require additional history. Complete training windows
+on either side of gaps are retained; only windows spanning a gap are excluded.
+The latest 61 minutes must be consecutive for current indicators. Features include 1–60 minute returns,
 volatility and deviation from 5/20/60-price averages. Candidates are a fixed ridge
 regression, recent momentum, mean reversion, and no change. Ridge keeps the fixed
-L2 penalty; training windows are bounded to 360 samples.
+L2 penalty; training expands across all valid weekly samples without a six-hour cap.
+Stable centered sufficient statistics avoid rescanning the whole week for every
+validation fit, preserving the 10-second worker deadline.
 
 Selection uses an earlier tuning window of up to 40 origins. Its winner is frozen
 before a later, separate walk-forward holdout of up to 80 origins. For horizons
@@ -162,11 +167,10 @@ is separate. The UI displays measured model runtime. A bounded 12-result cache
 reuses unchanged stock/horizon/history inputs only while their forecast remains
 fresh. Every input price/timestamp participates in the cache key.
 
-A reproducible local benchmark on 2,000 real TCI observations (12 runs for each
-of four horizons) measured median processing times of 12.6–25.4 ms and a slowest
-run of 60.5 ms in the development environment. These are computation measurements,
-not mobile-device or network latency guarantees. This lightweight model does not
-require Hugging Face, GPUs, or separately hosted per-stock instances. Its input
-window is up to 2,000 minutes (about 33h20m), with 1–60-minute features and the
-latest 360 training samples used by ridge. The 30-day archive is not all fitted
-at once. No universally optimal history duration has been established.
+The active input window is seven days (up to 10,080 minute observations), not
+the full 30-day archive. Ridge fitting uses all valid weekly samples. Features
+still describe 1–60 minute movements. The interface displays observation count,
+weekly coverage, actual first/last timestamps, valid training sample count and
+processing time. Partial provider history is disclosed rather than padded.
+This lightweight model needs no Hugging Face, GPU or per-stock hosting. A longer
+window is a user-selected policy, not a proven accuracy improvement.

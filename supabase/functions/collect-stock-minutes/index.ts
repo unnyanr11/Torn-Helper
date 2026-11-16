@@ -1,5 +1,5 @@
 import {adminClient,json,preflight,scheduled} from '../_shared/http.ts';
-import {boundedStockJson,watchlistMinutes,historyMinutes} from '../_shared/stock-minute-feed.ts';
+import {boundedStockJson,watchlistMinutes,historyMinutes,type MinutePoint} from '../_shared/stock-minute-feed.ts';
 import {STOCKS} from '../../../src/data/stocks.ts';
 Deno.serve(async req=>{
  const early=preflight(req);if(early)return early;
@@ -8,7 +8,7 @@ Deno.serve(async req=>{
  const claim=await admin.rpc('claim_stock_collection');
  if(claim.error)return json({error:'Collector state unavailable'},503);
  if(!claim.data)return json({skipped:true});
- const {lease,backfill_id}=claim.data;
+ const {lease,backfill_id,full_week}=claim.data;
  try{
   // Provider publishes about 5–10 seconds after the minute. One lease bounds all upstream calls.
   await new Promise(resolve=>setTimeout(resolve,12000));
@@ -16,9 +16,22 @@ Deno.serve(async req=>{
   let points=snapshot.points,backfilled=false;
   const stock=STOCKS.find(s=>s.id===backfill_id);
   if(stock){
-   try{const history=historyMinutes(await boundedStockJson(`https://tornsy.com/api/${stock.acronym}?interval=m1&limit=2000`),stock.id,snapshot.timestamp);
-    if(history.length){points=[...snapshot.points,...history.filter(p=>p.timestamp!==snapshot.timestamp)];backfilled=true;}
-   }catch{/* Keep the current 35 quotes; retry this stock's warmup next scheduled minute. */}
+   try{
+    const pages=full_week?6:1,history:MinutePoint[]=[];
+    let complete=true;
+    // At most three requests in flight; each page stays within the provider's 2,000-row cap.
+    for(let page=0;page<pages;page+=3){
+     const batch=await Promise.allSettled(Array.from({length:Math.min(3,pages-page)},async(_,offset)=>{
+      const index=page+offset,to=snapshot.timestamp-index*2000*60+60;
+      const from=Math.max(snapshot.timestamp-7*86400+60,to-2000*60);
+      const url=`https://tornsy.com/api/${stock.acronym}?interval=m1&limit=2000&from=${from}&to=${to}`;
+      return historyMinutes(await boundedStockJson(url),stock.id,snapshot.timestamp);
+     }));
+     for(const result of batch){if(result.status==='fulfilled')history.push(...result.value);else complete=false;}
+    }
+    points=[...snapshot.points,...history.filter(p=>p.timestamp!==snapshot.timestamp)];
+    backfilled=complete&&history.length>0;
+   }catch{/* Keep current quotes; retry this stock's weekly warmup next scheduled minute. */}
   }
   const result=await admin.rpc('finish_stock_collection',{p_lease:lease,p_provider_at:new Date(snapshot.timestamp*1000).toISOString(),p_points:points,p_backfilled:backfilled});
   if(result.error)throw new Error('Storage validation failed');

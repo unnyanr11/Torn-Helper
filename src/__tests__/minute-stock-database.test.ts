@@ -8,6 +8,7 @@ const points=(time:number)=>Array.from({length:35},(_,i)=>({stock_id:i+1,timesta
 beforeAll(async()=>{
  await db.exec(`create role anon;create role authenticated;create role service_role bypassrls;create schema private;grant usage on schema private to service_role;create schema auth;create function auth.uid() returns uuid language sql as $$select null::uuid$$;create schema cron;create function cron.schedule(text,text,text) returns integer language sql as $$select 1$$;`);
  await db.exec(readFileSync('supabase/migrations/20261116124032_stock_minute_history.sql','utf8'));
+ await db.exec(readFileSync('supabase/migrations/20261116131117_stock_week_window.sql','utf8'));
  const now=(await db.query<any>("select extract(epoch from date_trunc('minute',now()))::integer ts")).rows[0].ts;ts=now;
 },30000);
 afterAll(()=>db.close());
@@ -44,4 +45,11 @@ it('retains previous data on provider failure and never fabricates a missing min
  expect((await db.query<any>('select count(*)::integer n from public.stock_minute_prices')).rows[0].n).toBe(36);
  expect((await db.query<any>("select count(*)::integer n from public.stock_minute_prices where observed_at=to_timestamp($1)",[ts-60])).rows[0].n).toBe(0);
  expect((await db.query<any>('select message from public.stock_collection_status')).rows[0].message).toContain('previous observations retained');
+});
+it('reads more than 2,000 weekly minutes and excludes older archive prices',async()=>{
+ await db.query('insert into public.stock_minute_prices(stock_id,observed_at,price) select 1,to_timestamp($1-i*60),100 from generate_series(0,2099) i on conflict do nothing',[ts]);
+ await db.query('insert into public.stock_minute_prices(stock_id,observed_at,price) values(1,to_timestamp($1-8*86400),100)',[ts]);
+ const result=await role('authenticated',()=>db.query<any>('select public.read_stock_minute_history(1) points'));
+ expect(result.rows[0].points).toHaveLength(2100);
+ expect(result.rows[0].points.every((p:any)=>p.timestamp>ts-7*86400)).toBe(true);
 });
