@@ -206,3 +206,7 @@ The review corrects travel baggage, distinguishes crime experience/skill/progres
 Search includes the new text; updated-section links share the existing guide hash route. Every research section exposes its references and their check dates, with a complete source index available on the page. Automated coverage checks compare review slugs against every original heading, validate citation keys and source URLs, and check rendering/navigation for all ten guides. The updates require no extra API calls or database changes.
 
 The updated Player Guides use a casual, lightly humorous voice: all 300 practical tips and ten introductions/checklists have been rewritten for readability. Humour targets game situations rather than beginners. Mechanic notes, numbers, source URLs/dates, availability warnings, corrections and calculation tables retain their researched meaning; the original upstream archive remains unchanged.
+
+### Minute stock history and forecasting
+
+Stocks includes an automatic shared collector for all 35 stocks, backed by Tornsy's public minute feed, a 30-day online archive and CSV export. The separate minute model tests 1/5/15/60-minute horizons with earlier tuning and a purged chronological holdout. Collection continues when the website is closed; the selected forecast retrains in a background worker as fresh data arrives while the page is open. Missing/stale data or models that fail to beat the baseline produce Wait. See [stock model and collection details](docs/stock-forecast.md). No forecast accuracy or profit is guaranteed.

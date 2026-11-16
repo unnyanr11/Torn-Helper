@@ -76,3 +76,76 @@ Tests cover schema extraction, chronology and future-price exclusion, walk-forwa
 leakage, cost gates, stale forecasts, weak/flat series, bounded collection,
 cache reuse, failure/cancellation and explicit frontend actions. Synthetic prices
 exist only in tests; no synthetic training history is shown in the product.
+
+## Shared minute lab (v2)
+
+The Stocks page now has a separate **Minute-by-minute stock lab**, above the
+existing official-chart lab. It offers 1, 5, 15 and 60 minute forecast horizons.
+It does not claim that increasing sample frequency guarantees higher accuracy.
+
+### Collection and spreadsheet access
+
+`collect-stock-minutes` is scheduled every minute using the existing private
+scheduler token. It waits 12 seconds for publication, then reads Tornsy's public
+watchlist once for all 35 known tickers. No user's key, identity, or holdings are
+sent to Tornsy. Source: <https://tornsy.com/api> (checked 2026-11-16). Tornsy is an
+independent provider collecting Torn prices, not a direct Torn API response.
+The market index is excluded. A second bounded request loads up to 2,000 real
+historical minutes for one stock per run. Warmup takes roughly 35 successful
+runs; afterwards one stock is reconciled per run to recover provider-recorded
+gaps. This stays at two upstream requests per scheduled minute, not 35.
+
+Each point retains its source timestamp, price, share count when supplied,
+source and collection time. Duplicates never overwrite the first observation.
+Stale/incomplete batches, unknown stocks, invalid prices and future timestamps
+are rejected. Missing minutes are not interpolated or copied from another time.
+A failed run retains previous data and exposes its status. A lease prevents
+concurrent or repeat collection in the same scheduled minute.
+
+`stock_minute_prices` is an online table readable by signed-in users; client
+inserts, updates and deletes are denied. Only service-authorized collector RPCs
+can record observations. The archive is pruned to a rolling 30 days. At 35 stocks
+this is about 50,400 rows per complete day. No Google account or public spreadsheet
+is created. The website exposes the latest 120 table rows for the selected stock
+and a CSV export of its latest 2,000 loaded observations, compatible with Excel
+and Google Sheets. The full rolling archive is accessible to the database owner.
+CSV exports should be saved separately for longer retention.
+
+### Minute model validation
+
+The model uses the latest consecutive segment of up to 2,000 recorded minute
+observations. At least 240 observations are required for one-minute forecasts;
+longer horizons require additional history. Features include 1–60 minute returns,
+volatility and deviation from 5/20/60-price averages. Candidates are a fixed ridge
+regression, recent momentum, mean reversion, and no change. Ridge keeps the fixed
+L2 penalty; training windows are bounded to 360 samples.
+
+Selection uses an earlier tuning window of up to 40 origins. Its winner is frozen
+before a later, separate walk-forward holdout of up to 80 origins. For horizons
+longer than one minute, overlapping future labels are purged from both training
+and the end of the tuning window. Each holdout prediction sees only labels that
+would already have been known at its origin. Models are not selected using the
+reported holdout errors. Final fitting then uses all observed labels to predict
+the chosen future interval.
+
+A signal still requires at least 40 holdout predictions, 5% lower return MAE than
+no change, 55% directional accuracy, and a move exceeding both the empirical
+error margin and the configured 0.1% selling fee. Flat-series ties are not counted
+as direction successes. Nonfinite/extreme forecasts, stale data or missing
+history yield Wait. These gates do not establish statistically significant
+profitability. Overlapping horizons and repeated stock/model comparisons are
+correlated; do not treat each result as an independent discovery.
+
+The error interval is empirical. Its displayed historical coverage is scored
+sequentially using only residuals available at that origin, with the first 20
+available errors used for calibration. It is not a promised 90% future coverage.
+The interface also retains up to 240 genuinely forward predictions per
+stock/horizon during the current open page session. Once exact target-minute
+prices arrive, their direction/error are scored separately from historical
+tests. That prospective score resets on reload and does not modify shared data.
+
+The page checks shared collection status every 20 seconds while mounted and
+loads history when its source minute changes. New history retrains the selected
+stock/horizon in a dedicated Web Worker. Navigation terminates the worker.
+No new Torn calls are made by these refreshes. Forecasts are not computed while
+the page is closed, but collection continues. No trades are placed automatically.

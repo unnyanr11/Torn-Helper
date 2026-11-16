@@ -1,3 +1,4 @@
+import MinuteStockLab from '../components/MinuteStockLab';
 import StockForecast from "../components/StockForecast";
 import DataEntry from "../components/DataEntry";
 import SelectEntry from "../components/SelectEntry";
@@ -74,6 +75,7 @@ export default function Stocks() {
         your stocks; the data browser also provides stock reference and benefit
         data.
       </p>
+      <MinuteStockLab/>
       <StockForecast/>
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">

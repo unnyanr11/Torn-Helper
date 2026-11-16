@@ -33,7 +33,7 @@ function features(prices:number[],i:number):number[]{
  return [returns[11],mean(returns.slice(-3)),average,volatility,prices[i]/mean(prices.slice(i-11,i+1))-1];
 }
 /** Standardization is fitted only on this training window; intercept is not penalized. */
-function fitPredict(train:Sample[],input:number[]):number{
+export function fitPredict(train:Sample[],input:number[]):number{
  const dimensions=input.length,means=input.map((_,j)=>mean(train.map(r=>r.x[j])));
  const scales=means.map((m,j)=>Math.sqrt(mean(train.map(r=>(r.x[j]-m)**2)))||1);
  const transform=(x:number[])=>[1,...x.map((v,j)=>(v-means[j])/scales[j])];

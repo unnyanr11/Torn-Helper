@@ -116,7 +116,7 @@ beforeAll(async () => {
   const candidate = await db.query(
     "select table_name as table,column_name as column,data_type as type from information_schema.columns where table_schema='public'",
   );
-  writeFileSync(
+  if (process.env.UPDATE_SCHEMA_SNAPSHOT === "1") writeFileSync(
     "scripts/candidate-schema.json",
     JSON.stringify({ columns: candidate.rows }),
   );
