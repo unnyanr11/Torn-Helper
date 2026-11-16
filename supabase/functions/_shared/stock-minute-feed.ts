@@ -1,5 +1,5 @@
 import {STOCKS} from '../../../src/data/stocks.ts';
-export type MinutePoint={stock_id:number;timestamp:number;price:number;total_shares:number|null};
+export type MinutePoint={stock_id:number;timestamp:number;price:number;total_shares:number|null;source?:'Tornsy'|'Torn API'};
 const obj=(v:unknown):Record<string,any>=>v!==null&&typeof v==='object'&&!Array.isArray(v)?v as Record<string,any>:{};
 function price(value:unknown){
  if(!(typeof value==='number'||typeof value==='string'&&/^\d+(\.\d{1,6})?$/.test(value)))throw new Error('Invalid price');
@@ -31,4 +31,12 @@ export async function boundedStockJson(url:string,fetcher:typeof fetch=fetch):Pr
  try{for(;;){const {value,done}=await reader.read();if(done)break;size+=value.byteLength;if(size>512*1024){await reader.cancel();throw new Error('Stock response too large');}chunks.push(value);}}finally{reader.releaseLock();}
  const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
  return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));
+}
+/** Official API exposes current quotes without exchange timestamps. Record the
+ * minute we observe them; never claim that this is an exchange update time. */
+export function officialStockMinutes(payload:unknown,now:number):{timestamp:number;points:MinutePoint[]}{
+ const rows=obj(payload).stocks;if(!Array.isArray(rows))throw new Error('Invalid official stock feed');
+ const timestamp=Math.floor(now/60)*60,known=new Set<number>(STOCKS.map(s=>s.id)),seen=new Set<number>(),points:MinutePoint[]=[];
+ for(const entry of rows){const row=obj(entry),market=obj(row.market);if(!known.has(row.id))continue;if(seen.has(row.id))throw new Error('Duplicate official stock');seen.add(row.id);points.push({stock_id:row.id,timestamp,price:price(market.price),total_shares:shares(market.shares),source:'Torn API'});}
+ if(points.length!==35)throw new Error('Incomplete official stock feed');return {timestamp,points};
 }

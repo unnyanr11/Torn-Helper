@@ -1,9 +1,17 @@
+import {useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {supabase} from '../lib/supabase';
 import {useCurrentObservations} from '../hooks/useSavedObservations';
 export default function AdminAccountCard(){
  const {owner}=useCurrentObservations();
  const profile=useQuery({queryKey:['admin-account',owner],enabled:!!owner,retry:false,queryFn:async()=>{const r=await supabase.from('profiles').select('role').eq('id',owner!).maybeSingle();if(r.error)throw r.error;return r.data;}});
+ const [consent,setConsent]=useState(false),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
+ const collector=useQuery({queryKey:['admin-stock-collector',owner],enabled:!!owner&&profile.data?.role==='admin',retry:false,queryFn:async()=>{const r=await supabase.rpc('my_stock_collector');if(r.error)throw r.error;return r.data as {enabled:boolean;is_owner:boolean};}});
+ async function configure(enabled:boolean){setBusy(true);setMessage('');try{const r=await supabase.rpc('configure_stock_collector',{p_enabled:enabled});if(r.error)throw r.error;await collector.refetch();setConsent(false);setMessage(enabled?'Your saved key will supply current stock quotes on the next scheduled collection.':'Your key is no longer used for shared stock collection. Public collection continues.');}catch(e){setMessage(e&&typeof e==='object'&&'message' in e?String(e.message):'Unable to update collector settings.');}finally{setBusy(false);}}
  if(profile.data?.role!=='admin')return null;
- return <article className="card"><h3>Administrator account</h3><p>You have website administrator access. Your Torn identity and game data can be linked separately below.</p><p><a href="#Travel">Review price update requests</a> in Travel → Request a price update / review submissions. Price approval requires the database-managed reviewer permission.</p><p><a href="#Admin%20Cost%20Dashboard">Open administrator cost dashboard</a></p></article>;
+ return <article className="card"><h3>Administrator account</h3><p>You have website administrator access. Your Torn identity and game data can be linked separately below.</p><p><a href="#Travel">Review price update requests</a> in Travel → Request a price update / review submissions. Price approval requires the database-managed reviewer permission.</p><fieldset><legend>Admin key for shared stock prices</legend><p>Link and save your Full Access Torn key using the form below first. Enabling this uses your encrypted server copy for one public stock-price request per minute, covering all 35 stocks. It counts toward your Torn request allowance alongside other tools. The key is sent only to Torn; only stock quotes are shared. Tornsy remains the historical-data source and fallback.</p>
+  {collector.isError&&<p role="alert">Unable to check collector settings. Refresh this page.</p>}
+  {collector.data?.enabled&&collector.data.is_owner?<><p>Your saved key is enabled for shared stock collection.</p><button type="button" className="nu-btn" disabled={busy} onClick={()=>void configure(false)}>Disable my collector key</button></>:<>{collector.data?.enabled&&<p>Another administrator currently supplies the key. Enabling yours will replace that choice.</p>}<label><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)}/>I authorize my saved key to collect public stock prices for website users.</label><button type="button" className="nu-btn" disabled={!consent||busy||!collector.isSuccess} onClick={()=>void configure(true)}>Enable my saved admin key</button></>}
+  {message&&<p role="status">{message}</p>}
+ </fieldset><p><a href="#Admin%20Cost%20Dashboard">Open administrator cost dashboard</a></p></article>;
 }

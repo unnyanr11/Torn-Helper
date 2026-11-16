@@ -86,8 +86,9 @@ It does not claim that increasing sample frequency guarantees higher accuracy.
 ### Collection and spreadsheet access
 
 `collect-stock-minutes` is scheduled every minute using the existing private
-scheduler token. It waits 12 seconds for publication, then reads Tornsy's public
-watchlist once for all 35 known tickers. No user's key, identity, or holdings are
+scheduler token. It waits 12 seconds for publication, then reads the configured administrator's saved key through Torn's public stock
+endpoint, or Tornsy's public watchlist when no eligible admin key is configured.
+Each request covers all 35 known tickers. No user's key, identity, or holdings are
 sent to Tornsy. Source: <https://tornsy.com/api> (checked 2026-11-16). Tornsy is an
 independent provider collecting Torn prices, not a direct Torn API response.
 The market index is excluded. During weekly warmup, up to six bounded history requests load seven days for
@@ -174,3 +175,29 @@ weekly coverage, actual first/last timestamps, valid training sample count and
 processing time. Partial provider history is disclosed rather than padded.
 This lightweight model needs no Hugging Face, GPU or per-stock hosting. A longer
 window is a user-selected policy, not a proven accuracy improvement.
+
+### Administrator-provided key
+
+Settings → Administrator account → Admin key for shared stock prices can opt the
+signed-in administrator's own saved Full Access Torn key into the collector.
+Link and retain the key with the existing Settings form first, and leave tracking
+active. Only administrators can configure this; no client parameter chooses an
+arbitrary owner. Ordinary users' keys are never borrowed. The key remains
+encrypted in the existing backend credential store, is decrypted only inside
+the scheduled worker and is sent only to api.torn.com.
+
+An enabled valid admin source fetches all 35 current quotes with one Torn call per
+minute, through the existing shared user/global rate limiter and concurrency
+lease. Full Access works; the stock endpoint itself is a Public Only selection.
+Torn's current stock response has no exchange quote timestamp, so the official
+records use the minute of observation, with a separate collection time. This is
+not a claim about the exchange's exact last update or an absence of Torn caching.
+
+The archive and collector status label the current source as Torn API or Tornsy,
+and CSV preserves each row's source. Weekly historical backfill stays on Tornsy.
+If the official fetch fails, the public feed is used. Invalid/paused/disabled or
+insufficient keys disable this collector opt-in instead of repeatedly calling
+Torn with a rejected key. Pausing tracking, revoking the linked identity or
+removing admin status also prevents key use. Disabling this feature does not
+stop public price collection. The administrator must supply their key through
+Settings; no secret is embedded in the repository or frontend bundle.

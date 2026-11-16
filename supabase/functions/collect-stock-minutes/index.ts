@@ -1,5 +1,8 @@
+import {resolveRefreshKey} from '../_shared/live-refresh.ts';
+import {budgetedTornFetch} from '../_shared/torn-budget.ts';
+import {tornGet,TornApiError} from '../_shared/torn.ts';
 import {adminClient,json,preflight,scheduled} from '../_shared/http.ts';
-import {boundedStockJson,watchlistMinutes,historyMinutes,type MinutePoint} from '../_shared/stock-minute-feed.ts';
+import {boundedStockJson,watchlistMinutes,historyMinutes,officialStockMinutes,type MinutePoint} from '../_shared/stock-minute-feed.ts';
 import {STOCKS} from '../../../src/data/stocks.ts';
 Deno.serve(async req=>{
  const early=preflight(req);if(early)return early;
@@ -12,7 +15,18 @@ Deno.serve(async req=>{
  try{
   // Provider publishes about 5–10 seconds after the minute. One lease bounds all upstream calls.
   await new Promise(resolve=>setTimeout(resolve,12000));
-  const snapshot=watchlistMinutes(await boundedStockJson('https://tornsy.com/api/stocks'),Date.now()/1000);
+  let adminSnapshot:ReturnType<typeof watchlistMinutes>|undefined;
+  const owner=await admin.rpc('get_stock_collector_owner');
+  if(!owner.error&&typeof owner.data==='string'){
+   try{
+    const key=await resolveRefreshKey(admin,owner.data,undefined,Deno.env.get('TORN_KEY_ENCRYPTION_KEY'));
+    const payload=await tornGet(`/torn/stocks?timestamp=${Math.floor(Date.now()/1000)}&comment=TornHelperSharedStockCollector`,key,budgetedTornFetch(admin,owner.data));
+    adminSnapshot=officialStockMinutes(payload,Date.now()/1000);
+   }catch(error){
+    if(error instanceof TornApiError&&[2,10,13,16,18].includes(error.code??-1))await admin.rpc('disable_stock_collector_key',{p_owner:owner.data});
+   }
+  }
+  const snapshot=adminSnapshot??watchlistMinutes(await boundedStockJson('https://tornsy.com/api/stocks'),Date.now()/1000);
   let points=snapshot.points,backfilled=false;
   const stock=STOCKS.find(s=>s.id===backfill_id);
   if(stock){
