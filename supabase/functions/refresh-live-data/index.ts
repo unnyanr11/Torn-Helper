@@ -1,3 +1,4 @@
+import { readJsonObject } from "../_shared/request-body.ts";
 import { budgetedTornFetch } from '../_shared/torn-budget.ts';
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
 import {
@@ -21,12 +22,8 @@ Deno.serve(async (req) => {
     const admin = adminClient();
     const user = await authenticate(req, admin);
     if (!user) return json({ error: "Unauthorized" }, 401);
-    let body;
-    try {
-      body = await req.json();
-    } catch {
-      return json({ error: "Invalid request body" }, 400);
-    }
+    const body = await readJsonObject(req, json);
+    if (body instanceof Response) return body;
     const { feed_type, apiKey } = body ?? {};
     if (!Object.hasOwn(endpoints, feed_type))
       return json({ error: "Unsupported feed" }, 400);

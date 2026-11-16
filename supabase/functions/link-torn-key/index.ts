@@ -1,3 +1,4 @@
+import { readJsonObject } from "../_shared/request-body.ts";
 import { budgetedTornFetch } from '../_shared/torn-budget.ts';
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
 import { retentionPolicyError } from "../_shared/torn-key-policy.ts";
@@ -11,7 +12,9 @@ Deno.serve(async (req) => {
     const admin = adminClient();
     const user = await authenticate(req, admin);
     if (!user) return json({ error: "Unauthorized" }, 401);
-    const { apiKey, persist = true } = await req.json();
+    const requestBody = await readJsonObject(req, json);
+    if (requestBody instanceof Response) return requestBody;
+    const { apiKey, persist = true } = requestBody;
     if (typeof apiKey !== "string" || !/^[a-zA-Z0-9]{16}$/.test(apiKey))
       return json({ error: "Enter a 16-character Torn key" }, 400);
     const policyError=retentionPolicyError(persist);if(policyError)return json({error:policyError},409);

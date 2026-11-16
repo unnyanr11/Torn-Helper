@@ -1,3 +1,4 @@
+import {readJsonObject} from "../../supabase/functions/_shared/request-body";
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
@@ -29,7 +30,7 @@ function harness(actor=1){
  };
  const get=vi.fn(async(path:string)=>{lookups.push(path);if(!payloads[path])throw new Error('Unexpected request');return payloads[path];});
  const deps:Record<string,any>={
-  '../_shared/http.ts':{adminClient:()=>admin,authenticate:async(req:Request)=>req.headers.has('authorization')?{id:actor===1?'leader':actor===2?'member':'outsider'}:null,json:(body:any,status=200)=>new Response(JSON.stringify(body),{status}),preflight:()=>null,checked:(r:any)=>{if(r.error)throw r.error;return r;}},
+  '../_shared/request-body.ts':{readJsonObject},'../_shared/http.ts':{adminClient:()=>admin,authenticate:async(req:Request)=>req.headers.has('authorization')?{id:actor===1?'leader':actor===2?'member':'outsider'}:null,json:(body:any,status=200)=>new Response(JSON.stringify(body),{status}),preflight:()=>null,checked:(r:any)=>{if(r.error)throw r.error;return r;}},
   '../_shared/live-refresh.ts':{resolveRefreshKey:async()=> 'test-key',refreshFailure:(error:Error)=>({status:503,error:error.message})},
   '../_shared/torn-budget.ts':{budgetedTornFetch:()=>vi.fn()},'../_shared/torn.ts':{tornGet:get},'../_shared/war-targets.ts':policies,'../_shared/war-reports.ts':reports
  };

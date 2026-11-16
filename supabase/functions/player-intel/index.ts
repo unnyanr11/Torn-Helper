@@ -1,3 +1,4 @@
+import { readJsonObject } from "../_shared/request-body.ts";
 import { LoginError } from '../_shared/torn-login.ts';
 import { budgetedTornFetch } from '../_shared/torn-budget.ts';
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
@@ -10,7 +11,9 @@ Deno.serve(async (req) => {
     const admin = adminClient();
     const user = await authenticate(req, admin);
     if (!user) return json({ error: "Unauthorized" }, 401);
-    const { player_id } = await req.json();
+    const requestBody = await readJsonObject(req, json);
+    if (requestBody instanceof Response) return requestBody;
+    const { player_id } = requestBody;
     if (!Number.isSafeInteger(Number(player_id)) || Number(player_id) <= 0)
       return json({ error: "Valid player ID required" }, 400);
     const { data: profile } = await admin
