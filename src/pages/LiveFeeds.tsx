@@ -1,3 +1,5 @@
+import DataFreshness from '../components/DataFreshness';
+import RequestProblem from '../components/RequestProblem';
 import { useTornKeyMode } from '../hooks/useTornKeyMode';
 import { observationKey,type TornObservation } from "../lib/personal-data";
 import SelectEntry from "../components/SelectEntry";
@@ -237,7 +239,7 @@ export default function LiveFeeds() {
           </button>
         </form>
       </article>
-      {error && <p role="alert">{error}</p>}
+      {error && <RequestProblem message={error}/>}
       {message && <p role="status">{message}</p>}
       {result && (
         <article className="card">

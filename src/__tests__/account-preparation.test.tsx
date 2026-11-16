@@ -88,3 +88,18 @@ describe('loading screen and data shared across tools',()=>{
   await act(async()=>choose('request'));expect(JSON.stringify(root!.toJSON())).toContain('request');
  });
 });
+
+it('opens partial workspace on request while the original preparation finishes without restarting',async()=>{
+ const cache=client();
+ mocks.invoke.mockImplementation(async(_client,{body})=>({data:{endpoint_id:body.endpoint_id,parameters:body.parameters,payload:{},fetched_at:new Date().toISOString(),next_parameters:null},error:null}));
+ vi.stubGlobal('requestAnimationFrame',(callback:()=>void)=>callback());
+ vi.stubGlobal('document',{getElementById:()=>null});
+ await act(async()=>{root=create(<QueryClientProvider client={cache}><AccountPreparation owner={owner}><div>Partial workspace</div></AccountPreparation></QueryClientProvider>);await vi.advanceTimersByTimeAsync(0);});
+ await act(async()=>{root!.root.findAllByType('button').find(b=>b.children.includes('Open workspace while loading continues'))!.props.onClick();});
+ expect(JSON.stringify(root!.toJSON())).toContain('Partial workspace');
+ expect(cache.getQueryData(['account-preparation-running',owner])).toBe(true);
+ await act(async()=>{await vi.advanceTimersByTimeAsync(61200);});
+ expect(cache.getQueryData(preparationKey(owner))).toMatchObject({loaded:PREPARATION_CALLS});
+ expect(cache.getQueryData(['account-preparation-running',owner])).toBe(false);
+ expect(mocks.invoke).toHaveBeenCalledTimes(PREPARATION_CALLS);
+});

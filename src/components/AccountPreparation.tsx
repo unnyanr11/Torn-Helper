@@ -20,6 +20,7 @@ function PrivatePreparation({owner,children}:{owner:string;children:ReactNode}){
  // Restore saved observations alongside collection so a restore never replaces new data.
  useSavedObservations(owner);
  const [progress,setProgress]=useState(emptyProgress),[remaining,setRemaining]=useState(60),[phrase,setPhrase]=useState(messages[0]),[phase,setPhase]=useState<'loading'|'ready'|'done'>(()=>client.getQueryData(preparationKey(owner))?'done':'loading');
+ const [workspaceOpen,setWorkspaceOpen]=useState(false);
  const heading=useRef<HTMLHeadingElement>(null);
  useEffect(()=>{
   if(client.getQueryData(preparationKey(owner)))return;
@@ -27,6 +28,7 @@ function PrivatePreparation({owner,children}:{owner:string;children:ReactNode}){
   const boot=setTimeout(()=>{
    if(disposed)return;
    heading.current?.focus();
+   client.setQueryData(['account-preparation-running',owner],true);
    const task=startPreparation({
     fetch:async(row,signal)=>{
      const response=await invokeTornData(client,{body:{endpoint_id:row.capability.id,parameters:row.parameters,refresh:false},signal});
@@ -40,6 +42,7 @@ function PrivatePreparation({owner,children}:{owner:string;children:ReactNode}){
     onProgress:value=>{if(!disposed)setProgress(value);},
     onComplete:(result:PreparationResult)=>{
      if(disposed)return;
+     client.setQueryData(['account-preparation-running',owner],false);
      client.setQueryData(preparationKey(owner),result);
      setProgress(result);setRemaining(0);setPhase('ready');
      clearInterval(clock);clearInterval(text);
@@ -49,11 +52,12 @@ function PrivatePreparation({owner,children}:{owner:string;children:ReactNode}){
    const clock=setInterval(()=>setRemaining(Math.max(0,Math.ceil((PREPARATION_MS-(Date.now()-task.startedAt))/1000))),100);
    const text=setInterval(()=>setPhrase(old=>{const other=messages.filter(value=>value!==old);return other[Math.floor(Math.random()*other.length)];}),3500);
    let ready:ReturnType<typeof setTimeout>|undefined;
-   cleanup=()=>{task.cancel();clearInterval(clock);clearInterval(text);clearTimeout(ready);};
+   cleanup=()=>{client.setQueryData(['account-preparation-running',owner],false);task.cancel();clearInterval(clock);clearInterval(text);clearTimeout(ready);};
   },0);
   return()=>{disposed=true;clearTimeout(boot);cleanup?.();};
  },[client,owner]);
  if(phase==='done')return <>{children}</>;
+ if(workspaceOpen)return <><section className="card" aria-label="Background preparation"><p role="status">Preparing in the background · {progress.loaded} sections loaded · {progress.current}</p><progress aria-label="Background preparation" value={60-remaining} max={60}/></section>{children}</>;
  const complete=phase==='ready';
  return <main className={`account-preparation ${complete?'is-ready':''}`} aria-labelledby="preparation-title">
   <div className="preparation-glow" aria-hidden="true"/>
@@ -69,6 +73,7 @@ function PrivatePreparation({owner,children}:{owner:string;children:ReactNode}){
    {complete&&(progress.loaded<PREPARATION_CALLS)&&<p className="preparation-note">Some essentials could not be loaded. Check the details or retry them inside your workspace.</p>}
    {!complete&&<p className="preparation-note">A one-minute setup for your personal tools. Data access depends on your Torn key and role.</p>}
    {progress.issues.length>0&&<details className="preparation-note"><summary>See loading details</summary><ul>{progress.issues.map(issue=><li key={issue.endpoint+issue.label}><strong>{issue.label}</strong>: {issue.reason}</li>)}</ul></details>}
+   <button type="button" className="nu-btn" onClick={()=>setWorkspaceOpen(true)}>Open workspace while loading continues</button>
    <button type="button" className="preparation-signout" onClick={()=>void supabase.auth.signOut()}>Sign out</button>
   </section>
  </main>;

@@ -1,3 +1,5 @@
+import DataFreshness from './DataFreshness';
+import RequestProblem from './RequestProblem';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCurrentObservations} from '../hooks/useSavedObservations';
@@ -56,7 +58,8 @@ export default function StockForecast(){
   <div className="stock-forecast-heading"><div><span className="badge">Experimental ML</span><h3 id="stock-forecast-title">Stock timing lab</h3><p>Find buy candidates and sell / rebuy opportunities from actual Torn chart history.</p></div><a className="nu-btn" href="https://www.torn.com/page.php?sid=stocks" target="_blank" rel="noreferrer">Open Torn market ↗</a></div>
   <div className="stock-forecast-controls"><SelectEntry label="Stock to analyse" value={selected} options={choices} onChange={e=>setSelected(e.target.value)} allowCustom={false} searchable disabled={busy}/><div><button className="nu-btn" disabled={busy||!saved.owner||!selected} onClick={()=>void scan(false)}>Analyse / refresh selected</button>{' '}<button className="nu-btn" disabled={busy||!saved.owner} onClick={()=>void scan(true)}>Compare all 35 stocks</button>{busy&&<button className="nu-btn" onClick={stop}>Stop scan</button>}</div></div>
   <p className="muted">Charts load only when requested. Comparison reuses charts saved in the last 15 minutes. Training runs on your device; no extra calls while watching the results.</p>
-  {progress&&<p role="status">{progress}</p>}{error&&<p role="alert">{error}</p>}
+  {progress&&<p role="status">{progress}</p>}{error&&<RequestProblem message={error} busy={busy} onRetry={()=>void scan(false)}/>}
+  <DataFreshness at={Object.values(saved.data??{}).flatMap(e=>e.observation?.endpoint_id===HISTORY_ENDPOINT&&e.observation.parameters?.stockId===selected?[e.observation.fetched_at]:[]).sort().at(-1)} source="Torn stock chart · saved observation" busy={busy} error={!!error}/>
   {selectedForecast?<ForecastDetails forecast={selectedForecast} id={Number(selected)} now={now}/>:<div className="nu-inset stock-forecast-empty"><h4>No forecast yet</h4><p>Choose a stock and load its chart. A price quote alone cannot train this model.</p></div>}
   {ranked.length>0&&<div className="stock-forecast-table"><table><caption>Comparison · {ranked.length} of 35 stocks analysed. Buy candidates appear first; compare forecasts with the same time interval.</caption><thead><tr><th>Stock</th><th>Signal</th><th>Forecast interval</th><th>Estimated return after sale fee</th><th>Historical directional accuracy</th><th>Details</th></tr></thead><tbody>{ranked.map(([id,forecast])=>{
    const decision=stockDecision(forecast,now);

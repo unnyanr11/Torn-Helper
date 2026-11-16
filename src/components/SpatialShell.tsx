@@ -10,7 +10,7 @@ export default function SpatialShell({page,signedIn,role,shared,onNavigate,child
  const scope=`tcc-navigation:${accountId??'signed-out'}`;
  const readNav=()=>{try{const value=JSON.parse(localStorage.getItem(scope)??'{}');return {favourites:Array.isArray(value.favourites)?value.favourites.filter((p:Page)=>NAV.includes(p)):[],recent:Array.isArray(value.recent)?value.recent.filter((p:Page)=>NAV.includes(p)):[]};}catch{return {favourites:[],recent:[]};}};
  const [preferences,setPreferences]=useState<{favourites:Page[];recent:Page[]}>(readNav),[search,setSearch]=useState(''),[expanded,setExpanded]=useState<Record<string,boolean>>({});
- function saveNav(next:typeof preferences){setPreferences(next);try{localStorage.setItem(scope,JSON.stringify(next));}catch{}}
+ function saveNav(next:typeof preferences){setPreferences(next);try{localStorage.setItem(scope,JSON.stringify(next));}catch{}window.dispatchEvent(new Event('torn:navigation-change'));}
  useEffect(()=>{setExpanded(old=>({...old,...Object.fromEntries(Object.entries(NAV_GROUPS).filter(([,pages])=>pages.includes(page)).map(([name])=>[name,true]))}));},[page]);
  useEffect(()=>{setPreferences(old=>{const next={...old,recent:[page,...old.recent.filter(p=>p!==page)].slice(0,6)};try{localStorage.setItem(scope,JSON.stringify(next));}catch{}return next;});},[page,scope]);
  const [theme,setTheme]=useState(()=>readPreference('tcc-theme','light'));

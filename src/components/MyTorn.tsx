@@ -1,3 +1,6 @@
+import DashboardActions from './DashboardActions';
+import DataFreshness from './DataFreshness';
+import {errorRecovery} from '../lib/error-recovery';
 import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { invokeTornData } from '../lib/torn-data-client';
@@ -69,7 +72,7 @@ export default function MyTorn({accountId}:{accountId?:string}) {
   const startInitialRefresh=useRef<()=>void>(()=>{});
   startInitialRefresh.current=()=>{void collect('essentials');};
   useEffect(()=>{
-    if(!accountId||client.getQueryData(preparationKey(accountId))||connection.owner!==accountId||!connection.status.data?.hasStoredKey||!saved.isSuccess||mode!=='stored'||initialRefresh.current===accountId)return;
+    if(!accountId||client.getQueryData(['account-preparation-running',accountId])||client.getQueryData(preparationKey(accountId))||connection.owner!==accountId||!connection.status.data?.hasStoredKey||!saved.isSuccess||mode!=='stored'||initialRefresh.current===accountId)return;
     const timer=setTimeout(()=>{
       if(control.current&&!control.current.signal.aborted)return;
       initialRefresh.current=accountId;
@@ -78,20 +81,20 @@ export default function MyTorn({accountId}:{accountId?:string}) {
     return()=>clearTimeout(timer);
   },[accountId,connection.owner,connection.status.data?.hasStoredKey,saved.isSuccess,mode]);
 
-  async function collect(kind:'essentials'|'selected'|'single'='selected',path?:string,automatic=false) {
+  async function collect(kind:'essentials'|'selected'|'single'='selected',path?:string,automatic=false,individual?:ConnectedRequest) {
     if (control.current && !control.current.signal.aborted) return;
     if(mode==='request'&&!/^[A-Za-z0-9]{16}$/.test(key))return;
     const controller = new AbortController(); control.current = controller;automaticControl.current=automatic?controller:null;
     const secret = key; setKey(''); setBusy(true); setError(''); setDone(0); setShowUnloaded(false);
     const priority = ['profile', 'bars', 'battlestats', 'personalstats', 'money', 'networth', 'workstats', 'skills', 'cooldowns', 'travel'];
-    const queue = CONNECTED_REQUESTS.filter(r => kind==='single'?r.capability.path===path:kind==='essentials'?ESSENTIAL_PATHS.includes(r.capability.path)&&!isRecent(homeEntry(entries,r.capability.path)?.observation,refreshAfter(r.capability.path,'active',homeEntry(entries,r.capability.path)?.observation?.payload)):r.areas.some(a => selected.includes(a))).sort((a, b) => {
+    const queue = (individual?[individual]:CONNECTED_REQUESTS).filter(r => kind==='single'?r.capability.path===path:kind==='essentials'?ESSENTIAL_PATHS.includes(r.capability.path)&&!isRecent(homeEntry(entries,r.capability.path)?.observation,refreshAfter(r.capability.path,'active',homeEntry(entries,r.capability.path)?.observation?.payload)):r.areas.some(a => selected.includes(a))).sort((a, b) => {
       const rank = (r: ConnectedRequest) => { const index = r.capability.group === 'user' ? priority.indexOf(r.capability.path.split('/')[2]) : -1; return index < 0 ? 100 : index; };
       return rank(a) - rank(b);
     });
     setTotal(queue.length);
     if(!queue.length){setStatus('Your essentials were checked recently. Reusing saved observations without a Torn request.');setBusy(false);control.current=null;return;}
     try {
-      const result = await collectConnected({ requests: queue, areas: selected, signal: controller.signal, pause: wait,
+      const result = await collectConnected({ requests: queue, areas: kind==='single'?[]:selected, signal: controller.signal, pause: wait,
         fetch: async row => {
           const r = await invokeTornData(client, { body: { endpoint_id: row.capability.id, parameters: row.parameters, ...(kind==='single'&&!automatic?{refresh:true}:{}), ...(mode === 'request' ? { apiKey: secret } : {}) },signal:controller.signal });
           if (r.error || r.data?.error){const problem=(await functionError(r.data,r.error)).message;if(automatic)throw new Error(problem);return {error:problem,status:r.error?.context?.status};}
@@ -162,7 +165,7 @@ export default function MyTorn({accountId}:{accountId?:string}) {
     </div>
     {preparation?.issues?.length? <details className="card"><summary>Startup section details · {preparation.issues.length}</summary><ul>{preparation.issues.map(issue=><li key={issue.endpoint+issue.label}><strong>{issue.label}</strong> ({issue.kind.replace('_',' ')}): {issue.reason}</li>)}</ul><p>Full Access does not grant faction leadership or company director permissions.</p></details>:null}
     <WorkspaceWelcome focus={focus.focus} onChoose={focus.choose} storageError={focus.storageError}/>
-    <TimerPanel/>
+    <DashboardActions accountId={accountId}/><TimerPanel/>
     <HomeDashboard entries={entries} energyCoverage={energyCoverage} onRefresh={refreshSection} busy={busy}/>
     {saved.isLoading&&<p role="status">Loading your saved observations…</p>}{saved.isError&&<p role="alert">Saved observations could not be restored. <button type="button" className="nu-btn" onClick={()=>void saved.refetch()}>Retry saved data</button></p>}
     <article ref={refreshForm} className="card personal-connect"><h3>Refresh essentials</h3><p>Saved data appears first. Refresh only what you need; recent essentials are reused.</p>
@@ -194,9 +197,9 @@ export default function MyTorn({accountId}:{accountId?:string}) {
     <div className="personal-sections">{visible.map(row => {
       const id = observationKey(row.capability.id, row.parameters), entry = entries[id];
       return <article className="card personal-section" key={id}><header><div><small>{row.areas.join(' · ')}</small><h3>{row.label}</h3></div><span className={`section-state ${entry?.error ? 'needs-attention' : ''}`}>{entry?.error ? 'Needs attention' : entry?.observation ? 'Observed' : 'Not loaded'}</span></header>
-        {entry?.error && <p role="status">{entry.error}{entry.observation && ' Showing the last successful observation below.'}</p>}
-        {entry?.observation ? <><p className="observation-time">Observed {new Date(entry.observation.fetched_at).toLocaleString()}</p>{entry.observation.history_warning && <p role="status">{entry.observation.history_warning}</p>}<TornDataView value={entry.observation.payload} previous={entry.previous}/><RelatedLinks row={row} payload={entry.observation.payload}/></> : <p className="data-empty">No successful observation yet. Load this group or use its individual lookup.</p>}
-        <a className="data-section-link" href={browserLink(row)}>Open individual section ↗</a>{entry?.observation?.next_parameters && <> · <a className="data-section-link" href={browserLink(row, entry.observation.next_parameters)}>More history pages ↗</a></>}
+        {entry?.error && <p role="status">{entry.error} {errorRecovery(entry.error)}{entry.observation && ' Showing the last successful observation below.'}</p>}
+        {entry?.observation ? <><DataFreshness at={entry.observation.fetched_at} source="Torn API · saved observation" busy={busy} error={!!entry.error}/>{entry.observation.history_warning && <p role="status">{entry.observation.history_warning}</p>}<TornDataView value={entry.observation.payload} previous={entry.previous}/><RelatedLinks row={row} payload={entry.observation.payload}/></> : <p className="data-empty">No successful observation yet. Load this group or use its individual lookup.</p>}
+        <button className="nu-btn" disabled={busy||(mode==='request'&&!/^[A-Za-z0-9]{16}$/.test(key))} onClick={()=>void collect('single',row.capability.path,false,row)}>{busy?'Refresh in progress…':entry?.error?'Retry this section':'Refresh this section'}</button>{' '}<a className="data-section-link" href={browserLink(row)}>Open individual section ↗</a>{entry?.observation?.next_parameters && <> · <a className="data-section-link" href={browserLink(row, entry.observation.next_parameters)}>More history pages ↗</a></>}
       </article>;
     })}</div>{!visible.length && <p>No observations match. Load a group or enable “Show sections without observations”.</p>}
     </details>

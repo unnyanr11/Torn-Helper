@@ -1,3 +1,5 @@
+import DataFreshness from './DataFreshness';
+import RequestProblem from './RequestProblem';
 import { useTornKeyMode } from '../hooks/useTornKeyMode';
 import PriceUpdateRequests from './PriceUpdateRequests';
 import { useForeignShopPrices } from '../hooks/useForeignShopPrices';
@@ -26,6 +28,7 @@ export default function TravelProfitTool(){
  const [costOverride,setCostOverride]=useState(previous?.costOverride??''),[timeOverride,setTimeOverride]=useState(previous?.timeOverride??'');
  const [quote,setQuote]=useState<Quote|null>(previous?.quote??null),[busy,setBusy]=useState(false),[loading,setLoading]=useState(false),[revision,setRevision]=useState(0),[error,setError]=useState(''),[saveMessage,setSaveMessage]=useState(''),[saving,setSaving]=useState(false),[saved,setSaved]=useState<Saved[]>([]);
 
+ const [capacity,setCapacity]=useState(100);
  const [businessPrice,setBusinessPrice]=useState<number|null>(previous?.businessPrice??null),[businessTime,setBusinessTime]=useState(previous?.businessTime??'');
  useEffect(()=>{queryClient.setQueryData(['travel-workspace'],{country,category,itemId,method,quantity,paidLegs,fee,waiting,book,quote,costOverride,timeOverride,businessPrice,businessTime});},[country,category,itemId,method,quantity,paidLegs,fee,waiting,book,quote,costOverride,timeOverride,businessPrice,businessTime]);
  const businessController=useRef<AbortController|null>(null);
@@ -57,7 +60,7 @@ export default function TravelProfitTool(){
  const cost=costOverride.trim()!==''?Number(costOverride):estimatedCost;
  const roundTrip=timeOverride.trim()!==''?Number(timeOverride):flight.minutes===null?null:flight.minutes*2;
  const sell=current&&current.market.cacheTimes.length<=1?current.market.price:null;
- const result=travelProfit({buy:buy?.buy_price??null,sell,quantity,cost,roundTripMinutes:roundTrip,waitMinutes:waiting,feePercent:fee});
+ const result=travelProfit({buy:buy?.buy_price??null,sell,quantity:Math.min(quantity,capacity),cost,roundTripMinutes:roundTrip,waitMinutes:waiting,feePercent:fee});
  const displayResult=!busy?result:null;
 
  async function loadSaved(){const r=await supabase.from('travel_profit_scenarios').select('id,destination,item_name,profit_total,profit_per_hour,flight_minutes').order('created_at',{ascending:false}).limit(25);if(r.error)throw r.error;setSaved(r.data??[]);}
@@ -121,16 +124,16 @@ export default function TravelProfitTool(){
   <button className="nu-btn" disabled={!ready||loading} onClick={()=>void loadData()}>{loading?'Loading items and travel…':'Load items and my travel'}</button></details>
   {references.isError&&<p role="alert">Owner-verified price updates could not load. Showing the last available references; refresh to retry.</p>}
   {cache.error&&<p role="alert">Saved item choices could not be restored. Load items to try again.</p>}
-  {error&&<p role="alert">{error}</p>}
+  {error&&<RequestProblem message={error} busy={busy||loading} onRetry={()=>{setRevision(n=>n+1);void loadData();}}/>}
   <article className="card"><div className="travel-fields"><label>Location<select className="nu-input" value={country} onChange={e=>{setCountry(e.target.value);setCategory('');setItemId('');setCostOverride('');setTimeOverride('');}}>{ROUTES.map(r=><option key={r.country}>{r.country}</option>)}</select></label>
   <label>Item category<select className="nu-input" value={category} disabled={!categories.length} onChange={e=>{setCategory(e.target.value);setItemId('');}}><option value="">Choose a category…</option>{categories.map(c=><option key={c}>{c}</option>)}</select></label>
   <SelectEntry label="Item" searchable allowCustom={false} value={itemId} disabled={!category} onChange={e=>setItemId(e.target.value)} emptyText="Choose an item…" options={category?destinationItems(items,country,category).map(i=>({value:String(i.id),label:`${i.name} [${i.id}]`})):[]}/>
-  <label>Quantity to bring<select className="nu-input" value={quantity} onChange={e=>setQuantity(Number(e.target.value))}>{Array.from({length:100},(_,i)=><option key={i+1}>{i+1}</option>)}</select></label>
+  <label>Your carrying capacity<input className="nu-input" type="number" min="1" max="100" value={capacity} onChange={e=>{const n=Number(e.target.value);if(Number.isInteger(n)&&n>=1&&n<=100){setCapacity(n);setQuantity(q=>Math.min(q,n));}}}/></label><label>Quantity to bring<select className="nu-input" value={quantity} onChange={e=>setQuantity(Number(e.target.value))}>{Array.from({length:capacity},(_,i)=><option key={i+1}>{i+1}</option>)}</select></label>
   <label>Travel method<select className="nu-input" value={method} onChange={e=>{setMethod(e.target.value as FlyMethod);setCostOverride('');setTimeOverride('');}}>{METHODS.map(m=><option key={m}>{m}</option>)}</select></label>
   <label>Selling fee<select className="nu-input" value={fee} onChange={e=>setFee(Number(e.target.value))}>{[0,5,10,15].map(n=><option key={n} value={n}>{n}%{n===5?' · regular item market':n===0?' · fee-free assumption':''}</option>)}</select></label></div>
   {!items.length&&<p>Load item data above to populate categories and items.</p>}{!!items.length&&!available.length&&<p>No destination shop prices were returned for this location.</p>}
   {!!savedPrices.length&&<details><summary>Saved {country} shop prices ({savedPrices.length})</summary><p>Screenshot references observed on {[...new Set(savedPrices.map(p=>p.observed_on))].join(', ')}. Reference purchase prices only; Black Market prices are recorded observations. Live stock is not saved. A valid fetched shop price takes precedence.</p><div className="table-scroll"><table><thead><tr><th>Shop</th><th>Item</th><th>Type</th><th>Purchase price</th><th>Observed</th><th>Source</th></tr></thead><tbody>{savedPrices.map(p=><tr key={`${p.shop}-${p.id}`}><td>{p.shop}</td><td>{p.name}</td><td>{p.type}</td><td>{money(p.buy_price)}</td><td>{p.observed_on}</td><td>{p.source}</td></tr>)}</tbody></table></div></details>}
-  <p>Quantity is your planned purchase, not a fetched carrying-capacity limit. Check your actual capacity and stock in game.</p>
+  <p>Enter your carrying capacity from Torn. Purchases are limited to that amount in this calculator. Shop stock is unverified; check availability before flying.</p>
   <button className="nu-btn" disabled={!itemId||!ready||busy} onClick={()=>setRevision(n=>n+1)}>{busy?'Fetching prices…':'Refresh item prices'}</button>
   <details><summary>Travel costs and timing</summary><p>{travelRow?`Travel observation: ${new Date(travelRow.fetched_at??0).toLocaleString()}. Method is filled from your returned travel record.`:'Load my travel to fill your last/current flight method.'} The travel API does not return your charged fare.</p><p>Airstrip/private cash fares are estimated at zero, excluding property/stock overhead. Standard fares use the official route reference. Business ticket budgets use a fetched ticket listing price when available; a free business perk can be represented with zero paid tickets.</p>
   {businessTime&&<p>Business-ticket market estimate observed {new Date(businessTime).toLocaleString()}: {money(businessPrice)} each. This values tickets consumed; it is not a charged airfare.</p>}
@@ -142,7 +145,21 @@ export default function TravelProfitTool(){
   {current?.market.cacheTimes.length!==undefined&&current.market.cacheTimes.length>1&&<p role="alert">Market cache changed during scanning. Refresh prices before using this estimate.</p>}
   {current&&!current.market.complete&&<button className="nu-btn" disabled={busy||!ready} onClick={()=>void scanMore()}>Scan more market pages</button>}
   <p>{timeOverride!==''?'Using your round-trip time override.':flight.source} Profit per hour includes both flight legs plus your selected waiting time.</p>
-  {displayResult?<><div className="personal-summary"><article><span>Estimated profit per item after selling fee</span><strong>{money(displayResult.perItem)}</strong></article><article><span>Estimated trip profit</span><strong>{money(displayResult.profit)}</strong></article><article><span>Estimated profit per hour</span><strong>{money(displayResult.perHour)}/hr</strong></article></div><p>({money(sell)} × {quantity}) − {money(displayResult.fee)} selling fee − ({money(buy?.buy_price??null)} × {quantity}) − {money(cost)} travel cost, over {displayResult.totalMinutes.toLocaleString()} minutes. Listing prices are asking prices, not guaranteed proceeds. Shop stock and sale waiting time are not supplied by these price endpoints.</p><button className="nu-btn" disabled={saving} onClick={()=>void save()}>{saving?'Saving…':'Save this estimate'}</button></>:!busy&&<p>Profit remains unavailable until buy price, market price, travel cost and a valid trip time are known.{method==='Business'&&cost===null?' Enter the total business ticket budget under Travel costs and timing.':''}</p>}
+  {displayResult?<><div className="personal-summary"><article><span>Estimated profit per item after selling fee</span><strong>{money(displayResult.perItem)}</strong></article><article><span>Estimated trip profit</span><strong>{money(displayResult.profit)}</strong></article><article><span>Estimated profit per minute</span><strong>{money(displayResult.perHour/60)}/min</strong></article><article><span>Estimated profit per hour</span><strong>{money(displayResult.perHour)}/hr</strong></article></div><p>({money(sell)} × {quantity}) − {money(displayResult.fee)} selling fee − ({money(buy?.buy_price??null)} × {quantity}) − {money(cost)} travel cost, over {displayResult.totalMinutes.toLocaleString()} minutes. Listing prices are asking prices, not guaranteed proceeds. Shop stock and sale waiting time are not supplied by these price endpoints.</p><button className="nu-btn" disabled={saving} onClick={()=>void save()}>{saving?'Saving…':'Save this estimate'}</button></>:!busy&&<p>Profit remains unavailable until buy price, market price, travel cost and a valid trip time are known.{method==='Business'&&cost===null?' Enter the total business ticket budget under Travel costs and timing.':''}</p>}
+  </article>}
+  {chosen&&<article className="card"><h3>Compare destinations for {chosen.name}</h3>
+   <p>Uses your {quantity}-item purchase, {method} travel, {fee}% selling fee and {waiting} minutes waiting. Each route uses its estimated cost and round-trip time. Overrides apply only to the selected trip above.</p>
+   <div className="table-scroll"><table><caption>Destination estimates using the same observed resale price. Foreign stock is unverified.</caption><thead><tr><th>Country</th><th>Buy price</th><th>Price observed / source</th><th>Stock</th><th>Round trip</th><th>Trip profit</th><th>Profit / minute</th><th>Choose</th></tr></thead><tbody>
+    {ROUTES.map(route=>{
+     const purchase=shopQuote(chosen,route.country);
+     if(!purchase)return null;
+     const duration=flightEstimate(route.country,method,travelRow?.payload,book).minutes;
+     const estimate=travelProfit({buy:purchase.buy_price,sell,quantity,cost:tripCost(route.country,method,paidLegs,businessPrice),roundTripMinutes:duration===null?null:duration*2,waitMinutes:waiting,feePercent:fee});
+     return <tr key={route.country}><th scope="row">{route.country}</th><td>{money(purchase.buy_price)}</td><td>{purchase.observed_on??(current?new Date(current.detail.fetched_at).toLocaleString():'Collection time unavailable')} · {purchase.source??'Torn item catalogue'}</td><td>Unverified</td><td>{duration===null?'Unknown':duration*2+' min'}</td><td>{money(estimate?.profit??null)}</td><td>{money(estimate?estimate.perHour/60:null)}</td><td><button className="nu-btn" onClick={()=>{setCountry(route.country);setCategory('');setCostOverride('');setTimeOverride('');}}>Plan {route.country}</button></td></tr>;
+    })}
+   </tbody></table></div>
+   {!sell&&<p>Refresh item prices to calculate profit across destinations.</p>}
+   <DataFreshness at={current?.market.fetched_at} source="Torn item market · observed asking price" busy={busy} error={!!error}/>
   </article>}
   {saveMessage&&<p role="status">{saveMessage}</p>}
   {!!saved.length&&<details className="card"><summary>Saved estimates ({saved.length})</summary><div className="table-scroll"><table><thead><tr><th>Location</th><th>Item</th><th>Profit</th><th>Profit / hour</th></tr></thead><tbody>{saved.map(s=><tr key={s.id}><td>{s.destination}</td><td>{s.item_name}</td><td>{money(s.profit_total)}</td><td>{money(s.profit_per_hour)}</td></tr>)}</tbody></table></div><p>Saved estimates use the prices and assumptions from when they were saved.</p></details>}
