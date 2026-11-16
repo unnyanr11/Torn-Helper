@@ -149,3 +149,24 @@ loads history when its source minute changes. New history retrains the selected
 stock/horizon in a dedicated Web Worker. Navigation terminates the worker.
 No new Torn calls are made by these refreshes. Forecasts are not computed while
 the page is closed, but collection continues. No trades are placed automatically.
+
+### Analysis latency budget
+
+Minute analysis runs in a dedicated browser worker with a 10,000 ms deadline,
+including worker startup and message delivery. A deadline stops the worker,
+ignores late results, ends the spinner and shows Wait without fabricating a new
+prediction. Navigation cancels outstanding work. Browser scheduling/throttling
+can delay UI updates, so this is a processing safeguard, not a successful-result
+guarantee on every device or an end-to-end network SLA. Initial history download
+is separate. The UI displays measured model runtime. A bounded 12-result cache
+reuses unchanged stock/horizon/history inputs only while their forecast remains
+fresh. Every input price/timestamp participates in the cache key.
+
+A reproducible local benchmark on 2,000 real TCI observations (12 runs for each
+of four horizons) measured median processing times of 12.6–25.4 ms and a slowest
+run of 60.5 ms in the development environment. These are computation measurements,
+not mobile-device or network latency guarantees. This lightweight model does not
+require Hugging Face, GPUs, or separately hosted per-stock instances. Its input
+window is up to 2,000 minutes (about 33h20m), with 1–60-minute features and the
+latest 360 training samples used by ridge. The 30-day archive is not all fitted
+at once. No universally optimal history duration has been established.
