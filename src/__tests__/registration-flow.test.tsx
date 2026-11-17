@@ -6,7 +6,7 @@ vi.mock('../lib/supabase',()=>({supabase:{functions:{invoke:mocks.invoke},auth:{
 let root:ReactTestRenderer|undefined;
 afterEach(()=>{act(()=>root?.unmount());root=undefined;});
 beforeEach(()=>{mocks.invoke.mockReset().mockResolvedValue({data:{registered:true},error:null});mocks.login.mockReset().mockResolvedValue({error:null});});
-async function submit(onSignedIn=vi.fn(async()=>{})){
+async function submit(onSignedIn=vi.fn(async()=>{}),password='Strong!1'){
  act(()=>{root=create(<AccountRegistration onSignedIn={onSignedIn}/>);});
  const inputs=root!.root.findAllByType('input');
  const set=(input:any,value:string)=>act(()=>input.props.onChange({target:{value}}));
@@ -14,7 +14,7 @@ async function submit(onSignedIn=vi.fn(async()=>{})){
  set(inputs.find(i=>i.props.inputMode==='numeric'),'123');
  set(inputs.find(i=>i.props.maxLength===16&&i.props.type==='password'),'AbCdEf0123456789');
  for(const input of inputs.filter(i=>i.props.type==='email'))set(input,'player@example.com');
- for(const input of inputs.filter(i=>i.props.autoComplete==='new-password'))set(input,'strong password 123');
+ for(const input of inputs.filter(i=>i.props.autoComplete==='new-password'))set(input,password);
  act(()=>inputs.find(i=>i.props.type==='checkbox')!.props.onChange({target:{checked:true}}));
  await act(async()=>{root!.root.findByType('form').props.onSubmit({preventDefault:vi.fn()});await new Promise(r=>setTimeout(r,0));});
  return onSignedIn;
@@ -22,7 +22,7 @@ async function submit(onSignedIn=vi.fn(async()=>{})){
 it('signs in immediately after verified registration without a confirmation step',async()=>{
  const signedIn=await submit();
  expect(mocks.invoke).toHaveBeenCalledWith('register-torn',expect.objectContaining({body:expect.objectContaining({username:'NewPlayer',tornId:'123'})}));
- expect(mocks.login).toHaveBeenCalledWith({email:'player@example.com',password:'strong password 123'});
+ expect(mocks.login).toHaveBeenCalledWith({email:'player@example.com',password:'Strong!1'});
  expect(signedIn).toHaveBeenCalledOnce();expect(JSON.stringify(root!.toJSON())).not.toContain('Resend confirmation');
  expect(root!.root.findAllByType('input').filter(i=>i.props.type==='password').every(i=>i.props.value==='')).toBe(true);
 });
@@ -31,4 +31,16 @@ it('keeps a created account usable if automatic sign-in fails',async()=>{
  const signedIn=await submit();expect(signedIn).not.toHaveBeenCalled();
  expect(JSON.stringify(root!.toJSON())).toContain('Account created. Automatic sign-in failed');
  expect(mocks.invoke).toHaveBeenCalledTimes(1);
+});
+
+it('blocks weak signup passwords before calling the backend',async()=>{
+ await submit(undefined,'weakpass');expect(mocks.invoke).not.toHaveBeenCalled();expect(mocks.login).not.toHaveBeenCalled();
+ expect(JSON.stringify(root!.toJSON())).toContain('one uppercase letter');
+ const password=root!.root.findAllByType('input').find(i=>i.props.autoComplete==='new-password');expect(password!.props.minLength).toBe(8);
+});
+it('allows existing passwords at sign-in without applying signup complexity rules',async()=>{
+ act(()=>{root=create(<AccountRegistration initialMode="email" onSignedIn={vi.fn(async()=>{})}/>);});
+ act(()=>{root!.root.findAllByType('input').find(i=>i.props.type==='email')!.props.onChange({target:{value:'player@example.com'}});root!.root.findAllByType('input').find(i=>i.props.autoComplete==='current-password')!.props.onChange({target:{value:'oldpassword'}});});
+ await act(async()=>{root!.root.findByType('form').props.onSubmit({preventDefault:vi.fn()});await new Promise(r=>setTimeout(r,0));});
+ expect(mocks.login).toHaveBeenCalledWith({email:'player@example.com',password:'oldpassword'});
 });

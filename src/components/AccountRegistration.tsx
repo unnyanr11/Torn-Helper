@@ -1,3 +1,4 @@
+import { PASSWORD_REQUIREMENTS, validNewPassword } from '../../supabase/functions/_shared/password-policy';
 import TornKeyHelp from './TornKeyHelp';
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
@@ -16,6 +17,7 @@ export default function AccountRegistration({onSignedIn,initialMode="register"}:
    const {error}=await supabase.auth.signInWithPassword({email:email.trim(),password});setPassword('');if(error){if(error.code==='email_not_confirmed')throw new Error('For an older pending account, use Continue with Torn once to sign in without an email confirmation link.');throw error;}await onSignedIn();return;
   }
   if(email.trim().toLowerCase()!==confirmEmail.trim().toLowerCase())throw new Error('Email addresses do not match.');
+  if(!validNewPassword(password))throw new Error(PASSWORD_REQUIREMENTS);
   if(password!==confirmPassword)throw new Error('Passwords do not match.');
   const credentials={email:email.trim(),password};
   const body={username:username.trim(),tornId,apiKey,email:email.trim(),password,persist:consent};
@@ -44,10 +46,10 @@ export default function AccountRegistration({onSignedIn,initialMode="register"}:
    </>}
    <label>Email address<input className="nu-input" type="email" autoComplete="email" required maxLength={254} value={email} onChange={e=>setEmail(e.target.value)}/></label>
    {mode==='register'&&<label>Confirm email address<input className="nu-input" type="email" autoComplete="off" required maxLength={254} value={confirmEmail} onChange={e=>setConfirmEmail(e.target.value)}/></label>}
-   <SecretInput key={mode} label="Password" className="nu-input" autoComplete={mode==='register'?'new-password':'current-password'} required minLength={mode==='register'?12:undefined} maxLength={128} value={password} onChange={e=>setPassword(e.target.value)}/>
+   <SecretInput key={mode} label="Password" className="nu-input" autoComplete={mode==='register'?'new-password':'current-password'} required minLength={mode==='register'?8:undefined} aria-describedby={mode==='register'?'signup-password-requirements':undefined} maxLength={128} value={password} onChange={e=>setPassword(e.target.value)}/>
    {mode==='register'&&<>
-    <SecretInput label="Confirm password" className="nu-input" autoComplete="new-password" required minLength={12} maxLength={128} value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)}/>
-    <p>Use 12–128 characters. Your username is a display name; sign in with your email address.</p>
+    <SecretInput label="Confirm password" className="nu-input" autoComplete="new-password" required minLength={8} maxLength={128} value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)}/>
+    <p id="signup-password-requirements">{PASSWORD_REQUIREMENTS} Your username is a display name; sign in with your email address.</p>
     <KeyDisclosure persist requiredBackend/>
     <label className="registration-consent"><input type="checkbox" required checked={consent} onChange={e=>setConsent(e.target.checked)}/>I agree to encrypted backend storage of my Torn key for account updates. I can pause tracking, revoke the key in Torn, or delete my account.</label>
    </>}

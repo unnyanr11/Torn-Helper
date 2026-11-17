@@ -1,3 +1,4 @@
+import { PASSWORD_REQUIREMENTS, validNewPassword } from './password-policy.ts';
 import { encrypt } from './crypto.ts';
 import { LoginError, verifiedTornIdentity } from './torn-login.ts';
 
@@ -17,7 +18,7 @@ export async function registrationBody(req: Request): Promise<Registration> {
  if(!Number.isSafeInteger(tornId)||tornId<1)throw new LoginError(400,'Enter a valid Torn ID.');
  if(typeof body.apiKey!=='string'||!/^[A-Za-z0-9]{16}$/.test(body.apiKey))throw new LoginError(400,'Enter a valid 16-character Torn API key.');
  if(email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.endsWith('.invalid'))throw new LoginError(400,'Enter a valid email address.');
- if(typeof body.password!=='string'||body.password.length<12||body.password.length>128)throw new LoginError(400,'Use a password between 12 and 128 characters.');
+ if(!validNewPassword(body.password))throw new LoginError(400,PASSWORD_REQUIREMENTS);
  if(body.persist!==true)throw new LoginError(400,'Acknowledge encrypted backend key storage to register.');
  return {username,email,tornId,apiKey:body.apiKey,password:body.password,persist:true};
 }

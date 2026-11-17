@@ -2,7 +2,7 @@ import {describe,it,expect,vi} from 'vitest';
 import {registrationBody,registerWithTorn} from '../../supabase/functions/_shared/torn-register';
 import {loginWithTorn} from '../../supabase/functions/_shared/torn-login';
 import {decrypt} from '../../supabase/functions/_shared/crypto';
-const input={username:'Player_1',tornId:123,apiKey:'AbCdEf0123456789',email:'player@example.com',password:'a strong password 123',persist:true as const};
+const input={username:'Player_1',tornId:123,apiKey:'AbCdEf0123456789',email:'player@example.com',password:'Strong!1',persist:true as const};
 const secret=btoa(String.fromCharCode(...new Uint8Array(32).fill(9)));
 const upstream=vi.fn(async(url:any)=>new Response(JSON.stringify(String(url).endsWith('/user/basic')?{profile:{id:123,name:'Player'}}:{info:{user:{id:123},access:{type:'Limited Access'}}}))) as unknown as typeof fetch;
 function backend(existing=false){return {
@@ -18,6 +18,12 @@ describe('verified Torn registration',()=>{
   const req=(body:unknown)=>new Request('https://app.invalid',{method:'POST',body:typeof body==='string'?body:JSON.stringify(body)});
   expect(await registrationBody(req({...input,email:' Player@Example.com ',tornId:'123'}))).toEqual(input);
   for(const body of ['x'.repeat(4097),'{}','{',{...input,persist:false},{...input,tornId:1.5},{...input,password:'short'},{...input,username:'<script>'},{...input,email:'bad'}])await expect(registrationBody(req(body))).rejects.toThrow();
+ });
+ it('enforces all password requirements on the server before registration',async()=>{
+  const request=(password:unknown)=>new Request('https://app.invalid',{method:'POST',body:JSON.stringify({...input,password})});
+  for(const password of ['Aa1!abc','lowercase!1','UPPERCASE!1','NoNumbers!','NoSpecial123','SpaceOnly1 ',null,'Aa1!'+'x'.repeat(125)])
+   await expect(registrationBody(request(password))).rejects.toThrow('8–128 characters');
+  for(const password of ['Strong!1','Aa1!'+'x'.repeat(124)])expect((await registrationBody(request(password))).password).toBe(password);
  });
  it('rejects mismatched IDs and existing accounts before creating any credentials',async()=>{
   const admin=backend();await expect(registerWithTorn(admin,{...input,tornId:999},secret,upstream)).rejects.toThrow('does not belong');expect(admin.from).not.toHaveBeenCalled();
