@@ -1388,7 +1388,11 @@ describe("database-owner-only sealed access and corrections", () => {
     } finally { await db.exec("revoke execute on function private.can_correct_lucky_draw_name() from authenticated,service_role"); }
   });
   it("lets the SQL owner inspect and audit a correction while clients and workers stay sealed", async () => {
-    const winner = (await db.query<any>("select w.* from private.lucky_draw_winners w join lucky_draw_campaigns c on c.id=w.campaign_id where c.reveal_at>now() limit 1")).rows[0];
+    const sealed = await act(host, "create", null, terms({ entry_item: "Cash", quantity_per_ticket: 1000000, minimum_entries: 1, days_after_threshold: 1, deposit_mode: "fixed", prizes: [{ percentage: 75 }], reveal_delay_hours: 168 }));
+    await receivedPage(sealed, [transfer(sealed, "owner-correction-fixture", 3)]);
+    await db.query("update lucky_draw_campaigns set closes_at=now()-interval '1 second' where id=$1", [sealed.id]);
+    await asService("select public.finalize_lucky_draw($1)", [sealed.id]);
+    const winner = (await db.query<any>("select * from private.lucky_draw_winners where campaign_id=$1 limit 1", [sealed.id])).rows[0];
     expect(winner).toBeTruthy();
     await db.query("select public.admin_correct_lucky_draw_name($1,$2,'Owner corrected name','Verified owner correction')", [winner.campaign_id,winner.rank]);
     const saved = (await db.query<any>("select * from private.lucky_draw_winners where campaign_id=$1 and rank=$2", [winner.campaign_id,winner.rank])).rows[0];

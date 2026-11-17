@@ -157,8 +157,8 @@ export async function loginWithTorn(
     const user = await admin.auth.admin.getUserById(canonical);
     if (user.error || !user.data.user?.email)
       throw user.error ?? new Error("Account unavailable");
-    if (!user.data.user.email.endsWith('@torn-login.invalid') && !user.data.user.email_confirmed_at)
-      throw new LoginError(403, 'Confirm your registration email before signing in. Use Resend confirmation if needed.');
+    // Torn key ownership was verified above. Email confirmation is not required;
+    // the internal one-time exchange authenticates this canonical account without sending mail.
     const banned = (user.data.user as { banned_until?: string }).banned_until;
     if (banned && Date.parse(banned) > Date.now())
       throw new LoginError(403, "This app account is unavailable.");

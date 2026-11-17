@@ -53,7 +53,7 @@ See [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) for the supplied specification 
 
 ## Vercel production deployment
 
-`vercel.json` configures Vite, `npm ci`, `npm run build`, the `dist` output, response security headers and revalidation of the application shell/service worker. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the Vercel deployment environment before deploying. Never put server secrets in `VITE_` variables. Keep the Supabase Auth Site URL set to the deployed origin. Torn-key sign-in exchanges a one-time app-session token directly. Email registrations use Supabase confirmation emails and require a correct Auth Site URL / redirect allowlist.
+`vercel.json` configures Vite, `npm ci`, `npm run build`, the `dist` output, response security headers and revalidation of the application shell/service worker. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the Vercel deployment environment before deploying. Never put server secrets in `VITE_` variables. Keep the Supabase Auth Site URL set to the deployed origin. Torn-key sign-in exchanges a one-time app-session token directly. Website registrations verify Torn ownership and create immediately usable email/password accounts without signup confirmation mail.
 
 New sessions open the real sign-in flow. Deep links cannot bypass authentication or administrative role gates. The sign-in form accepts a Torn API key and automatically creates/reuses the verified Torn account. Email/password registration is also available; the Torn-key flow remains available for existing accounts. Published shared reports remain explicitly token-accessible. Page/module loading failures show a recoverable error screen.
 
@@ -73,7 +73,7 @@ The backend uses Supabase Auth internally with a random, non-deliverable alias a
 
 The public login endpoint is rate-limited per server-HMAC request/key fingerprint and globally, bounds request bodies and derives identities only from verified Torn responses. Account linking is transactional and concurrent first-sign-in proposals converge on the same identity. A signed-in account cannot replace its key with one for a different Torn player; sign out to switch accounts.
 
-The Vercel `VITE_SUPABASE_PUBLISHABLE_KEY` remains project hosting configuration. It is distinct from the individual Torn API key entered by each user. The backend's `TORN_KEY_ENCRYPTION_KEY` is needed only for encrypted retention. Keep Supabase's email provider and signup confirmation emails enabled. Configure production SMTP and the Auth Site URL for delivery; Supabase's default mail service has delivery restrictions. Account provisioning and Torn identity verification run server-side.
+The Vercel `VITE_SUPABASE_PUBLISHABLE_KEY` remains project hosting configuration. It is distinct from the individual Torn API key entered by each user. The backend's `TORN_KEY_ENCRYPTION_KEY` is needed only for encrypted retention. Keep Supabase's email provider enabled for password sign-in. The website registration endpoint creates confirmed Auth records after Torn ownership verification; it does not send signup confirmation mail. Mailbox ownership is not verified by that flow. Account provisioning and Torn identity verification run server-side.
 
 
 ### Browse all documented Torn data
@@ -185,9 +185,9 @@ The shared catalogue includes a Community submissions filter. Missing battle tot
 
 Settings offers registration with username, Torn ID, Torn API key, email confirmation fields and a 12–128 character password. `register-torn` bounds the request to 4 KiB, shares the existing login abuse limiter and two-call Torn allowance, verifies both Torn endpoints and checks the submitted player ID before creating any account. The username is display metadata, never an authorization claim. Supabase Auth hashes passwords; only encrypted Torn keys are stored. Users explicitly acknowledge backend key storage.
 
-Email accounts are created unconfirmed and receive a Supabase signup confirmation email. Email/password sign-in and confirmation resend are available alongside Continue with Torn. Torn-key sign-in cannot mint a magic link for an unconfirmed registration email. Existing Torn accounts cannot be registered again or replaced by supplying an email/password; they keep their current key-based access and data. Concurrent registration losers cannot change the winner's email/password and their unused Auth account is deleted. An ambiguous database transport failure does not delete an account that may already have committed.
+Email accounts are created with confirmation disabled for this website flow, and signup signs users in immediately with their chosen email/password. Continue with Torn remains available, including for older pending registrations whose Torn ownership has been verified. Internal one-time session exchanges do not send mail or require users to click links. Existing Torn accounts cannot be registered again or replaced by supplying an email/password; they keep their current key-based access and data. Concurrent registration losers cannot change the winner's email/password and their unused Auth account is deleted. An ambiguous database transport failure does not delete an account that may already have committed.
 
-Deploy both `register-torn` and the updated `sign-in-torn` with gateway JWT verification disabled: each public endpoint verifies Torn ownership and applies server-side limits. No schema migration is required. Delivery failures retain the account and expose Resend confirmation. Real email delivery and confirmation redirects require hosted acceptance with a controlled mailbox; unit tests do not prove mail delivery. Supabase's leaked-password protection is a separate project setting and should be enabled when available.
+Deploy both `register-torn` and the updated `sign-in-torn` with gateway JWT verification disabled: each public endpoint verifies Torn ownership and applies server-side limits. No schema migration is required. No signup confirmation mail is requested. If immediate password sign-in fails after registration, the account is retained and the interface offers normal sign-in. Supabase's leaked-password protection is a separate project setting and should be enabled when available.
 
 ## Player Guides (TC Essentials)
 
@@ -210,3 +210,19 @@ The updated Player Guides use a casual, lightly humorous voice: all 300 practica
 ### Minute stock history and forecasting
 
 Stocks includes an automatic shared collector for all 35 stocks, backed by Tornsy's public minute feed, a 30-day online archive and CSV export. The separate minute model uses the last seven days of minute observations (up to 10,080 per stock), with all valid weekly ridge-training samples, earlier tuning and a purged chronological holdout for 1/5/15/60-minute horizons. Collection continues when the website is closed; the selected forecast retrains in a background worker as fresh data arrives while the page is open. Missing/stale data or models that fail to beat the baseline produce Wait. See [stock model and collection details](docs/stock-forecast.md). No forecast accuracy or profit is guaranteed.
+
+### Lucky draw invitation links
+
+Campaigns expose a copyable `?draw=CAMPAIGN_UUID` invitation link. New visitors
+see signup and sign-in with an invitation notice; the campaign destination stays
+in the URL across registration, login and reload. Legacy hash-based campaign
+links remain supported. Normal navigation is not hijacked by an old invitation
+query, and link generation removes any unrelated authentication URL parameters.
+
+After signup, users open the campaign and click Enroll. Enrollment verifies a
+linked Torn identity and reuses the server's audience/deadline checks. It records
+one enrollment per account/campaign; the host can see enrollment counts and
+Torn identity, while other entrants cannot read those records. Enrollments never
+count as tickets, deposits, prize-pool contributions or minimum verified entries.
+Only the existing verified token-tagged transfer pipeline can create counted
+entries. Account creation performs no in-game transfer.

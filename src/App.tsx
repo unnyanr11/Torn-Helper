@@ -1,3 +1,4 @@
+import {drawInvitation} from './lib/draw-invitation';
 import {clearBrowserTornKeys} from './lib/browser-torn-key';
 import { cancelTornRequests } from "./lib/torn-request-state";
 import SpatialShell from "./components/SpatialShell";
@@ -168,6 +169,7 @@ export default function App() {
           location.hash.replace(/^#\/?/, "").split("?")[0],
         );
         if (NAV.includes(name as Page)) setPage(name as Page);
+        else if(drawInvitation(window.location.href))setPage("Lucky Draws");
       } catch {}
     };
     route();
@@ -182,6 +184,7 @@ export default function App() {
   // The workspace navigation is mounted only for a session or a published report.
   if (!sharedToken && (!authReady || authError || !signedIn)) {
     return <AuthLanding>
+      {typeof window!=='undefined'&&drawInvitation(window.location.href)&&<div className="card"><h2>You’re invited to a lucky draw</h2><p>Create an account or sign in below to open this campaign and enroll. No email-confirmation link is needed. Only verified token-tagged deposits count as draw entries.</p></div>}
       {!authReady ? <p role="status">Checking session…</p>
         : authError ? <div className="card" role="alert"><h1>Unable to check your session</h1><p>{authError}</p><button className="nu-btn" onClick={()=>window.location.reload()}>Try again</button></div>
         : <Settings entry/>}

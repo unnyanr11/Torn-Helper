@@ -30,8 +30,8 @@ export async function registerWithTorn(admin:any, input:Registration, secret:str
  const lookup=await admin.from('linked_torn_accounts').select('user_id').eq('torn_id',identity.id).maybeSingle();
  if(lookup.error)throw lookup.error;
  if(lookup.data)throw new LoginError(409,'This Torn player already has an account. Use Continue with Torn to access your existing data.');
- const created=await admin.auth.admin.createUser({email:input.email,password:input.password,email_confirm:false,user_metadata:{username:input.username},app_metadata:{identity_provider:'torn',torn_id:identity.id,registration:'email'}});
- if(created.error||!created.data.user)throw new LoginError(409,'Unable to register with these details. If you already registered, confirm your email or sign in.');
+ const created=await admin.auth.admin.createUser({email:input.email,password:input.password,email_confirm:true,user_metadata:{username:input.username},app_metadata:{identity_provider:'torn',torn_id:identity.id,registration:'email'}});
+ if(created.error||!created.data.user)throw new LoginError(409,'Unable to register with these details. If you already registered, sign in.');
  const userId=created.data.user.id;
  let complete;
  try{complete=await admin.rpc('complete_torn_login',{player_id:identity.id,proposed_user:userId,player_name:identity.name,access_level:identity.access,persist_key:true,ciphertext});}
@@ -42,7 +42,5 @@ export async function registerWithTorn(admin:any, input:Registration, secret:str
   throw new LoginError(503,'Registration could not be completed. Contact the site owner before retrying.');
  }
  if(complete.data!==userId){await admin.auth.admin.deleteUser(userId);throw new LoginError(409,'This Torn player already has an account. Use Continue with Torn.');}
- let delivered=false;
- try{const sent=await admin.auth.resend({type:'signup',email:input.email});delivered=!sent.error;}catch{/* A mail transport failure must not hide the committed registration. */}
- return {registered:true,confirmation_sent:delivered,message:!delivered?'Account created. The confirmation email could not be sent. Use Resend confirmation below.':'Account created. Check your email to confirm your address, then sign in.'};
+ return {registered:true,message:'Account created. Signing you in; no confirmation email is required.'};
 }

@@ -10,7 +10,7 @@ function backend(existing=false){return {
  rpc:vi.fn(async()=>({data:'new',error:null})),
  auth:{resend:vi.fn(async()=>({error:null})),admin:{
  createUser:vi.fn(async()=>({data:{user:{id:'new'}},error:null})),deleteUser:vi.fn(async()=>({error:null})),
- getUserById:vi.fn(async()=>({data:{user:{id:'new',email:input.email,email_confirmed_at:null}},error:null})),generateLink:vi.fn()
+ getUserById:vi.fn(async()=>({data:{user:{id:'new',email:input.email,email_confirmed_at:null}},error:null})),generateLink:vi.fn(async()=>({data:{user:{id:'new'},properties:{hashed_token:'one-time-token'}},error:null}))
  }}
 };}
 describe('verified Torn registration',()=>{
@@ -23,11 +23,11 @@ describe('verified Torn registration',()=>{
   const admin=backend();await expect(registerWithTorn(admin,{...input,tornId:999},secret,upstream)).rejects.toThrow('does not belong');expect(admin.from).not.toHaveBeenCalled();
   const existing=backend(true);await expect(registerWithTorn(existing,input,secret,upstream)).rejects.toThrow('already has an account');expect(existing.auth.admin.createUser).not.toHaveBeenCalled();
  });
- it('requires email confirmation, encrypts the key and never returns credentials',async()=>{
+ it('creates an immediately usable account without confirmation mail and never returns credentials',async()=>{
   const admin=backend();const result=await registerWithTorn(admin,input,secret,upstream);
-  expect(admin.auth.admin.createUser).toHaveBeenCalledWith(expect.objectContaining({email_confirm:false,password:input.password,user_metadata:{username:input.username}}));
+  expect(admin.auth.admin.createUser).toHaveBeenCalledWith(expect.objectContaining({email_confirm:true,password:input.password,user_metadata:{username:input.username}}));
   const args=(admin.rpc.mock.calls[0] as any)[1];expect(await decrypt(args.ciphertext,secret)).toBe(input.apiKey);
-  expect(admin.auth.resend).toHaveBeenCalledWith({type:'signup',email:input.email});expect(result.confirmation_sent).toBe(true);
+  expect(admin.auth.resend).not.toHaveBeenCalled();expect(result.registered).toBe(true);
   expect(JSON.stringify(result)).not.toContain(input.apiKey);expect(JSON.stringify(result)).not.toContain(input.password);
  });
  it('does not overwrite credentials of a concurrent winning account',async()=>{
@@ -35,17 +35,12 @@ describe('verified Torn registration',()=>{
   await expect(registerWithTorn(admin,input,secret,upstream)).rejects.toThrow('already has an account');
   expect(admin.auth.admin.deleteUser).toHaveBeenCalledWith('new');expect(admin.auth.resend).not.toHaveBeenCalled();
  });
- it('reports delivery failure without deleting a committed account',async()=>{
-  const admin=backend();admin.auth.resend.mockResolvedValueOnce({error:new Error('delivery')} as any);
-  const result=await registerWithTorn(admin,input,secret,upstream);expect(result.confirmation_sent).toBe(false);expect(admin.auth.admin.deleteUser).not.toHaveBeenCalled();
+ it('does not attempt mail delivery even if the mail transport is unavailable',async()=>{
+  const admin=backend();admin.auth.resend.mockRejectedValueOnce(new Error('mail disabled'));
+  expect(await registerWithTorn(admin,input,secret,upstream)).toMatchObject({registered:true});expect(admin.auth.resend).not.toHaveBeenCalled();
  });
- it('reports transport failures after account creation as pending email delivery',async()=>{
-  const admin=backend();admin.auth.resend.mockRejectedValueOnce(new Error('network'));
-  expect(await registerWithTorn(admin,input,secret,upstream)).toMatchObject({registered:true,confirmation_sent:false});
-  expect(admin.auth.admin.deleteUser).not.toHaveBeenCalled();
- });
- it('does not auto-confirm a registered email through the Torn magic-link fallback',async()=>{
+ it('allows a verified Torn owner to access an older pending registration without sending confirmation mail',async()=>{
   const admin=backend(true);admin.rpc.mockResolvedValueOnce({data:'new',error:null});
-  await expect(loginWithTorn(admin as any,input.apiKey,true,secret,upstream)).rejects.toThrow('Confirm your registration email');expect(admin.auth.admin.generateLink).not.toHaveBeenCalled();
+  expect(await loginWithTorn(admin as any,input.apiKey,true,secret,upstream)).toMatchObject({token_hash:'one-time-token',torn_id:123});expect(admin.auth.resend).not.toHaveBeenCalled();
  });
 });

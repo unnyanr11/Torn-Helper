@@ -13,15 +13,18 @@ export default function AccountRegistration({onSignedIn,initialMode="register"}:
  async function perform(action:()=>Promise<void>){setBusy(true);setMessage('');try{await action();}catch(e){setMessage(e instanceof Error?e.message:'Unable to complete this request.');}finally{setBusy(false);}}
  async function submit(){
   if(mode==='email'){
-   const {error}=await supabase.auth.signInWithPassword({email:email.trim(),password});setPassword('');if(error)throw error;await onSignedIn();return;
+   const {error}=await supabase.auth.signInWithPassword({email:email.trim(),password});setPassword('');if(error){if(error.code==='email_not_confirmed')throw new Error('For an older pending account, use Continue with Torn once to sign in without an email confirmation link.');throw error;}await onSignedIn();return;
   }
   if(email.trim().toLowerCase()!==confirmEmail.trim().toLowerCase())throw new Error('Email addresses do not match.');
   if(password!==confirmPassword)throw new Error('Passwords do not match.');
+  const credentials={email:email.trim(),password};
   const body={username:username.trim(),tornId,apiKey,email:email.trim(),password,persist:consent};
   setApiKey('');setPassword('');setConfirmPassword('');
   const {data,error}=await supabase.functions.invoke('register-torn',{body});
   if(error||data?.error)throw await functionError(data,error,'Unable to register.');
-  setMessage(data.message);setMode('email');
+  const signedIn=await supabase.auth.signInWithPassword(credentials);
+  if(signedIn.error){setMode('email');throw new Error('Account created. Automatic sign-in failed; sign in below with your email and password.');}
+  await onSignedIn();
  }
  return <article className="card account-registration">
   <div className="registration-tabs" role="group" aria-label="Account access">
@@ -29,7 +32,7 @@ export default function AccountRegistration({onSignedIn,initialMode="register"}:
    <button className="nu-btn" type="button" aria-pressed={mode==='email'} disabled={busy} onClick={()=>{setMode('email');setMessage('');setPassword('');setConfirmPassword('');setApiKey('');}}>Email sign-in</button>
   </div>
   <h3>{mode==='register'?'Register':'Sign in with email'}</h3>
-  <p>{mode==='register'?'Create a new Torn Helper account. Your Torn ID and API key are verified on the server. Already used this website? Continue with Torn below to access your existing account.':'Confirm your email before your first sign-in. You can also continue with your Torn key below.'}</p>
+  <p>{mode==='register'?'Create a new Torn Helper account. Your Torn ID and API key are verified on the server. Already used this website? Continue with Torn below to access your existing account.':'Sign in with your email and password. No confirmation email is required. You can also continue with your Torn key below.'}</p>
   {message&&<p role="status">{message}</p>}
   <form className="registration-form" onSubmit={e=>{e.preventDefault();void perform(submit);}}>
    {mode==='register'&&<>
@@ -50,8 +53,5 @@ export default function AccountRegistration({onSignedIn,initialMode="register"}:
    </>}
    <button className="nu-btn" type="submit" disabled={busy}>{busy?'Please wait…':mode==='register'?'Register':'Sign in'}</button>
   </form>
-  {mode==='email'&&<div className="registration-tabs">
-   <button type="button" className="nu-btn" disabled={busy||!email.trim()} onClick={()=>void perform(async()=>{const {error}=await supabase.auth.resend({type:'signup',email:email.trim()});if(error)throw error;setMessage('If this address has an unconfirmed account, a confirmation email has been requested. Check your inbox and spam folder.');})}>Resend confirmation</button>
-  </div>}
  </article>;
 }

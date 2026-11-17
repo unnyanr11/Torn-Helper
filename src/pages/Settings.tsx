@@ -1,3 +1,4 @@
+import {drawInvitation} from '../lib/draw-invitation';
 import AdminAccountCard from '../components/AdminAccountCard';
 import TornKeyHelp from '../components/TornKeyHelp';
 import { useQueryClient } from "@tanstack/react-query";
@@ -157,7 +158,7 @@ export default function Settings({entry=false}:{entry?:boolean}={}) {
       )}
       {!signedIn ? (
         <>
-        <AccountRegistration initialMode={entry?"email":"register"} onSignedIn={async()=>{await load();await client.invalidateQueries({queryKey:["torn-connection"]});}}/>
+        <AccountRegistration initialMode={entry&&!(typeof window!=='undefined'&&drawInvitation(window.location.href))?"email":"register"} onSignedIn={async()=>{await load();await client.invalidateQueries({queryKey:["torn-connection"]});}}/>
         <article className="card">
           <form
             onSubmit={(e) => {

@@ -1,3 +1,4 @@
+import {drawInvitation,drawInvitationLink} from '../lib/draw-invitation';
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
@@ -68,10 +69,7 @@ const dateLabel = (s: string | null) =>
     ? new Date(s).toLocaleString()
     : "Waiting for the required verified entries";
 function selectedCampaign() {
-  const value = new URLSearchParams(location.hash.split("?")[1] ?? "").get(
-    "campaign",
-  );
-  return value && /^[0-9a-f-]{36}$/i.test(value) ? value : "";
+  return drawInvitation(window.location.href)??'';
 }
 export default function LuckyDraws() {
   const cache = useQueryClient();
@@ -829,13 +827,16 @@ function CampaignDetail({
           )}
         </div>
       )}
-      <Field label="Share campaign link (sign-in required)">
+      <Field label="Referral / invitation link · signup supported">
         <input
           readOnly
-          value={`${location.origin}${location.pathname}#Lucky%20Draws?campaign=${c.id}`}
+          value={drawInvitationLink(location.href,c.id)}
           onFocus={(e) => e.target.select()}
         />
       </Field>
+      <p>Share this invitation link. New players can sign up without an email confirmation and return directly to this campaign. Enrollment is free; a qualifying token-tagged transfer is still required for a counted entry.</p>
+      <button type="button" className="nu-btn" disabled={busy} onClick={()=>void run(async()=>{if(!navigator.clipboard?.writeText)throw new Error('Select and copy the invitation link above.');await navigator.clipboard.writeText(drawInvitationLink(location.href,c.id));},'Invitation link copied.')}>Copy invitation link</button>
+      <CampaignEnrollment campaign={c} isHost={data.is_host} viewer={viewer}/>
       <div className="draw-preview">
         <p>
           <strong>
@@ -1117,4 +1118,18 @@ function CampaignDetail({
       )}
     </article>
   );
+}
+
+function CampaignEnrollment({campaign,isHost,viewer}:{campaign:Campaign;isHost:boolean;viewer:string|undefined}){
+ const cache=useQueryClient(),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
+ const enrolled=useQuery({queryKey:['draw-enrollment',campaign.id,viewer],enabled:!!viewer,queryFn:async()=>{
+  const r=await supabase.from('lucky_draw_enrollments').select('user_id,created_at').eq('campaign_id',campaign.id).eq('user_id',viewer!).maybeSingle();if(r.error)throw r.error;return r.data;
+ }});
+ const count=useQuery({queryKey:['draw-enrollment-count',campaign.id],enabled:isHost,refetchInterval:30000,queryFn:async()=>{const r=await supabase.from('lucky_draw_enrollments').select('user_id',{count:'exact',head:true}).eq('campaign_id',campaign.id);if(r.error)throw r.error;return r.count??0;}});
+ async function join(){setBusy(true);setMessage('');try{await refreshEligibility(cache,campaign.audience??'all');const r=await supabase.rpc('enroll_lucky_draw',{p_campaign:campaign.id});if(r.error)throw r.error;await enrolled.refetch();setMessage('You are enrolled. Send the required deposit in Torn with the campaign token to create a verified draw entry.');}catch(e){setMessage(e&&typeof e==='object'&&'message' in e?String(e.message):'Unable to enroll. Try again.');}finally{setBusy(false);}}
+ const closed=!!campaign.cancelled_at||!!campaign.drawn_at||!!campaign.closes_at&&Date.parse(campaign.closes_at)<=Date.now();
+ return <div className="draw-preview"><h4>{isHost?'Campaign enrollments':'Enroll in this campaign'}</h4>
+ {isHost?<p>{count.isError?'Unable to load enrollments':`${count.data??0} enrolled players`}. Enrollments do not count toward minimum verified entries.</p>:<><p>{enrolled.data?'You are enrolled.':'Enroll to register your participation before making the token-tagged deposit.'} The host can see your Torn name and ID; your email and API key are not shared.</p><button type="button" className="nu-btn" disabled={busy||!viewer||enrolled.isPending||enrolled.isError||!!enrolled.data||closed} onClick={()=>void join()}>{enrolled.data?'Enrolled':closed?'Enrollment closed':busy?'Checking eligibility…':'Enroll in this lucky draw'}</button>{enrolled.isError&&<p role="alert">Unable to check enrollment. Refresh the campaign.</p>}</>}
+ {message&&<p role="status">{message}</p>}
+ </div>;
 }
