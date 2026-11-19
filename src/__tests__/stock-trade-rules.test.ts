@@ -35,3 +35,13 @@ it('keeps estimated values out of validation targets and forward scoring',()=>{
  const altered=forecastMinuteStock(points.map(p=>p.timestamp===now+591*60?{...p,price:p.price*1.01}:p),now+599*60+10);
  expect(altered.validation.filter(v=>v.timestamp<now+590*60)).toEqual(forecast.validation.filter(v=>v.timestamp<now+590*60));
 });
+
+it('keeps historical Buy/Wait unchanged when profile holdings load or change',()=>{
+ const buy={...down,lower:102,upper:104,predictedPrice:103,predictedReturn:.03,dip:{present:true,dropReturn:-.01,tests:30,reboundRate:.6}};
+ const wait={...buy,supported:false};
+ const profiles=[undefined,{stock_id:'2',shares:0,avg_cost:null},{stock_id:'2',shares:100,avg_cost:null},{stock_id:'2',shares:500,avg_cost:70}];
+ for(const holding of profiles){
+  expect(stockTradeDecision(buy,now,holding).signal).toBe('Buy candidate');
+  expect(stockTradeDecision(wait,now,holding).signal).toBe('Wait');
+ }
+});

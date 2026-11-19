@@ -8,15 +8,13 @@ import {useStockStream} from '../hooks/useStockStream';
 import {useStockAnalyses} from '../hooks/useStockAnalyses';
 import StockHistoryExport from './StockHistoryExport';
 import LiveStockPrices from './LiveStockPrices';
-import {useEffect,useMemo,useRef,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
 import {stockChoices,stockLabel} from '../lib/stock-catalogue';
-import {scoreForwardPredictions,type MinuteHorizon} from '../lib/minute-forecast';
+import {type MinuteHorizon} from '../lib/minute-forecast';
 import {ForecastDetails} from './StockForecast';
 import SelectEntry from './SelectEntry';
-type Prediction={targetTime:number;predictedPrice:number;originPrice:number};
 export default function MinuteStockLab({holdings=[]}:{holdings?:StockHolding[]}){
  const [selected,setSelected]=useState('2'),[horizon,setHorizon]=useState<MinuteHorizon>(1),[archiveOpen,setArchiveOpen]=useState(false),[now,setNow]=useState(()=>Date.now()/1000);
- const predictions=useRef(new Map<string,Prediction[]>());
  const {status,connected}=useStockStream(),analysis=useStockAnalyses();
  const timing=useStockInferenceStatus();
  const chart=useStockChartHistory(Number(selected),status.data?.provider_at);
@@ -28,15 +26,6 @@ export default function MinuteStockLab({holdings=[]}:{holdings?:StockHolding[]})
  const actionableForecast=forecast?.issue||forecast?.last?.timestamp===Date.parse(status.data?.provider_at??'')/1000?forecast:forecast?{...forecast,issue:'Newer prices are available. This saved analysis is being updated; wait before trading.'}:undefined;
  const stale=!status.data?.provider_at||now-Date.parse(status.data.provider_at)/1000>120;
  useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()/1000),10000);return()=>clearInterval(timer);},[]);
- useEffect(()=>{
-  for(const row of analysis.data??[]){
-   const result=row.forecast;
-   if(result.issue||!result.last||result.targetTime<=Date.now()/1000)continue;
-   const key=`${row.stock_id}:${row.horizon}`,log=predictions.current.get(key)??[];
-   if(!log.some(p=>p.targetTime===result.targetTime)){log.push({targetTime:result.targetTime,predictedPrice:result.predictedPrice,originPrice:result.last.price});predictions.current.set(key,log.slice(-240));}
-  }
- },[analysis.data]);
- const live=scoreForwardPredictions(predictions.current.get(`${selected}:${horizon}`)??[],forecast?.points??[]);
  const currentCount=rows.filter(row=>Date.parse(row.provider_at)===Date.parse(status.data?.provider_at??'')).length;
  return <section className="card stock-forecast" aria-labelledby="minute-stock-title">
   <span className="badge">Shared server analysis · experimental ML</span><h3 id="minute-stock-title">Minute-by-minute stock lab</h3>
@@ -47,12 +36,14 @@ export default function MinuteStockLab({holdings=[]}:{holdings?:StockHolding[]})
    <label>Forecast ahead<select className="nu-input" value={horizon} onChange={e=>setHorizon(Number(e.target.value) as MinuteHorizon)}>{[1,5,15,60].map(n=><option key={n} value={n}>{n} minute{n>1?'s':''}</option>)}</select></label>
    <button className="nu-btn" type="button" disabled={analysis.isFetching} onClick={()=>void analysis.refetch()}>Check latest results</button>
   </div>
+  <p className="muted">Buy/Wait uses the shared seven-day stock history and saved backend model, including prices collected before you signed in. Collection continues while you are logged out; opening your profile does not start a new training window.</p>
   <p className="muted">Sell uses your recorded holdings and average purchase cost below. Keep them up to date; unknown cost or zero shares cannot produce Sell.</p>
   {timing.data?.duration_ms!=null&&<p role="status">Latest complete backend batch: {timing.data.stock_count} stocks · {timing.data.forecast_count} forecasts in {(timing.data.duration_ms/1000).toFixed(3)} seconds · {timing.data.within_budget?'under the 10-second target':'over the 10-second target'}. Observed price minute: {new Date(timing.data.provider_at).toLocaleString()}.</p>}
   <h4>Suggested action for {stockLabel(selected)} · next {horizon} minute{horizon>1?'s':''}</h4>
   <StockAdvice holding={holding} forecast={actionableForecast} now={now} training={!forecast&&analysis.isFetching}/>
   {analysis.isPending&&<p role="status">Loading saved server analysis…</p>}
   {analysis.isError&&<p role="alert">Saved analysis could not be refreshed. Previous results remain visible. <button className="nu-btn" onClick={()=>void analysis.refetch()}>Retry</button></p>}
+  {forecast&&<p className="muted">Historical model evidence: {forecast.tests} held-out checks · {(forecast.directionAccuracy*100).toFixed(1)}% direction correct. This evidence comes from the stored market history and is shared across users.</p>}
   {chosen&&<p className="muted">Analysed on the server at {new Date(chosen.computed_at).toLocaleTimeString()} · {(chosen.processing_ms/1000).toFixed(3)} seconds of model processing.</p>}
   {forecast?.fitted&&<p className="muted">Weekly model last trained: {new Date(forecast.fitted.trainedAt*1000).toLocaleString()}. Historical validation belongs to that fit; each minute updates the prediction with fresh prices.</p>}
   {(forecast||chart.data?.points.length)&&<StockPriceChart key={selected} forecast={forecast??{points:chart.data!.points,last:chart.data!.points.at(-1)!,issue:'Analysis unavailable',cadence:60,predictedPrice:0,predictedReturn:0,lower:0,upper:0,tests:0,mae:0,baselineMae:0,directionAccuracy:0,supported:false,targetTime:0,validation:[]}} name={stockLabel(selected)} history={cleanChart} now={now}/>}
@@ -67,7 +58,7 @@ export default function MinuteStockLab({holdings=[]}:{holdings?:StockHolding[]})
    <ForecastDetails holding={holding} hideChart forecast={stale?{...forecast,issue:'Minute prices are stale. Wait for fresh data.'}:forecast} id={Number(selected)} now={now}/>
    <p>Held-out error improvement over no change: {(forecast.holdoutImprovement*100).toFixed(1)}%. Historical interval coverage: {(forecast.intervalCoverage*100).toFixed(0)}% on {forecast.coverageTests} sequential checks. Missing intervals: {forecast.gapCount} · Estimated minutes filled: {forecast.imputedCount??0}.</p>
   </details>}
-  <p>Forward score during this open page session: {live.tests} completed predictions{live.tests&&live.directionAccuracy!==null?` · ${(live.directionAccuracy*100).toFixed(0)}% direction correct`:''}. This score uses subsequent observed prices and resets on reload.</p>
+
   <details onToggle={e=>setArchiveOpen(e.currentTarget.open)}><summary>Online minute price table and spreadsheet export</summary>
    <p>The optional archive contains the last seven days of recorded minutes. CSV opens in Excel or Google Sheets.</p>
    {archiveOpen&&<StockHistoryExport selected={selected} providerAt={status.data?.provider_at} backfilled={status.data?.backfilled_stocks}/>}

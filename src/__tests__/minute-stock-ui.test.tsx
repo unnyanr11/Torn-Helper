@@ -22,7 +22,7 @@ afterEach(()=>{act(()=>root?.unmount());root=undefined;client.clear();vi.unstubA
 describe('shared minute lab',()=>{
  it('makes the data source, archive limit and spreadsheet export clear before any model is ready',()=>{
   const html=renderToStaticMarkup(<QueryClientProvider client={client}><MinuteStockLab/></QueryClientProvider>);
-  expect(html).toContain('30 days online');expect(html).toContain('Tornsy');expect(html).toContain('spreadsheet export');expect(html).toContain('not guaranteed');expect(html).toContain('Forecast ahead');
+  expect(html).toContain('30 days online');expect(html).toContain('Tornsy');expect(html).toContain('spreadsheet export');expect(html).toContain('not guaranteed');expect(html).toContain('Forecast ahead');expect(html).toContain('prices collected before you signed in');expect(html).not.toContain('Forward score during this open page session');
  });
  it('loads saved server results without a worker or weekly history download',async()=>{
   await act(async()=>{root=create(<QueryClientProvider client={client}><MinuteStockLab/></QueryClientProvider>);await new Promise(r=>setTimeout(r,40));});
