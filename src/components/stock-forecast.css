@@ -42,3 +42,7 @@
 .stock-range-distances,.stock-range-coverage{font-size:.7rem;color:var(--muted);line-height:1.5}
 
 .advice-hold > strong{color:var(--accent)}
+
+.live-stock-price{transition:color .35s ease}
+@media(prefers-reduced-motion:reduce){.live-stock-price{transition:none}}
+:root[data-motion="reduced"] .live-stock-price{transition:none}

@@ -7,3 +7,14 @@
 .market-chart .market-projection-up{stroke:#16a34a}.market-chart .market-projection-down{stroke:#dc2626}.market-chart .market-projection-flat{stroke:var(--muted)}
 .market-forecast-upside,.market-forecast-downside{opacity:.5}.market-forecast-upside .market-projection,.market-forecast-downside .market-projection{stroke-width:1.5}
 .market-legend-up:before,.market-legend-down:before{content:'';display:inline-block;width:18px;border-top:2px dotted #16a34a;margin-right:6px;vertical-align:middle}.market-legend-down:before{border-color:#dc2626}
+
+.market-series{animation:market-series-appear .45s ease-out both}
+.market-current-point{animation:market-price-arrived .8s ease-out}
+.market-chart .market-projection{animation:market-forecast-flow 4s linear infinite}
+@keyframes market-series-appear{from{opacity:.25}to{opacity:1}}
+@keyframes market-price-arrived{from{stroke:#2563eb;stroke-width:9;stroke-opacity:.2}to{stroke-width:0;stroke-opacity:0}}
+@keyframes market-forecast-flow{from{stroke-dashoffset:0}to{stroke-dashoffset:-28}}
+.stock-forecast-unavailable{margin-block:16px;padding:16px;border:1px solid var(--border);border-radius:12px;background:var(--input)}
+.stock-forecast-unavailable p{margin-block:8px;max-width:80ch}
+@media(prefers-reduced-motion:reduce){.market-series,.market-current-point,.market-chart .market-projection{animation:none}}
+:root[data-motion="reduced"] .market-series,:root[data-motion="reduced"] .market-current-point,:root[data-motion="reduced"] .market-chart .market-projection{animation:none}

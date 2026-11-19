@@ -22,6 +22,10 @@ export default function MinuteStockLab({holdings=[]}:{holdings?:StockHolding[]})
  const horizonHours=mode==='short'?shortHorizon:longHorizon;
  const {status,connected}=useStockStream(),analysis=useStockHorizonResults(status.data?.provider_at);
  const rows=(analysis.data??[]).filter(row=>row.horizon_hours===horizonHours),chosen=rows.find(row=>row.stock_id===Number(selected));
+ const [previewEnabled,setPreviewEnabled]=useState(true);
+ const dailyPreview=(analysis.data??[]).find(row=>row.stock_id===Number(selected)&&row.horizon_hours===24&&!row.forecast.issue);
+ const preview=mode==='long'&&!!chosen?.forecast.issue&&previewEnabled?dailyPreview:undefined;
+ const chartForecast=preview?.forecast??chosen?.forecast??empty;
  const forecasts=Object.fromEntries(rows.map(row=>[row.stock_id,row.forecast]));
  const chart=useStockChartHistory(Number(selected),status.data?.provider_at);
  const longChart=useLongTermChart(Number(selected),mode==='long',chosen?.computed_at);
@@ -51,7 +55,8 @@ export default function MinuteStockLab({holdings=[]}:{holdings?:StockHolding[]})
    {chosen.forecast.issue&&<p>{chosen.forecast.issue}</p>}
    <p>Backend batch: 35 stocks · 350 forecasts in {(chosen.batch_ms/1000).toFixed(3)} seconds. Updated {new Date(chosen.computed_at).toLocaleString()}.</p>
   </details>}
-  {!!history?.length&&<StockPriceChart longTerm={mode==='long'} forecast={chosen?.forecast??empty} history={history} name={stockLabel(selected)} comparisonMinutes={comparisonMinutes} onComparisonChange={setComparisonMinutes} now={now}/>}
+  {mode==='long'&&chosen?.forecast.issue&&<div className="stock-forecast-unavailable" role="status"><strong>{horizonLabel(horizonHours)} forecast unavailable</strong><p>{chosen.forecast.issue}</p>{dailyPreview&&<label><input type="checkbox" checked={previewEnabled} onChange={e=>setPreviewEnabled(e.target.checked)}/> Show available 24-hour forecast preview</label>}{preview&&<p>The dotted lines below are a separately computed <b>24-hour preview</b>, not a {horizonLabel(horizonHours)} forecast. Your selected long-term trading signal remains unchanged.</p>}</div>}
+  {!!history?.length&&<StockPriceChart longTerm={mode==='long'} forecastLabel={preview?'24-hour preview':`Next ${horizonLabel(horizonHours)}`} forecast={chartForecast} history={history} name={stockLabel(selected)} comparisonMinutes={comparisonMinutes} onComparisonChange={setComparisonMinutes} now={now}/>}
   {(mode==='short'?chart.isPending:!!chosen&&longChart.isPending)&&<p role="status">Loading recorded chart prices…</p>}
   {(mode==='short'?chart.isError:longChart.isError)&&<p role="alert">Chart unavailable. <button className="nu-btn" onClick={()=>void (mode==='short'?chart.refetch():longChart.refetch())}>Retry chart</button></p>}
   <LiveStockPrices onPrices={setLiveQuotes} mode={mode} horizonHours={horizonHours} longAnalyses={forecasts} comparisonMinutes={comparisonMinutes} holdings={holdings} at={status.data?.provider_at} connected={connected} onSelect={setSelected} now={now}/>

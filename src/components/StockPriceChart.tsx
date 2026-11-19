@@ -1,10 +1,13 @@
+import AnimatedForecastPath from './AnimatedForecastPath';
+import AnimatedStockPrice from './AnimatedStockPrice';
+import {useAnimatedStockHistory} from '../hooks/useAnimatedStockHistory';
 import {displayedStockProjection} from '../lib/stock-projection';
-import {useEffect,useId,useRef,useState} from 'react';
+import {useEffect,useId,useMemo,useRef,useState} from 'react';
 import type {PricePoint,StockForecast} from '../lib/stock-forecast';
 import './stock-price-chart.css';
 const money=(value:number)=>value.toLocaleString(undefined,{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2});
 const time=(timestamp:number)=>new Date(timestamp*1000).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
-export default function StockPriceChart({forecast,name,history,longTerm=false,comparisonMinutes,onComparisonChange,now=Date.now()/1000}:{forecast:StockForecast;name:string;history?:PricePoint[];longTerm?:boolean;comparisonMinutes?:number;onComparisonChange?:(minutes:number)=>void;now?:number}){
+export default function StockPriceChart({forecast,name,history,forecastLabel,longTerm=false,comparisonMinutes,onComparisonChange,now=Date.now()/1000}:{forecast:StockForecast;name:string;history?:PricePoint[];forecastLabel?:string;longTerm?:boolean;comparisonMinutes?:number;onComparisonChange?:(minutes:number)=>void;now?:number}){
  const host=useRef<HTMLDivElement>(null),id=useId().replace(/:/g,'');
  const [width,setWidth]=useState(760),[localRange,setLocalRange]=useState(1440),[projection,setProjection]=useState(true),[active,setActive]=useState<number|null>(null);
  const range=comparisonMinutes??localRange;
@@ -16,9 +19,10 @@ export default function StockPriceChart({forecast,name,history,longTerm=false,co
  useEffect(()=>setActive(null),[forecast,range,projection]);
  const source=history?.length?history:forecast.points;
  const latest=source.at(-1);
- const points=source.filter(p=>latest&&p.timestamp>latest.timestamp-range*60),last=points.at(-1),first=points[0];
+ const points=useMemo(()=>source.filter(p=>latest&&p.timestamp>latest.timestamp-range*60),[source,latest,range]);
+ const animated=useAnimatedStockHistory(points,`${name}:${longTerm}:${range}`),last=points.at(-1),first=points[0];
+ const forecastPaths=useMemo(()=>projection&&last?displayedStockProjection(forecast,last,now,longTerm?600:120):[],[projection,forecast,last,now,longTerm]);
  if(!last||!first)return <p>No recorded prices available for the chart.</p>;
- const forecastPaths=projection?displayedStockProjection(forecast,last,now,longTerm?600:120):[];
  const hasProjection=forecastPaths.length>0;
  const values=points.map(p=>p.price).concat(hasProjection?[forecast.lower,forecast.upper,...forecastPaths.flatMap(path=>path.points.map(p=>p.price))]:[]);
  const low=Math.min(...values),high=Math.max(...values),padding=Math.max((high-low)*.12,last.price*.0001,.005);
@@ -35,7 +39,7 @@ export default function StockPriceChart({forecast,name,history,longTerm=false,co
  candidates.sort((a,b)=>a.timestamp-b.timestamp);
  const selected=active===null?null:candidates[Math.min(active,candidates.length-1)];
  const change=last.price-first.price,changePercent=change/first.price*100;
- const rendered=points;
+ const rendered=animated;
  const segments:PricePoint[][]=[];
  for(const point of rendered){const segment=segments.at(-1);if(!segment||point.timestamp-segment.at(-1)!.timestamp>maxGap)segments.push([point]);else segment.push(point);}
  const area=segments.filter(segment=>segment.length>1).map(segment=>segment.map((p,i)=>`${i?'L':'M'}${x(p.timestamp)},${y(p.price)}`).join(' ')+` L${x(segment.at(-1)!.timestamp)},${plotBottom} L${x(segment[0].timestamp)},${plotBottom} Z`).join(' ');
@@ -53,9 +57,10 @@ export default function StockPriceChart({forecast,name,history,longTerm=false,co
  const tick=(stamp:number)=>end-start>=7*86400?new Date(stamp*1000).toLocaleDateString(undefined,{month:'short',day:'numeric'}):end-start>86400?new Date(stamp*1000).toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):time(stamp);
  const age=Math.max(0,Math.floor(now-last.timestamp));
  return <figure className="market-chart" aria-label={`${name} stock price chart`}>
-  <div className="market-chart-heading"><div><h4>{name}</h4><strong>{money(last.price)}</strong> <span className={change>=0?'market-positive':'market-negative'}>{change>=0?'+':''}{money(change)} ({changePercent>=0?'+':''}{changePercent.toFixed(2)}%)</span><small>Change across displayed observations · per share</small></div>
+  <div className="market-chart-heading"><div><h4>{name}</h4><AnimatedStockPrice value={last.price} observedAt={String(last.timestamp)} showChange={false}/> <span className={change>=0?'market-positive':'market-negative'}>{change>=0?'+':''}{money(change)} ({changePercent>=0?'+':''}{changePercent.toFixed(2)}%)</span><small>Change across displayed observations · per share</small></div>
    <div className="market-chart-controls"><div role="group" aria-label="Price comparison range">{(longTerm?[[1440,'24 hr'],[10080,'7 days'],[43200,'30 days']]:[[15,'15 min'],[30,'30 min'],[60,'60 min'],[120,'2 hr'],[180,'3 hr'],[360,'6 hr'],[720,'12 hr'],[1080,'18 hr'],[1440,'24 hr'],[10080,'7 days']]).map(([n,label])=><button key={n} className="nu-btn" aria-pressed={range===Number(n)} onClick={()=>setRange(Number(n))}>{label}</button>)}</div><label><input type="checkbox" checked={projection} onChange={e=>setProjection(e.target.checked)}/> Model estimate</label></div>
   </div>
+  {forecastLabel&&<p className="market-chart-freshness"><b>Forecast overlay: {forecastLabel}</b></p>}
   <p className={`market-chart-freshness ${age>(longTerm?600:120)?'market-negative':''}`} role="status">Latest recorded price: {new Date(last.timestamp*1000).toLocaleString()} · {age<(longTerm?600:120)?`${age} seconds`:`${Math.floor(age/60)} minutes`} behind your device clock. Your time: {new Date(now*1000).toLocaleTimeString()} · {zone}.{age>(longTerm?600:120)?' Price data is delayed; trade signals should wait.':''}</p>
   <div className="market-chart-readout" id={`${id}-readout`} aria-live="polite">
    {selected?<><strong>{selected.filled?'Estimated gap fill':selected.estimated?(selected.series==='upside'?'Upside scenario':selected.series==='downside'?'Downside scenario':'Model estimate'):'Observed price'}: {money(selected.price)}</strong><span>{new Date(selected.timestamp*1000).toLocaleString()} · {zone}</span></>:<><strong>High {money(Math.max(...points.map(p=>p.price)))} · Low {money(Math.min(...points.map(p=>p.price)))}</strong><span>Hover or drag to inspect · Arrow keys move between prices</span></>}
@@ -68,21 +73,19 @@ export default function StockPriceChart({forecast,name,history,longTerm=false,co
     {Array.from({length:6},(_,i)=>{const price=min+(max-min)*i/5,py=y(price);return <g key={`y-${i}`}><line className="market-grid" x1={left} x2={plotRight} y1={py} y2={py}/><text className="market-axis" x={plotRight+8} y={py+4}>{money(price)}</text></g>;})}
     {Array.from({length:xTickCount},(_,i)=>{const stamp=start+(end-start)*i/(xTickCount-1),px=x(stamp);return <g key={`x-${i}`}><line className="market-grid" x1={px} x2={px} y1={top} y2={plotBottom}/><text className="market-axis" x={px} y={plotBottom+23} textAnchor={i===0?'start':i===xTickCount-1?'end':'middle'}>{tick(stamp)}</text></g>;})}
     <text className="market-axis-title" x={plotRight+8} y={15}>Price / share ($)</text><text className="market-axis-title" x={left} y={height-10}>Time · {zone}</text>
-    <g clipPath={`url(#${id}-clip)`}>
+    <g key={`${name}:${range}:${projection}`} className="market-series" clipPath={`url(#${id}-clip)`}>
      {hasProjection&&<rect x={x(last.timestamp)} y={top} width={Math.max(0,plotRight-x(last.timestamp))} height={plotBottom-top} fill="var(--accent)" opacity=".045"/>}
      <path d={area} fill={`url(#${id}-fill)`}/>
      <path d={observedPath} className="market-observed" fill="none"/><path d={filledPath} className="market-filled" fill="none"/>
+     <circle key={last.timestamp} className="market-current-point" cx={x(last.timestamp)} cy={y(rendered.at(-1)?.price??last.price)} r={3.5} fill="#2563eb"/>
      <line className="market-last-line" x1={left} x2={plotRight} y1={y(last.price)} y2={y(last.price)}/>
-     {forecastPaths.map(path=><g key={path.kind} className={`market-forecast-path market-forecast-${path.kind}`} aria-label={path.kind==='expected'?'Model estimate path':`${path.kind} historical scenario`}>
-      {path.points.slice(1).map((point,i)=>{const previous=path.points[i],direction=point.price>previous.price?'up':point.price<previous.price?'down':'flat';return <path key={point.timestamp} d={`M${x(previous.timestamp)},${y(previous.price)} L${x(point.timestamp)},${y(point.price)}`} className={`market-projection market-projection-${direction}`} fill="none"/>;})}
-      <circle cx={x(path.points.at(-1)!.timestamp)} cy={y(path.points.at(-1)!.price)} r={path.kind==='expected'?4:3} fill={path.points.at(-1)!.price>=last.price?'#16a34a':'#dc2626'}/>
-     </g>)}
+     {forecastPaths.map(path=><AnimatedForecastPath key={`${name}:${path.kind}`} path={path} x={x} y={y} lastPrice={last.price}/>)}
      {hasProjection&&<line x1={plotRight-4} x2={plotRight-4} y1={y(forecast.lower)} y2={y(forecast.upper)} stroke="var(--accent)" strokeWidth={8} opacity=".25"/>}
     </g>
     {selected&&<g className="market-crosshair"><line x1={x(selected.timestamp)} x2={x(selected.timestamp)} y1={top} y2={plotBottom}/><line x1={left} x2={plotRight} y1={y(selected.price)} y2={y(selected.price)}/><circle cx={x(selected.timestamp)} cy={y(selected.price)} r={4}/><rect x={plotRight+2} y={y(selected.price)-11} width={right-4} height={23} rx={3}/><text x={plotRight+8} y={y(selected.price)+5}>{money(selected.price)}</text><rect x={Math.max(left,Math.min(plotRight-62,x(selected.timestamp)-31))} y={plotBottom+5} width={62} height={24} rx={3}/><text x={Math.max(left+31,Math.min(plotRight-31,x(selected.timestamp)))} y={plotBottom+22} textAnchor="middle">{time(selected.timestamp)}</text></g>}
    </svg>
   </div>
-  {projection&&!hasProjection&&<p className="market-chart-freshness">The model projection appears when a recent analysis is available for this horizon. Recorded prices remain available while analysis updates.</p>}
+  {projection&&!hasProjection&&<p className="market-chart-freshness">{forecast.issue?`Forecast unavailable: ${forecast.issue}`:'Forecast lines are waiting for a recent analysis and fresh chart prices.'} Recorded prices remain available while analysis updates.</p>}
   {hasProjection&&forecast.projection&&<p className="market-chart-freshness">Pattern paths use {forecast.projection.sampleCount} similar completed historical windows. The stronger dotted line meets the model’s endpoint; lighter lines are alternative upside/downside scenarios when at least five examples exist. Intermediate turns are illustrative estimates, not independently validated forecasts.{!forecast.supported?' This model has not passed the trade-signal validation checks.':''}</p>}
   {forecast.projection&&<p className="market-chart-freshness">Historical hourly rising runs: {forecast.projection.runs.riseHours===null?'unavailable':`${forecast.projection.runs.riseHours.toFixed(1)} hr median (${forecast.projection.runs.riseCount} runs)`} · Falling runs: {forecast.projection.runs.fallHours===null?'unavailable':`${forecast.projection.runs.fallHours.toFixed(1)} hr median (${forecast.projection.runs.fallCount} runs)`}. These are past intervals, not a repeating schedule.</p>}
   {hasProjection&&<p className="market-chart-freshness">Forecast issued {new Date(forecast.last!.timestamp*1000).toLocaleString()} · Target {new Date(forecast.targetTime*1000).toLocaleString()}. Hover or use arrow keys to inspect future prices and times.</p>}

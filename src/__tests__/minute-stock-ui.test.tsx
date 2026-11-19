@@ -58,4 +58,20 @@ describe('shared minute lab',()=>{
   await act(async()=>root!.root.findByProps({'aria-label':'Trading style'}).props.onChange({target:{value:'short'}}));expect(selector().props.value).toBe(12);
  });
 
+ it('labels a shorter chart preview explicitly while retaining the unavailable long-term decision',async()=>{
+  const stamp=Math.floor(Date.now()/60000)*60,points=Array.from({length:240},(_,i)=>({timestamp:stamp-(239-i)*3600,price:100+i*.01}));
+  const daily=forecastLongTermStock(points,24,30),weekly={...forecastLongTermStock(points,168,120),issue:'Not enough completed 7 days outcomes.'};
+  mocks.analyses.mockResolvedValue({data:[{stock_id:2,horizon_hours:24,forecast:daily,computed_at:'test',batch_ms:100},{stock_id:2,horizon_hours:168,forecast:weekly,computed_at:'test',batch_ms:100}],error:null});
+  await act(async()=>{root=create(<QueryClientProvider client={client}><MinuteStockLab holdings={[{stock_id:'2',shares:10,avg_cost:90}]}/></QueryClientProvider>);});
+  await act(async()=>root!.root.findByProps({'aria-label':'Trading style'}).props.onChange({target:{value:'long'}}));
+  await act(async()=>{await new Promise(r=>setTimeout(r,40));});
+  expect(JSON.stringify(root!.toJSON())).toContain('forecast unavailable');
+  const notice=root!.root.findByProps({className:'stock-forecast-unavailable'});
+  expect(notice.findAllByType('b').some(n=>n.children.includes('24-hour preview'))).toBe(true);
+  expect(root!.root.findAllByProps({className:'stock-advice advice-wait'})).toHaveLength(1);
+  expect(notice.findByType('input').props.checked).toBe(true);
+  await act(async()=>notice.findByType('input').props.onChange({target:{checked:false}}));
+  expect(notice.findByType('input').props.checked).toBe(false);
+ });
+
 });

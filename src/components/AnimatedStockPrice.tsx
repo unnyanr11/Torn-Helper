@@ -1,3 +1,4 @@
+import {prefersReducedStockMotion} from '../hooks/useAnimatedStockHistory';
 import {useEffect,useRef,useState} from 'react';
 const money=(value:number)=>value.toLocaleString(undefined,{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2});
 
@@ -10,8 +11,8 @@ export default function AnimatedStockPrice({value,observedAt,showChange=true,com
   setChange(difference);
   if(frame.current!==undefined)cancelAnimationFrame(frame.current);
   const start=displayed.current;
-  const reduced=document.documentElement.dataset.motion==='reduced'||matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduced||difference===0){displayed.current=value;setDisplay(value);return;}
+  const reduced=prefersReducedStockMotion();
+  if(reduced||typeof requestAnimationFrame!=='function'||difference===0){displayed.current=value;setDisplay(value);return;}
   let started:number|undefined;
   const animate=(time:number)=>{
    started??=time;
@@ -23,7 +24,7 @@ export default function AnimatedStockPrice({value,observedAt,showChange=true,com
   frame.current=requestAnimationFrame(animate);
   return()=>{if(frame.current!==undefined)cancelAnimationFrame(frame.current);};
  },[value,observedAt]);
- const movement=comparisonPrice===undefined?change:comparisonPrice&&comparisonPrice>0?value-comparisonPrice:null;
+ const movement=comparisonPrice===undefined?change:comparisonPrice&&comparisonPrice>0?display-comparisonPrice:null;
  const percent=comparisonPrice&&comparisonPrice>0&&movement!==null?movement/comparisonPrice*100:null;
  const color=movement===null||movement===0?'var(--fg)':movement>0?'var(--ok)':'var(--warn)';
  return <span style={comparisonPrice!==undefined?{color}:showChange?undefined:{color:'var(--fg)'}} className={`live-stock-price ${change>0?'price-up':change<0?'price-down':''}`}>
