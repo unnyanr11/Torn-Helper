@@ -4,6 +4,7 @@ export const MIN_HISTORY = 80;
 export const HISTORY_ENDPOINT = 'v2-torn-{stockId}-stocks';
 export type PricePoint = {timestamp:number;price:number;estimated?:boolean;availableAt?:number};
 export type StockForecast = {
+ projection?:import('./stock-projection.ts').StockProjection;
  points:PricePoint[]; issue?:string; cadence:number; last:PricePoint|null;
  predictedReturn:number; predictedPrice:number; lower:number; upper:number;
  tests:number; mae:number; baselineMae:number; directionAccuracy:number;

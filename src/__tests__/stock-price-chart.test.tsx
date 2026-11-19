@@ -72,3 +72,14 @@ it('leaves genuine missing hours disconnected in the line and shaded area',()=>{
  const area=root!.root.findAllByType('path').find(p=>p.props.fill?.startsWith('url('))!;
  expect((area.props.d.match(/ Z/g)??[])).toHaveLength(2);
 });
+it('plots rising and falling dotted segments plus inspectable upside/downside alternatives',()=>{
+ const last=points.at(-1)!,ahead={...forecast,issue:undefined,last,targetTime:last.timestamp+7200,predictedPrice:last.price+1,lower:last.price-2,upper:last.price+2,projection:{method:'historical-analogues-v1' as const,sampleCount:40,runs:{riseHours:2,fallHours:3,riseCount:8,fallCount:9},paths:[{kind:'expected' as const,samples:40,points:[last,{timestamp:last.timestamp+3600,price:last.price-1},{timestamp:last.timestamp+7200,price:last.price+1}]},{kind:'upside' as const,samples:20,points:[last,{timestamp:last.timestamp+7200,price:last.price+2}]},{kind:'downside' as const,samples:20,points:[last,{timestamp:last.timestamp+7200,price:last.price-2}]}]}};
+ act(()=>{root=create(<StockPriceChart name="Test stock" forecast={ahead} history={points} now={last.timestamp+10}/>);});
+ expect(root!.root.findAllByProps({className:'market-projection market-projection-up'}).length).toBeGreaterThan(0);
+ expect(root!.root.findAllByProps({className:'market-projection market-projection-down'}).length).toBeGreaterThan(0);
+ expect(root!.root.findAllByProps({className:'market-forecast-path market-forecast-upside'})).toHaveLength(1);
+ act(()=>root!.root.findByType('svg').props.onKeyDown({key:'End',preventDefault(){}}));
+ expect(root!.root.findAllByType('strong').map(n=>n.children.join('')).join(' ')).toContain('Downside scenario:');
+ act(()=>root!.root.findByType('input').props.onChange({target:{checked:false}}));
+ expect(root!.root.findAllByProps({className:'market-projection market-projection-down'})).toHaveLength(0);
+});

@@ -1,12 +1,13 @@
 import {expect,it,vi} from 'vitest';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
+import {buildStockProjection} from '../lib/stock-projection';
 import {forecastLongTermStock,FORECAST_HOURS} from '../lib/long-term-stock';
 function endpoint(authorized:boolean,rpc:ReturnType<typeof vi.fn>){
  const source=readFileSync('supabase/functions/analyze-long-term-stocks/index.ts','utf8').replace(/^import .*\n/gm,'');
  const js=ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;
  let handler:(req:Request)=>Promise<Response>;
- new Function('Deno','adminClient','json','preflight','scheduled','forecastLongTermStock','FORECAST_HOURS',js)({serve:(fn:typeof handler)=>{handler=fn;}},()=>({rpc}),(body:unknown,status=200)=>new Response(JSON.stringify(body),{status}),()=>null,async()=>authorized,forecastLongTermStock,FORECAST_HOURS);
+ new Function('Deno','adminClient','json','preflight','scheduled','forecastLongTermStock','FORECAST_HOURS','buildStockProjection',js)({serve:(fn:typeof handler)=>{handler=fn;}},()=>({rpc}),(body:unknown,status=200)=>new Response(JSON.stringify(body),{status}),()=>null,async()=>authorized,forecastLongTermStock,FORECAST_HOURS,buildStockProjection);
  return (req:Request)=>handler(req);
 }
 const request=()=>new Request('https://example.test',{method:'POST'});

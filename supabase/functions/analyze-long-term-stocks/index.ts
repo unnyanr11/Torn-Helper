@@ -1,4 +1,5 @@
 import {adminClient,json,preflight,scheduled} from '../_shared/http.ts';
+import {buildStockProjection} from '../../../src/lib/stock-projection.ts';
 import {forecastLongTermStock,FORECAST_HOURS} from '../../../src/lib/long-term-stock.ts';
 Deno.serve(async req=>{
  const early=preflight(req);if(early)return early;
@@ -15,6 +16,7 @@ Deno.serve(async req=>{
    const start=performance.now();
    const forecast=forecastLongTermStock(points,horizon_hours,horizon_hours<=24?7:120);
    if(forecast.last?.timestamp!==Date.parse(provider_at)/1000)return json({error:'Current stock batch is incomplete'},503);
+   forecast.projection=buildStockProjection(forecast.points,forecast);
    const processing_ms=performance.now()-start;
    results.push({stock_id,horizon_hours,forecast:{...forecast,points:[],validation:[]},processing_ms});
    if(horizon_hours===24)charts.push({stock_id,forecast:{...forecast,points:points.filter((p:{timestamp:number})=>p.timestamp>Date.parse(provider_at)/1000-30*86400)},processing_ms});
