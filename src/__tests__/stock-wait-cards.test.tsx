@@ -18,6 +18,11 @@ it('keeps compact cards to the name, action, price and comparison movement',asyn
   const text=flatten(root!.toJSON());
   expect(text).toContain('0 Buy · 0 Sell · 2 Wait');const cards=root!.root.findAllByProps({className:'live-stock-quote'});
   expect(text).not.toContain('44.0%');
+  expect(text).toContain('Why all stocks show Wait');
+  expect(text).toContain('1 stock: No predictive edge');
+  expect(text).toContain('1 stock: Historical checks failed');
+  expect(root!.root.findByType('details').props.open).toBeUndefined();
+  expect(cards.every(card=>card.findAllByType('li').length===0)).toBe(true);
   expect(JSON.stringify(root!.toJSON())).toContain('+1.01%');
   expect(cards[0].props.title).toContain('no-change baseline');
   expect(cards[1].props.title).toContain('Historical checks failed');

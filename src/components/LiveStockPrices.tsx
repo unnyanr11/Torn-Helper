@@ -1,7 +1,7 @@
 import {stockHorizonDecision,horizonLabel,type LongTermForecast,type TradingMode} from '../lib/long-term-stock';
 import {useStockWindowExtremes} from '../hooks/useStockWindowExtremes';
 import {stockWindowLabel} from '../lib/stock-window';
-import {stockCardDecision} from '../lib/stock-card-decision';
+import {stockCardDecision,WAIT_LABELS} from '../lib/stock-card-decision';
 import {type StockHolding} from '../lib/stock-trade-decision';
 import {type StockForecast} from '../lib/stock-forecast';
 import {useEffect,useRef} from 'react';
@@ -29,11 +29,19 @@ export default function LiveStockPrices({at,connected,onSelect,onPrices,horizonH
  useEffect(()=>{if(prices.data)onPrices?.(prices.data);},[prices.data,onPrices]);
  const cards=(prices.data??[]).map(quote=>({quote,decision:horizonHours!==undefined||mode==='long'?stockHorizonDecision(longAnalyses[quote.stock_id],now,holdings.find(h=>Number(h.stock_id)===quote.stock_id),{timestamp:Date.parse(quote.observed_at)/1000,price:quote.price},mode):stockCardDecision(analyses[quote.stock_id],quote.observed_at,now,holdings.find(h=>Number(h.stock_id)===quote.stock_id))}));
  const counts={Buy:0,Sell:0,Hold:0,Wait:0};for(const {decision} of cards)counts[decision.signal==='Hold'?'Hold':decision.signal==='Buy candidate'?'Buy':decision.signal==='Sell / rebuy watch'?'Sell':'Wait']++;
+ const waitReasons=new Map<string,number>();
+ for(const {decision} of cards)if(decision.signal==='Wait'){const label=decision.blocker?WAIT_LABELS[decision.blocker]:'No confirmed trade signal';waitReasons.set(label,(waitReasons.get(label)??0)+1);}
  return <section className="live-stock-board" aria-label="Live stock prices">
   <h4>Live prices</h4>
   <p role="status">{connected?'Price stream connected':'Reconnecting price stream · automatic backup checks active'}{prices.isError?' · Latest prices unavailable; previous quotes retained':''}</p>
   <p>Forecast: {horizonHours!==undefined?horizonLabel(horizonHours):`${horizon} minutes`}. Price movement compares the first and latest recorded quotes in the selected {stockWindowLabel(comparisonMinutes)} window.</p>
   {!!cards.length&&<p role="status">{counts.Buy} Buy · {counts.Sell} Sell · {mode==='long'?`${counts.Hold} Hold · `:''}{counts.Wait} Wait.</p>}
+  {counts.Wait>0&&<details className="stock-wait-summary"><summary>Why {counts.Wait===cards.length?'all stocks show Wait':`${counts.Wait} stocks show Wait`}</summary>
+   <p>These reasons apply to the selected {horizonHours!==undefined?horizonLabel(horizonHours):`${horizon} minute`} forecast, using the latest available quote:</p>
+   <ul>{[...waitReasons].sort((a,b)=>b[1]-a[1]).map(([reason,count])=><li key={reason}>{count} {count===1?'stock':'stocks'}: {reason}</li>)}</ul>
+   <p>Green or red price movement describes the past comparison window, not a forecast trade signal. Select a stock for its exact forecast and failed checks.</p>
+   <p>Buy requires a validated rebound after a dip. Sell requires recorded shares and more than 0.1% net profit after fees. Wait means the current model does not establish a trade under those rules.</p>
+  </details>}
   {prices.isPending&&<p>Waiting for prices…</p>}
   {prices.data&&<><p className="muted">Observed {new Date(prices.data[0].observed_at).toLocaleString()} · {prices.data[0].source}. Select a stock for its chart and full signal explanation.</p>
    {extremes.isError&&<p role="alert">Comparison movement unavailable. <button className="nu-btn" onClick={()=>void extremes.refetch()}>Retry movement</button></p>}
