@@ -75,7 +75,8 @@ export default function Stocks() {
       <MinuteStockLab holdings={holdings}/>
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
-        <h3>Add / update holding</h3>
+        <h3>My holdings</h3>
+        <p>Record the shares you own so Hold and Sell can be checked. Add your average purchase price to calculate profit after fees.</p>
         <DataEntry source="stock"
           className="nu-input"
           aria-label="Stock name or ticker" placeholder="Choose stock name or ticker"
@@ -90,7 +91,7 @@ export default function Stocks() {
         />
         <SelectEntry kind="money" type="number" step="any"
           className="nu-input"
-          placeholder="Average cost (optional)"
+          placeholder="Average purchase price per share"
           value={avgCost}
           onChange={(e) => setAvgCost(e.target.value)}
         />
@@ -103,7 +104,7 @@ export default function Stocks() {
           <article key={h.id} className="card nu-raised">
             <h3>{stockLabel(h.stock_id,catalogue.data??[])}</h3>
             <p className="value">{h.shares}</p>
-            {h.avg_cost && <p className="muted">Avg cost: {h.avg_cost}</p>}
+            {h.avg_cost && <p className="muted">Average purchase price: {h.avg_cost}</p>}
             <button className="nu-btn" onClick={() => removeHolding(h.id)}>
               Remove
             </button>
