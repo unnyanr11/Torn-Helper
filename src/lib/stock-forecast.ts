@@ -74,15 +74,24 @@ export function forecastStock(input:PricePoint[]):StockForecast{
  const supported=count>=20&&mae<baselineMae*.95&&directionAccuracy>=.55&&Number.isFinite(predictedReturn)&&Math.abs(predictedReturn)<.2;
  return {points,cadence,last,predictedReturn,predictedPrice:last!.price*(1+predictedReturn),lower:Math.max(0,last!.price*(1+predictedReturn-margin)),upper:last!.price*(1+predictedReturn+margin),tests:count,mae,baselineMae,directionAccuracy,supported,targetTime:last!.timestamp+cadence,validation};
 }
-export type StockDecision={signal:'Buy candidate'|'Sell / rebuy watch'|'Wait';reason:string;stale:boolean;netReturn:number;buyCeiling:number;rebuyCeiling:number};
+export type StockWaitBlocker='data'|'stale'|'baseline'|'validation'|'fees'|'ownership'|'cost'|'profit'|'dip'|'rebound'|'updating';
+export type StockDecision={blocker?:StockWaitBlocker;signal:'Buy candidate'|'Sell / rebuy watch'|'Wait';reason:string;stale:boolean;netReturn:number;buyCeiling:number;rebuyCeiling:number};
 export function stockDecision(forecast:StockForecast,now=Date.now()/1000,maxAge=Math.max(900,forecast.cadence*2)):StockDecision{
  const {last,cadence}=forecast;
  const stale=!last||now-last.timestamp>maxAge||last.timestamp>now+60||forecast.targetTime<=now;
  const base={signal:'Wait' as const,reason:forecast.issue??'The model has not shown enough evidence to trade.',stale,netReturn:last?forecast.predictedPrice*(1-SELL_FEE)/last.price-1:0,buyCeiling:forecast.lower*(1-SELL_FEE),rebuyCeiling:last?last.price*(1-SELL_FEE):0};
- if(forecast.issue)return base;
- if(stale)return {...base,reason:last&&now-last.timestamp>maxAge?'Prices are outdated. Wait for the next price collection.':'The forecast window has passed. Refresh history before using a signal.'};
- if(!forecast.supported)return base;
+ if(forecast.issue)return {...base,blocker:'data'};
+ if(stale)return {...base,blocker:'stale',reason:last&&now-last.timestamp>maxAge?'Prices are outdated. Wait for the next price collection.':'The forecast window has passed. Refresh history before using a signal.'};
+ if(!forecast.supported){
+  if('model' in forecast&&forecast.model==='No change')return {...base,blocker:'baseline',reason:'The no-change baseline won the historical comparison. No predictive trading edge was established.'};
+  const minimumTests='model' in forecast?40:20,checks:string[]=[];
+  if(forecast.tests<minimumTests)checks.push(`${forecast.tests}/${minimumTests} historical tests`);
+  if(forecast.directionAccuracy<.55)checks.push(`${(forecast.directionAccuracy*100).toFixed(1)}% direction accuracy; needs 55%`);
+  const improvement=forecast.baselineMae>0?1-forecast.mae/forecast.baselineMae:0;
+  if(improvement<.05)checks.push(`${(improvement*100).toFixed(1)}% error improvement; needs 5%`);
+  return {...base,blocker:'validation',reason:checks.length?`Historical checks failed: ${checks.join(' · ')}.`:base.reason};
+ }
  if(forecast.lower*(1-SELL_FEE)>last!.price)return {...base,signal:'Buy candidate',reason:'The estimated upside clears the selling fee and historical error margin.'};
  if(forecast.upper<last!.price*(1-SELL_FEE))return {...base,signal:'Sell / rebuy watch',reason:'The estimated decline clears the selling fee and historical error margin. Only consider shares you already own.'};
- return {...base,reason:'The estimated move does not clear both the selling fee and historical error margin.'};
+ return {...base,blocker:'fees',reason:`The estimated move of ${forecast.predictedReturn>=0?'+':''}${(forecast.predictedReturn*100).toFixed(4)}% does not clear the 0.1% selling fee and historical error margin.`};
 }

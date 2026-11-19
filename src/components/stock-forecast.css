@@ -25,3 +25,7 @@
 .advice-sell > strong { color:var(--warn); }
 .stock-advice p { max-width:75ch; margin-bottom:0; }
 .stock-action { font-size:.8rem; font-weight:600; }
+
+.stock-wait-reason{font-size:.75rem;line-height:1.45;color:var(--muted);text-wrap:balance}
+
+.stock-validation-text{font-size:.7rem;line-height:1.5;color:var(--muted);font-variant-numeric:tabular-nums}

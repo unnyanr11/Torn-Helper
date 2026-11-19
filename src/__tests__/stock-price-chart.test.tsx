@@ -9,10 +9,12 @@ let root:ReactTestRenderer|undefined;
 afterEach(()=>{act(()=>root?.unmount());root=undefined;});
 it('labels both axes, timezone, observed data and model estimates',()=>{
  const html=renderToStaticMarkup(<StockPriceChart name="Test stock" forecast={forecast} now={points.at(-1)!.timestamp+5}/>);
+ expect(html).toMatch(/aria-pressed="true"[^>]*>24 hr<\/button>/);
  expect(html).toContain('Price / share ($)');expect(html).toContain('Time ·');expect(html).toContain('historical error range');expect(html).toContain('15 min');expect(html).toContain('60 min');expect(html).toContain('12 hr');expect(html).toContain('24 hr');expect(html).toContain('7 days');
 });
 it('inspects exact observations with pointer and keys and distinguishes the forecast',()=>{
  act(()=>{root=create(<StockPriceChart name="Test stock" forecast={forecast} now={points.at(-1)!.timestamp+5}/>);});
+ act(()=>root!.root.findAllByType('button').find(b=>b.children.includes('60 min'))!.props.onClick());
  const svg=()=>root!.root.findByType('svg');
  act(()=>svg().props.onPointerMove({clientX:14,currentTarget:{getBoundingClientRect:()=>({left:0,width:760})}}));
  expect(root!.root.findAllByType('strong').map(n=>n.children.join('')).join(' ')).toContain('Observed price: $102.40');
