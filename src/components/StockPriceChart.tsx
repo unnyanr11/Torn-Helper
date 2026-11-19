@@ -23,7 +23,9 @@ export default function StockPriceChart({forecast,name,history,longTerm=false,co
  const min=low-padding,max=high+padding;
  const left=14,right=width<500?84:100,top=28,bottom=64,height=360,plotRight=width-right,plotBottom=height-bottom;
  const xTickCount=width<500?3:5;
- const observedCadence=Math.min(...points.slice(1).map((p,i)=>p.timestamp-points[i].timestamp));
+ // A partial final hour must not redefine the spacing of every historical point.
+ const observedCadence=longTerm?3600:60;
+ const maxGap=observedCadence*1.5;
  const start=last.timestamp-(range-1)*60,end=hasProjection?forecast.targetTime:last.timestamp;
  const x=(stamp:number)=>left+(stamp-start)/Math.max(60,end-start)*(plotRight-left);
  const y=(price:number)=>plotBottom-(price-min)/(max-min)*(plotBottom-top);
@@ -31,9 +33,11 @@ export default function StockPriceChart({forecast,name,history,longTerm=false,co
  const selected=active===null?null:candidates[Math.min(active,candidates.length-1)];
  const change=last.price-first.price,changePercent=change/first.price*100;
  const rendered=points;
- const path=rendered.map((p,i)=>`${i&&p.timestamp-rendered[i-1].timestamp<=Math.max(60,observedCadence)*1.5?'L':'M'}${x(p.timestamp)},${y(p.price)}`).join(' ');
- const observedPath=rendered.slice(1).map((p,i)=>!p.estimated&&!rendered[i].estimated&&p.timestamp-rendered[i].timestamp<=Math.max(60,observedCadence)*1.5?`M${x(rendered[i].timestamp)},${y(rendered[i].price)} L${x(p.timestamp)},${y(p.price)}`:'').join(' ');
- const filledPath=rendered.slice(1).map((p,i)=>p.estimated||rendered[i].estimated?`M${x(rendered[i].timestamp)},${y(rendered[i].price)} L${x(p.timestamp)},${y(p.price)}`:'').join(' ');
+ const segments:PricePoint[][]=[];
+ for(const point of rendered){const segment=segments.at(-1);if(!segment||point.timestamp-segment.at(-1)!.timestamp>maxGap)segments.push([point]);else segment.push(point);}
+ const area=segments.filter(segment=>segment.length>1).map(segment=>segment.map((p,i)=>`${i?'L':'M'}${x(p.timestamp)},${y(p.price)}`).join(' ')+` L${x(segment.at(-1)!.timestamp)},${plotBottom} L${x(segment[0].timestamp)},${plotBottom} Z`).join(' ');
+ const observedPath=rendered.slice(1).map((p,i)=>!p.estimated&&!rendered[i].estimated&&p.timestamp-rendered[i].timestamp<=maxGap?`M${x(rendered[i].timestamp)},${y(rendered[i].price)} L${x(p.timestamp)},${y(p.price)}`:'').join(' ');
+ const filledPath=rendered.slice(1).map((p,i)=>(p.estimated||rendered[i].estimated)&&p.timestamp-rendered[i].timestamp<=maxGap?`M${x(rendered[i].timestamp)},${y(rendered[i].price)} L${x(p.timestamp)},${y(p.price)}`:'').join(' ');
  const fillCount=points.filter(p=>p.estimated).length;
  const inspect=(clientX:number,element:SVGSVGElement)=>{
   const box=element.getBoundingClientRect();if(!box.width)return;
@@ -62,7 +66,7 @@ export default function StockPriceChart({forecast,name,history,longTerm=false,co
     <text className="market-axis-title" x={plotRight+8} y={15}>Price / share ($)</text><text className="market-axis-title" x={left} y={height-10}>Time · {zone}</text>
     <g clipPath={`url(#${id}-clip)`}>
      {hasProjection&&<rect x={x(last.timestamp)} y={top} width={Math.max(0,plotRight-x(last.timestamp))} height={plotBottom-top} fill="var(--accent)" opacity=".045"/>}
-     <path d={`${path} L${x(last.timestamp)},${plotBottom} L${x(first.timestamp)},${plotBottom} Z`} fill={`url(#${id}-fill)`}/>
+     <path d={area} fill={`url(#${id}-fill)`}/>
      <path d={observedPath} className="market-observed" fill="none"/><path d={filledPath} className="market-filled" fill="none"/>
      <line className="market-last-line" x1={left} x2={plotRight} y1={y(last.price)} y2={y(last.price)}/>
      {hasProjection&&<><path d={`M${x(last.timestamp)},${y(last.price)} L${x(forecast.targetTime)},${y(forecast.predictedPrice)}`} className="market-projection" fill="none"/><line x1={plotRight-4} x2={plotRight-4} y1={y(forecast.lower)} y2={y(forecast.upper)} stroke="var(--accent)" strokeWidth={8} opacity=".35"/><circle cx={plotRight-4} cy={y(forecast.predictedPrice)} r={4} fill="var(--accent)"/></>}

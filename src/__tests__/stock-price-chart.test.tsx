@@ -52,3 +52,23 @@ it('offers daily, weekly and monthly chart comparisons for long-term mode',()=>{
  const html=renderToStaticMarkup(<StockPriceChart longTerm name="Test stock" forecast={forecast} now={points.at(-1)!.timestamp+5}/>);
  expect(html).toContain('30 days');expect(html).toContain('7 days');expect(html).toContain('24 hr');expect(html).not.toContain('15 min');
 });
+it('connects hourly observations when the latest quote is only a minute into a partial hour',()=>{
+ const start=1794000000;
+ const hourly=Array.from({length:24},(_,i)=>({timestamp:start+i*3600,price:100+Math.sin(i)*.1}));
+ const history=[...hourly,{timestamp:hourly.at(-1)!.timestamp+60,price:100.2}];
+ act(()=>{root=create(<StockPriceChart longTerm name="Hourly stock" forecast={{...forecast,issue:'Awaiting validation'}} history={history} now={history.at(-1)!.timestamp+10}/>);});
+ const line=root!.root.findByProps({className:'market-observed'}).props.d as string;
+ expect((line.match(/ L/g)??[])).toHaveLength(24);
+ const svg=root!.root.findByType('svg');
+ act(()=>svg.props.onKeyDown({key:'Home',preventDefault(){}}));
+ expect(root!.root.findAllByType('strong').map(n=>n.children.join('')).join(' ')).toContain('Observed price: $100.00');
+ act(()=>svg.props.onKeyDown({key:'End',preventDefault(){}}));
+ expect(root!.root.findAllByType('strong').map(n=>n.children.join('')).join(' ')).toContain('Observed price: $100.20');
+});
+it('leaves genuine missing hours disconnected in the line and shaded area',()=>{
+ const start=1794000000,history=[0,1,4,5].map((h,i)=>({timestamp:start+h*3600,price:100+i}));
+ act(()=>{root=create(<StockPriceChart longTerm name="Gapped stock" forecast={{...forecast,issue:'Awaiting validation'}} history={history} now={history.at(-1)!.timestamp+10}/>);});
+ expect((root!.root.findByProps({className:'market-observed'}).props.d.match(/ L/g)??[])).toHaveLength(2);
+ const area=root!.root.findAllByType('path').find(p=>p.props.fill?.startsWith('url('))!;
+ expect((area.props.d.match(/ Z/g)??[])).toHaveLength(2);
+});
