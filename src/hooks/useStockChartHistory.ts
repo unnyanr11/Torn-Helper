@@ -9,9 +9,9 @@ export function mergeChartHistory(previous:ChartHistory|undefined,incoming:{prov
  const latest=Math.max(0,...merged.keys()),cutoff=latest-7*86400;
  return {provider_at:incoming.provider_at,points:[...merged.values()].filter(p=>p.timestamp>cutoff).sort((a,b)=>a.timestamp-b.timestamp)};
 }
-export function useStockChartHistory(stockId:number,providerAt:string|null|undefined){
+export function useStockChartHistory(stockId:number,providerAt:string|null|undefined,enabled=true){
  const client=useQueryClient(),key=['stock-chart-history',stockId];
- const history=useQuery({queryKey:key,enabled:!!providerAt,staleTime:15000,refetchInterval:30000,retry:1,
+ const history=useQuery({queryKey:key,enabled:enabled&&!!providerAt,staleTime:15000,refetchInterval:30000,retry:1,
   queryFn:async()=>{
    const previous=client.getQueryData<ChartHistory>(key);
    const result=await supabase.rpc('read_stock_chart_history',{p_stock_id:stockId,p_after:previous?.points.at(-1)?.timestamp??null});
@@ -20,6 +20,6 @@ export function useStockChartHistory(stockId:number,providerAt:string|null|undef
    return mergeChartHistory(previous,result.data);
   },
  });
- useEffect(()=>{if(providerAt)void client.invalidateQueries({queryKey:key});},[providerAt,stockId,client]);
+ useEffect(()=>{if(enabled&&providerAt)void client.invalidateQueries({queryKey:key});},[enabled,providerAt,stockId,client]);
  return history;
 }

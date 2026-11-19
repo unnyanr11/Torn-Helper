@@ -30,10 +30,10 @@ describe('shared minute lab',()=>{
   await act(async()=>{root=create(<QueryClientProvider client={client}><MinuteStockLab/></QueryClientProvider>);await new Promise(r=>setTimeout(r,40));});
   await act(async()=>{await new Promise(r=>setTimeout(r,40));});
   expect(mocks.workers).toHaveLength(0);
-  expect(mocks.rpc.mock.calls.every(call=>['read_stock_chart_history','read_stock_window_extremes'].includes(call[0]))).toBe(true);
+  expect(mocks.rpc.mock.calls.every(call=>['read_stock_chart_history','read_stock_window_openings'].includes(call[0]))).toBe(true);
   expect(JSON.stringify(root!.toJSON())).toContain('Backend batch: 35 stocks');
   await act(async()=>{root!.root.findByProps({label:'Stock'}).props.onChange({target:{value:'3'}});});
-  expect(mocks.workers).toHaveLength(0);expect(mocks.rpc.mock.calls.every(call=>['read_stock_chart_history','read_stock_window_extremes'].includes(call[0]))).toBe(true);
+  expect(mocks.workers).toHaveLength(0);expect(mocks.rpc.mock.calls.every(call=>['read_stock_chart_history','read_stock_window_openings'].includes(call[0]))).toBe(true);
  });
  it('switches to cached long-term results and shows Hold for an owned stock',async()=>{
   const stamp=Math.floor(Date.now()/60000)*60;

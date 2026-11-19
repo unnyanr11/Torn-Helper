@@ -27,7 +27,7 @@ export default function MinuteStockLab({holdings=[]}:{holdings?:StockHolding[]})
  const preview=mode==='long'&&!!chosen?.forecast.issue&&previewEnabled?dailyPreview:undefined;
  const chartForecast=preview?.forecast??chosen?.forecast??empty;
  const forecasts=Object.fromEntries(rows.map(row=>[row.stock_id,row.forecast]));
- const chart=useStockChartHistory(Number(selected),status.data?.provider_at);
+ const chart=useStockChartHistory(Number(selected),status.data?.provider_at,mode==='short');
  const longChart=useLongTermChart(Number(selected),mode==='long',chosen?.computed_at);
  const minutePoints=useMemo(()=>chart.data?.points?fillMissingStockMinutes(chart.data.points):undefined,[chart.data]);
  const history=mode==='short'?minutePoints:longChart.data;

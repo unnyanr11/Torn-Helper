@@ -18,5 +18,5 @@ it('explains tiny price moves, ownership gates and updates separately',()=>{
  expect(stockCardDecision(sell,at,now,{stock_id:'1',shares:10,avg_cost:95}).signal).toBe('Sell / rebuy watch');
  expect(stockCardDecision(base,new Date((now+60)*1000).toISOString(),now).blocker).toBe('updating');
  expect(stockCardDecision(undefined,at,now).blocker).toBe('data');
- expect(WAIT_LABELS.fees).toBe('Move too small after fees');
+ expect(WAIT_LABELS.fees).toBe('Expected move too small after costs');
 });
