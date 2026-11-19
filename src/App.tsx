@@ -2,7 +2,7 @@ import {drawInvitation} from './lib/draw-invitation';
 import {clearBrowserTornKeys} from './lib/browser-torn-key';
 import { cancelTornRequests } from "./lib/torn-request-state";
 import SpatialShell from "./components/SpatialShell";
-import AccountPreparation from "./components/AccountPreparation";
+import AccountPreparation,{clearPreparationSession} from "./components/AccountPreparation";
 import TimerProvider from "./components/TimerProvider";
 import WarTargetProvider from "./components/WarTargetProvider";
 import TornDataShortcut from "./components/TornDataShortcut";
@@ -108,7 +108,7 @@ export default function App() {
         if (disposed || version !== refreshVersion) return;
         const nextIdentity = session?.user.id ?? null;
         if (identityRef.current !== nextIdentity) {
-          if(identityRef.current)clearBrowserTornKeys();
+          if(identityRef.current){clearPreparationSession(identityRef.current);clearBrowserTornKeys();}
           cancelTornRequests(queryClient);
           queryClient.clear();
           setRole("user");
@@ -141,6 +141,7 @@ export default function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
+      if(event==='SIGNED_OUT'&&identityRef.current)clearPreparationSession(identityRef.current);
       if (identityRef.current !== (session?.user.id ?? null)) {
         setAuthReady(false);
         setSignedIn(false);

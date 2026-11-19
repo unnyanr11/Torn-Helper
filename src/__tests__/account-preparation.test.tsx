@@ -7,7 +7,7 @@ import {preparationPlan,startPreparation,pageDatasets,PAGE_DATA,PREPARATION_CALL
 import {compileTornRequest} from '../../supabase/functions/_shared/torn-data';
 import {observationKey} from '../lib/personal-data';
 import {observationsKey,mergeObservation} from '../lib/observation-cache';
-import AccountPreparation,{preparationKey} from '../components/AccountPreparation';
+import AccountPreparation,{preparationKey,clearPreparationSession} from '../components/AccountPreparation';
 import TornDataShortcut from '../components/TornDataShortcut';
 import {useTornKeyMode} from '../hooks/useTornKeyMode';
 const mocks=vi.hoisted(()=>({invoke:vi.fn()}));
@@ -102,4 +102,36 @@ it('opens partial workspace on request while the original preparation finishes w
  expect(cache.getQueryData(preparationKey(owner))).toMatchObject({loaded:PREPARATION_CALLS});
  expect(cache.getQueryData(['account-preparation-running',owner])).toBe(false);
  expect(mocks.invoke).toHaveBeenCalledTimes(PREPARATION_CALLS);
+});
+
+it('opens immediately after a refresh, even if first setup was still running',async()=>{
+ const values=new Map<string,string>();
+ vi.stubGlobal('sessionStorage',{getItem:(key:string)=>values.get(key)??null,setItem:(key:string,value:string)=>values.set(key,value),removeItem:(key:string)=>values.delete(key)});
+ mocks.invoke.mockResolvedValue({data:{},error:null});
+ let cache=client();
+ await act(async()=>{root=create(<QueryClientProvider client={cache}><AccountPreparation owner={owner}>Workspace</AccountPreparation></QueryClientProvider>);await vi.advanceTimersByTimeAsync(0);});
+ const calls=mocks.invoke.mock.calls.length;
+ act(()=>root!.unmount());root=undefined;cache.clear();
+ cache=client();
+ await act(async()=>{root=create(<QueryClientProvider client={cache}><AccountPreparation owner={owner}>Workspace</AccountPreparation></QueryClientProvider>);await vi.advanceTimersByTimeAsync(0);});
+ expect(JSON.stringify(root!.toJSON())).toContain('Workspace');
+ expect(JSON.stringify(root!.toJSON())).not.toContain('Getting your world ready');
+ expect(mocks.invoke).toHaveBeenCalledTimes(calls);
+ // A different account gets its own setup, and signing out resets the original account.
+ expect(renderToStaticMarkup(<QueryClientProvider client={cache}><AccountPreparation owner="other">Other workspace</AccountPreparation></QueryClientProvider>)).not.toContain('Other workspace');
+ clearPreparationSession(owner);
+ expect(renderToStaticMarkup(<QueryClientProvider client={cache}><AccountPreparation owner={owner}>Workspace</AccountPreparation></QueryClientProvider>)).toContain('Getting your world ready');
+});
+it('still opens setup safely when session storage is blocked',()=>{
+ vi.stubGlobal('sessionStorage',{getItem:()=>{throw new Error('Blocked');}});
+ expect(renderToStaticMarkup(<QueryClientProvider client={client()}><AccountPreparation owner={owner}>Workspace</AccountPreparation></QueryClientProvider>)).toContain('Getting your world ready');
+});
+
+it('opens an existing account from restored observations without waiting for setup',async()=>{
+ const cache=client();
+ cache.setQueryData(observationsKey(owner),mergeObservation({},{endpoint_id:'v2-user-profile',parameters:{},payload:{profile:{name:'Player'}},fetched_at:new Date().toISOString(),next_parameters:null},true));
+ await act(async()=>{root=create(<QueryClientProvider client={cache}><AccountPreparation owner={owner}>Restored workspace</AccountPreparation></QueryClientProvider>);await vi.advanceTimersByTimeAsync(0);});
+ expect(JSON.stringify(root!.toJSON())).toContain('Restored workspace');
+ expect(JSON.stringify(root!.toJSON())).not.toContain('Getting your world ready');
+ expect(mocks.invoke).not.toHaveBeenCalled();
 });

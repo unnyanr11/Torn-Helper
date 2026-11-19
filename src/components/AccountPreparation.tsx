@@ -10,6 +10,16 @@ import {observationsKey} from '../lib/observation-cache';
 import type {DataEntry} from '../lib/connected-data';
 import './account-preparation.css';
 export const preparationKey=(owner:string)=>['account-preparation',owner] as const;
+const sessionKey=(owner:string)=>`tcc-preparation-v1:${owner}`;
+function alreadyStarted(owner:string){
+ try{return sessionStorage.getItem(sessionKey(owner))==='started';}catch{return false;}
+}
+function rememberPreparationSession(owner:string){
+ try{sessionStorage.setItem(sessionKey(owner),'started');}catch{/* Browser storage is optional. */}
+}
+export function clearPreparationSession(owner:string){
+ try{sessionStorage.removeItem(sessionKey(owner));}catch{/* Storage may be disabled. */}
+}
 const messages=['Preparing environment','Loading dashboard essentials','Restoring saved timers','Checking cooldown deadlines','Preparing travel status','Connecting your workspace'];
 export default function AccountPreparation({owner,children}:{owner:string;children:ReactNode}){
  if(!owner)return <>{children}</>;
@@ -18,15 +28,19 @@ export default function AccountPreparation({owner,children}:{owner:string;childr
 function PrivatePreparation({owner,children}:{owner:string;children:ReactNode}){
  const client=useQueryClient();
  // Restore saved observations alongside collection so a restore never replaces new data.
- useSavedObservations(owner);
- const [progress,setProgress]=useState(emptyProgress),[remaining,setRemaining]=useState(60),[phrase,setPhrase]=useState(messages[0]),[phase,setPhase]=useState<'loading'|'ready'|'done'>(()=>client.getQueryData(preparationKey(owner))?'done':'loading');
+ const saved=useSavedObservations(owner);
+ const restoredAccount=Object.values(saved.data??{}).some(entry=>entry.restored&&entry.observation);
+ const [progress,setProgress]=useState(emptyProgress),[remaining,setRemaining]=useState(60),[phrase,setPhrase]=useState(messages[0]),[phase,setPhase]=useState<'loading'|'ready'|'done'>(()=>(client.getQueryData(preparationKey(owner))||alreadyStarted(owner))?'done':'loading');
+ const skipPreparation=useRef(phase==='done');
  const [workspaceOpen,setWorkspaceOpen]=useState(false);
  const heading=useRef<HTMLHeadingElement>(null);
  useEffect(()=>{
-  if(client.getQueryData(preparationKey(owner)))return;
+  if(restoredAccount){skipPreparation.current=true;rememberPreparationSession(owner);setPhase('done');return;}
+  if(skipPreparation.current||client.getQueryData(preparationKey(owner)))return;
   let cleanup:(()=>void)|undefined,disposed=false;
   const boot=setTimeout(()=>{
    if(disposed)return;
+   rememberPreparationSession(owner);
    heading.current?.focus();
    client.setQueryData(['account-preparation-running',owner],true);
    const task=startPreparation({
@@ -55,7 +69,7 @@ function PrivatePreparation({owner,children}:{owner:string;children:ReactNode}){
    cleanup=()=>{client.setQueryData(['account-preparation-running',owner],false);task.cancel();clearInterval(clock);clearInterval(text);clearTimeout(ready);};
   },0);
   return()=>{disposed=true;clearTimeout(boot);cleanup?.();};
- },[client,owner]);
+ },[client,owner,restoredAccount]);
  if(phase==='done')return <>{children}</>;
  if(workspaceOpen)return <><section className="card" aria-label="Background preparation"><p role="status">Preparing in the background · {progress.loaded} sections loaded · {progress.current}</p><progress aria-label="Background preparation" value={60-remaining} max={60}/></section>{children}</>;
  const complete=phase==='ready';
