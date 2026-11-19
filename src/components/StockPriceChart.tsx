@@ -3,9 +3,11 @@ import type {PricePoint,StockForecast} from '../lib/stock-forecast';
 import './stock-price-chart.css';
 const money=(value:number)=>value.toLocaleString(undefined,{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2});
 const time=(timestamp:number)=>new Date(timestamp*1000).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
-export default function StockPriceChart({forecast,name,history,now=Date.now()/1000}:{forecast:StockForecast;name:string;history?:PricePoint[];now?:number}){
+export default function StockPriceChart({forecast,name,history,comparisonMinutes,onComparisonChange,now=Date.now()/1000}:{forecast:StockForecast;name:string;history?:PricePoint[];comparisonMinutes?:number;onComparisonChange?:(minutes:number)=>void;now?:number}){
  const host=useRef<HTMLDivElement>(null),id=useId().replace(/:/g,'');
- const [width,setWidth]=useState(760),[range,setRange]=useState(1440),[projection,setProjection]=useState(true),[active,setActive]=useState<number|null>(null);
+ const [width,setWidth]=useState(760),[localRange,setLocalRange]=useState(1440),[projection,setProjection]=useState(true),[active,setActive]=useState<number|null>(null);
+ const range=comparisonMinutes??localRange;
+ const setRange=(minutes:number)=>onComparisonChange?onComparisonChange(minutes):setLocalRange(minutes);
  useEffect(()=>{
   const element=host.current;if(!element||typeof ResizeObserver==='undefined')return;
   const observer=new ResizeObserver(([entry])=>setWidth(Math.max(300,entry.contentRect.width)));observer.observe(element);return()=>observer.disconnect();

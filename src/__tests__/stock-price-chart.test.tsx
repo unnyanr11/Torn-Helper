@@ -38,3 +38,12 @@ it('shows current chart prices independently of an older pending analysis and in
  expect(root!.root.findAllByType('strong').map(n=>n.children.join('')).join(' ')).toContain('Observed price: $110.08');
  expect(JSON.stringify(root!.toJSON())).toContain('20 seconds');
 });
+
+it('shares comparison range selection with its parent and accepts the selected range',()=>{
+ let selected=0;
+ act(()=>{root=create(<StockPriceChart name="Test stock" forecast={forecast} comparisonMinutes={720} onComparisonChange={minutes=>{selected=minutes;}} now={points.at(-1)!.timestamp+5}/>);});
+ const buttons=root!.root.findAllByType('button');
+ expect(buttons.find(b=>b.children.includes('12 hr'))!.props['aria-pressed']).toBe(true);
+ act(()=>buttons.find(b=>b.children.includes('7 days'))!.props.onClick());
+ expect(selected).toBe(10080);
+});

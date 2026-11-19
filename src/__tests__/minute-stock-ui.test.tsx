@@ -28,9 +28,9 @@ describe('shared minute lab',()=>{
   await act(async()=>{root=create(<QueryClientProvider client={client}><MinuteStockLab/></QueryClientProvider>);await new Promise(r=>setTimeout(r,40));});
   await act(async()=>{await new Promise(r=>setTimeout(r,40));});
   expect(mocks.workers).toHaveLength(0);
-  expect(mocks.rpc.mock.calls.every(call=>call[0]==='read_stock_chart_history')).toBe(true);
+  expect(mocks.rpc.mock.calls.every(call=>['read_stock_chart_history','read_stock_window_extremes'].includes(call[0]))).toBe(true);
   expect(JSON.stringify(root!.toJSON())).toContain('Analysed on the server');
   await act(async()=>{root!.root.findByProps({label:'Minute stock'}).props.onChange({target:{value:'3'}});});
-  expect(mocks.workers).toHaveLength(0);expect(mocks.rpc.mock.calls.every(call=>call[0]==='read_stock_chart_history')).toBe(true);
+  expect(mocks.workers).toHaveLength(0);expect(mocks.rpc.mock.calls.every(call=>['read_stock_chart_history','read_stock_window_extremes'].includes(call[0]))).toBe(true);
  });
 });

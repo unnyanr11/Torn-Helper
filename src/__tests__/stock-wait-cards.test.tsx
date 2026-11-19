@@ -4,7 +4,7 @@ import {expect,it,vi} from 'vitest';
 import LiveStockPrices from '../components/LiveStockPrices';
 import type {StockForecast} from '../lib/stock-forecast';
 const mocked=vi.hoisted(()=>({rows:[] as any[]}));
-vi.mock('../lib/supabase',()=>({supabase:{from:()=>({select:()=>({eq:()=>({order:async()=>({data:mocked.rows,error:null})})})})}}));
+vi.mock('../lib/supabase',()=>({supabase:{rpc:async()=>({data:{provider_at:new Date(Math.floor(Date.now()/60000)*60000).toISOString(),window_minutes:1440,stocks:[]},error:null}),from:()=>({select:()=>({eq:()=>({order:async()=>({data:mocked.rows,error:null})})})})}}));
 const flatten=(node:any):string=>typeof node==='string'?node:Array.isArray(node)?node.map(flatten).join(''):node?flatten(node.children):'';
 it('shows distinct Wait causes, thresholds and counts on live stock cards',async()=>{
  vi.stubGlobal('document',{documentElement:{dataset:{motion:'reduced'}}});

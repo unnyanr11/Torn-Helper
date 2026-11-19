@@ -14,6 +14,7 @@ import {type MinuteHorizon} from '../lib/minute-forecast';
 import {ForecastDetails} from './StockForecast';
 import SelectEntry from './SelectEntry';
 export default function MinuteStockLab({holdings=[]}:{holdings?:StockHolding[]}){
+ const [comparisonMinutes,setComparisonMinutes]=useState(1440);
  const [selected,setSelected]=useState('2'),[horizon,setHorizon]=useState<MinuteHorizon>(1),[archiveOpen,setArchiveOpen]=useState(false),[now,setNow]=useState(()=>Date.now()/1000);
  const {status,connected}=useStockStream(),analysis=useStockAnalyses();
  const timing=useStockInferenceStatus();
@@ -46,10 +47,10 @@ export default function MinuteStockLab({holdings=[]}:{holdings?:StockHolding[]})
   {forecast&&<p className="muted">Historical model evidence: {forecast.tests} held-out checks · {(forecast.directionAccuracy*100).toFixed(1)}% direction correct. This evidence comes from the stored market history and is shared across users.</p>}
   {chosen&&<p className="muted">Analysed on the server at {new Date(chosen.computed_at).toLocaleTimeString()} · {(chosen.processing_ms/1000).toFixed(3)} seconds of model processing.</p>}
   {forecast?.fitted&&<p className="muted">Weekly model last trained: {new Date(forecast.fitted.trainedAt*1000).toLocaleString()}. Historical validation belongs to that fit; each minute updates the prediction with fresh prices.</p>}
-  {(forecast||chart.data?.points.length)&&<StockPriceChart key={selected} forecast={forecast??{points:chart.data!.points,last:chart.data!.points.at(-1)!,issue:'Analysis unavailable',cadence:60,predictedPrice:0,predictedReturn:0,lower:0,upper:0,tests:0,mae:0,baselineMae:0,directionAccuracy:0,supported:false,targetTime:0,validation:[]}} name={stockLabel(selected)} history={cleanChart} now={now}/>}
+  {(forecast||chart.data?.points.length)&&<StockPriceChart comparisonMinutes={comparisonMinutes} onComparisonChange={setComparisonMinutes} key={selected} forecast={forecast??{points:chart.data!.points,last:chart.data!.points.at(-1)!,issue:'Analysis unavailable',cadence:60,predictedPrice:0,predictedReturn:0,lower:0,upper:0,tests:0,mae:0,baselineMae:0,directionAccuracy:0,supported:false,targetTime:0,validation:[]}} name={stockLabel(selected)} history={cleanChart} now={now}/>}
   {chart.isPending&&<p role="status">Loading the latest recorded week of prices independently of model analysis…</p>}
   {chart.isError&&<p role="alert">Latest chart prices could not be refreshed. The displayed timestamps show the age of retained data. <button className="nu-btn" onClick={()=>void chart.refetch()}>Retry chart</button></p>}
-  <LiveStockPrices horizon={horizon} holdings={holdings} at={status.data?.provider_at} connected={connected} onSelect={setSelected} analyses={analyses} now={now}/>
+  <LiveStockPrices comparisonMinutes={comparisonMinutes} horizon={horizon} holdings={holdings} at={status.data?.provider_at} connected={connected} onSelect={setSelected} analyses={analyses} now={now}/>
   <p role="status">{currentCount}/35 stocks have saved analysis for the latest price minute.{currentCount<35?' The backend is updating results; earlier data stays visible.':''}{stale?' Price collection is stale; wait for fresh data.':''}</p>
   {forecast&&<details><summary>Model evidence and price chart</summary>
    <p>Weekly data coverage: {(forecast.observations/10080*100).toFixed(1)}% ({forecast.observations.toLocaleString()}/10,080 recorded minutes). Valid weekly training samples: {forecast.trainingSamples.toLocaleString()}.</p>

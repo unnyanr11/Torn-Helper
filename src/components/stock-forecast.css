@@ -29,3 +29,14 @@
 .stock-wait-reason{font-size:.75rem;line-height:1.45;color:var(--muted);text-wrap:balance}
 
 .stock-validation-text{font-size:.7rem;line-height:1.5;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.stock-window-range{display:flex;flex-direction:column;gap:8px;width:100%;font-variant-numeric:tabular-nums}
+.stock-window-period{font-size:.72rem;color:var(--muted)}
+.stock-extreme-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stock-extreme-grid>span{display:flex;flex-direction:column;gap:3px}
+.stock-extreme-grid b{font-size:.8rem;overflow-wrap:anywhere}
+.stock-extreme-grid time{font-size:.68rem;color:var(--muted);line-height:1.4}
+.stock-window-meter{position:relative;display:block;height:6px;margin:5px;background:var(--border);border-radius:4px}
+.stock-window-meter i{position:absolute;top:50%;width:10px;height:10px;background:var(--accent);border:1px solid var(--fg);border-radius:50%;transform:translate(-50%,-50%)}
+.stock-window-meter+span{font-size:.72rem}
+.stock-range-distances,.stock-range-coverage{font-size:.7rem;color:var(--muted);line-height:1.5}
