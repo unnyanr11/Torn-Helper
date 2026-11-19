@@ -1,0 +1,84 @@
+{
+  "data_end_utc": "2026-11-19T17:06:00+00:00",
+  "stocks": 35,
+  "horizons": [
+    1,
+    5,
+    15,
+    60
+  ],
+  "models": [
+    {
+      "model": "No change",
+      "mean_relative_mae": 0.0002919567641136328,
+      "nonflat_direction_accuracy": null,
+      "test_forecasts": 198905,
+      "nonflat_test_forecasts": 179791,
+      "fit_seconds_all_140": 0.0006654899978002504,
+      "test_batch_prediction_seconds": 0.0007345820001773973
+    },
+    {
+      "model": "Momentum",
+      "mean_relative_mae": 0.00029825354548843774,
+      "nonflat_direction_accuracy": 0.4846182511916614,
+      "test_forecasts": 198905,
+      "nonflat_test_forecasts": 179791,
+      "fit_seconds_all_140": 0.000654868000310671,
+      "test_batch_prediction_seconds": 0.001332933001094716
+    },
+    {
+      "model": "Mean reversion",
+      "mean_relative_mae": 0.000292564654785841,
+      "nonflat_direction_accuracy": 0.5079230884749515,
+      "test_forecasts": 198905,
+      "nonflat_test_forecasts": 179791,
+      "fit_seconds_all_140": 0.0006105669988301088,
+      "test_batch_prediction_seconds": 0.001602293000814825
+    },
+    {
+      "model": "Ridge",
+      "mean_relative_mae": 0.0002946111729139579,
+      "nonflat_direction_accuracy": 0.5173395776206818,
+      "test_forecasts": 198905,
+      "nonflat_test_forecasts": 179791,
+      "fit_seconds_all_140": 0.2511744670009648,
+      "test_batch_prediction_seconds": 0.02766395300000113
+    },
+    {
+      "model": "LightGBM",
+      "mean_relative_mae": 0.0003006060351559449,
+      "nonflat_direction_accuracy": 0.5078897163929229,
+      "test_forecasts": 198905,
+      "nonflat_test_forecasts": 179791,
+      "fit_seconds_all_140": 5.076940070999626,
+      "test_batch_prediction_seconds": 0.2937520560001303
+    }
+  ],
+  "cached_inference_cpu_benchmark": {
+    "stocks": 35,
+    "forecasts": 140,
+    "fitting_ms": 2896.6169950000003,
+    "inference_median_ms": 2.716323000000102,
+    "inference_p95_ms": 3.90467099999978,
+    "inference_max_ms": 4.443582999999762,
+    "includes_network_or_database": false
+  },
+  "notes": [
+    "Recorded shared market data; 7 days. Internal gaps use marked surrounding-observation averages. Origins and targets must be observed.",
+    "Chronological train through day 5, tuning day 6, final untouched test day 7; training labels cannot cross split boundaries.",
+    "Fixed LightGBM settings: 64 trees, 15 leaves, depth 5, minimum 80 samples/leaf, learning rate 0.05, one CPU thread. No test-set hyperparameter optimization.",
+    "Direction scores exclude flat actual moves. They measure price direction, not personalized trade win rates. Wait is never counted as a successful prediction.",
+    "A single held-out day and overlapping horizons do not establish future accuracy or independent confidence intervals.",
+    "No-change has no directional forecast. It had the lowest mean absolute price error in this experiment.",
+    "CPU timing excludes networking and database work; live batch timing is separately displayed by the application."
+  ],
+  "live_backend_measurement": {
+    "price_minute_utc": "2026-11-19T17:18:00Z",
+    "stocks": 35,
+    "forecasts": 140,
+    "database_publication_ms": 1198.1,
+    "backend_response_ms": 1210.810085,
+    "under_10_second_target": true,
+    "initial_model_fitting_excluded": true
+  }
+}

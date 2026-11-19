@@ -17,7 +17,7 @@ export function useStockAnalyses(){
  useEffect(()=>{
   let active=true;
   let pending:ReturnType<typeof setTimeout>|undefined;
-  const refresh=()=>{clearTimeout(pending);pending=setTimeout(()=>void client.invalidateQueries({queryKey:['stock-server-analyses']}),1000);};
+  const refresh=()=>{clearTimeout(pending);pending=setTimeout(()=>{void client.invalidateQueries({queryKey:['stock-server-analyses']});void client.invalidateQueries({queryKey:['stock-inference-status']});},1000);};
   const channel=supabase.channel('stock-server-analysis')
    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'stock_analysis_status',filter:'id=eq.1'},refresh)
    .subscribe(status=>{if(active&&status==='SUBSCRIBED')void client.invalidateQueries({queryKey:['stock-server-analyses']});});

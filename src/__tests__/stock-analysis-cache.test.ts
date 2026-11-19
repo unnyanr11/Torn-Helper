@@ -9,6 +9,8 @@ beforeAll(async()=>{
  await db.exec(readFileSync('supabase/migrations/20261119154328_stock_analysis_queue.sql','utf8'));
  await db.exec(readFileSync('supabase/migrations/20261119154951_stock_analysis_dispatch.sql','utf8'));
  await db.exec(readFileSync('supabase/migrations/20261119160836_stock_chart_and_fast_analysis.sql','utf8'));
+ await db.exec(readFileSync('supabase/migrations/20261119171329_fast_stock_inference.sql','utf8'));
+ await db.exec(readFileSync('supabase/migrations/20261119171619_stock_training_compatibility.sql','utf8'));
 });
 afterAll(()=>db.close());
 it('restricts analysis jobs and writes to service role while members can read',async()=>{
@@ -41,4 +43,14 @@ it('returns compact week prices in order and only deltas after the cursor',async
  const after=rows[0].data.points[0][0];
  const delta=await db.query<{data:{points:[number,number][]}}>(`select public.read_stock_chart_history(2,$1) data`,[after]);
  expect(delta.rows[0].data.points.map(p=>p[1])).toEqual([101]);
+});
+
+it('publishes all stocks atomically and restricts fast inference to the service',async()=>{
+ const perms=await db.query<{allowed:boolean}>(`select has_function_privilege('authenticated','public.read_stock_inference_input()','EXECUTE') allowed`);expect(perms.rows[0].allowed).toBe(false);
+ await db.exec(`update public.stock_collection_status set provider_at=date_trunc('minute',now()) where id=1`);
+ const {rows}=await db.query<{at:string;stamp:number}>(`select provider_at::text at,extract(epoch from provider_at)::bigint::float8 stamp from public.stock_collection_status where id=1`);
+ const payload=Array.from({length:35},(_,i)=>[1,5,15,60].map(horizon=>({stock_id:i+1,horizon,forecast:{last:{timestamp:rows[0].stamp,price:100},points:[]},processing_ms:1,history_from:null,history_to:null}))).flat();
+ await expect(db.query(`select public.publish_stock_inference($1,'server-minute-v5-cached-inference',now(),$2::jsonb)`,[rows[0].at,JSON.stringify(payload.slice(1))])).rejects.toThrow('140');
+ await db.query(`select public.publish_stock_inference($1,'server-minute-v5-cached-inference',now(),$2::jsonb)`,[rows[0].at,JSON.stringify(payload)]);
+ expect((await db.query<{forecast_count:number}>(`select forecast_count from public.stock_analysis_status`)).rows[0].forecast_count).toBe(140);
 });

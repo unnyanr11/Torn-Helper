@@ -1,10 +1,12 @@
+export type LinearRidge={coefficients:number[];intercept:number};
 type Sample={x:number[];y:number};
 /** Expanding sufficient statistics reproduce standardized ridge without rescanning
  * the entire training prefix at every walk-forward origin. No future rows enter. */
 export function expandingRidge(samples:Sample[]){
  const d=samples[0]?.x.length??0;
  let count=0,meanY=0,means=new Float64Array(d),covXY=new Float64Array(d),covXX=new Float64Array(d*d);
- return (end:number,input:number[])=>{
+ let linear:LinearRidge|undefined;
+ const predict=(end:number,input:number[])=>{
   if(end<count){count=0;meanY=0;means=new Float64Array(d);covXY=new Float64Array(d);covXX=new Float64Array(d*d);}
   while(count<end){
    const {x,y}=samples[count],delta=x.map((v,j)=>v-means[j]),deltaY=y-meanY;
@@ -22,6 +24,9 @@ export function expandingRidge(samples:Sample[]){
    for(let k=j;k<=d;k++)matrix[j][k]/=divisor;
    for(let row=0;row<d;row++)if(row!==j){const factor=matrix[row][j];for(let k=j;k<=d;k++)matrix[row][k]-=factor*matrix[j][k];}
   }
+  const coefficients=Array.from(means,(_,j)=>matrix[j][d]/scales[j]);
+  linear={coefficients,intercept:meanY-coefficients.reduce((sum,v,j)=>sum+v*means[j],0)};
   return meanY+input.reduce((sum,v,j)=>sum+(v-means[j])/scales[j]*matrix[j][d],0);
  };
+ return Object.assign(predict,{snapshot:()=>linear});
 }
