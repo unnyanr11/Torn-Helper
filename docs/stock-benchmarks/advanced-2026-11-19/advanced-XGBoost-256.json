@@ -1,0 +1,76 @@
+{
+  "stocks": 35,
+  "horizons": [
+    1,
+    5,
+    15,
+    60
+  ],
+  "origins": [
+    1795021500,
+    1795028700,
+    1795035900,
+    1795043100,
+    1795050300,
+    1795057500,
+    1795064700,
+    1795071900,
+    1795079100,
+    1795086300,
+    1795093500,
+    1795100700
+  ],
+  "data_start": 1794503280,
+  "data_end": 1795107900,
+  "cpu_threads": 2,
+  "gpu": false,
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "feature_preparation_s": 0.1596187690001898,
+  "model": "XGBoost-256",
+  "status": "complete",
+  "fitting_s": 8.387094171000172,
+  "cold_load_s": null,
+  "warm_batch_s": [
+    0.011310951000268687,
+    0.01721550699994623,
+    0.01088060999973095,
+    0.010437090999857901,
+    0.00987428300004467
+  ],
+  "warm_median_s": 0.01088060999973095,
+  "warm_p95_s": 0.01603459580001072,
+  "direction_accuracy": 0.5104659014179609,
+  "relative_mae": 0.00028658946192632723,
+  "forecasts": 1680,
+  "nonflat": 1481,
+  "by_horizon": [
+    {
+      "horizon": 1,
+      "forecasts": 420,
+      "nonflat": 291,
+      "direction_accuracy": 0.49140893470790376,
+      "relative_mae": 7.030605615253224e-05
+    },
+    {
+      "horizon": 5,
+      "forecasts": 420,
+      "nonflat": 380,
+      "direction_accuracy": 0.4868421052631579,
+      "relative_mae": 0.00018266922590338765
+    },
+    {
+      "horizon": 15,
+      "forecasts": 420,
+      "nonflat": 400,
+      "direction_accuracy": 0.5325,
+      "relative_mae": 0.0002948042813763385
+    },
+    {
+      "horizon": 60,
+      "forecasts": 420,
+      "nonflat": 410,
+      "direction_accuracy": 0.524390243902439,
+      "relative_mae": 0.0005985782842730505
+    }
+  ]
+}

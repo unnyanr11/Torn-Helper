@@ -1,0 +1,76 @@
+{
+  "stocks": 35,
+  "horizons": [
+    1,
+    5,
+    15,
+    60
+  ],
+  "origins": [
+    1795021500,
+    1795028700,
+    1795035900,
+    1795043100,
+    1795050300,
+    1795057500,
+    1795064700,
+    1795071900,
+    1795079100,
+    1795086300,
+    1795093500,
+    1795100700
+  ],
+  "data_start": 1794503280,
+  "data_end": 1795107900,
+  "cpu_threads": 2,
+  "gpu": false,
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "feature_preparation_s": 0.1639821670000856,
+  "model": "LightGBM-256",
+  "status": "complete",
+  "fitting_s": 10.420903373999863,
+  "cold_load_s": null,
+  "warm_batch_s": [
+    0.032100355999773456,
+    0.02854357300020638,
+    0.02790533500001402,
+    0.02698382299968216,
+    0.02890963899972121
+  ],
+  "warm_median_s": 0.02854357300020638,
+  "warm_p95_s": 0.031462212599763006,
+  "direction_accuracy": 0.5401755570560433,
+  "relative_mae": 0.0002890568962786203,
+  "forecasts": 1680,
+  "nonflat": 1481,
+  "by_horizon": [
+    {
+      "horizon": 1,
+      "forecasts": 420,
+      "nonflat": 291,
+      "direction_accuracy": 0.570446735395189,
+      "relative_mae": 7.214457648307626e-05
+    },
+    {
+      "horizon": 5,
+      "forecasts": 420,
+      "nonflat": 380,
+      "direction_accuracy": 0.5342105263157895,
+      "relative_mae": 0.00018564939560640256
+    },
+    {
+      "horizon": 15,
+      "forecasts": 420,
+      "nonflat": 400,
+      "direction_accuracy": 0.515,
+      "relative_mae": 0.00029862764960481887
+    },
+    {
+      "horizon": 60,
+      "forecasts": 420,
+      "nonflat": 410,
+      "direction_accuracy": 0.5487804878048781,
+      "relative_mae": 0.0005998059634201836
+    }
+  ]
+}

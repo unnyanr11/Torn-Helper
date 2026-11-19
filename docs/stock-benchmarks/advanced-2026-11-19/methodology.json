@@ -1,0 +1,53 @@
+{
+  "input_sha256": "e633d7142fbe4794b2b7ecef216e7d41791409414abc800f805550dff98bd331",
+  "stocks": 35,
+  "held_out_day_origins": 12,
+  "horizons_minutes": [
+    1,
+    5,
+    15,
+    60
+  ],
+  "forecasts_per_model": 1680,
+  "scored_nonflat_outcomes": 1481,
+  "gpu_available": false,
+  "notes": [
+    "All forecasts use the same observed origins and targets, with a common market-time cutoff.",
+    "Tree candidates fit only labels ending before the final-day test period. Foundation models are used zero-shot.",
+    "Internal missing minutes use nearest surrounding observed-price averages. Selected origins and all scored targets are real observations.",
+    "Direction accuracy excludes flat actual moves. It does not count Wait signals or measure personalized trade profitability.",
+    "Warm latency excludes data preparation, loading, training, network and database time. Warm samples: five for trees, three for foundation models.",
+    "Neural profiles use CPU bfloat16 autocast. They are not GPU or deployed Hugging Face timings.",
+    "Chronos-2 uses at most 8192 minutes, Chronos-Bolt Small at most 2048, and TimesFM is configured for 10240, covering the available week.",
+    "This is a saved single-day exploratory evaluation, not independent forward evidence or a 99% accuracy guarantee."
+  ],
+  "packages": {
+    "numpy": "2.3.5",
+    "scikit-learn": "1.8.0",
+    "lightgbm": "4.7.0",
+    "catboost": "1.2.10",
+    "xgboost-cpu": "3.4.1",
+    "torch": "2.15.0+cpu",
+    "chronos-forecasting": "2.3.2",
+    "timesfm": "3.0.2",
+    "transformers": "5.23.0",
+    "huggingface-hub": "2.4.0"
+  },
+  "model_revisions": {
+    "amazon/chronos-2": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+    "amazon/chronos-bolt-small": "772f3d25d38aec6d914c8949dab4462e2d46f5d8",
+    "google/timesfm-2.5-200m-pytorch": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3"
+  },
+  "initial_float32_observations": {
+    "Chronos-2": {
+      "threads": 2,
+      "first_prediction_batch_s": 30.995329820999814,
+      "accuracy_run_interrupted": true
+    },
+    "TimesFM-2.5": {
+      "threads": 2,
+      "first_prediction_batch_s": 87.537791922,
+      "accuracy_run_interrupted": true
+    }
+  }
+}

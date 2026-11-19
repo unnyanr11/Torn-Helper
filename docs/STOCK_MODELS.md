@@ -52,3 +52,7 @@ The Python benchmark is an offline evaluation tool. It does not change public pr
 [Chronos-2](https://huggingface.co/amazon/chronos-2) and [TimesFM 2.5](https://huggingface.co/google/timesfm-2.5-200m-pytorch) are time-series foundation-model candidates to benchmark on the same chronological splits. Their published results on other datasets do not establish Torn trading accuracy. A complex model must beat the current baseline after fees and meet the full 35-stock latency budget before promotion.
 
 For a consistent latency target, use an always-running authenticated endpoint and batch all stocks together. [Scale-to-zero introduces a cold start](https://huggingface.co/docs/inference-endpoints/en/autoscaling). Scheduled predictions should still be saved in Supabase and served from cache to the UI. Training stays separate from page loads. No Hugging Face resource or paid hardware is created by this change.
+
+## Further model experiments
+
+See [the matched stronger-model benchmark](ADVANCED_STOCK_BENCHMARKS.md) for CatBoost, XGBoost, larger LightGBM, random forests, extra trees, Chronos-2, Chronos-Bolt and TimesFM, including measured CPU response times.

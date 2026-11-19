@@ -1,0 +1,76 @@
+{
+  "stocks": 35,
+  "horizons": [
+    1,
+    5,
+    15,
+    60
+  ],
+  "origins": [
+    1795021500,
+    1795028700,
+    1795035900,
+    1795043100,
+    1795050300,
+    1795057500,
+    1795064700,
+    1795071900,
+    1795079100,
+    1795086300,
+    1795093500,
+    1795100700
+  ],
+  "data_start": 1794503280,
+  "data_end": 1795107900,
+  "cpu_threads": 2,
+  "gpu": false,
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "feature_preparation_s": 0.15276241699984894,
+  "model": "ExtraTrees-96",
+  "status": "complete",
+  "fitting_s": 18.994783818000087,
+  "cold_load_s": null,
+  "warm_batch_s": [
+    1.8139595719999306,
+    1.8079052980001507,
+    1.7752919780000411,
+    1.8214548630003264,
+    1.8208043049999105
+  ],
+  "warm_median_s": 1.8139595719999306,
+  "warm_p95_s": 1.8213247514002433,
+  "direction_accuracy": 0.5266711681296421,
+  "relative_mae": 0.00028419997073538434,
+  "forecasts": 1680,
+  "nonflat": 1481,
+  "by_horizon": [
+    {
+      "horizon": 1,
+      "forecasts": 420,
+      "nonflat": 291,
+      "direction_accuracy": 0.563573883161512,
+      "relative_mae": 7.105236469452513e-05
+    },
+    {
+      "horizon": 5,
+      "forecasts": 420,
+      "nonflat": 380,
+      "direction_accuracy": 0.5184210526315789,
+      "relative_mae": 0.00018267527463296517
+    },
+    {
+      "horizon": 15,
+      "forecasts": 420,
+      "nonflat": 400,
+      "direction_accuracy": 0.515,
+      "relative_mae": 0.00029455440334183165
+    },
+    {
+      "horizon": 60,
+      "forecasts": 420,
+      "nonflat": 410,
+      "direction_accuracy": 0.5195121951219512,
+      "relative_mae": 0.0005885178402722153
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "stocks": 35,
+  "horizons": [
+    1,
+    5,
+    15,
+    60
+  ],
+  "origins": [
+    1795021500,
+    1795028700,
+    1795035900,
+    1795043100,
+    1795050300,
+    1795057500,
+    1795064700,
+    1795071900,
+    1795079100,
+    1795086300,
+    1795093500,
+    1795100700
+  ],
+  "data_start": 1794503280,
+  "data_end": 1795107900,
+  "cpu_threads": 2,
+  "gpu": false,
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "feature_preparation_s": 11.610011576000034,
+  "model": "Ridge",
+  "status": "complete",
+  "fitting_s": 0.9018112409999048,
+  "cold_load_s": null,
+  "warm_batch_s": [
+    0.011206024999864894,
+    0.008872251999946457,
+    0.008673626000017975,
+    0.009837137999966217,
+    0.00784520400020483
+  ],
+  "warm_median_s": 0.008872251999946457,
+  "warm_p95_s": 0.010932247599885158,
+  "direction_accuracy": 0.5151924375422012,
+  "relative_mae": 0.00028497654224982343,
+  "forecasts": 1680,
+  "nonflat": 1481,
+  "by_horizon": [
+    {
+      "horizon": 1,
+      "forecasts": 420,
+      "nonflat": 291,
+      "direction_accuracy": 0.5292096219931272,
+      "relative_mae": 7.153994251454164e-05
+    },
+    {
+      "horizon": 5,
+      "forecasts": 420,
+      "nonflat": 380,
+      "direction_accuracy": 0.5236842105263158,
+      "relative_mae": 0.00018238187190236114
+    },
+    {
+      "horizon": 15,
+      "forecasts": 420,
+      "nonflat": 400,
+      "direction_accuracy": 0.4925,
+      "relative_mae": 0.00029679448395149364
+    },
+    {
+      "horizon": 60,
+      "forecasts": 420,
+      "nonflat": 410,
+      "direction_accuracy": 0.5195121951219512,
+      "relative_mae": 0.0005891898706308973
+    }
+  ]
+}

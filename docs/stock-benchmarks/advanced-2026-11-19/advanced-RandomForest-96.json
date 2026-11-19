@@ -1,0 +1,76 @@
+{
+  "stocks": 35,
+  "horizons": [
+    1,
+    5,
+    15,
+    60
+  ],
+  "origins": [
+    1795021500,
+    1795028700,
+    1795035900,
+    1795043100,
+    1795050300,
+    1795057500,
+    1795064700,
+    1795071900,
+    1795079100,
+    1795086300,
+    1795093500,
+    1795100700
+  ],
+  "data_start": 1794503280,
+  "data_end": 1795107900,
+  "cpu_threads": 2,
+  "gpu": false,
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "feature_preparation_s": 0.13648044199999276,
+  "model": "RandomForest-96",
+  "status": "complete",
+  "fitting_s": 168.7840291350003,
+  "cold_load_s": null,
+  "warm_batch_s": [
+    1.9811986499998966,
+    1.773206133000258,
+    1.7226685649998217,
+    1.7821574119998331,
+    1.8065546459997677
+  ],
+  "warm_median_s": 1.7821574119998331,
+  "warm_p95_s": 1.9462698491998707,
+  "direction_accuracy": 0.5340985820391627,
+  "relative_mae": 0.00028629101426503743,
+  "forecasts": 1680,
+  "nonflat": 1481,
+  "by_horizon": [
+    {
+      "horizon": 1,
+      "forecasts": 420,
+      "nonflat": 291,
+      "direction_accuracy": 0.5567010309278351,
+      "relative_mae": 7.160650997411107e-05
+    },
+    {
+      "horizon": 5,
+      "forecasts": 420,
+      "nonflat": 380,
+      "direction_accuracy": 0.5447368421052632,
+      "relative_mae": 0.00018219079031451602
+    },
+    {
+      "horizon": 15,
+      "forecasts": 420,
+      "nonflat": 400,
+      "direction_accuracy": 0.52,
+      "relative_mae": 0.0002941053291332953
+    },
+    {
+      "horizon": 60,
+      "forecasts": 420,
+      "nonflat": 410,
+      "direction_accuracy": 0.5219512195121951,
+      "relative_mae": 0.0005972614276382274
+    }
+  ]
+}

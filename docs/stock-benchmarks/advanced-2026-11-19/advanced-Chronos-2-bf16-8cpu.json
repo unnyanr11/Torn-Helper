@@ -1,0 +1,91 @@
+{
+  "stocks": 35,
+  "horizons": [
+    1,
+    5,
+    15,
+    60
+  ],
+  "origins": [
+    1795021500,
+    1795028700,
+    1795035900,
+    1795043100,
+    1795050300,
+    1795057500,
+    1795064700,
+    1795071900,
+    1795079100,
+    1795086300,
+    1795093500,
+    1795100700
+  ],
+  "data_start": 1794503280,
+  "data_end": 1795107900,
+  "cpu_threads": 8,
+  "gpu": false,
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "feature_preparation_s": 0.15918907699960982,
+  "model": "Chronos-2-bf16",
+  "status": "complete",
+  "fitting_s": 0,
+  "cold_load_s": 10.014446957000473,
+  "first_batch_s": 5.303887465999651,
+  "precision": "bfloat16",
+  "context_limit": 8192,
+  "warm_batch_s": [
+    4.6607395279997945,
+    4.725576094999269,
+    4.820248609000373
+  ],
+  "warm_median_s": 4.725576094999269,
+  "warm_p95_s": 4.810781357600263,
+  "accuracy_batch_s": [
+    4.7551237119996586,
+    4.782443773000523,
+    4.9864578480001,
+    4.957568542999979,
+    4.851974746999986,
+    5.008703446000254,
+    4.967950166999799,
+    4.980669378999664,
+    4.9303342109997175,
+    5.033713376000378,
+    4.758582008000303,
+    4.919972175000112
+  ],
+  "direction_accuracy": 0.5422012153950033,
+  "relative_mae": 0.0002888484109403789,
+  "forecasts": 1680,
+  "nonflat": 1481,
+  "by_horizon": [
+    {
+      "horizon": 1,
+      "forecasts": 420,
+      "nonflat": 291,
+      "direction_accuracy": 0.5532646048109966,
+      "relative_mae": 8.65708905067642e-05
+    },
+    {
+      "horizon": 5,
+      "forecasts": 420,
+      "nonflat": 380,
+      "direction_accuracy": 0.5526315789473685,
+      "relative_mae": 0.00018241313446095935
+    },
+    {
+      "horizon": 15,
+      "forecasts": 420,
+      "nonflat": 400,
+      "direction_accuracy": 0.535,
+      "relative_mae": 0.000292952999161655
+    },
+    {
+      "horizon": 60,
+      "forecasts": 420,
+      "nonflat": 410,
+      "direction_accuracy": 0.5317073170731708,
+      "relative_mae": 0.000593456619632137
+    }
+  ]
+}

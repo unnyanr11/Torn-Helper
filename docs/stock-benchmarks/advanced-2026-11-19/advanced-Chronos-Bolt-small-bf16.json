@@ -1,0 +1,91 @@
+{
+  "stocks": 35,
+  "horizons": [
+    1,
+    5,
+    15,
+    60
+  ],
+  "origins": [
+    1795021500,
+    1795028700,
+    1795035900,
+    1795043100,
+    1795050300,
+    1795057500,
+    1795064700,
+    1795071900,
+    1795079100,
+    1795086300,
+    1795093500,
+    1795100700
+  ],
+  "data_start": 1794503280,
+  "data_end": 1795107900,
+  "cpu_threads": 2,
+  "gpu": false,
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "feature_preparation_s": 0.15552096999999776,
+  "model": "Chronos-Bolt-small-bf16",
+  "status": "complete",
+  "fitting_s": 0,
+  "cold_load_s": 41.34455667600014,
+  "first_batch_s": 0.7504403559996717,
+  "precision": "bfloat16",
+  "context_limit": 2048,
+  "warm_batch_s": [
+    0.5930053679994671,
+    0.5453297280000697,
+    0.6130910870006119
+  ],
+  "warm_median_s": 0.5930053679994671,
+  "warm_p95_s": 0.6110825151004974,
+  "accuracy_batch_s": [
+    0.5428564110006846,
+    0.5961826709999514,
+    0.6088905079996039,
+    0.7493808780000109,
+    0.5942116989999704,
+    0.6417506349998803,
+    0.7073990010003399,
+    0.5844926990002932,
+    0.5401163189999352,
+    0.5823045839997576,
+    0.5122181790002287,
+    0.5228839539995533
+  ],
+  "direction_accuracy": 0.5192437542201216,
+  "relative_mae": 0.00029582658135410094,
+  "forecasts": 1680,
+  "nonflat": 1481,
+  "by_horizon": [
+    {
+      "horizon": 1,
+      "forecasts": 420,
+      "nonflat": 291,
+      "direction_accuracy": 0.5051546391752577,
+      "relative_mae": 8.698323012738144e-05
+    },
+    {
+      "horizon": 5,
+      "forecasts": 420,
+      "nonflat": 380,
+      "direction_accuracy": 0.5131578947368421,
+      "relative_mae": 0.00019369526627536162
+    },
+    {
+      "horizon": 15,
+      "forecasts": 420,
+      "nonflat": 400,
+      "direction_accuracy": 0.51,
+      "relative_mae": 0.00030403610249026507
+    },
+    {
+      "horizon": 60,
+      "forecasts": 420,
+      "nonflat": 410,
+      "direction_accuracy": 0.5439024390243903,
+      "relative_mae": 0.0005985917265233956
+    }
+  ]
+}
