@@ -1,0 +1,35 @@
+import {afterEach,expect,it,vi} from 'vitest';
+import {act,create,type ReactTestRenderer} from 'react-test-renderer';
+import AnimatedStockPrice from '../components/AnimatedStockPrice';
+let root:ReactTestRenderer|undefined;
+afterEach(()=>{act(()=>root?.unmount());root=undefined;vi.unstubAllGlobals();});
+it('animates toward real quotes and cancels an interrupted transition',()=>{
+ const frames=new Map<number,FrameRequestCallback>();let next=0;
+ vi.stubGlobal('document',{documentElement:{dataset:{motion:'full'}}});
+ vi.stubGlobal('matchMedia',()=>({matches:false}));
+ vi.stubGlobal('requestAnimationFrame',(fn:FrameRequestCallback)=>{frames.set(++next,fn);return next;});
+ const cancel=vi.fn((id:number)=>frames.delete(id));vi.stubGlobal('cancelAnimationFrame',cancel);
+ act(()=>{root=create(<AnimatedStockPrice value={100}/>);});
+ act(()=>{root!.update(<AnimatedStockPrice value={110}/>);});
+ expect(JSON.stringify(root!.toJSON())).toContain('$100.00');
+ act(()=>{const [id,fn]=[...frames][0];frames.delete(id);fn(0);});
+ act(()=>{const [id,fn]=[...frames][0];frames.delete(id);fn(350);});
+ expect(JSON.stringify(root!.toJSON())).toContain('$108.75');
+ act(()=>{root!.update(<AnimatedStockPrice value={90}/>);});
+ expect(cancel).toHaveBeenCalled();
+ act(()=>{const [id,fn]=[...frames][0];frames.delete(id);fn(400);});
+ act(()=>{const [id,fn]=[...frames][0];frames.delete(id);fn(1100);});
+ expect(JSON.stringify(root!.toJSON())).toContain('$90.00');
+ expect(JSON.stringify(root!.toJSON())).toContain('price-down');
+});
+it('updates immediately for reduced motion and clears the change on an unchanged batch',()=>{
+ vi.stubGlobal('document',{documentElement:{dataset:{motion:'reduced'}}});
+ vi.stubGlobal('matchMedia',()=>({matches:false}));
+ const raf=vi.fn();vi.stubGlobal('requestAnimationFrame',raf);vi.stubGlobal('cancelAnimationFrame',vi.fn());
+ act(()=>{root=create(<AnimatedStockPrice value={100} observedAt="one"/>);});
+ act(()=>{root!.update(<AnimatedStockPrice value={105} observedAt="two"/>);});
+ expect(JSON.stringify(root!.toJSON())).toContain('$105.00');
+ expect(raf).not.toHaveBeenCalled();
+ act(()=>{root!.update(<AnimatedStockPrice value={105} observedAt="three"/>);});
+ expect(JSON.stringify(root!.toJSON())).not.toContain('price-up');
+});

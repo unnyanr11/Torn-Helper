@@ -4,7 +4,7 @@ import {QueryClient,QueryClientProvider} from '@tanstack/react-query';
 import {renderToStaticMarkup} from 'react-dom/server';
 import MinuteStockLab from '../components/MinuteStockLab';
 const mocks=vi.hoisted(()=>({rpc:vi.fn(),single:vi.fn(),download:vi.fn(),workers:[] as any[]}));
-vi.mock('../lib/supabase',()=>({supabase:{from:()=>({select:()=>({eq:()=>({single:mocks.single})})}),rpc:mocks.rpc}}));
+vi.mock('../lib/supabase',()=>({supabase:{channel:()=>({on(){return this;},subscribe(){return this;}}),removeChannel:vi.fn(),from:()=>({select:()=>({eq:()=>({single:mocks.single,order:async()=>({data:[],error:null})})})}),rpc:mocks.rpc}}));
 vi.mock('../lib/export',()=>({downloadBlob:mocks.download}));
 vi.mock('../components/StockForecast',()=>({ForecastDetails:()=>null}));
 let root:ReactTestRenderer|undefined,client:QueryClient;
