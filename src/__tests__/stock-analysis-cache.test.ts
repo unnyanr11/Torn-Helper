@@ -3,11 +3,12 @@ import {readFileSync} from 'node:fs';
 import {beforeAll,afterAll,it,expect} from 'vitest';
 const db=new PGlite();
 beforeAll(async()=>{
- await db.exec(`create role anon;create role authenticated;create role service_role bypassrls;create schema private;create schema vault;create schema net;create schema cron;create function cron.schedule(name text,schedule text,command text) returns bigint language sql as $$select 1::bigint$$;grant usage on schema private to service_role;create table vault.decrypted_secrets(name text,decrypted_secret text);create function net.http_post(url text,headers jsonb,body jsonb,timeout_milliseconds integer) returns bigint language sql as $$select 1::bigint$$;create publication supabase_realtime;create table public.stock_collection_status(id int,provider_at timestamptz,backfilled_stocks int);insert into public.stock_collection_status values(1,now(),35);`);
+ await db.exec(`create role anon;create role authenticated;create role service_role bypassrls;create schema private;create schema vault;create schema net;create schema cron;create function cron.schedule(name text,schedule text,command text) returns bigint language sql as $$select 1::bigint$$;grant usage on schema private to service_role;create table vault.decrypted_secrets(name text,decrypted_secret text);create function net.http_post(url text,headers jsonb,body jsonb,timeout_milliseconds integer) returns bigint language sql as $$select 1::bigint$$;create publication supabase_realtime;create table public.stock_minute_prices(stock_id integer,observed_at timestamptz,price numeric);create table public.stock_collection_status(id int,provider_at timestamptz,backfilled_stocks int);insert into public.stock_collection_status values(1,now(),35);`);
  await db.exec(readFileSync('supabase/migrations/20261119153711_cached_stock_analysis.sql','utf8'));
  await db.exec(readFileSync('supabase/migrations/20261119153956_stock_analysis_batches.sql','utf8'));
  await db.exec(readFileSync('supabase/migrations/20261119154328_stock_analysis_queue.sql','utf8'));
  await db.exec(readFileSync('supabase/migrations/20261119154951_stock_analysis_dispatch.sql','utf8'));
+ await db.exec(readFileSync('supabase/migrations/20261119160836_stock_chart_and_fast_analysis.sql','utf8'));
 });
 afterAll(()=>db.close());
 it('restricts analysis jobs and writes to service role while members can read',async()=>{
@@ -30,5 +31,14 @@ it('deduplicates work, rejects other leases, and stores four compact results ato
 it('reserves queued jobs so the next dispatch does not repeat pending requests',async()=>{
  await db.exec(`insert into vault.decrypted_secrets values('tcc_job_token','local-test-token');select private.enqueue_stock_analyses();select private.enqueue_stock_analyses();`);
  const {rows}=await db.query<{count:number}>(`select count(*)::integer count from private.stock_analysis_jobs where queued_until>now()`);
- expect(rows[0].count).toBe(8);
+ expect(rows[0].count).toBe(14);
+});
+
+it('returns compact week prices in order and only deltas after the cursor',async()=>{
+ await db.exec(`insert into public.stock_minute_prices values(2,date_trunc('minute',now())-interval '1 minute',100),(2,date_trunc('minute',now()),101),(3,now(),999);`);
+ const {rows}=await db.query<{data:{points:[number,number][]}}>(`select public.read_stock_chart_history(2) data`);
+ expect(rows[0].data.points.map(p=>p[1])).toEqual([100,101]);
+ const after=rows[0].data.points[0][0];
+ const delta=await db.query<{data:{points:[number,number][]}}>(`select public.read_stock_chart_history(2,$1) data`,[after]);
+ expect(delta.rows[0].data.points.map(p=>p[1])).toEqual([101]);
 });

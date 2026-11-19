@@ -15,13 +15,13 @@ Deno.serve(async req=>{
  if(!claim.data)return json({skipped:true});
  const {lease,provider_at}=claim.data;
  try{
-  const history=await admin.rpc('read_stock_minute_history',{p_stock_id:stockId});
-  if(history.error||!Array.isArray(history.data))throw new Error('History unavailable');
+  const history=await admin.rpc('read_stock_chart_history',{p_stock_id:stockId,p_after:null});
+  if(history.error||!Array.isArray(history.data?.points)){console.error('stock-history-read',stockId,history.error?.code);throw new Error('History unavailable');}
   const observed=Date.parse(provider_at)/1000;
-  const points=(history.data as PricePoint[]).filter(p=>p.timestamp<=observed);
+  const points=(history.data.points as [number,number][]).map(([timestamp,price])=>({timestamp,price:Number(price)})).filter(p=>p.timestamp<=observed);
   const results=analyzeStockHistory(points,Date.now()/1000);
   const stored=await admin.rpc('finish_stock_analysis',{p_stock_id:stockId,p_lease:lease,p_results:results});
-  if(stored.error||!stored.data)throw new Error('Analysis cache write failed');
+  if(stored.error||!stored.data){console.error('stock-analysis-write',stockId,stored.error?.code);throw new Error('Analysis cache write failed');}
   return json({stock_id:stockId,stored:results.length,processing_ms:results.reduce((n,r)=>n+r.processing_ms,0)});
  }catch{
   await admin.rpc('finish_stock_analysis',{p_stock_id:stockId,p_lease:lease,p_results:null});

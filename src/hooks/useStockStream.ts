@@ -6,7 +6,7 @@ export type StockCollectionStatus={quote_source?:string;last_attempt:string|null
 export function useStockStream(){
  const client=useQueryClient(),[connected,setConnected]=useState(false);
  const status=useQuery({
-  queryKey:['stock-minute-status'],staleTime:10000,refetchInterval:connected?false:60000,retry:1,
+  queryKey:['stock-minute-status'],staleTime:10000,refetchInterval:30000,retry:1,
   queryFn:async()=>{
    const result=await supabase.from('stock_collection_status').select('last_attempt,last_success,provider_at,rows_written,message,backfilled_stocks,quote_source').eq('id',1).single();
    if(result.error)throw result.error;

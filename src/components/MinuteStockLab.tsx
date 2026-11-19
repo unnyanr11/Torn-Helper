@@ -1,3 +1,4 @@
+import {useStockChartHistory} from '../hooks/useStockChartHistory';
 import StockPriceChart from './StockPriceChart';
 import StockAdvice from './StockAdvice';
 import {useStockStream} from '../hooks/useStockStream';
@@ -14,10 +15,11 @@ export default function MinuteStockLab(){
  const [selected,setSelected]=useState('2'),[horizon,setHorizon]=useState<MinuteHorizon>(1),[archiveOpen,setArchiveOpen]=useState(false),[now,setNow]=useState(()=>Date.now()/1000);
  const predictions=useRef(new Map<string,Prediction[]>());
  const {status,connected}=useStockStream(),analysis=useStockAnalyses();
+ const chart=useStockChartHistory(Number(selected),status.data?.provider_at);
  const rows=(analysis.data??[]).filter(row=>row.horizon===horizon);
  const analyses=Object.fromEntries(rows.map(row=>[String(row.stock_id),row.forecast]));
  const chosen=rows.find(row=>row.stock_id===Number(selected)),forecast=chosen?.forecast;
- const actionableForecast=forecast?.last?.timestamp===Date.parse(status.data?.provider_at??'')/1000?forecast:undefined;
+ const actionableForecast=forecast?.issue||forecast?.last?.timestamp===Date.parse(status.data?.provider_at??'')/1000?forecast:forecast?{...forecast,issue:'Newer prices are available. This saved analysis is being updated; wait before trading.'}:undefined;
  const stale=!status.data?.provider_at||now-Date.parse(status.data.provider_at)/1000>120;
  useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()/1000),10000);return()=>clearInterval(timer);},[]);
  useEffect(()=>{
@@ -40,11 +42,13 @@ export default function MinuteStockLab(){
    <button className="nu-btn" type="button" disabled={analysis.isFetching} onClick={()=>void analysis.refetch()}>Check latest results</button>
   </div>
   <h4>Suggested action for {stockLabel(selected)} · next {horizon} minute{horizon>1?'s':''}</h4>
-  <StockAdvice forecast={actionableForecast} now={now} training={!actionableForecast}/>
+  <StockAdvice forecast={actionableForecast} now={now} training={!forecast&&analysis.isFetching}/>
   {analysis.isPending&&<p role="status">Loading saved server analysis…</p>}
   {analysis.isError&&<p role="alert">Saved analysis could not be refreshed. Previous results remain visible. <button className="nu-btn" onClick={()=>void analysis.refetch()}>Retry</button></p>}
   {chosen&&<p className="muted">Analysed on the server at {new Date(chosen.computed_at).toLocaleTimeString()} · {(chosen.processing_ms/1000).toFixed(3)} seconds of model processing.</p>}
-  {forecast&&<StockPriceChart key={selected} forecast={forecast} name={stockLabel(selected)}/>}
+  {(forecast||chart.data?.points.length)&&<StockPriceChart key={selected} forecast={forecast??{points:chart.data!.points,last:chart.data!.points.at(-1)!,issue:'Analysis unavailable',cadence:60,predictedPrice:0,predictedReturn:0,lower:0,upper:0,tests:0,mae:0,baselineMae:0,directionAccuracy:0,supported:false,targetTime:0,validation:[]}} name={stockLabel(selected)} history={chart.data?.points} now={now}/>}
+  {chart.isPending&&<p role="status">Loading the latest recorded week of prices independently of model analysis…</p>}
+  {chart.isError&&<p role="alert">Latest chart prices could not be refreshed. The displayed timestamps show the age of retained data. <button className="nu-btn" onClick={()=>void chart.refetch()}>Retry chart</button></p>}
   <LiveStockPrices at={status.data?.provider_at} connected={connected} onSelect={setSelected} analyses={analyses} now={now}/>
   <p role="status">{currentCount}/35 stocks have saved analysis for the latest price minute.{currentCount<35?' The backend is updating results; earlier data stays visible.':''}{stale?' Price collection is stale; wait for fresh data.':''}</p>
   {forecast&&<details><summary>Model evidence and price chart</summary>

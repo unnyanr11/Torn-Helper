@@ -10,7 +10,7 @@ vi.mock('../lib/export',()=>({downloadBlob:mocks.download}));
 vi.mock('../components/StockForecast',()=>({ForecastDetails:()=>null}));
 let root:ReactTestRenderer|undefined,client:QueryClient;
 beforeEach(()=>{
- mocks.rpc.mockReset().mockResolvedValue({data:{provider_at:'2026-11-16T12:50:00Z',backfilled_stocks:1,stocks:{'2':[[1794833400,100.25]]}},error:null});
+ mocks.rpc.mockReset().mockResolvedValue({data:{points:[],provider_at:'2026-11-16T12:50:00Z',backfilled_stocks:1,stocks:{'2':[[1794833400,100.25]]}},error:null});
  mocks.single.mockReset().mockResolvedValue({data:{provider_at:'2026-11-16T12:50:00Z',last_attempt:null,last_success:null,rows_written:35,backfilled_stocks:1,message:'Minute collection active'},error:null});mocks.download.mockReset();mocks.workers=[];
  vi.stubGlobal('Worker',class{onmessage:any;onerror:any;postMessage=vi.fn();terminate=vi.fn();constructor(){mocks.workers.push(this);}});
  const timestamp=Math.floor(Date.now()/60000)*60;
@@ -28,9 +28,9 @@ describe('shared minute lab',()=>{
   await act(async()=>{root=create(<QueryClientProvider client={client}><MinuteStockLab/></QueryClientProvider>);await new Promise(r=>setTimeout(r,40));});
   await act(async()=>{await new Promise(r=>setTimeout(r,40));});
   expect(mocks.workers).toHaveLength(0);
-  expect(mocks.rpc).not.toHaveBeenCalled();
+  expect(mocks.rpc.mock.calls.every(call=>call[0]==='read_stock_chart_history')).toBe(true);
   expect(JSON.stringify(root!.toJSON())).toContain('Analysed on the server');
   await act(async()=>{root!.root.findByProps({label:'Minute stock'}).props.onChange({target:{value:'3'}});});
-  expect(mocks.workers).toHaveLength(0);expect(mocks.rpc).not.toHaveBeenCalled();
+  expect(mocks.workers).toHaveLength(0);expect(mocks.rpc.mock.calls.every(call=>call[0]==='read_stock_chart_history')).toBe(true);
  });
 });

@@ -25,7 +25,7 @@ export default function LiveStockPrices({at,connected,onSelect,analyses={},now=D
   {prices.isPending&&<p>Waiting for prices…</p>}
   {prices.data&&<><p className="muted">Observed {new Date(prices.data[0].observed_at).toLocaleString()} · {prices.data[0].source}. Changes compare consecutive received quotes.</p>
    <div className="live-stock-grid">{prices.data.map(quote=><button type="button" className="live-stock-quote" key={quote.stock_id} onClick={()=>onSelect(String(quote.stock_id))}>
-    <span>{stockLabel(quote.stock_id)}</span><span className="stock-action">{analyses[quote.stock_id]?.last?.timestamp===Date.parse(quote.observed_at)/1000?({'Buy candidate':'Buy','Sell / rebuy watch':'Sell',Wait:'Wait'}[stockDecision(analyses[quote.stock_id],now,120).signal]):'Wait · analysis pending'}</span><AnimatedStockPrice value={quote.price} observedAt={quote.observed_at}/>
+    <span>{stockLabel(quote.stock_id)}</span><span className="stock-action">{analyses[quote.stock_id]?.last?.timestamp===Date.parse(quote.observed_at)/1000?({'Buy candidate':'Buy','Sell / rebuy watch':'Sell',Wait:'Wait'}[stockDecision(analyses[quote.stock_id],now,120).signal]):analyses[quote.stock_id]?.issue?'Wait · data gaps':analyses[quote.stock_id]?'Wait · newer prices':'Wait · analysis unavailable'}</span><AnimatedStockPrice value={quote.price} observedAt={quote.observed_at}/>
    </button>)}</div>
   </>}
  </section>;

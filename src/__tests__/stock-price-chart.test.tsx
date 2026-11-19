@@ -8,11 +8,11 @@ const forecast=forecastMinuteStock(points,points.at(-1)!.timestamp+5);
 let root:ReactTestRenderer|undefined;
 afterEach(()=>{act(()=>root?.unmount());root=undefined;});
 it('labels both axes, timezone, observed data and model estimates',()=>{
- const html=renderToStaticMarkup(<StockPriceChart name="Test stock" forecast={forecast}/>);
- expect(html).toContain('Price / share ($)');expect(html).toContain('Time ·');expect(html).toContain('historical error range');expect(html).toContain('15 min');expect(html).toContain('60 min');
+ const html=renderToStaticMarkup(<StockPriceChart name="Test stock" forecast={forecast} now={points.at(-1)!.timestamp+5}/>);
+ expect(html).toContain('Price / share ($)');expect(html).toContain('Time ·');expect(html).toContain('historical error range');expect(html).toContain('15 min');expect(html).toContain('60 min');expect(html).toContain('12 hr');expect(html).toContain('24 hr');expect(html).toContain('7 days');
 });
 it('inspects exact observations with pointer and keys and distinguishes the forecast',()=>{
- act(()=>{root=create(<StockPriceChart name="Test stock" forecast={forecast}/>);});
+ act(()=>{root=create(<StockPriceChart name="Test stock" forecast={forecast} now={points.at(-1)!.timestamp+5}/>);});
  const svg=()=>root!.root.findByType('svg');
  act(()=>svg().props.onPointerMove({clientX:14,currentTarget:{getBoundingClientRect:()=>({left:0,width:760})}}));
  expect(root!.root.findAllByType('strong').map(n=>n.children.join('')).join(' ')).toContain('Observed price: $102.40');
@@ -23,4 +23,16 @@ it('inspects exact observations with pointer and keys and distinguishes the fore
  act(()=>root!.root.findByType('input').props.onChange({target:{checked:false}}));
  act(()=>svg().props.onKeyDown({key:'End',preventDefault(){}}));
  expect(root!.root.findAllByType('strong').map(n=>n.children.join('')).join(' ')).toContain('Observed price: $102.99');
+});
+
+it('shows current chart prices independently of an older pending analysis and includes a full week',()=>{
+ const week=Array.from({length:10080},(_,i)=>({timestamp:1794000000+i*60,price:100+i*.001}));
+ act(()=>{root=create(<StockPriceChart name="Test stock" forecast={forecast} history={week} now={week.at(-1)!.timestamp+20}/>);});
+ act(()=>root!.root.findAllByType('button').find(b=>b.children.includes('7 days'))!.props.onClick());
+ const svg=root!.root.findByType('svg');
+ act(()=>svg.props.onKeyDown({key:'Home',preventDefault(){}}));
+ expect(root!.root.findAllByType('strong').map(n=>n.children.join('')).join(' ')).toContain('Observed price: $100.00');
+ act(()=>svg.props.onKeyDown({key:'End',preventDefault(){}}));
+ expect(root!.root.findAllByType('strong').map(n=>n.children.join('')).join(' ')).toContain('Observed price: $110.08');
+ expect(JSON.stringify(root!.toJSON())).toContain('20 seconds');
 });
