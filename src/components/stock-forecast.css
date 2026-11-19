@@ -40,3 +40,5 @@
 .stock-window-meter i{position:absolute;top:50%;width:10px;height:10px;background:var(--accent);border:1px solid var(--fg);border-radius:50%;transform:translate(-50%,-50%)}
 .stock-window-meter+span{font-size:.72rem}
 .stock-range-distances,.stock-range-coverage{font-size:.7rem;color:var(--muted);line-height:1.5}
+
+.advice-hold > strong{color:var(--accent)}

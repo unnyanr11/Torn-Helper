@@ -3,7 +3,7 @@ import type {PricePoint,StockForecast} from '../lib/stock-forecast';
 import './stock-price-chart.css';
 const money=(value:number)=>value.toLocaleString(undefined,{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2});
 const time=(timestamp:number)=>new Date(timestamp*1000).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
-export default function StockPriceChart({forecast,name,history,comparisonMinutes,onComparisonChange,now=Date.now()/1000}:{forecast:StockForecast;name:string;history?:PricePoint[];comparisonMinutes?:number;onComparisonChange?:(minutes:number)=>void;now?:number}){
+export default function StockPriceChart({forecast,name,history,longTerm=false,comparisonMinutes,onComparisonChange,now=Date.now()/1000}:{forecast:StockForecast;name:string;history?:PricePoint[];longTerm?:boolean;comparisonMinutes?:number;onComparisonChange?:(minutes:number)=>void;now?:number}){
  const host=useRef<HTMLDivElement>(null),id=useId().replace(/:/g,'');
  const [width,setWidth]=useState(760),[localRange,setLocalRange]=useState(1440),[projection,setProjection]=useState(true),[active,setActive]=useState<number|null>(null);
  const range=comparisonMinutes??localRange;
@@ -46,9 +46,9 @@ export default function StockPriceChart({forecast,name,history,comparisonMinutes
  const age=Math.max(0,Math.floor(now-last.timestamp));
  return <figure className="market-chart" aria-label={`${name} stock price chart`}>
   <div className="market-chart-heading"><div><h4>{name}</h4><strong>{money(last.price)}</strong> <span className={change>=0?'market-positive':'market-negative'}>{change>=0?'+':''}{money(change)} ({changePercent>=0?'+':''}{changePercent.toFixed(2)}%)</span><small>Change across displayed observations · per share</small></div>
-   <div className="market-chart-controls"><div role="group" aria-label="Price comparison range">{([[15,'15 min'],[30,'30 min'],[60,'60 min'],[720,'12 hr'],[1440,'24 hr'],[10080,'7 days']] as const).map(([n,label])=><button key={n} className="nu-btn" aria-pressed={range===n} onClick={()=>setRange(n)}>{label}</button>)}</div><label><input type="checkbox" checked={projection} onChange={e=>setProjection(e.target.checked)}/> Model estimate</label></div>
+   <div className="market-chart-controls"><div role="group" aria-label="Price comparison range">{(longTerm?[[1440,'24 hr'],[10080,'7 days'],[43200,'30 days']]:[[15,'15 min'],[30,'30 min'],[60,'60 min'],[720,'12 hr'],[1440,'24 hr'],[10080,'7 days']]).map(([n,label])=><button key={n} className="nu-btn" aria-pressed={range===Number(n)} onClick={()=>setRange(Number(n))}>{label}</button>)}</div><label><input type="checkbox" checked={projection} onChange={e=>setProjection(e.target.checked)}/> Model estimate</label></div>
   </div>
-  <p className={`market-chart-freshness ${age>120?'market-negative':''}`} role="status">Latest recorded price: {new Date(last.timestamp*1000).toLocaleString()} · {age<120?`${age} seconds`:`${Math.floor(age/60)} minutes`} behind your device clock. Your time: {new Date(now*1000).toLocaleTimeString()} · {zone}.{age>120?' Price data is delayed; trade signals should wait.':''}</p>
+  <p className={`market-chart-freshness ${age>(longTerm?600:120)?'market-negative':''}`} role="status">Latest recorded price: {new Date(last.timestamp*1000).toLocaleString()} · {age<(longTerm?600:120)?`${age} seconds`:`${Math.floor(age/60)} minutes`} behind your device clock. Your time: {new Date(now*1000).toLocaleTimeString()} · {zone}.{age>(longTerm?600:120)?' Price data is delayed; trade signals should wait.':''}</p>
   <div className="market-chart-readout" id={`${id}-readout`} aria-live="polite">
    {selected?<><strong>{selected.filled?'Estimated gap fill':selected.estimated?'Model estimate':'Observed price'}: {money(selected.price)}</strong><span>{new Date(selected.timestamp*1000).toLocaleString()} · {zone}</span></>:<><strong>High {money(Math.max(...points.map(p=>p.price)))} · Low {money(Math.min(...points.map(p=>p.price)))}</strong><span>Hover or drag to inspect · Arrow keys move between prices</span></>}
   </div>
@@ -71,6 +71,6 @@ export default function StockPriceChart({forecast,name,history,comparisonMinutes
    </svg>
   </div>
   {projection&&!hasProjection&&<p className="market-chart-freshness">The model projection appears when a valid analysis matches the latest chart price. Recorded prices remain available while analysis updates.</p>}
-  <figcaption><span>{(points.length-fillCount).toLocaleString()} recorded prices · {fillCount.toLocaleString()} estimated gap fills · {new Date(first.timestamp*1000).toLocaleString()} – {new Date(last.timestamp*1000).toLocaleString()}</span><span className="market-legend-observed">Observed prices</span><span className="market-legend-estimate">Dashed: model estimate</span><span>Vertical band: historical error range at forecast time</span><span>Dotted segments: missing minutes filled by neighbouring-price averages</span></figcaption>
+  <figcaption><span>{(points.length-fillCount).toLocaleString()} recorded prices · {fillCount.toLocaleString()} estimated gap fills · {new Date(first.timestamp*1000).toLocaleString()} – {new Date(last.timestamp*1000).toLocaleString()}</span><span className="market-legend-observed">Observed prices</span><span className="market-legend-estimate">Dashed: model estimate</span><span>Vertical band: historical error range at forecast time</span><span>Dotted segments: missing {longTerm?'hours':'minutes'} filled by neighbouring-price averages</span></figcaption>
  </figure>;
 }

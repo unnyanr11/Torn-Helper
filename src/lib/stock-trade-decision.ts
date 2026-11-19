@@ -1,4 +1,4 @@
-import {SELL_FEE,stockDecision,type StockForecast,type StockDecision} from './stock-forecast';
+import {SELL_FEE,stockDecision,type StockForecast,type StockDecision} from './stock-forecast.ts';
 export type StockHolding={stock_id:string;shares:string|number;avg_cost:string|number|null};
 export const MIN_NET_SELL_PROFIT=.001;
 export function stockTradeDecision(forecast:StockForecast,now:number,holding?:StockHolding,maxAge=120):StockDecision{

@@ -47,3 +47,8 @@ it('shares comparison range selection with its parent and accepts the selected r
  act(()=>buttons.find(b=>b.children.includes('7 days'))!.props.onClick());
  expect(selected).toBe(10080);
 });
+
+it('offers daily, weekly and monthly chart comparisons for long-term mode',()=>{
+ const html=renderToStaticMarkup(<StockPriceChart longTerm name="Test stock" forecast={forecast} now={points.at(-1)!.timestamp+5}/>);
+ expect(html).toContain('30 days');expect(html).toContain('7 days');expect(html).toContain('24 hr');expect(html).not.toContain('15 min');
+});
