@@ -1,3 +1,4 @@
+import './stock-forecast.css';
 import {useLongTermChart} from '../hooks/useLongTermStocks';
 import {useStockHorizonResults} from '../hooks/useStockHorizonResults';
 import {stockHorizonDecision,SHORT_HORIZONS,LONG_HORIZONS,horizonLabel,type TradingMode} from '../lib/long-term-stock';
