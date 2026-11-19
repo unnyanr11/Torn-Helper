@@ -1,4 +1,4 @@
-import {stockAnalysisOptions} from './hooks/useStockAnalyses';
+import {stockHorizonOptions} from './hooks/useStockHorizonResults';
 import {drawInvitation} from './lib/draw-invitation';
 import {clearBrowserTornKeys} from './lib/browser-torn-key';
 import { cancelTornRequests } from "./lib/torn-request-state";
@@ -95,7 +95,7 @@ export default function App() {
   const [authError, setAuthError] = useState("");
   const [role, setRole] = useState("user");
   useEffect(()=>{
-    if(accountId)void queryClient.prefetchQuery(stockAnalysisOptions());
+    if(accountId)void queryClient.prefetchQuery(stockHorizonOptions());
   },[accountId,queryClient]);
   useEffect(() => {
     let disposed = false;

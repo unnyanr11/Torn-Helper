@@ -1,7 +1,7 @@
 import {useEffect,useRef,useState} from 'react';
 const money=(value:number)=>value.toLocaleString(undefined,{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2});
 
-export default function AnimatedStockPrice({value,observedAt,showChange=true}:{value:number;observedAt?:string;showChange?:boolean}){
+export default function AnimatedStockPrice({value,observedAt,showChange=true,comparisonPrice}:{value:number;observedAt?:string;showChange?:boolean;comparisonPrice?:number|null}){
  const [display,setDisplay]=useState(value),[change,setChange]=useState(0);
  const displayed=useRef(value),previous=useRef(value),frame=useRef<number>();
  useEffect(()=>{
@@ -23,9 +23,12 @@ export default function AnimatedStockPrice({value,observedAt,showChange=true}:{v
   frame.current=requestAnimationFrame(animate);
   return()=>{if(frame.current!==undefined)cancelAnimationFrame(frame.current);};
  },[value,observedAt]);
- return <span style={showChange?undefined:{color:'var(--fg)'}} className={`live-stock-price ${change>0?'price-up':change<0?'price-down':''}`}>
+ const movement=comparisonPrice===undefined?change:comparisonPrice&&comparisonPrice>0?value-comparisonPrice:null;
+ const percent=comparisonPrice&&comparisonPrice>0&&movement!==null?movement/comparisonPrice*100:null;
+ const color=movement===null||movement===0?'var(--fg)':movement>0?'var(--ok)':'var(--warn)';
+ return <span style={comparisonPrice!==undefined?{color}:showChange?undefined:{color:'var(--fg)'}} className={`live-stock-price ${change>0?'price-up':change<0?'price-down':''}`}>
   {change!==0&&<span key={observedAt??value} className="stock-price-flash" aria-hidden="true"/>}
   <strong><span aria-hidden="true">{money(display)}</span><span className="stock-price-accessible">{money(value)}</span></strong>
-  {showChange&&<small>{change===0?'—':`${change>0?'↑ +':'↓ −'}${money(Math.abs(change))}`}</small>}
+  {showChange&&<small style={comparisonPrice===undefined?undefined:{color}}>{movement===null||(comparisonPrice===undefined&&movement===0)?'—':`${movement>0?'↑ +':movement<0?'↓ −':''}${money(Math.abs(movement))}${percent===null?'':` (${percent>0?'+':''}${percent.toFixed(2)}%)`}`}</small>}
  </span>;
 }

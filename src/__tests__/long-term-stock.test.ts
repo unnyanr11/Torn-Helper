@@ -13,7 +13,7 @@ it('uses a month of data with separate historical checks and a 24-hour forecast'
 });
 it('labels partial history and blocks insufficient or invalid history',()=>{
  expect(forecastLongTermStock(points.slice(-240)).change30d).toBeNull();
- expect(forecastLongTermStock(points.slice(-24)).issue).toContain('seven days');
+ expect(forecastLongTermStock(points.slice(-24)).issue).toContain('7 days');
  expect(forecastLongTermStock([{timestamp:NaN,price:10},{timestamp:100,price:0}]).last).toBeNull();
 });
 it('keeps future neighbours out of an earlier gap and does not invent leading days',()=>{
@@ -45,4 +45,17 @@ it('uses fresh quotes for profit and blocks stale prices or expired cached resul
  expect(longTermStockDecision(f,now+300,undefined,{timestamp:now-1000,price:100}).blocker).toBe('stale');
  expect(longTermStockDecision(f,now,{stock_id:'1',shares:10,avg_cost:110},{timestamp:now,price:109}).signal).toBe('Hold');
  expect(longTermStockDecision({...f,predictedPrice:NaN},now).signal).toBe('Wait');
+});
+it('uses the exact requested target for each hourly and weekly horizon, with horizon-specific validation',()=>{
+ const full=Array.from({length:2880},(_,i)=>({timestamp:start+i*3600+3540,price:100+i*.001}));
+ for(const hours of [1,3,6,12,18,24,168,336,504,672]){
+  const f=forecastLongTermStock(full,hours,hours<=24?7:120);
+  expect(f.horizonHours).toBe(hours);expect(f.targetTime).toBe(f.last!.timestamp+hours*3600);
+  expect(f.issue).toBeUndefined();expect(f.tests).toBeGreaterThanOrEqual(24);expect(f.tuningThrough!).toBeLessThan(f.holdoutFrom!);
+ }
+});
+it('does not reuse daily validation for a weekly forecast with too little history',()=>{
+ const f=forecastLongTermStock(points.slice(-240),168,120);
+ expect(f.issue).toContain('7 days');expect(f.supported).toBe(false);expect(f.tests).toBe(0);
+ expect(forecastLongTermStock(points,24).targetTime).not.toBe(f.targetTime);
 });

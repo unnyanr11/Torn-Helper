@@ -33,3 +33,12 @@ it('updates immediately for reduced motion and clears the change on an unchanged
  act(()=>{root!.update(<AnimatedStockPrice value={105} observedAt="three"/>);});
  expect(JSON.stringify(root!.toJSON())).not.toContain('price-up');
 });
+it('shows amount and percentage against the comparison baseline even on the first render',()=>{
+ vi.stubGlobal('document',{documentElement:{dataset:{motion:'reduced'}}});
+ act(()=>{root=create(<AnimatedStockPrice value={110} comparisonPrice={100}/>);});
+ expect(JSON.stringify(root!.toJSON())).toContain('↑ +$10.00 (+10.00%)');
+ act(()=>{root!.update(<AnimatedStockPrice value={90} comparisonPrice={100}/>);});
+ expect(JSON.stringify(root!.toJSON())).toContain('↓ −$10.00 (-10.00%)');
+ act(()=>{root!.update(<AnimatedStockPrice value={90} comparisonPrice={null}/>);});
+ expect(root!.root.findByType('small').children).toEqual(['—']);
+});
