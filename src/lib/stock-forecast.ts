@@ -2,12 +2,13 @@
 export const SELL_FEE = 0.001;
 export const MIN_HISTORY = 80;
 export const HISTORY_ENDPOINT = 'v2-torn-{stockId}-stocks';
-export type PricePoint = {timestamp:number;price:number};
+export type PricePoint = {timestamp:number;price:number;estimated?:boolean;availableAt?:number};
 export type StockForecast = {
  points:PricePoint[]; issue?:string; cadence:number; last:PricePoint|null;
  predictedReturn:number; predictedPrice:number; lower:number; upper:number;
  tests:number; mae:number; baselineMae:number; directionAccuracy:number;
  supported:boolean; targetTime:number;
+ dip?:{present:boolean;dropReturn:number;tests:number;reboundRate:number};
  validation:{timestamp:number;predictedReturn:number;actualReturn:number}[];
 };
 const object=(v:unknown):Record<string,unknown>=>v!==null&&typeof v==='object'&&!Array.isArray(v)?v as Record<string,unknown>:{};

@@ -25,11 +25,14 @@ export default function StockPriceChart({forecast,name,history,now=Date.now()/10
  const start=last.timestamp-(range-1)*60,end=hasProjection?forecast.targetTime:last.timestamp;
  const x=(stamp:number)=>left+(stamp-start)/Math.max(60,end-start)*(plotRight-left);
  const y=(price:number)=>plotBottom-(price-min)/(max-min)*(plotBottom-top);
- const candidates=[...points.map(p=>({...p,estimated:false})),...(hasProjection?[{timestamp:forecast.targetTime,price:forecast.predictedPrice,estimated:true}]:[])];
+ const candidates=[...points.map(p=>({...p,filled:!!p.estimated,estimated:false})),...(hasProjection?[{timestamp:forecast.targetTime,price:forecast.predictedPrice,filled:false,estimated:true}]:[])];
  const selected=active===null?null:candidates[Math.min(active,candidates.length-1)];
  const change=last.price-first.price,changePercent=change/first.price*100;
  const rendered=points;
  const path=rendered.map((p,i)=>`${i&&p.timestamp-rendered[i-1].timestamp<=Math.max(60,observedCadence)*1.5?'L':'M'}${x(p.timestamp)},${y(p.price)}`).join(' ');
+ const observedPath=rendered.slice(1).map((p,i)=>!p.estimated&&!rendered[i].estimated&&p.timestamp-rendered[i].timestamp<=Math.max(60,observedCadence)*1.5?`M${x(rendered[i].timestamp)},${y(rendered[i].price)} L${x(p.timestamp)},${y(p.price)}`:'').join(' ');
+ const filledPath=rendered.slice(1).map((p,i)=>p.estimated||rendered[i].estimated?`M${x(rendered[i].timestamp)},${y(rendered[i].price)} L${x(p.timestamp)},${y(p.price)}`:'').join(' ');
+ const fillCount=points.filter(p=>p.estimated).length;
  const inspect=(clientX:number,element:SVGSVGElement)=>{
   const box=element.getBoundingClientRect();if(!box.width)return;
   const stamp=start+((clientX-box.left)/box.width*width-left)/(plotRight-left)*Math.max(60,end-start);
@@ -45,7 +48,7 @@ export default function StockPriceChart({forecast,name,history,now=Date.now()/10
   </div>
   <p className={`market-chart-freshness ${age>120?'market-negative':''}`} role="status">Latest recorded price: {new Date(last.timestamp*1000).toLocaleString()} · {age<120?`${age} seconds`:`${Math.floor(age/60)} minutes`} behind your device clock. Your time: {new Date(now*1000).toLocaleTimeString()} · {zone}.{age>120?' Price data is delayed; trade signals should wait.':''}</p>
   <div className="market-chart-readout" id={`${id}-readout`} aria-live="polite">
-   {selected?<><strong>{selected.estimated?'Model estimate':'Observed price'}: {money(selected.price)}</strong><span>{new Date(selected.timestamp*1000).toLocaleString()} · {zone}</span></>:<><strong>High {money(Math.max(...points.map(p=>p.price)))} · Low {money(Math.min(...points.map(p=>p.price)))}</strong><span>Hover or drag to inspect · Arrow keys move between prices</span></>}
+   {selected?<><strong>{selected.filled?'Estimated gap fill':selected.estimated?'Model estimate':'Observed price'}: {money(selected.price)}</strong><span>{new Date(selected.timestamp*1000).toLocaleString()} · {zone}</span></>:<><strong>High {money(Math.max(...points.map(p=>p.price)))} · Low {money(Math.min(...points.map(p=>p.price)))}</strong><span>Hover or drag to inspect · Arrow keys move between prices</span></>}
   </div>
   <div ref={host} className="market-chart-canvas">
    <svg viewBox={`0 0 ${width} ${height}`} role="application" tabIndex={0} aria-label={`${name}: interactive price history. Use left and right arrows to inspect observations.`} aria-describedby={`${id}-readout`} onPointerMove={e=>inspect(e.clientX,e.currentTarget)} onPointerDown={e=>{inspect(e.clientX,e.currentTarget);e.currentTarget.focus();}} onPointerLeave={()=>setActive(null)} onBlur={()=>setActive(null)} onKeyDown={e=>{
@@ -58,7 +61,7 @@ export default function StockPriceChart({forecast,name,history,now=Date.now()/10
     <g clipPath={`url(#${id}-clip)`}>
      {hasProjection&&<rect x={x(last.timestamp)} y={top} width={Math.max(0,plotRight-x(last.timestamp))} height={plotBottom-top} fill="var(--accent)" opacity=".045"/>}
      <path d={`${path} L${x(last.timestamp)},${plotBottom} L${x(first.timestamp)},${plotBottom} Z`} fill={`url(#${id}-fill)`}/>
-     <path d={path} className="market-observed" fill="none"/>
+     <path d={observedPath} className="market-observed" fill="none"/><path d={filledPath} className="market-filled" fill="none"/>
      <line className="market-last-line" x1={left} x2={plotRight} y1={y(last.price)} y2={y(last.price)}/>
      {hasProjection&&<><path d={`M${x(last.timestamp)},${y(last.price)} L${x(forecast.targetTime)},${y(forecast.predictedPrice)}`} className="market-projection" fill="none"/><line x1={plotRight-4} x2={plotRight-4} y1={y(forecast.lower)} y2={y(forecast.upper)} stroke="var(--accent)" strokeWidth={8} opacity=".35"/><circle cx={plotRight-4} cy={y(forecast.predictedPrice)} r={4} fill="var(--accent)"/></>}
     </g>
@@ -66,6 +69,6 @@ export default function StockPriceChart({forecast,name,history,now=Date.now()/10
    </svg>
   </div>
   {projection&&!hasProjection&&<p className="market-chart-freshness">The model projection appears when a valid analysis matches the latest chart price. Recorded prices remain available while analysis updates.</p>}
-  <figcaption><span>{points.length.toLocaleString()} recorded prices · {new Date(first.timestamp*1000).toLocaleString()} – {new Date(last.timestamp*1000).toLocaleString()}</span><span className="market-legend-observed">Observed prices</span><span className="market-legend-estimate">Dashed: model estimate</span><span>Vertical band: historical error range at forecast time</span><span>One-minute observations · gaps remain unconnected</span></figcaption>
+  <figcaption><span>{(points.length-fillCount).toLocaleString()} recorded prices · {fillCount.toLocaleString()} estimated gap fills · {new Date(first.timestamp*1000).toLocaleString()} – {new Date(last.timestamp*1000).toLocaleString()}</span><span className="market-legend-observed">Observed prices</span><span className="market-legend-estimate">Dashed: model estimate</span><span>Vertical band: historical error range at forecast time</span><span>Dotted segments: missing minutes filled by neighbouring-price averages</span></figcaption>
  </figure>;
 }

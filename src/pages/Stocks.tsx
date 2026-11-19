@@ -72,7 +72,7 @@ export default function Stocks() {
       <p className="muted">
         Live stock prices and model guidance update automatically. Track your own holdings below.
       </p>
-      <MinuteStockLab/>
+      <MinuteStockLab holdings={holdings}/>
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Add / update holding</h3>

@@ -35,12 +35,12 @@ describe('chronological minute forecasts',()=>{
   expect(f.predictedReturn).toBeCloseTo(.001,5);expect(f.mae).toBeLessThan(f.baselineMae);
   expect(f.validation.every(v=>v.timestamp<=f.last!.timestamp)).toBe(true);
  });
- it('excludes future prices and does not fill gaps',()=>{
+ it('excludes future prices and marks internal neighbour-average fills',()=>{
   const p=series(),now=p.at(-1)!.timestamp+10;
   expect(forecastMinuteStock([...p,{timestamp:now+50,price:99999}],now)).toEqual(forecastMinuteStock(p,now));
   const gap=p.filter((_,i)=>i!==500),f=forecastMinuteStock(gap,now);
   expect(f.gapCount).toBe(1);expect(f.issue).toBeUndefined();
-  expect(f.points).toHaveLength(599);expect(f.trainingSamples).toBeGreaterThan(360);
+  expect(f.points).toHaveLength(600);expect(f.imputedCount).toBe(1);expect(f.validation.some(v=>v.timestamp===p[500].timestamp)).toBe(false);expect(f.trainingSamples).toBeGreaterThan(360);
  });
  it('does not allow a future holdout price to alter an earlier prediction',()=>{
   const p=series(),now=p.at(-1)!.timestamp+10,original=forecastMinuteStock(p,now);

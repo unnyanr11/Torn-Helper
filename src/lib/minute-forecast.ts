@@ -1,10 +1,11 @@
+import {fillMissingStockMinutes} from './stock-minute-clean.ts';
 import {type PricePoint,type StockForecast} from './stock-forecast.ts';
 import {expandingRidge} from './expanding-ridge.ts';
-export const MINUTE_MODEL_VERSION='minute-ridge-v3-week';
+export const MINUTE_MODEL_VERSION='minute-ridge-v4-dips-filled';
 export const WEEK_MINUTES=10080;
 export const WEEK_SECONDS=WEEK_MINUTES*60;
 export type MinuteHorizon=1|5|15|60;
-export type MinuteForecast=StockForecast&{model:string;tuningTests:number;observations:number;gapCount:number;intervalCoverage:number;holdoutImprovement:number;segmentStart:number;trainingSamples:number;coverageTests:number};
+export type MinuteForecast=StockForecast&{model:string;tuningTests:number;observations:number;gapCount:number;intervalCoverage:number;holdoutImprovement:number;segmentStart:number;trainingSamples:number;coverageTests:number;imputedCount?:number};
 const average=(a:number[])=>a.reduce((s,v)=>s+v,0)/(a.length||1);
 const quantile=(a:number[],q:number)=>{const sorted=[...a].sort((a,b)=>a-b);return sorted[Math.max(0,Math.ceil(q*sorted.length)-1)]??0;};
 type Sample={x:number[];y:number;origin:number;target:number};
@@ -24,30 +25,30 @@ function predict(model:Model,end:number,x:number[],ridge:ReturnType<typeof expan
  return ridge(end,x);
 }
 /** Fixed candidates selected on earlier tuning data, then scored on a disjoint later holdout.
- * Horizons are 1, 5, 15 or 60 minutes, with overlapping labels purged from training. Missing minutes are never fabricated.
+ * Horizons are 1, 5, 15 or 60 minutes, with overlapping labels purged from training. Internal gaps use marked neighbour averages; only observed origins and targets score the model.
  */
 export function forecastMinuteStock(input:PricePoint[],now=Date.now()/1000,horizon:MinuteHorizon=1,featureCache?:Map<number,number[]>):MinuteForecast{
  if(![1,5,15,60].includes(horizon))throw new Error('Unsupported forecast horizon');
- const clean=input.filter(p=>Number.isInteger(p.timestamp)&&p.timestamp%60===0&&p.timestamp<=now&&p.timestamp>now-WEEK_SECONDS&&Number.isFinite(p.price)&&p.price>0).sort((a,b)=>a.timestamp-b.timestamp);
+ const clean=input.filter(p=>!p.estimated&&Number.isInteger(p.timestamp)&&p.timestamp%60===0&&p.timestamp<=now&&p.timestamp>now-WEEK_SECONDS&&Number.isFinite(p.price)&&p.price>0).sort((a,b)=>a.timestamp-b.timestamp);
  const unique=[...new Map(clean.map(p=>[p.timestamp,p])).values()].slice(-WEEK_MINUTES);
- let gaps=0;const gapPrefix=[0];
- for(let i=1;i<unique.length;i++){if(unique[i].timestamp-unique[i-1].timestamp!==60)gaps++;gapPrefix.push(gaps);}
- const points=unique,last=points.at(-1)??null;
- const empty=(issue:string):MinuteForecast=>({points,last,issue,cadence:horizon*60,predictedReturn:0,predictedPrice:0,lower:0,upper:0,tests:0,mae:0,baselineMae:0,directionAccuracy:0,supported:false,targetTime:0,validation:[],model:'No change',tuningTests:0,observations:unique.length,gapCount:gaps,intervalCoverage:0,holdoutImprovement:0,segmentStart:points[0]?.timestamp??0,trainingSamples:0,coverageTests:0});
+ let gaps=0;
+ for(let i=1;i<unique.length;i++){if(unique[i].timestamp-unique[i-1].timestamp!==60)gaps++;}
+ const points=fillMissingStockMinutes(unique),last=points.at(-1)??null;
+ const imputedCount=points.filter(p=>p.estimated).length;
+ const empty=(issue:string):MinuteForecast=>({points,last,issue,imputedCount,cadence:horizon*60,predictedReturn:0,predictedPrice:0,lower:0,upper:0,tests:0,mae:0,baselineMae:0,directionAccuracy:0,supported:false,targetTime:0,validation:[],model:'No change',tuningTests:0,observations:unique.length,gapCount:gaps,intervalCoverage:0,holdoutImprovement:0,segmentStart:points[0]?.timestamp??0,trainingSamples:0,coverageTests:0});
  const required=240+2*(horizon-1);
- if(points.length<required)return empty(`Need at least ${required} recorded minute observations in the last seven days; ${points.length} available. Weekly backfill runs automatically.`);
+ if(unique.length<required)return empty(`Need at least ${required} recorded minute observations in the last seven days; ${unique.length} recorded available. Weekly backfill runs automatically.`);
  if(!last||now-last.timestamp>120)return empty('Minute prices are stale. Waiting for the collector to catch up.');
- if(gapPrefix.at(-1)!==gapPrefix[points.length-61])return empty('Need 61 consecutive latest minutes for current indicators. Older valid weekly history is retained.');
  const prices=points.map(p=>p.price),samples:Sample[]=[];
  const featureAt=(i:number)=>{
   const stamp=points[i].timestamp,cached=featureCache?.get(stamp);if(cached)return cached;
   const value=features(prices,i);featureCache?.set(stamp,value);return value;
  };
  for(let i=60;i<prices.length-horizon;i++){
-  if(gapPrefix[i+horizon]!==gapPrefix[i-60])continue;
+  if(points[i].estimated||points[i+horizon].estimated)continue;
   samples.push({x:featureAt(i),y:prices[i+horizon]/prices[i]-1,origin:points[i].timestamp,target:points[i+horizon].timestamp});
  }
- if(samples.length<120+horizon)return empty('Not enough complete training windows in the last seven days. Missing minutes are never invented.');
+ if(samples.length<120+horizon)return empty('Not enough complete training windows in the last seven days. Only recorded origin and target prices are scored.');
  const knownEnd=(origin:number)=>{let lo=0,hi=samples.length;while(lo<hi){const mid=(lo+hi)>>>1;if(samples[mid].target<=origin)lo=mid+1;else hi=mid;}return lo;};
  const ridge=expandingRidge(samples);
  const holdoutCount=Math.min(80,Math.floor(samples.length*.25));
@@ -72,11 +73,14 @@ export function forecastMinuteStock(input:PricePoint[],now=Date.now()/1000,horiz
  if(!Number.isFinite(predictedReturn)||Math.abs(predictedReturn)>=.2)return empty('Minute forecast is unstable. No trade signal.');
  const margin=Math.max(quantile(errors,.9),1e-8),mae=average(errors),baselineMae=average(base),directionAccuracy=correct/holdoutCount;
  const improvement=baselineMae>0?1-mae/baselineMae:0;
- return {points,last,cadence:horizon*60,predictedReturn,predictedPrice:last.price*(1+predictedReturn),lower:Math.max(0,last.price*(1+predictedReturn-margin)),upper:last.price*(1+predictedReturn+margin),tests:holdoutCount,mae,baselineMae,directionAccuracy,supported:model!=='No change'&&holdoutCount>=40&&improvement>=.05&&directionAccuracy>=.55,targetTime:last.timestamp+horizon*60,validation,model,tuningTests:tuneCount,observations:unique.length,gapCount:gaps,intervalCoverage:coverageTests?covered/coverageTests:0,holdoutImprovement:improvement,segmentStart:points[0].timestamp,trainingSamples:samples.length,coverageTests};
+ const recent=featureAt(prices.length-1),dropReturn=prices.at(-1)!/prices[prices.length-6]-1;
+ const dips=samples.filter(s=>s.x[3]<0&&s.x[11]<0);
+ const dip={present:dropReturn<0&&recent[11]<0,dropReturn,tests:dips.length,reboundRate:dips.length?dips.filter(s=>s.y>0).length/dips.length:0};
+ return {points,last,dip,imputedCount,cadence:horizon*60,predictedReturn,predictedPrice:last.price*(1+predictedReturn),lower:Math.max(0,last.price*(1+predictedReturn-margin)),upper:last.price*(1+predictedReturn+margin),tests:holdoutCount,mae,baselineMae,directionAccuracy,supported:model!=='No change'&&holdoutCount>=40&&improvement>=.05&&directionAccuracy>=.55,targetTime:last.timestamp+horizon*60,validation,model,tuningTests:tuneCount,observations:unique.length,gapCount:gaps,intervalCoverage:coverageTests?covered/coverageTests:0,holdoutImprovement:improvement,segmentStart:points[0].timestamp,trainingSamples:samples.length,coverageTests};
 }
 /** Evaluate forecasts only at their exact future minute; gaps are not substitutes. */
 export function scoreForwardPredictions(predictions:{targetTime:number;predictedPrice:number;originPrice:number}[],actuals:PricePoint[]){
- const prices=new Map(actuals.map(p=>[p.timestamp,p.price]));
+ const prices=new Map(actuals.filter(p=>!p.estimated).map(p=>[p.timestamp,p.price]));
  const pairs=predictions.flatMap(p=>{const actual=prices.get(p.targetTime);return actual===undefined?[]:[{...p,actual}];});
  return {tests:pairs.length,mae:pairs.length?average(pairs.map(p=>Math.abs(p.predictedPrice/p.originPrice-p.actual/p.originPrice))):null,baselineMae:pairs.length?average(pairs.map(p=>Math.abs(p.actual/p.originPrice-1))):null,directionAccuracy:pairs.length?pairs.filter(p=>Math.abs(p.actual-p.originPrice)>1e-10&&Math.sign(p.predictedPrice-p.originPrice)===Math.sign(p.actual-p.originPrice)).length/pairs.length:null};
 }

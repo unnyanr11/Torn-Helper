@@ -1,7 +1,8 @@
-import {stockDecision,type StockForecast} from '../lib/stock-forecast';
+import {stockTradeDecision,type StockHolding} from '../lib/stock-trade-decision';
+import {type StockForecast} from '../lib/stock-forecast';
 const money=(value:number)=>value.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:2});
-export default function StockAdvice({forecast,now,training=false}:{forecast?:StockForecast;now:number;training?:boolean}){
- const decision=forecast?stockDecision(forecast,now,120):null;
+export default function StockAdvice({forecast,now,training=false,holding}:{forecast?:StockForecast;now:number;training?:boolean;holding?:StockHolding}){
+ const decision=forecast?stockTradeDecision(forecast,now,holding):null;
  const action=decision?.signal==='Buy candidate'?'Buy':decision?.signal==='Sell / rebuy watch'?'Sell':'Wait';
  return <div className={`stock-advice advice-${action.toLowerCase()}`}>
   <strong>{action}</strong>

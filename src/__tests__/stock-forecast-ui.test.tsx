@@ -41,8 +41,8 @@ describe('stock timing lab',()=>{
  it('renders supported and expired forecasts with price windows and transparent evidence',()=>{
   const points=Array.from({length:120},(_,i)=>({timestamp:1794000000+i*3600,price:100*1.004**i})),forecast=forecastStock(points);
   const active=renderToStaticMarkup(<ForecastDetails forecast={forecast} id={2} now={points[119].timestamp+30}/>);
-  expect(active).toContain('Buy candidate');expect(active).toContain('Entry ceiling');expect(active).toContain('walk-forward tests');expect(active).toContain('Historical error range');expect(active).toContain('Torn City Investments');
+  expect(active).toContain('Wait');expect(active).toContain('five-minute price drop');expect(active).toContain('walk-forward tests');expect(active).toContain('Historical error range');expect(active).toContain('Torn City Investments');
   const expired=renderToStaticMarkup(<ForecastDetails forecast={forecast} id={2} now={forecast.targetTime}/>);
-  expect(expired).toContain('Wait');expect(expired).toContain('forecast window has passed');expect(expired).not.toContain('Entry ceiling');
+  expect(expired).toContain('Wait');expect(expired).toContain('Prices are outdated');expect(expired).not.toContain('Entry ceiling');
  });
 });

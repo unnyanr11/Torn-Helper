@@ -19,10 +19,10 @@ it('shows Wait for incomplete analysis and for an expired forecast',()=>{
 });
 it('explains actionable price levels and returns to Wait when minute data is stale',()=>{
  const now=1795089600;
- const base={...forecastMinuteStock([],now,1),issue:undefined,last:{timestamp:now,price:100},supported:true,targetTime:now+3600,lower:102,upper:104,predictedPrice:103};
+ const base={...forecastMinuteStock([],now,1),issue:undefined,last:{timestamp:now,price:100},dip:{present:true,dropReturn:-.01,tests:30,reboundRate:.6},supported:true,targetTime:now+3600,lower:102,upper:104,predictedPrice:103};
  const buy=renderToStaticMarkup(<StockAdvice forecast={base} now={now}/>);
  expect(buy).toContain('Buy');expect(buy).toContain('$101.90');
- const sell=renderToStaticMarkup(<StockAdvice forecast={{...base,lower:96,upper:98,predictedPrice:97}} now={now}/>);
+ const sell=renderToStaticMarkup(<StockAdvice holding={{stock_id:"2",shares:100,avg_cost:95}} forecast={{...base,lower:96,upper:98,predictedPrice:97}} now={now}/>);
  expect(sell).toContain('Sell');expect(sell).toContain('$99.90');expect(sell).toContain('already own');
  const stale=renderToStaticMarkup(<StockAdvice forecast={base} now={now+121}/>);
  expect(stale).toContain('Wait');expect(stale).toContain('Prices are outdated');

@@ -17,10 +17,10 @@ describe('expanding weekly ridge',()=>{
   expect(f.points[0].timestamp).toBeGreaterThan(now-WEEK_SECONDS);
   expect(f.points.at(-1)).toEqual(points.at(-1));
  });
- it('retains usable samples before old gaps without creating fake prices',()=>{
+ it('retains usable samples before old gaps while marking estimated prices separately',()=>{
   const p:PricePoint[]=Array.from({length:3000},(_,i)=>({timestamp:start+i*60,price:100+Math.sin(i/70)})).filter((_,i)=>i!==1000);
   const f=forecastMinuteStock(p,p.at(-1)!.timestamp+15,15);
-  expect(f.issue).toBeUndefined();expect(f.gapCount).toBe(1);expect(f.points).toHaveLength(2999);
-  expect(f.trainingSamples).toBeGreaterThan(2800);expect(f.points.some(p=>p.timestamp===start+1000*60)).toBe(false);
+  expect(f.issue).toBeUndefined();expect(f.gapCount).toBe(1);expect(f.points).toHaveLength(3000);
+  expect(f.trainingSamples).toBeGreaterThan(2800);expect(f.points.find(p=>p.timestamp===start+1000*60)?.estimated).toBe(true);expect(f.imputedCount).toBe(1);
  });
 });

@@ -1,3 +1,4 @@
+import {stockTradeDecision,type StockHolding} from '../lib/stock-trade-decision';
 import StockPriceChart from './StockPriceChart';
 import AnimatedStockPrice from './AnimatedStockPrice';
 import DataFreshness from './DataFreshness';
@@ -6,7 +7,7 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCurrentObservations} from '../hooks/useSavedObservations';
 import {stockChoices,stockLabel} from '../lib/stock-catalogue';
-import {stockHistory,forecastStock,stockDecision,HISTORY_ENDPOINT,type StockForecast as Forecast} from '../lib/stock-forecast';
+import {stockHistory,forecastStock,HISTORY_ENDPOINT,type StockForecast as Forecast} from '../lib/stock-forecast';
 import {scanStockHistory,stockScanPause} from '../lib/stock-scan';
 import {invokeTornData} from '../lib/torn-data-client';
 import {functionError} from '../lib/function-error';
@@ -52,7 +53,7 @@ export default function StockForecast(){
  }
  function stop(){controller.current?.abort();controller.current=null;setBusy(false);setProgress('Scan stopped. Loaded charts are kept.');}
  const ranked=[...forecasts].sort((a,b)=>{
-  const da=stockDecision(a[1],now),db=stockDecision(b[1],now);
+  const da=stockTradeDecision(a[1],now),db=stockTradeDecision(b[1],now);
   const priority=(signal:string)=>signal==='Buy candidate'?0:signal==='Sell / rebuy watch'?1:2;
   return priority(da.signal)-priority(db.signal)||a[0]-b[0];
  });
@@ -64,14 +65,14 @@ export default function StockForecast(){
   <DataFreshness at={Object.values(saved.data??{}).flatMap(e=>e.observation?.endpoint_id===HISTORY_ENDPOINT&&e.observation.parameters?.stockId===selected?[e.observation.fetched_at]:[]).sort().at(-1)} source="Torn stock chart · saved observation" busy={busy} error={!!error}/>
   {selectedForecast?<ForecastDetails forecast={selectedForecast} id={Number(selected)} now={now}/>:<div className="nu-inset stock-forecast-empty"><h4>No forecast yet</h4><p>Choose a stock and load its chart. A price quote alone cannot train this model.</p></div>}
   {ranked.length>0&&<div className="stock-forecast-table"><table><caption>Comparison · {ranked.length} of 35 stocks analysed. Buy candidates appear first; compare forecasts with the same time interval.</caption><thead><tr><th>Stock</th><th>Signal</th><th>Forecast interval</th><th>Estimated return after sale fee</th><th>Historical directional accuracy</th><th>Details</th></tr></thead><tbody>{ranked.map(([id,forecast])=>{
-   const decision=stockDecision(forecast,now);
+   const decision=stockTradeDecision(forecast,now);
    return <tr key={id}><th scope="row">{stockLabel(id)}</th><td>{decision.signal}{decision.stale&&!forecast.issue?' · stale':''}</td><td>{forecast.issue?'—':intervalLabel(forecast.cadence)}</td><td>{forecast.issue?'—':percent(decision.netReturn)}</td><td>{forecast.tests?`${Math.round(forecast.directionAccuracy*100)}% · ${forecast.tests} tests`:'Needs history'}</td><td><button className="nu-btn" onClick={()=>setSelected(String(id))}>View {stockLabel(id)}</button></td></tr>;
   })}</tbody></table></div>}
   <details className="stock-forecast-method"><summary>How the model earns a signal</summary><p>A regularized regression learns from recent returns, momentum, volatility, and distance from the recent average. It needs at least 80 evenly spaced observations. Each historical test trains only on earlier prices. A signal needs at least 20 tests, 55% directional accuracy, and at least 5% less prediction error than assuming no price change.</p><p>The displayed range uses the 90th percentile of historical prediction errors. It is an empirical error range, not a 90% guarantee. Stale data, weak tests, or a move too small to clear the range and sale fee produce Wait. The forecast covers one chart interval, not an exact market bottom or top.</p><p>Price-only estimates exclude dividends and lost benefit progress. Use trading shares; preserve benefit blocks you want to keep. Losses remain possible. Trades are placed manually in Torn.</p><a href="https://wiki.torn.com/wiki/Stock_Market" target="_blank" rel="noreferrer">Torn stock rules · 0.1% sale fee, no buy fee</a></details>
  </section>;
 }
-export function ForecastDetails({forecast,id,now,hideChart=false}:{forecast:Forecast;id:number;now:number;hideChart?:boolean}){
- const decision=stockDecision(forecast,now);
+export function ForecastDetails({forecast,id,now,hideChart=false,holding}:{forecast:Forecast;id:number;now:number;hideChart?:boolean;holding?:StockHolding}){
+ const decision=stockTradeDecision(forecast,now,holding);
  return <article className="nu-inset stock-forecast-detail"><h4>{stockLabel(id)}</h4><span className={`badge ${decision.signal==='Buy candidate'?'ok':decision.signal==='Sell / rebuy watch'?'warn':''}`}>{decision.signal}</span><p>{decision.reason}</p>
   {!forecast.issue&&<><div className="stock-forecast-metrics"><div><small>Last chart price</small><AnimatedStockPrice value={forecast.last!.price} observedAt={String(forecast.last!.timestamp)}/><small>{new Date(forecast.last!.timestamp*1000).toLocaleString()}</small></div><div><small>Next {intervalLabel(forecast.cadence)}</small><strong>{money(forecast.predictedPrice)}</strong><small>Window ends {new Date(forecast.targetTime*1000).toLocaleString()}</small></div><div><small>Historical error range</small><strong>{money(forecast.lower)} – {money(forecast.upper)}</strong><small>Estimated return after sale fee: {percent(decision.netReturn)}</small></div><div><small>Model evidence</small><strong>{forecast.supported?'Passed historical checks':'Weak · wait'}</strong><small>{forecast.tests} walk-forward tests · {Math.round(forecast.directionAccuracy*100)}% directional accuracy</small></div></div>
    {!hideChart&&<StockPriceChart forecast={forecast} name={stockLabel(id)}/>}
