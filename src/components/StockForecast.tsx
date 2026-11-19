@@ -1,3 +1,4 @@
+import StockPriceChart from './StockPriceChart';
 import AnimatedStockPrice from './AnimatedStockPrice';
 import DataFreshness from './DataFreshness';
 import RequestProblem from './RequestProblem';
@@ -69,21 +70,14 @@ export default function StockForecast(){
   <details className="stock-forecast-method"><summary>How the model earns a signal</summary><p>A regularized regression learns from recent returns, momentum, volatility, and distance from the recent average. It needs at least 80 evenly spaced observations. Each historical test trains only on earlier prices. A signal needs at least 20 tests, 55% directional accuracy, and at least 5% less prediction error than assuming no price change.</p><p>The displayed range uses the 90th percentile of historical prediction errors. It is an empirical error range, not a 90% guarantee. Stale data, weak tests, or a move too small to clear the range and sale fee produce Wait. The forecast covers one chart interval, not an exact market bottom or top.</p><p>Price-only estimates exclude dividends and lost benefit progress. Use trading shares; preserve benefit blocks you want to keep. Losses remain possible. Trades are placed manually in Torn.</p><a href="https://wiki.torn.com/wiki/Stock_Market" target="_blank" rel="noreferrer">Torn stock rules · 0.1% sale fee, no buy fee</a></details>
  </section>;
 }
-export function ForecastDetails({forecast,id,now}:{forecast:Forecast;id:number;now:number}){
+export function ForecastDetails({forecast,id,now,hideChart=false}:{forecast:Forecast;id:number;now:number;hideChart?:boolean}){
  const decision=stockDecision(forecast,now);
  return <article className="nu-inset stock-forecast-detail"><h4>{stockLabel(id)}</h4><span className={`badge ${decision.signal==='Buy candidate'?'ok':decision.signal==='Sell / rebuy watch'?'warn':''}`}>{decision.signal}</span><p>{decision.reason}</p>
   {!forecast.issue&&<><div className="stock-forecast-metrics"><div><small>Last chart price</small><AnimatedStockPrice value={forecast.last!.price} observedAt={String(forecast.last!.timestamp)}/><small>{new Date(forecast.last!.timestamp*1000).toLocaleString()}</small></div><div><small>Next {intervalLabel(forecast.cadence)}</small><strong>{money(forecast.predictedPrice)}</strong><small>Window ends {new Date(forecast.targetTime*1000).toLocaleString()}</small></div><div><small>Historical error range</small><strong>{money(forecast.lower)} – {money(forecast.upper)}</strong><small>Estimated return after sale fee: {percent(decision.netReturn)}</small></div><div><small>Model evidence</small><strong>{forecast.supported?'Passed historical checks':'Weak · wait'}</strong><small>{forecast.tests} walk-forward tests · {Math.round(forecast.directionAccuracy*100)}% directional accuracy</small></div></div>
-   <ForecastChart forecast={forecast}/>
+   {!hideChart&&<StockPriceChart forecast={forecast} name={stockLabel(id)}/>}
    {decision.signal==='Buy candidate'&&<p>Entry ceiling for this forecast: <strong>{money(decision.buyCeiling)}</strong> per share. Above that price, the lower estimate no longer covers the sale fee. Refresh before trading.</p>}
    {decision.signal==='Sell / rebuy watch'&&<p>Selling at the observed price leaves {money(decision.rebuyCeiling)} per share after the fee. A rebuy must cost less to increase your share count. Estimated next price: {money(forecast.predictedPrice)}. This is a watch signal, not a promised rebuy price.</p>}
    <p className="muted">Model mean absolute error: {(forecast.mae*100).toFixed(3)}% · No-change baseline: {(forecast.baselineMae*100).toFixed(3)}% per interval. Refresh prices before acting.</p>
   </>}
  </article>;
-}
-function ForecastChart({forecast}:{forecast:Forecast}){
- const points=forecast.points.slice(-60),min=Math.min(...points.map(p=>p.price),forecast.lower),max=Math.max(...points.map(p=>p.price),forecast.upper),span=max-min||1;
- const y=(price:number)=>165-(price-min)/span*140,x=(i:number)=>20+i/(points.length)*560;
- const path=points.map((p,i)=>`${i?'L':'M'}${x(i).toFixed(2)},${y(p.price).toFixed(2)}`).join(' ');
- const last=points[points.length-1];
- return <figure><svg viewBox="0 0 600 190" role="img" aria-label="Observed stock prices and next-interval estimate with historical error range"><path d={path} fill="none" stroke="var(--accent)" strokeWidth="2"/><path d={`M${x(points.length-1)},${y(last.price)} L580,${y(forecast.predictedPrice)}`} stroke="currentColor" strokeDasharray="4 4" fill="none"/><path d={`M580,${y(forecast.lower)} V${y(forecast.upper)}`} stroke="currentColor" strokeWidth="8" opacity=".3"/><circle cx="580" cy={y(forecast.predictedPrice)} r="4" fill="currentColor"/></svg><figcaption>Solid: observed history · Dashed: model estimate · Vertical band: historical error range</figcaption></figure>;
 }

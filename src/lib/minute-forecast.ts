@@ -26,7 +26,7 @@ function predict(model:Model,end:number,x:number[],ridge:ReturnType<typeof expan
 /** Fixed candidates selected on earlier tuning data, then scored on a disjoint later holdout.
  * Horizons are 1, 5, 15 or 60 minutes, with overlapping labels purged from training. Missing minutes are never fabricated.
  */
-export function forecastMinuteStock(input:PricePoint[],now=Date.now()/1000,horizon:MinuteHorizon=1):MinuteForecast{
+export function forecastMinuteStock(input:PricePoint[],now=Date.now()/1000,horizon:MinuteHorizon=1,featureCache?:Map<number,number[]>):MinuteForecast{
  if(![1,5,15,60].includes(horizon))throw new Error('Unsupported forecast horizon');
  const clean=input.filter(p=>Number.isInteger(p.timestamp)&&p.timestamp%60===0&&p.timestamp<=now&&p.timestamp>now-WEEK_SECONDS&&Number.isFinite(p.price)&&p.price>0).sort((a,b)=>a.timestamp-b.timestamp);
  const unique=[...new Map(clean.map(p=>[p.timestamp,p])).values()].slice(-WEEK_MINUTES);
@@ -39,9 +39,13 @@ export function forecastMinuteStock(input:PricePoint[],now=Date.now()/1000,horiz
  if(!last||now-last.timestamp>120)return empty('Minute prices are stale. Waiting for the collector to catch up.');
  if(gapPrefix.at(-1)!==gapPrefix[points.length-61])return empty('Need 61 consecutive latest minutes for current indicators. Older valid weekly history is retained.');
  const prices=points.map(p=>p.price),samples:Sample[]=[];
+ const featureAt=(i:number)=>{
+  const stamp=points[i].timestamp,cached=featureCache?.get(stamp);if(cached)return cached;
+  const value=features(prices,i);featureCache?.set(stamp,value);return value;
+ };
  for(let i=60;i<prices.length-horizon;i++){
   if(gapPrefix[i+horizon]!==gapPrefix[i-60])continue;
-  samples.push({x:features(prices,i),y:prices[i+horizon]/prices[i]-1,origin:points[i].timestamp,target:points[i+horizon].timestamp});
+  samples.push({x:featureAt(i),y:prices[i+horizon]/prices[i]-1,origin:points[i].timestamp,target:points[i+horizon].timestamp});
  }
  if(samples.length<120+horizon)return empty('Not enough complete training windows in the last seven days. Missing minutes are never invented.');
  const knownEnd=(origin:number)=>{let lo=0,hi=samples.length;while(lo<hi){const mid=(lo+hi)>>>1;if(samples[mid].target<=origin)lo=mid+1;else hi=mid;}return lo;};
@@ -64,7 +68,7 @@ export function forecastMinuteStock(input:PricePoint[],now=Date.now()/1000,horiz
   validation.push({timestamp:samples[i].target,predictedReturn:forecast,actualReturn:actual});
   if(Math.abs(actual)>1e-10&&Math.sign(forecast)===Math.sign(actual))correct++;
  }
- const predictedReturn=predict(model,samples.length,features(prices,prices.length-1),ridge);
+ const predictedReturn=predict(model,samples.length,featureAt(prices.length-1),ridge);
  if(!Number.isFinite(predictedReturn)||Math.abs(predictedReturn)>=.2)return empty('Minute forecast is unstable. No trade signal.');
  const margin=Math.max(quantile(errors,.9),1e-8),mae=average(errors),baselineMae=average(base),directionAccuracy=correct/holdoutCount;
  const improvement=baselineMae>0?1-mae/baselineMae:0;
