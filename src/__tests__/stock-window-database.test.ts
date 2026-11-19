@@ -1,11 +1,13 @@
 import {PGlite} from '@electric-sql/pglite';
-import {readFileSync} from 'node:fs';
+import {readFileSync,readdirSync} from 'node:fs';
 import {beforeAll,afterAll,it,expect} from 'vitest';
 const db=new PGlite();
 const anchor='2026-11-19T18:00:00Z';
 beforeAll(async()=>{
  await db.exec(`create role anon;create role authenticated;create role service_role;create table public.stock_collection_status(id int,provider_at timestamptz);create table public.stock_minute_prices(stock_id int,price numeric,observed_at timestamptz);grant select on public.stock_collection_status,public.stock_minute_prices to authenticated,service_role;insert into public.stock_collection_status values(1,'${anchor}');`);
  await db.exec(readFileSync('supabase/migrations/20261119184434_stock_window_extremes.sql','utf8'));
+ const ranges=readdirSync('supabase/migrations').find(n=>n.endsWith('_stock_add_chart_hour_ranges.sql'))!;
+ await db.exec(readFileSync('supabase/migrations/'+ranges,'utf8'));
  await db.exec(`insert into public.stock_minute_prices values(1,1,'2026-11-18T18:00:00Z'),(1,100,'2026-11-18T19:00:00Z'),(1,120,'2026-11-19T10:00:00Z'),(1,100,'2026-11-19T11:00:00Z'),(1,110,'${anchor}'),(1,9999,'2026-11-19T18:01:00Z'),(2,50,'${anchor}');`);
 });
 afterAll(()=>db.close());
@@ -20,4 +22,10 @@ it('supports matching an earlier displayed quote and a shorter comparison window
  await expect(db.query(`select public.read_stock_window_extremes(999999)`)).rejects.toThrow('Unsupported comparison window');
  const {rows:perms}=await db.query<any>(`select has_function_privilege('anon','public.read_stock_window_extremes(integer,timestamptz)','EXECUTE') anonymous,has_function_privilege('authenticated','public.read_stock_window_extremes(integer,timestamptz)','EXECUTE') member`);
  expect(perms[0]).toEqual({anonymous:false,member:true});
+});
+
+it.each([120,180,360,1080])('supports the %i-minute chart range and returns the matching opening price',async minutes=>{
+ const {rows}=await db.query<any>('select public.read_stock_window_extremes($1) data',[minutes]);
+ expect(rows[0].data.window_minutes).toBe(minutes);expect(rows[0].data.stocks).toHaveLength(2);
+ expect(rows[0].data.stocks[0].open).toBe(minutes===1080?120:110);
 });

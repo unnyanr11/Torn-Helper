@@ -83,3 +83,11 @@ it('plots rising and falling dotted segments plus inspectable upside/downside al
  act(()=>root!.root.findByType('input').props.onChange({target:{checked:false}}));
  expect(root!.root.findAllByProps({className:'market-projection market-projection-down'})).toHaveLength(0);
 });
+
+it.each([[120,'2 hr'],[180,'3 hr'],[360,'6 hr'],[1080,'18 hr']] as const)('plots the selected %s-minute comparison window', (minutes,label)=>{
+ const day=Array.from({length:1440},(_,i)=>({timestamp:1794000000+i*60,price:100+i*.01}));
+ act(()=>{root=create(<StockPriceChart name="Test stock" forecast={forecast} history={day} comparisonMinutes={minutes} now={day.at(-1)!.timestamp+10}/>);});
+ expect(root!.root.findAllByType('button').find(b=>b.children.includes(label))!.props['aria-pressed']).toBe(true);
+ const line=root!.root.findByProps({className:'market-observed'}).props.d;
+ expect((line.match(/ L/g)??[]).length).toBe(minutes-1);
+});
