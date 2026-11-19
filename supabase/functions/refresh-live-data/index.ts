@@ -1,3 +1,4 @@
+import {sharedStockData} from '../_shared/shared-stock-data.ts';
 import { readJsonObject } from "../_shared/request-body.ts";
 import { budgetedTornFetch } from '../_shared/torn-budget.ts';
 import { adminClient, authenticate, preflight, json } from "../_shared/http.ts";
@@ -27,6 +28,10 @@ Deno.serve(async (req) => {
     const { feed_type, apiKey } = body ?? {};
     if (!Object.hasOwn(endpoints, feed_type))
       return json({ error: "Unsupported feed" }, 400);
+    if(feed_type==='stocks'){
+      const snapshot=await sharedStockData(admin,'/torn/stocks');
+      return json({ok:true,payload:snapshot.payload,fetched_at:snapshot.fetched_at,cached:snapshot.cached,source:'shared stock collector',stale:snapshot.stale});
+    }
     const { data: profile, error: profileError } = await admin
       .from("profiles")
       .select("tracking_paused")

@@ -1,3 +1,4 @@
+import {isPublicStockEndpoint,sharedStockData} from '../_shared/shared-stock-data.ts';
 import {isTimerEndpoint} from '../_shared/timer-events.ts';
 import { budgetedTornFetch } from '../_shared/torn-budget.ts';
 import { adminClient, authenticate, json, preflight } from "../_shared/http.ts";
@@ -24,6 +25,22 @@ Deno.serve(async (req) => {
       body?.endpoint_id,
       body?.parameters ?? {},
     );
+    const selections=(compiled.parameters.selections??'').split(',');
+    const genericStockSelection=compiled.endpoint.path==='/torn'&&selections.includes('stocks');
+    let sharedSelection:Awaited<ReturnType<typeof sharedStockData>>|undefined;
+    let upstreamPath=compiled.path;
+    if(genericStockSelection){
+      sharedSelection=await sharedStockData(admin,compileTornRequest(compiled.endpoint.id,{...compiled.parameters,selections:'stocks'}).path);
+      const remaining=selections.filter(selection=>selection!=='stocks');
+      if(remaining.length)upstreamPath=compileTornRequest(compiled.endpoint.id,{...compiled.parameters,selections:remaining.join(',')}).path;
+    }
+    if(isPublicStockEndpoint(compiled.endpoint.path)||(genericStockSelection&&selections.length===1)){
+      const snapshot=sharedSelection??await sharedStockData(admin,compiled.path);
+      return json({payload:snapshot.payload,fetched_at:snapshot.fetched_at,cached:snapshot.cached,
+        source:'shared stock collector',endpoint_id:compiled.endpoint.id,parameters:compiled.parameters,
+        next_parameters:nextPageParameters(snapshot.payload,compiled),
+        ...(snapshot.stale?{history_warning:'Stock refresh is delayed. Showing the previous shared observation.'}:{})});
+    }
     const profile = await admin
       .from("profiles")
       .select("tracking_paused")
@@ -59,9 +76,10 @@ Deno.serve(async (req) => {
     if (cached.error) throw cached.error;
     const fresh =
       body.refresh !== true && cached.data && Date.now() - Date.parse(cached.data.fetched_at) < 60000;
-    const payload = fresh
+    const upstreamPayload = fresh
       ? cached.data!.payload
-      : await fetchTornPage(compiled.path, key,budgetedTornFetch(admin,user.id));
+      : await fetchTornPage(upstreamPath, key,budgetedTornFetch(admin,user.id));
+    const payload=sharedSelection?{...(upstreamPayload as Record<string,unknown>),...(sharedSelection.payload as Record<string,unknown>)}:upstreamPayload;
     let fetched_at = fresh ? cached.data!.fetched_at : "";
     if (!fresh) {
       const saved = await admin.rpc("store_torn_data", {
