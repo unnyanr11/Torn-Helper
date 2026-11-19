@@ -19,3 +19,9 @@
 :root[data-motion="reduced"] .live-stock-price .stock-price-flash { animation:none; }
 
 .stock-price-accessible { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.stock-advice { margin-block:16px; padding:18px; border:1px solid var(--border); border-radius:12px; }
+.stock-advice > strong { font-size:1.5rem; }
+.advice-buy > strong { color:var(--ok); }
+.advice-sell > strong { color:var(--warn); }
+.stock-advice p { max-width:75ch; margin-bottom:0; }
+.stock-action { font-size:.8rem; font-weight:600; }

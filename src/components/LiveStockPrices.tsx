@@ -1,3 +1,4 @@
+import {stockDecision,type StockForecast} from '../lib/stock-forecast';
 import {useEffect,useRef} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {supabase} from '../lib/supabase';
@@ -5,7 +6,7 @@ import {stockLabel} from '../lib/stock-catalogue';
 import AnimatedStockPrice from './AnimatedStockPrice';
 type Quote={stock_id:number;price:number;source:string;observed_at:string};
 
-export default function LiveStockPrices({at,connected,onSelect}:{at:string|null|undefined;connected:boolean;onSelect:(id:string)=>void}){
+export default function LiveStockPrices({at,connected,onSelect,analyses={},now=Date.now()/1000}:{at:string|null|undefined;connected:boolean;onSelect:(id:string)=>void;analyses?:Record<string,StockForecast>;now?:number}){
  const latest=useRef(at);
  latest.current=at;
  const prices=useQuery({
@@ -24,7 +25,7 @@ export default function LiveStockPrices({at,connected,onSelect}:{at:string|null|
   {prices.isPending&&<p>Waiting for prices…</p>}
   {prices.data&&<><p className="muted">Observed {new Date(prices.data[0].observed_at).toLocaleString()} · {prices.data[0].source}. Changes compare consecutive received quotes.</p>
    <div className="live-stock-grid">{prices.data.map(quote=><button type="button" className="live-stock-quote" key={quote.stock_id} onClick={()=>onSelect(String(quote.stock_id))}>
-    <span>{stockLabel(quote.stock_id)}</span><AnimatedStockPrice value={quote.price} observedAt={quote.observed_at}/>
+    <span>{stockLabel(quote.stock_id)}</span><span className="stock-action">{analyses[quote.stock_id]?.last?.timestamp===Date.parse(quote.observed_at)/1000?({'Buy candidate':'Buy','Sell / rebuy watch':'Sell',Wait:'Wait'}[stockDecision(analyses[quote.stock_id],now,120).signal]):'Wait · analysis pending'}</span><AnimatedStockPrice value={quote.price} observedAt={quote.observed_at}/>
    </button>)}</div>
   </>}
  </section>;

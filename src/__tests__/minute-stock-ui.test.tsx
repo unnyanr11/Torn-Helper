@@ -9,7 +9,7 @@ vi.mock('../lib/export',()=>({downloadBlob:mocks.download}));
 vi.mock('../components/StockForecast',()=>({ForecastDetails:()=>null}));
 let root:ReactTestRenderer|undefined,client:QueryClient;
 beforeEach(()=>{
- mocks.rpc.mockReset().mockResolvedValue({data:[{timestamp:1794833400,price:100.25}],error:null});
+ mocks.rpc.mockReset().mockResolvedValue({data:{provider_at:'2026-11-16T12:50:00Z',backfilled_stocks:1,stocks:{'2':[[1794833400,100.25]]}},error:null});
  mocks.single.mockReset().mockResolvedValue({data:{provider_at:'2026-11-16T12:50:00Z',last_attempt:null,last_success:null,rows_written:35,backfilled_stocks:1,message:'Minute collection active'},error:null});mocks.download.mockReset();mocks.workers=[];
  vi.stubGlobal('Worker',class{onmessage:any;onerror:any;postMessage=vi.fn();terminate=vi.fn();constructor(){mocks.workers.push(this);}});
  client=new QueryClient({defaultOptions:{queries:{retry:false}}});
@@ -23,8 +23,10 @@ describe('shared minute lab',()=>{
  it('trains in a worker and terminates it when leaving the screen',async()=>{
   await act(async()=>{root=create(<QueryClientProvider client={client}><MinuteStockLab/></QueryClientProvider>);await new Promise(r=>setTimeout(r,40));});
   await act(async()=>{await new Promise(r=>setTimeout(r,40));});
-  expect(mocks.rpc).toHaveBeenCalledWith('read_stock_minute_history',{p_stock_id:2});
-  expect(mocks.workers).toHaveLength(1);expect(mocks.workers[0].postMessage).toHaveBeenCalledWith(expect.objectContaining({horizon:1,points:[{timestamp:1794833400,price:100.25}]}));
+  expect(mocks.rpc).toHaveBeenCalledWith('read_all_stock_minute_history',{p_after:null});
+  expect(mocks.workers).toHaveLength(1);expect(mocks.workers[0].postMessage).toHaveBeenCalledWith(expect.objectContaining({horizon:1,stocks:expect.objectContaining({'2':[{timestamp:1794833400,price:100.25}]})}));
+  await act(async()=>{root!.root.findByProps({label:'Minute stock'}).props.onChange({target:{value:'3'}});});
+  expect(mocks.rpc).toHaveBeenCalledTimes(1);expect(mocks.workers).toHaveLength(1);
   act(()=>root!.unmount());root=undefined;expect(mocks.workers[0].terminate).toHaveBeenCalled();
  });
 });

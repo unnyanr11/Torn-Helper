@@ -1,5 +1,4 @@
 import MinuteStockLab from '../components/MinuteStockLab';
-import StockForecast from "../components/StockForecast";
 import DataEntry from "../components/DataEntry";
 import SelectEntry from "../components/SelectEntry";
 import { useEffect, useState } from "react";
@@ -71,12 +70,9 @@ export default function Stocks() {
     <section>
       <h2>Stocks</h2>
       <p className="muted">
-        Manual holdings tracker. Use the official Torn data link above to fetch
-        your stocks; the data browser also provides stock reference and benefit
-        data.
+        Live stock prices and model guidance update automatically. Track your own holdings below.
       </p>
       <MinuteStockLab/>
-      <StockForecast/>
       {error && <p className="badge warn">{error}</p>}
       <article className="card nu-inset">
         <h3>Add / update holding</h3>
